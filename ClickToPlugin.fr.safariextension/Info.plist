@@ -7,7 +7,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>ClickToPlugin</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.hoyois.safari.clicktoplugin</string>
+	<string>com.hoyois.safari.clicktoplugin.fr</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
@@ -36,7 +36,7 @@
 		</array>
 	</dict>
 	<key>Description</key>
-	<string>Prevents plugins from loading automatically</string>
+	<string>Empêche l'exécution automatique des plugins</string>
 	<key>ExtensionInfoDictionaryVersion</key>
 	<string>1.0</string>
 	<key>Permissions</key>
