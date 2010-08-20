@@ -1,4 +1,4 @@
-function mediaPlayer(playerType, usePlaylistControls) {
+function mediaPlayer(playerType) {
 	
 	// PROPERTIES
 	this.playerType = playerType;
@@ -15,12 +15,11 @@ function mediaPlayer(playerType, usePlaylistControls) {
 	this.width = null;
 	this.height = null;
 	
-	this.usePlaylistControls = usePlaylistControls;
+	this.usePlaylistControls = false;
 	this.playlistControls = null;
 	
 	// METHODS
 	//this.isReadyToBeLoaded = function() { // use startTrack to check
-	//	return !!this.mediaElement;
 	//};
 	
 }
@@ -59,10 +58,15 @@ mediaPlayer.prototype.initialize = function(buffer, width, height, volume, conte
 	this.mediaElement.addEventListener("contextmenu", function(event) {_this.setContextInfo(event, contextInfo);}, false);
 	this.mediaElement.addEventListener("loadedmetadata", function() {_this.fixAspectRatio();}, false);
 	this.mediaElement.addEventListener("ended", function() {_this.nextTrack();}, false);
-	//return this.mediaElement;
-
-	if(this.usePlaylistControls && this.playlistLength > 1) {
+	this.mediaElement.ondblclick = function() {
+		_this.switchLoop();
+	};
+	
+	//this.usePlaylistControls = this.usePlaylistControls && this.playlistLength > 1;
+	if(this.usePlaylistControls) {
 		this.initializePlaylistControls();
+	} else {
+		this.initializeDownloadControls();
 	}
 };
 
@@ -103,19 +107,24 @@ mediaPlayer.prototype.initializePlaylistControls = function() {
 	var _this = this;
 	this.mediaElement.onmouseover = function(event) {
 		this.focus = true;
-		if(!this.paused && this.readyState > 2) _this.fadeIn(.05);
+		if(!this.paused && this.readyState > 1) _this.fadeIn(.05);
 	};
 	this.playlistControls.onmouseover = function(event) {
 		_this.mediaElement.focus = true;
-		if(!_this.mediaElement.paused && _this.mediaElement.readyState > 2) _this.fadeIn(0);
+		if(!_this.mediaElement.paused && _this.mediaElement.readyState > 1) _this.fadeIn(0);
 	};
 	this.mediaElement.onmouseout = function(event) {
-		this.focus = false;
-		if(!this.paused && this.readyState > 2) _this.fadeOut(0);
+		// prevents the default controls from disappearing
+		if(event.relatedTarget && (event.relatedTarget == prevButton || event.relatedTarget == nextButton || event.relatedTarget == trackInput.firstChild || event.relatedTarget == trackTitleTextP.lastChild || event.relatedTarget.hasAttribute("precision"))) {
+			event.preventDefault();
+		} else {
+			this.focus = false;
+			if(!this.paused && this.readyState > 1) _this.fadeOut(0);
+		}
 	};
 	this.playlistControls.onmouseout = function(event) {
 		_this.mediaElement.focus = false;
-		if(!_this.mediaElement.paused && _this.mediaElement.readyState > 2) _this.fadeOut(.1);
+		if(!_this.mediaElement.paused && _this.mediaElement.readyState > 1) _this.fadeOut(.1);
 	};
 	this.mediaElement.focus = false;
 	this.mediaElement.addEventListener("pause", function(){_this.fadeIn(0);}, false);
@@ -129,7 +138,7 @@ mediaPlayer.prototype.initializePlaylistControls = function() {
 		if(track < 1 || track > _this.playlistLength) return;
 		track = (track - _this.startTrack - 1 + _this.playlistLength) % _this.playlistLength;
 		if(track == _this.currentTrack) return;
-		if(track <= _this.playlist.length) {
+		if(track < _this.playlist.length) {
 			_this.loadTrack(track, true);
 		}
 	};
@@ -143,10 +152,59 @@ mediaPlayer.prototype.initializePlaylistControls = function() {
 	};
 	
 	// If the controls are shown at once a webkit bug will mess up font smoothing
-	// The only way I was able to prevent this is to fade controls in on loadedmetadata
+	// when the video starts playing.
+	// The only way I was able to prevent this is to show controls on loadedmetadata
 	this.playlistControls.style.opacity = "0";
 	this.containerElement.appendChild(this.playlistControls);
 
+};
+
+mediaPlayer.prototype.initializeDownloadControls = function() {
+	this.playlistControls =  document.createElement("div");
+	this.playlistControls.className = "CTFplaylistControls";
+	
+	var hoverElement = document.createElement("div");
+	hoverElement.className = "CTFhoverElement";
+	this.playlistControls.innerHTML = "<div class=\"CTFtrackTitle\"><div class=\"CTFtrackTitleText\"><p></p></div></div>";
+	
+	this.playlistControls.appendChild(hoverElement);
+	
+	var _this = this;
+	
+	this.playlistControls.firstChild.onmouseout = function(event) {
+		this.nextSibling.style.display = "block";
+		_this.fadeOut(0)
+	};
+	
+	this.playlistControls.firstChild.onmouseover = function(event) {
+		if(event.relatedTarget && event.relatedTarget.className == "CTFhoverElement") {
+			this.nextSibling.style.display = "none";
+			_this.fadeIn(0)
+		}
+	};
+	hoverElement.onmouseover = function(event) {
+		this.previousSibling.style.display ="block";
+	}
+	
+	hoverElement.onmouseout = function(event) {
+		if(!event.relatedTarget || event.relatedTarget.className != "CTFtitleText") {
+			this.previousSibling.style.display ="none";
+		}
+	};
+	
+	this.mediaElement.onmouseout = function(event) {
+		if(event.relatedTarget && (event.relatedTarget == hoverElement || event.relatedTarget.className == "CTFtitleText")) {
+			event.preventDefault();
+		}
+	}
+	
+	this.playlistControls.addEventListener("webkitTransitionEnd", function() {if(this.style.opacity == "0") this.firstChild.style.display = "none";}, false);
+	
+	this.playlistControls.style.opacity = "0";
+	this.playlistControls.firstChild.style.display = "none";
+	//this.playlistControls.firstChild.style.pointerEvents = "auto";
+	
+	this.containerElement.appendChild(this.playlistControls);
 };
 
 mediaPlayer.prototype.fadeOut = function(delay) {
@@ -174,7 +232,7 @@ mediaPlayer.prototype.fixAspectRatio = function() {
 		// Apparently webkit uses floor, not round
 		if(this.playlistControls) this.playlistControls.style.width = Math.floor(w/h*this.height) + "px";
     }
-	if(this.playlistControls) {
+	if(this.usePlaylistControls) {
 		this.fadeIn(.05);
 	}
 	
@@ -186,15 +244,21 @@ mediaPlayer.prototype.resetAspectRatio = function() {
 	if(this.playlistControls) this.playlistControls.style.width = this.width + "px";
 };
 
+mediaPlayer.prototype.switchLoop = function() {
+	if(this.mediaElement.hasAttribute("loop")) this.mediaElement.removeAttribute("loop");
+	else this.mediaElement.setAttribute("loop", "true");
+}
+
 mediaPlayer.prototype.nextTrack = function() {
-	if(this.currentTrack + this.startTrack + 1 == this.playlistLength) return;
-	this.loadTrack(this.currentTrack + 1, true);
+	if(!this.mediaElement.hasAttribute("loop")) {
+		if(this.currentTrack + this.startTrack + 1 == this.playlistLength) return;
+		this.loadTrack(this.currentTrack + 1, true);
+	}
 };
 
 mediaPlayer.prototype.loadTrack = function(track, autoplay) {
 	track = track % this.playlist.length;
     if(track < 0) track += this.playlist.length; // weird JS behavior
-	//alert(this.startTrack + "[" + ((track + this.startTrack) % this.playlist.length + 1) + "/" + this.playlist.length + "/" + this.playlistLength + "] " + this.playlist[track].mediaURL);
     
 	this.resetAspectRatio();
     this.mediaElement.src = this.playlist[track].mediaURL;
@@ -221,9 +285,10 @@ mediaPlayer.prototype.loadTrack = function(track, autoplay) {
         this.mediaElement.setAttribute("autoplay", "autoplay");
     }
 
-	if(this.playlistControls) {
+	if(this.usePlaylistControls) {
 		var title = this.playlist[track].title;
 		if(!title) title = "(no title)";
+		title = "<a class=\"CTFtitleText\" href=\"" + this.mediaElement.src + "\">" + title + "</a>";
 		this.playlistControls.getElementsByTagName("p")[0].innerHTML = ((track + this.startTrack) % this.playlistLength + 1) + ". " + title;
 		var inputField = this.playlistControls.getElementsByTagName("input")[0];
 		var newInputField = document.createElement("input");
@@ -233,6 +298,10 @@ mediaPlayer.prototype.loadTrack = function(track, autoplay) {
 		// simply changing the value does not update if user has used the field
 		this.playlistControls.getElementsByTagName("form")[0].replaceChild(newInputField, inputField);
 		//this.playlistControls.getElementsByTagName("input")[0].setAttribute("value", track + this.startTrack + 1);
+	} else {
+		var title = "Download " + (this.playlist[track].mediaType == "audio" ? "Audio" : "Video");
+		title = "<a class=\"CTFtitleText\" href=\"" + this.mediaElement.src + "\">" + title + "</a>";
+		this.playlistControls.getElementsByTagName("p")[0].innerHTML = title;
 	}
 };
 
@@ -241,6 +310,7 @@ mediaPlayer.prototype.setContextInfo = function(event, contextInfo) {
 	if(track == null) track = 0;
 	contextInfo.mediaType = this.playlist[track].mediaType;
 	contextInfo.siteInfo = this.playlist[track].siteInfo;
+	//if(this.mediaElement) contextInfo.loop = this.mediaElement.hasAttribute("loop");
 	// contextInfo.isPlaylist = (this.playlist.length > 1); // not used
 	safari.self.tab.setContextMenuEventUserInfo(event, contextInfo);
 	event.stopPropagation();
@@ -249,7 +319,7 @@ mediaPlayer.prototype.setContextInfo = function(event, contextInfo) {
 mediaPlayer.prototype.addToPlaylist = function(playlist, init) {
 	if(init) this.playlist = playlist.concat(this.playlist);
 	else this.playlist = this.playlist.concat(playlist);
-	if(this.playlistControls) {
+	if(this.usePlaylistControls && this.playlistControls) {
 		this.playlistControls.getElementsByTagName("span")[0].innerHTML = "/" + normalize(this.playlist.length + this.startTrack, this.playlistLength); 
 		var width = this.playlistControls.offsetWidth - this.playlistControls.getElementsByClassName("CTFtrackSelect")[0].offsetWidth;
 		this.playlistControls.getElementsByTagName("p")[0].style.width = (width - 7) + "px";

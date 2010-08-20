@@ -76,16 +76,16 @@ ClickToFlash.prototype.respondToMessage = function(event) {
             this.loadInPlugin(loadData[1]);
         } else if (loadData[2] == "remove") {
             this.removeElement(loadData[1]);
-        } else if (loadData[2] == "download") {
-            var track = this.mediaPlayers[loadData[1]].currentTrack;
-			if(track == null) track = 0; // download from placeholder
-            safari.self.tab.dispatchMessage("downloadMedia", this.mediaPlayers[loadData[1]].playlist[track].mediaURL);
+		} else if (loadData[2] == "qtp") {
+	    	this.launchInQuickTimePlayer(loadData[1]);
         } else if (loadData[2] == "show") {
             alert(document.HTMLToString(this.blockedElements[loadData[1]]));
         }
     } else if (event.name == "updateVolume") {
         this.setVolumeTo(event.message);
-    } else if(event.name == "loadAll") {
+    } else if (event.name == "updateOpacity") {
+		this.setOpacityTo(event.message);
+	} else if(event.name == "loadAll") {
         this.loadAll();
     }
 };
@@ -214,9 +214,9 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
 };
 
 ClickToFlash.prototype.prepMedia = function(mediaData) {
-    if(!mediaData.playlist[0].mediaURL) return;
+    if(mediaData.playlist.length == 0 || !mediaData.playlist[0].mediaURL) return;
 	if(!this.mediaPlayers[mediaData.elementID]) {
-		this.mediaPlayers[mediaData.elementID] = new mediaPlayer(mediaData.isAudio ? "audio" : "video", this.settings["usePlaylists"] && !mediaData.noPlaylistControls);
+		this.mediaPlayers[mediaData.elementID] = new mediaPlayer(mediaData.isAudio ? "audio" : "video");
 	}
 	if(mediaData.loadAfter) { // just adding stuff to the playlist
 		// BEGIN DEBUG
@@ -224,6 +224,7 @@ ClickToFlash.prototype.prepMedia = function(mediaData) {
 	        if(!confirm("Preparing to add " + mediaData.playlist.length + " tracks to the playlist for element " + this.instance +"."+ mediaData.elementID)) return;
 	    }
 	    // END DEBUG
+		this.mediaPlayers[mediaData.elementID].playlistLength -= mediaData.missed;
 		this.mediaPlayers[mediaData.elementID].addToPlaylist(mediaData.playlist);
 		return;
 	}
@@ -239,10 +240,13 @@ ClickToFlash.prototype.prepMedia = function(mediaData) {
     // END DEBUG
 
 	// do it backward just in case a loadAfter came first
-	// frankly, this can't happen since the loadAfter uses AJAX
+	// can happen for embedded playlists
+	
 	this.mediaPlayers[mediaData.elementID].addToPlaylist(mediaData.playlist, true);
 	this.mediaPlayers[mediaData.elementID].playlistLength = mediaData.playlistLength ? mediaData.playlistLength : mediaData.playlist.length;
 	this.mediaPlayers[mediaData.elementID].startTrack = mediaData.startTrack ? mediaData.startTrack : 0;
+	
+	this.mediaPlayers[mediaData.elementID].usePlaylistControls = this.settings["usePlaylists"] && !mediaData.noPlaylistControls && this.mediaPlayers[mediaData.elementID].playlistLength > 1;
 
     // Check if we should load video at once
     if(this.settings["H264autoload"]) {
@@ -251,7 +255,7 @@ ClickToFlash.prototype.prepMedia = function(mediaData) {
     }
     var badgeLabel = mediaData.badgeLabel;
     if(!badgeLabel) badgeLabel = "Video";
-				
+	
     this.displayBadge(badgeLabel, mediaData.elementID);
 };
 
@@ -280,7 +284,6 @@ ClickToFlash.prototype.loadInPlugin = function(elementID) {
 	var element = this.blockedElements[elementID];
 	element.allowedToLoad = true;
 	containerElement.parentNode.replaceChild(element, containerElement);
-	this.numberOfUnblockedElements++;
     this.clearAll(elementID);
 };
 
@@ -290,7 +293,8 @@ ClickToFlash.prototype.loadMediaForElement = function(elementID) {
     var contextInfo = {
         "CTFInstance": this.instance,
         "elementID": elementID,
-        "isH264": true,
+        "isH264": true
+		//"blocked": this.numberOfBlockedElements - this.numberOfUnblockedElements
     };
 
 	// Initialize player
@@ -309,9 +313,44 @@ ClickToFlash.prototype.loadMediaForElement = function(elementID) {
     
 };
 
+ClickToFlash.prototype.launchInQuickTimePlayer = function(elementID) {
+	var track = this.mediaPlayers[elementID].currentTrack;
+	var element = null;
+	if(track == null) {
+		track = 0;
+		element = this.placeholderElements[elementID];
+	} else {
+		element = this.mediaPlayers[elementID].containerElement;
+	}
+    var mediaURL = this.mediaPlayers[elementID].playlist[track].mediaURL;
+	var QTObject = document.createElement("embed");
+	QTObject.allowedToLoad = true;
+	QTObject.className = "CTFQTObject";
+	QTObject.setAttribute("type", "video/quicktime");
+	QTObject.setAttribute("width", "0");
+	QTObject.setAttribute("height", "0");
+	// need an external URL for source, since QT plugin doesn't accept safari-extension:// protocol
+	// Apple has a small 1px image for this exact purpose
+	QTObject.setAttribute("src", "http://images.apple.com/apple-events/includes/qtbutton.mov");
+	QTObject.setAttribute("href", mediaURL);
+	QTObject.setAttribute("target", "quicktimeplayer");
+	QTObject.setAttribute("autohref", "true");
+	QTObject.setAttribute("controller", "false");
+	//QTObject.setAttribute("postdomevents", "true");
+	element.appendChild(QTObject);
+	// There doesn't seem to exist an appropriate event, so we just wait a bit...
+	setTimeout(function() {element.removeChild(QTObject);}, 100);
+};
+
 ClickToFlash.prototype.setVolumeTo = function(volume) {
     for(var i = 0; i < this.numberOfBlockedElements; i++) {
         if(this.mediaPlayers[i] && this.mediaPlayers[i].mediaElement) this.mediaPlayers[i].mediaElement.volume = volume;
+    }
+};
+
+ClickToFlash.prototype.setOpacityTo = function(opacity) {
+    for(var i = 0; i < this.numberOfBlockedElements; i++) {
+        if(this.placeholderElements[i]) this.placeholderElements[i].style.opacity = opacity;
     }
 };
 
@@ -396,6 +435,7 @@ ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
 	var placeholderElement = document.createElement("div");
 	placeholderElement.style.width = element.offsetWidth + "px";
 	placeholderElement.style.height = element.offsetHeight + "px";
+	placeholderElement.style.opacity = this.settings["opacity"];
     
 	placeholderElement.className = "clickToFlashPlaceholder";
     

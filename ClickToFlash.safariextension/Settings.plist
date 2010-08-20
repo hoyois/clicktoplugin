@@ -187,16 +187,6 @@
 		<string>TextField</string>
 	</dict>
 	<dict>
-		<key>DefaultValue</key>
-		<false/>
-		<key>Key</key>
-		<string>useWLcontext</string>
-		<key>Title</key>
-		<string>Enable Whitelist contextual menu item          </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
 		<key>Title</key>
 		<string>Invisible Flash</string>
 		<key>Type</key>
@@ -237,6 +227,52 @@
 		</array>
 	</dict>
 	<dict>
+		<key>Title</key>
+		<string>Contextual Menu Items</string>
+		<key>Type</key>
+		<string>Group</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useWLcontext</string>
+		<key>Title</key>
+		<string>Add to Whitelist                                             </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useLAcontext</string>
+		<key>Title</key>
+		<string>Load All Plugins                                             </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useVScontext</string>
+		<key>Title</key>
+		<string>View on Site                                                   </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useQTcontext</string>
+		<key>Title</key>
+		<string>View in QuickTime Player                               </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
 		<key>Type</key>
 		<string>Separator</string>
 	</dict>
@@ -264,13 +300,21 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string></string>
+		<real>1</real>
+		<key>Key</key>
+		<string>opacity</string>
+		<key>MaximumValue</key>
+		<real>1</real>
+		<key>StepValue</key>
+		<real>0.01</real>
+		<key>Title</key>
+		<string>Opacity</string>
+		<key>Type</key>
+		<string>Slider</string>
+	</dict>
+	<dict>
 		<key>Key</key>
 		<string>debug</string>
-		<key>Title</key>
-		<string>Enable debugging mode                                </string>
-		<key>Type</key>
-		<string>Hidden</string>
 	</dict>
 </array>
 </plist>
