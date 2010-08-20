@@ -15,6 +15,11 @@ function respondToMessage(event) {
         case "killFlash":
             killFlash(event.message);
             break;
+        case "downloadMedia":
+            //var newTab = safari.application.activeBrowserWindow.openTab("foreground");
+            //newTab.url = event.message;
+            prompt("Copiez l'URL ci-dessous et collez-le dans la fenêtre des Téléchargements.", event.message);
+            break;
     }
 }
 
@@ -31,38 +36,48 @@ function respondToCanLoad(message) {
     }
 }
 
+/* NOTE
+what I learned today: passing associative arrays as command (first or last argument) in the
+appendContextMenu method is not a good idea: they are all considered the same identifier
+and thus every new context menu item will replace the previous one. Plus, the array
+is not received as expected (presumably the array becomes null or something).
+Thus, I use strings with separators instead, and reconstruct an array
+on the other side.
+*/
+
 function printMedia(mediaType) {
     switch(mediaType) {
-        case "video": return "Video";
-        case "audio": return "Audio";
-        default: return "Video";
+        case "video": return "la vidéo";
+        case "audio": return "l'audio";
+        default: return "la vidéo";
     }
 }
 
 function handleContextMenu(event) {
     if(!event.userInfo.CTFInstance) {
-        if(safari.extension.settings["useLAcontext"] && event.userInfo.blocked > 0) event.contextMenu.appendContextMenuItem("loadall", "Débloquer Flash sur cette page (" + event.userInfo.blocked + ")");
+		if(event.userInfo.blocked > 0) event.contextMenu.appendContextMenuItem("loadall", "Débloquer Flash sur cette page (" + event.userInfo.blocked + ")");
         if(safari.extension.settings["useWLcontext"]) {
             event.contextMenu.appendContextMenuItem("locwhitelist", "Ajouter à la liste blanche\u2026");
         }
         return;
     }
+    // NOTE: just uncomment the 2 lines below to activate the 'open video in new tab' functionality
+    // (didn't seem worth taking a place in the context menu)
     if(event.userInfo.isH264) {
+        event.contextMenu.appendContextMenuItem(event.userInfo.CTFInstance + "," + event.userInfo.elementID + ",download", "Télécharger " + printMedia(event.userInfo.mediaType) + "\u2026");
+		if(event.userInfo.siteInfo) event.contextMenu.appendContextMenuItem("gotosite", "Voir la vidéo sur " + event.userInfo.siteInfo.name);
         event.contextMenu.appendContextMenuItem(event.userInfo.CTFInstance + "," + event.userInfo.elementID + ",reloadFlash", "Relancer avec Flash");
-		if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.CTFInstance + "," + event.userInfo.elementID + ",qtp", "Ouvrir dans QuickTime Player");
-		if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", "Voir la vidéo sur " + event.userInfo.siteInfo.name);
     } else {
+        event.contextMenu.appendContextMenuItem(event.userInfo.CTFInstance + "," + event.userInfo.elementID + ",flash", "Lancer Flash");
         if(event.userInfo.hasH264) {
-			event.contextMenu.appendContextMenuItem(event.userInfo.CTFInstance + "," + event.userInfo.elementID + ",flash", "Lancer Flash");
-			event.contextMenu.appendContextMenuItem(event.userInfo.CTFInstance + "," + event.userInfo.elementID + ",remove", "Supprimer Flash");
-			if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.CTFInstance + "," + event.userInfo.elementID + ",qtp", "Ouvrir dans QuickTime Player");
-			if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", "Voir la vidéo sur " + event.userInfo.siteInfo.name);
-        } else {
-			event.contextMenu.appendContextMenuItem(event.userInfo.CTFInstance + "," + event.userInfo.elementID + ",remove", "Supprimer Flash");
-		}
+            event.contextMenu.appendContextMenuItem(event.userInfo.CTFInstance + "," + event.userInfo.elementID + ",video", "Lancer " + printMedia(event.userInfo.mediaType));
+            event.contextMenu.appendContextMenuItem(event.userInfo.CTFInstance + "," + event.userInfo.elementID + ",download", "Télécharger " + printMedia(event.userInfo.mediaType) + "\u2026");
+			if(event.userInfo.siteInfo) event.contextMenu.appendContextMenuItem("gotosite", "Voir la vidéo sur " + event.userInfo.siteInfo.name);
+        }
         if(safari.extension.settings["useWLcontext"]) {
             event.contextMenu.appendContextMenuItem("srcwhitelist", "Ajouter à la liste blanche\u2026");
         }
+        event.contextMenu.appendContextMenuItem(event.userInfo.CTFInstance + "," + event.userInfo.elementID + ",remove", "Supprimer l'élément");
         // BEGIN DEBUG
         if(safari.extension.settings["debug"]) {
             event.contextMenu.appendContextMenuItem(event.userInfo.CTFInstance + "," + event.userInfo.elementID + ",show", "Voir l'élément " + event.userInfo.CTFInstance + "." + event.userInfo.elementID);
@@ -109,9 +124,7 @@ function handleChangeOfSettings(event) {
     if(event.key == "volume") {
         // send to all pages or just the active one??
         safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("updateVolume", event.newValue);
-    } else if(event.key = "opacity") {
-		dispatchMessageToAllPages("updateOpacity", event.newValue);
-	}
+    }
 }
 
 function getSettings() {
@@ -137,7 +150,6 @@ function getSettings() {
     settings.loadInvisible = safari.extension.settings["loadInvisible"];
     if(settings.loadInvisible) settings.maxinvdim = safari.extension.settings["maxinvdim"];
     settings.sifrReplacement = safari.extension.settings["sifrReplacement"];
-	settings.opacity = safari.extension.settings["opacity"];
     settings.debug = safari.extension.settings["debug"];
 	return settings;
 }
