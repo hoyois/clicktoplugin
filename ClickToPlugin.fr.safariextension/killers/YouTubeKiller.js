@@ -10,6 +10,9 @@ YouTubeKiller.prototype.canKill = function(data) {
 YouTubeKiller.prototype.processElement = function(data, callback) {
     if(data.params) {
 		if(safari.extension.settings["usePlaylists"]) {
+			// see http://apiblog.youtube.com/2010/03/upcoming-change-to-youtube-video-page.html
+			// these new YT urls break everything!!!! Video data is loaded dynamically
+			// after the Flash has been loaded... no more flashvars :(
 			var URLvars = data.location.split("?")[1];
 	        var playlistID = null;
 	        if(URLvars) {
@@ -121,12 +124,16 @@ YouTubeKiller.prototype.buildPlaylist = function(videoIDList, playlistID, isFirs
 	if(isFirst) --n;
 	if(jmax > n) jmax = n; // load by groups of n
 	if(isFirst) ++n;
-	var mediaData = {"loadAfter": true, "playlist": []};
+	var mediaData = {"loadAfter": true, "missed": 0, "playlist": []};
 	var _this = this;
 	var next = function(videoData) {
 		// this actually works!!
-		videoData.playlist[0].siteInfo.url += "&p=" + playlistID;
-		mediaData.playlist.push(videoData.playlist[0]);
+		if(videoData.playlist.length > 0) {
+			videoData.playlist[0].siteInfo.url += "&p=" + playlistID;
+			mediaData.playlist.push(videoData.playlist[0]);
+		} else {// playlist is 1 shorter than announced
+			++mediaData.missed;
+		}
 		++j;
 		//alert(mediaData.playlist.length);
 		if(j == jmax) {
@@ -219,14 +226,14 @@ YouTubeKiller.prototype.processElementFromVideoID = function(videoID, callback) 
 		if(safari.extension.settings["usePlaylists"]) {
 			var toMatchTitle = /<meta\sname=\"title\"\scontent=\"[^\"]*\"/;
 			var matchTitle = req.responseText.match(toMatchTitle);
-			if(matchTitle.length > 0) title = matchTitle[0].replace(/<meta\sname=\"title\"\scontent=/, "").replace(/\"/g,"");
+			if(matchTitle) title = matchTitle[0].replace(/<meta\sname=\"title\"\scontent=/, "").replace(/\"/g,"");
 		}
         var matches = req.responseText.match(toMatch);
         var matches2 = req.responseText.match(toMatch2);
         var urlMap = null;
         var videoHash = null;
-        if(matches.length > 0) urlMap = matches[0].replace(/\"fmt_url_map\":\s/,"").replace(/\"/g,"").replace(/\\\//g,"/");//"//
-        if(matches2.length > 0) videoHash = escape(matches2[0].replace(/\"t\":\s/,"").replace(/\"/g,""));//"//
+        if(matches) urlMap = matches[0].replace(/\"fmt_url_map\":\s/,"").replace(/\"/g,"").replace(/\\\//g,"/");//"//
+        if(matches2) videoHash = escape(matches2[0].replace(/\"t\":\s/,"").replace(/\"/g,""));//"//
         //alert(videoHash);
         if(urlMap && videoHash) {
 			var x = _this.getMediaDataFromURLMap(videoID, videoHash, urlMap);
@@ -235,6 +242,8 @@ YouTubeKiller.prototype.processElementFromVideoID = function(videoID, callback) 
 		        "badgeLabel": x.badgeLabel
 		    };
 		    callback(videoData);
+		} else {// happens when YT removes content
+			callback({"playlist": []});
 		}
     };
     // BEGIN DEBUG

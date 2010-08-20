@@ -16,7 +16,8 @@
 	background: -webkit-gradient(linear, left top, left bottom, from(rgba(235, 235, 235, 1)), to(rgba(190, 190, 190, 1))) !important;
 	border: 1px solid rgba(0, 0, 0, 0.5) !important;
 	-webkit-user-select: none !important;
-	display: table !important;
+	display: inline-block !important;
+	-webkit-box-sizing: border-box !important;
 }
 
 .clickToFlashPlaceholder.notable {
@@ -37,7 +38,6 @@
 	height: inherit !important;
 	margin: -1px !important;
     overflow: visible !important;
-    /*display: table !important;*/
 }
 
 div.logoVerticalPosition {
@@ -122,7 +122,7 @@ div.logoVerticalPosition {
 
 .CTFvideoContainer {
 	position: relative !important;
-	display: block !important;
+	display: inline-block !important;
 	margin: 0 !important;
 	padding: 0 !important;
 }
@@ -133,11 +133,17 @@ div.logoVerticalPosition {
 	margin: 0px auto 0px auto !important;
 }
 
+.CTFQTObject {
+	position: absolute !important;
+	width: 0px !important;
+	height: 0px !important;
+}
+
 /* PLAYLIST CONTROLS */
 .CTFplaylistControls {
 	z-index: 1 !important;
 	-webkit-user-select: none !important;
-	display: table !important;
+	display: block !important;
 	position: relative !important;
 	bottom: 48px !important;
 	margin: 0px auto 0px auto !important;
@@ -156,6 +162,17 @@ div.logoVerticalPosition {
 	text-rendering: auto !important;
 }
 
+.CTFtitleText {
+	color: white !important;
+	pointer-events: auto !important;
+	text-decoration: none !important;
+	border: 0 !important;
+}
+
+.CTFtitleText:hover {
+	text-decoration: underline !important;
+}
+
 /*:hover.CTFplaylistControls {
 	opacity: 1 !important;
 }*/
@@ -170,7 +187,7 @@ div.logoVerticalPosition {
 	height: inherit !important;
 	margin: 0 !important;
 	padding: 0 !important;
-	width: 38px !important;
+	width: 35px !important;
 	background-image: url('prev.png') !important;
 	background-repeat: no-repeat !important;
 	background-position: center center !important;
@@ -193,9 +210,9 @@ div.logoVerticalPosition {
 	display: table-cell !important;
 	vertical-align: middle !important;
 	height: inherit !important;
-	margin: 0 !important;
-	padding: 0 2px 0 0 !important;
-	width: 38px !important;
+	margin: 0 0 0 0 !important;
+	padding: 0 0 0 0 !important;
+	width: 35px !important;
 	background-image: url('next.png') !important;
 	background-repeat: no-repeat !important;
 	background-position: center center !important;
@@ -210,12 +227,13 @@ div.logoVerticalPosition {
 	position: absolute !important;
 	top: 0px !important;
 	left: 0px !important;
+	height: 24px !important;
 }
 
 .CTFtrackSelect {
 	position: absolute !important;
 	top: 0px !important;
-	right: 0px !important;
+	right: 6px !important;
 	/*margin: 0 2px 0 0 !important;*/
 }
 
@@ -237,6 +255,7 @@ div.logoVerticalPosition {
 	overflow: hidden !important;
 	text-overflow: ellipsis !important;
 	text-align: left !important;
+	line-height: normal !important;
 }
 
 
@@ -264,5 +283,15 @@ div.logoVerticalPosition {
 	font-size: 10px !important;
 	font-weight: normal !important;
 	line-height: 1 !important;
+}
+
+/*need the specificity*/
+div.CTFplaylistControls div.CTFhoverElement {
+	position: absolute !important;
+	left: 28px !important;
+	top: 18px !important;
+	width: 24px !important;
+	height: 6px !important;
+	pointer-events: auto !important;
 }
 

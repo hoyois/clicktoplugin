@@ -64,20 +64,16 @@ ClickToPlugin.prototype.respondToMessage = function(event) {
             this.loadInPlugin(loadData[1]);
         } else if (loadData[2] == "remove") {
             this.removeElement(loadData[1]);
-        } else if (loadData[2] == "download") {
-            var track = this.mediaPlayers[loadData[1]].currentTrack;
-			if(track == null) track = 0; // download from placeholder
-            safari.self.tab.dispatchMessage("downloadMedia", this.mediaPlayers[loadData[1]].playlist[track].mediaURL);
-        // } else if (loadData[2] == "next") {
-        //             this.mediaPlayers[loadData[1]].loadTrack(this.mediaPlayers[loadData[1]].currentTrack + 1, true);
-        //         } else if (loadData[2] == "prev") {
-        //             this.mediaPlayers[loadData[1]].loadTrack(this.mediaPlayers[loadData[1]].currentTrack - 1, true);
-        } else if (loadData[2] == "show") {
+        } else if (loadData[2] == "qtp") {
+	    	this.launchInQuickTimePlayer(loadData[1]);
+		} else if (loadData[2] == "show") {
             alert(document.HTMLToString(this.blockedElements[loadData[1]]));
         }
     } else if (event.name == "updateVolume") {
         this.setVolumeTo(event.message);
-    } else if(event.name == "loadAll") {
+    } else if (event.name == "updateOpacity") {
+		this.setOpacityTo(event.message);
+	} else if(event.name == "loadAll") {
         this.loadAll();
     }
 };
@@ -172,12 +168,11 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
     if(this.instance == null) {
         this.instance = safari.self.tab.canLoad(event, "getInstance");
     }
-    var elementID = this.numberOfBlockedElements++;
     
     element.otherInfo = new Object();
     element.source = getSrcOf(element);
 	
-    var pluginName = safari.self.tab.canLoad(event, {"CTPinstance": this.instance, "elementID": elementID, "src": element.source, "type": getTypeOf(element), "classid": element.getAttribute("classid"), "params": this.settings["useH264"] ? getParamsOf(element) : "", "location": this.location, "width": element.offsetWidth, "height": element.offsetHeight, "otherInfo": element.otherInfo});
+    var pluginName = safari.self.tab.canLoad(event, {"src": element.source, "type": getTypeOf(element), "classid": element.getAttribute("classid"), "params": this.settings["useH264"] ? getParamsOf(element) : "", "location": this.location, "width": element.offsetWidth, "height": element.offsetHeight, "otherInfo": element.otherInfo});
     if(!pluginName) return; // whitelisted
     //alert(pluginName);
     
@@ -199,6 +194,7 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
     
     // At this point we know we have to block 'element' from loading
     element.plugin = pluginName;
+	var elementID = this.numberOfBlockedElements++;
     
     // BEGIN DEBUG
     if(this.settings["debug"]) {
@@ -212,9 +208,9 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
 };
 
 ClickToPlugin.prototype.prepMedia = function(mediaData) {
-    if(!mediaData.playlist[0].mediaURL) return;
+    if(mediaData.playlist.length == 0 || !mediaData.playlist[0].mediaURL) return;
 	if(!this.mediaPlayers[mediaData.elementID]) {
-		this.mediaPlayers[mediaData.elementID] = new mediaPlayer(mediaData.isAudio ? "audio" : "video", this.settings["usePlaylists"] && !mediaData.noPlaylistControls);
+		this.mediaPlayers[mediaData.elementID] = new mediaPlayer(mediaData.isAudio ? "audio" : "video");
 	}
 	if(mediaData.loadAfter) { // just adding stuff to the playlist
 		// BEGIN DEBUG
@@ -222,6 +218,7 @@ ClickToPlugin.prototype.prepMedia = function(mediaData) {
 	        if(!confirm("Preparing to add " + mediaData.playlist.length + " tracks to the playlist for element " + this.instance +"."+ mediaData.elementID)) return;
 	    }
 	    // END DEBUG
+		this.mediaPlayers[mediaData.elementID].playlistLength -= mediaData.missed;
 		this.mediaPlayers[mediaData.elementID].addToPlaylist(mediaData.playlist);
 		return;
 	}
@@ -237,10 +234,13 @@ ClickToPlugin.prototype.prepMedia = function(mediaData) {
     // END DEBUG
 
 	// do it backward just in case a loadAfter came first
-	// frankly, this can't happen since the loadAfter uses AJAX
+	// can happen for embedded playlists
+	
 	this.mediaPlayers[mediaData.elementID].addToPlaylist(mediaData.playlist, true);
 	this.mediaPlayers[mediaData.elementID].playlistLength = mediaData.playlistLength ? mediaData.playlistLength : mediaData.playlist.length;
 	this.mediaPlayers[mediaData.elementID].startTrack = mediaData.startTrack ? mediaData.startTrack : 0;
+	
+	this.mediaPlayers[mediaData.elementID].usePlaylistControls = this.settings["usePlaylists"] && !mediaData.noPlaylistControls && this.mediaPlayers[mediaData.elementID].playlistLength > 1;
 
     // Check if we should load video at once
     if(this.settings["H264autoload"]) {
@@ -249,7 +249,7 @@ ClickToPlugin.prototype.prepMedia = function(mediaData) {
     }
     var badgeLabel = mediaData.badgeLabel;
     if(!badgeLabel) badgeLabel = "Video";
-				
+	
     this.displayBadge(badgeLabel, mediaData.elementID);
 };
 
@@ -290,6 +290,7 @@ ClickToPlugin.prototype.loadMediaForElement = function(elementID) {
         "elementID": elementID,
         "isH264": true,
         "plugin": this.blockedElements[elementID].plugin
+		//"blocked": this.numberOfBlockedElements - this.numberOfUnblockedElements
     };
 
 	// Initialize player
@@ -308,9 +309,44 @@ ClickToPlugin.prototype.loadMediaForElement = function(elementID) {
     
 };
 
+ClickToPlugin.prototype.launchInQuickTimePlayer = function(elementID) {
+	var track = this.mediaPlayers[elementID].currentTrack;
+	var element = null;
+	if(track == null) {
+		track = 0;
+		element = this.placeholderElements[elementID];
+	} else {
+		element = this.mediaPlayers[elementID].containerElement;
+	}
+    var mediaURL = this.mediaPlayers[elementID].playlist[track].mediaURL;
+	var QTObject = document.createElement("embed");
+	QTObject.allowedToLoad = true;
+	QTObject.className = "CTFQTObject";
+	QTObject.setAttribute("type", "video/quicktime");
+	QTObject.setAttribute("width", "0");
+	QTObject.setAttribute("height", "0");
+	// need an external URL for source, since QT plugin doesn't accept safari-extension:// protocol
+	// Apple has a small 1px image for this exact purpose
+	QTObject.setAttribute("src", "http://images.apple.com/apple-events/includes/qtbutton.mov");
+	QTObject.setAttribute("href", mediaURL);
+	QTObject.setAttribute("target", "quicktimeplayer");
+	QTObject.setAttribute("autohref", "true");
+	QTObject.setAttribute("controller", "false");
+	//QTObject.setAttribute("postdomevents", "true");
+	element.appendChild(QTObject);
+	// There doesn't seem to exist an appropriate event, so we just wait a bit...
+	setTimeout(function() {element.removeChild(QTObject);}, 100);
+};
+
 ClickToPlugin.prototype.setVolumeTo = function(volume) {
     for(var i = 0; i < this.numberOfBlockedElements; i++) {
         if(this.mediaPlayers[i] && this.mediaPlayers[i].mediaElement) this.mediaPlayers[i].mediaElement.volume = volume;
+    }
+};
+
+ClickToPlugin.prototype.setOpacityTo = function(opacity) {
+    for(var i = 0; i < this.numberOfBlockedElements; i++) {
+        if(this.placeholderElements[i]) this.placeholderElements[i].style.opacity = opacity;
     }
 };
 
@@ -395,6 +431,7 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
 	var placeholderElement = document.createElement("div");
 	placeholderElement.style.width = element.offsetWidth + "px";
 	placeholderElement.style.height = element.offsetHeight + "px";
+	placeholderElement.style.opacity = this.settings["opacity"];
     
 	placeholderElement.className = "clickToFlashPlaceholder";
     
@@ -419,7 +456,8 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
             "CTPInstance": _this.instance,
             "elementID": elementID,
 			"src": element.source,
-            "plugin": element.plugin
+            "plugin": element.plugin,
+			"blocked": _this.numberOfBlockedElements - _this.numberOfUnblockedElements
         };
         if (_this.mediaPlayers[elementID] && _this.mediaPlayers[elementID].startTrack != null) {
 			contextInfo.hasH264 = true;

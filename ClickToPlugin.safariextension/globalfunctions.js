@@ -58,7 +58,6 @@ function canPlayWithQTPlugin(MIMEType) {
 
 const canPlayFLV = canPlayWithQTPlugin("video/x-flv");
 const canPlayWM = canPlayWithQTPlugin("video/x-ms-wmv");
-const canPlayDivX = canPlayWithQTPlugin("video/divx");
 
 function extractExt(url) {
     return url.split("?")[0].split(".").pop();
