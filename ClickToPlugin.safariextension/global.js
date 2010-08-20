@@ -78,7 +78,7 @@ function blockOrAllow(data) { // returns null if element can be loaded, the name
 	
     // try not to block objects created by other extensions
     if(data.src.substring(0,19) == "safari-extension://") return null;
-    
+
     // Deal with invisible plugins
     if(safari.extension.settings["loadInvisible"]) {
         if(data.width <= safari.extension.settings["maxinvdim"] && data.height <= safari.extension.settings["maxinvdim"]) {
@@ -174,11 +174,11 @@ function respondToMessage(event) {
         case "killPlugin":
             killPlugin(event.message);
             break;
-        case "downloadMedia":
+        //case "downloadMedia":
             //var newTab = safari.application.activeBrowserWindow.openTab("foreground");
-            //newTab.url = event.message;
-            prompt("Copy the following URL and paste it into the Downloads window.", event.message);
-            break;
+            //newTab.url = event.message + ".zip";
+            //prompt("Copy the following URL and paste it into the Downloads window.", event.message);
+            //break;
     }
 }
 
@@ -205,37 +205,38 @@ function printMedia(mediaType) {
     }
 }
 
+function printPlugin(pluginName) {
+	if(/[A-Z]/.test(pluginName)) return pluginName;
+	return "Plugin";
+}
+
 function handleContextMenu(event) {
     if(!event.userInfo.CTPInstance) {
-        if(event.userInfo.blocked > 0) event.contextMenu.appendContextMenuItem("loadall", "Load All Plugins (" + event.userInfo.blocked + ")");
+		if(safari.extension.settings["useLAcontext"] && event.userInfo.blocked > 0) event.contextMenu.appendContextMenuItem("loadall", "Load All Plugins (" + event.userInfo.blocked + ")");
         if(safari.extension.settings["useWLcontext"]) {
             event.contextMenu.appendContextMenuItem("locwhitelist", "Add Location to Whitelist\u2026");
         }
         return;
     }
-    // NOTE: just uncomment the 2 lines below to activate the 'open video in new tab' functionality
-    // (didn't seem worth taking a place in the context menu)
     if(event.userInfo.isH264) {
-        // if(event.userInfo.isPlaylist) {
-        //             event.contextMenu.appendContextMenuItem(event.userInfo.CTPInstance + "," + event.userInfo.elementID + ",next", "Next Track");
-        //             event.contextMenu.appendContextMenuItem(event.userInfo.CTPInstance + "," + event.userInfo.elementID + ",prev", "Previous Track");
-        //         }
-        event.contextMenu.appendContextMenuItem(event.userInfo.CTPInstance + "," + event.userInfo.elementID + ",download", "Download " + printMedia(event.userInfo.mediaType) + "\u2026");
-		if(event.userInfo.siteInfo) event.contextMenu.appendContextMenuItem("gotosite", "View on " + event.userInfo.siteInfo.name);
-        event.contextMenu.appendContextMenuItem(event.userInfo.CTPInstance + "," + event.userInfo.elementID + ",reloadPlugin", "Reload in " + event.userInfo.plugin);
+		event.contextMenu.appendContextMenuItem(event.userInfo.CTPInstance + "," + event.userInfo.elementID + ",reloadPlugin", "Reload in " + event.userInfo.plugin);
+		if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.CTPInstance + "," + event.userInfo.elementID + ",qtp", "View in QuickTime Player");
+		if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", "View on " + event.userInfo.siteInfo.name);
     } else {
         if(event.userInfo.hasH264) {
-            event.contextMenu.appendContextMenuItem(event.userInfo.CTPInstance + "," + event.userInfo.elementID + ",plugin", "Load " + event.userInfo.plugin);
-            event.contextMenu.appendContextMenuItem(event.userInfo.CTPInstance + "," + event.userInfo.elementID + ",video", "Load " + printMedia(event.userInfo.mediaType));
-            event.contextMenu.appendContextMenuItem(event.userInfo.CTPInstance + "," + event.userInfo.elementID + ",download", "Download " + printMedia(event.userInfo.mediaType) + "\u2026");
-			if(event.userInfo.siteInfo) event.contextMenu.appendContextMenuItem("gotosite", "View on " + event.userInfo.siteInfo.name);
-        } else {
-            event.contextMenu.appendContextMenuItem(event.userInfo.CTPInstance + "," + event.userInfo.elementID + ",plugin", "Load Plugin");
-        }
+            //event.contextMenu.appendContextMenuItem(event.userInfo.CTPInstance + "," + event.userInfo.elementID + ",video", "Load " + printMedia(event.userInfo.mediaType));
+			event.contextMenu.appendContextMenuItem(event.userInfo.CTPInstance + "," + event.userInfo.elementID + ",plugin", "Load " + printPlugin(event.userInfo.plugin));
+			event.contextMenu.appendContextMenuItem(event.userInfo.CTPInstance + "," + event.userInfo.elementID + ",remove", "Hide " + printPlugin(event.userInfo.plugin));
+			//if(safari.extension.settings["useLAcontext"] && event.userInfo.blocked > 1) event.contextMenu.appendContextMenuItem("loadall", "Load All Plugins (" + event.userInfo.blocked + ")");
+			if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.CTPInstance + "," + event.userInfo.elementID + ",qtp", "View in QuickTime Player");
+			if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", "View on " + event.userInfo.siteInfo.name);
+		} else {
+			event.contextMenu.appendContextMenuItem(event.userInfo.CTPInstance + "," + event.userInfo.elementID + ",remove", "Hide " + printPlugin(event.userInfo.plugin));
+			//if(safari.extension.settings["useLAcontext"] && event.userInfo.blocked > 1) event.contextMenu.appendContextMenuItem("loadall", "Load All Plugins (" + event.userInfo.blocked + ")");
+		}
         if(safari.extension.settings["useWLcontext"]) {
             event.contextMenu.appendContextMenuItem("srcwhitelist", "Add Source to Whitelist\u2026");
         }
-        event.contextMenu.appendContextMenuItem(event.userInfo.CTPInstance + "," + event.userInfo.elementID + ",remove", "Remove Element");
         // BEGIN DEBUG
         if(safari.extension.settings["debug"]) {
             event.contextMenu.appendContextMenuItem(event.userInfo.CTPInstance + "," + event.userInfo.elementID + ",show", "Show Element " + event.userInfo.CTPInstance + "." + event.userInfo.elementID);
@@ -282,7 +283,9 @@ function handleChangeOfSettings(event) {
     if(event.key == "volume") {
         // send to all pages or just the active one??
         safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("updateVolume", event.newValue);
-    }
+    } else if(event.key = "opacity") {
+		dispatchMessageToAllPages("updateOpacity", event.newValue);
+	}
 }
 
 function getSettings() {
@@ -294,6 +297,7 @@ function getSettings() {
     settings.H264behavior = safari.extension.settings["H264behavior"];
     settings.volume = safari.extension.settings["volume"];
     settings.sifrReplacement = safari.extension.settings["sifrReplacement"];
+	settings.opacity = safari.extension.settings["opacity"];
     settings.debug = safari.extension.settings["debug"];
 	return settings;
 }

@@ -297,16 +297,6 @@
 		<string>TextField</string>
 	</dict>
 	<dict>
-		<key>DefaultValue</key>
-		<false/>
-		<key>Key</key>
-		<string>useWLcontext</string>
-		<key>Title</key>
-		<string>Activer le menu contextuel de la liste blanche </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
 		<key>Title</key>
 		<string>Éléments invisibles</string>
 		<key>Type</key>
@@ -347,6 +337,52 @@
 		</array>
 	</dict>
 	<dict>
+		<key>Title</key>
+		<string>Menu contextuel</string>
+		<key>Type</key>
+		<string>Group</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useWLcontext</string>
+		<key>Title</key>
+		<string>Ajouter à la liste blanche                                  </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useLAcontext</string>
+		<key>Title</key>
+		<string>Débloquer tous les plugins                               </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useVScontext</string>
+		<key>Title</key>
+		<string>Voir la vidéo sur le site                                     </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useQTcontext</string>
+		<key>Title</key>
+		<string>Ouvrir dans QuickTime Player                           </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
 		<key>Type</key>
 		<string>Separator</string>
 	</dict>
@@ -371,6 +407,22 @@
 			<string>normal</string>
 			<string>autoload</string>
 		</array>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<real>1</real>
+		<key>Key</key>
+		<string>opacity</string>
+		<key>MaximumValue</key>
+		<real>1</real>
+		<key>Secure</key>
+		<false/>
+		<key>StepValue</key>
+		<real>0.01</real>
+		<key>Title</key>
+		<string>Opacité</string>
+		<key>Type</key>
+		<string>Slider</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
