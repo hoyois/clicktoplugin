@@ -33,31 +33,31 @@ function respondToCanLoad(message) {
 
 function handleContextMenu(event) {
     if(!event.userInfo.instance) {
-        if(safari.extension.settings["useLAcontext"] && event.userInfo.blocked > 0) event.contextMenu.appendContextMenuItem("loadall", "Débloquer Flash sur cette page (" + event.userInfo.blocked + ")");
+        if(safari.extension.settings["useLAcontext"] && event.userInfo.blocked > 0) event.contextMenu.appendContextMenuItem("loadall", "DÃ©bloquer Flash sur cette page (" + event.userInfo.blocked + ")");
         if(safari.extension.settings["useWLcontext"]) {
-            event.contextMenu.appendContextMenuItem("locwhitelist", "Ajouter à la liste blanche\u2026");
+            event.contextMenu.appendContextMenuItem("locwhitelist", "Ajouter Ã  la liste blanche\u2026");
         }
         return;
     }
     if(event.userInfo.isH264) {
         event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",reload", "Relancer avec Flash");
         if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",qtp", "Ouvrir avec QuickTime Player");
-        if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", "Voir la vidéo sur " + event.userInfo.siteInfo.name);
+        if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", "Voir la vidÃ©o sur " + event.userInfo.siteInfo.name);
     } else {
         if(event.userInfo.hasH264) {
             event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",plugin", "Lancer Flash");
             event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",remove", "Supprimer Flash");
             if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",qtp", "Ouvrir dans QuickTime Player");
-            if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", "Voir la vidéo sur " + event.userInfo.siteInfo.name);
+            if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", "Voir la vidÃ©o sur " + event.userInfo.siteInfo.name);
         } else {
             event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",remove", "Supprimer Flash");
         }
         if(safari.extension.settings["useWLcontext"]) {
-            event.contextMenu.appendContextMenuItem("srcwhitelist", "Ajouter à la liste blanche\u2026");
+            event.contextMenu.appendContextMenuItem("srcwhitelist", "Ajouter Ã  la liste blanche\u2026");
         }
         // BEGIN DEBUG
         if(safari.extension.settings["debug"]) {
-            event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",show", "Voir l'élément " + event.userInfo.instance + "." + event.userInfo.elementID);
+            event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",show", "Voir l'Ã©lÃ©ment " + event.userInfo.instance + "." + event.userInfo.elementID);
         }
         //END DEBUG
     }
@@ -85,7 +85,7 @@ function doCommand(event) {
 }
 
 function handleWhitelisting (type, url) {
-    var newWLstring = prompt("Autoriser " + (type ? "Flash si l'adresse de la page contient" : "les éléments Flash provenant de"), url);
+    var newWLstring = prompt("Autoriser " + (type ? "Flash si l'adresse de la page contient" : "les Ã©lÃ©ments Flash provenant de"), url);
     if(newWLstring) {
         safari.extension.settings["use" + (type ? "loc" : "src") + "Whitelist"] = true;
         if(type && safari.extension.settings["locwhitelist"] == "www.example.com, www.example2.com") { // get rid of the example
