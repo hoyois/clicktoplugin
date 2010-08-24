@@ -215,14 +215,16 @@ mediaPlayer.prototype.fixAspectRatio = function() {
     if(w == 0 || h == 0) { // audio source
         //this.mediaElement.style.height = "24px"; // the height of the controls
         this.mediaElement.style.width = this.width + "px"; this.mediaElement.style.height = this.height + "px";
-        if(this.playlistControls) this.playlistControls.style.width = this.width + "px";
     } else if (w/h > this.width/this.height) {
         this.mediaElement.style.width = this.width + "px"; this.mediaElement.style.height = "";
-        if(this.playlistControls) this.playlistControls.style.width = this.width + "px";
     } else {
         this.mediaElement.style.height = this.height + "px"; this.mediaElement.style.width = "";
-        // Apparently webkit uses floor, not round
-        if(this.playlistControls) this.playlistControls.style.width = Math.floor(w/h*this.height) + "px";
+        if(this.playlistControls) {
+            // Apparently QuickTime uses floor, not round
+            var width = Math.floor(w/h*this.height);
+            this.playlistControls.style.width = width + "px";
+            if(this.usePlaylistControls) this.playlistControls.getElementsByTagName("p")[0].style.width = (width - this.playlistControls.getElementsByClassName("CTFtrackSelect")[0].offsetWidth - 12) + "px";
+        }
     }
     if(this.usePlaylistControls) {
         // need this otherwise a webkit bug messes up font smoothing
@@ -234,7 +236,10 @@ mediaPlayer.prototype.fixAspectRatio = function() {
 mediaPlayer.prototype.resetAspectRatio = function() {
     this.mediaElement.style.width = this.width + "px";
     this.mediaElement.style.height = this.height + "px";
-    if(this.playlistControls) this.playlistControls.style.width = this.width + "px";
+    if(this.playlistControls) {
+        this.playlistControls.style.width = this.width + "px";
+        if(this.usePlaylistControls) this.playlistControls.getElementsByTagName("p")[0].style.width = (this.width - this.playlistControls.getElementsByClassName("CTFtrackSelect")[0].offsetWidth - 12) + "px";
+    }
 };
 
 mediaPlayer.prototype.switchLoop = function() {
@@ -313,9 +318,7 @@ mediaPlayer.prototype.addToPlaylist = function(playlist, init) {
     if(init) this.playlist = playlist.concat(this.playlist);
     else this.playlist = this.playlist.concat(playlist);
     if(this.usePlaylistControls && this.playlistControls) {
-        this.playlistControls.getElementsByTagName("span")[0].innerHTML = "/" + normalize(this.playlist.length + this.startTrack, this.playlistLength); 
-        var width = this.playlistControls.offsetWidth - this.playlistControls.getElementsByClassName("CTFtrackSelect")[0].offsetWidth;
-        this.playlistControls.getElementsByTagName("p")[0].style.width = (width - 7) + "px";
+        this.playlistControls.getElementsByTagName("span")[0].innerHTML = "/" + normalize(this.playlist.length + this.startTrack, this.playlistLength);
     }
 };
 

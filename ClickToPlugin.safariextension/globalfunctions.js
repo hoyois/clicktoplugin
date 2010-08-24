@@ -137,7 +137,7 @@ function getPluginNameFromPlugin(plugin) {
 }
 
 function getPluginNameFromType(type) { // only used if no installed plugin is found
-    if(/shockwave-flash/.test(type) || /futuresplah/.test(type)) return "Flash";
+    if(/shockwave-flash/.test(type) || /futuresplash/.test(type)) return "Flash";
     if(/silverlight/.test(type)) return "Silverlight";
     if(/x-java/.test(type)) return "Java";
     if(/x-ms/.test(type)) return "WM";
