@@ -1,91 +1,63 @@
-function getSrcOf(element) {
+function getInfo(element, url) {
+    // gathers attributes of the element that might be needed later on
+    // Done by a single function so that we only loop once through the <param> children
+    var info = new Object();
     var tmpAnchor = document.createElement("a");
     switch (element.tag) {
         case "embed":
+            if(element.hasAttribute("qtsrc")) {
+                tmpAnchor.href = element.getAttribute("qtsrc");
+                info.src = tmpAnchor.href;
+            }
+            if(element.hasAttribute("href")) {
+                tmpAnchor.href = element.getAttribute("href");
+                info.href = tmpAnchor.href;
+            }
+            if(element.hasAttribute("target")) {
+                info.target = element.getAttribute("target");
+            }
             if(element.hasAttribute("previewimage")) {
                 tmpAnchor.href = element.getAttribute("previewimage");
-                element.image = tmpAnchor.href;
+                info.image = tmpAnchor.href;
             }
-            if(element.src) tmpAnchor.href = element.src;
-			if(element.hasAttribute("qtsrc")) tmpAnchor.href = element.getAttribute("qtsrc");
-			element.presource = tmpAnchor.href;
-            if(element.hasAttribute("target")) element.otherInfo.target = element.getAttribute("target");
-			if(element.hasAttribute("href")) {
-				tmpAnchor.href = element.getAttribute("href");
-			} else {
-				delete element.presource;
-				if(!element.src) return "";
-			}
-            return tmpAnchor.href;
             break;
         case "object":
-            // NOTE: For silverlight objects element.data is used for something else than the source
-            // and a param named 'source' is used for the source. So we look for that before
-            // using element.data
             var paramElements = element.getElementsByTagName("param");
-            var srcParam = null; var qtsrcParam = null;
             for (i = 0; i < paramElements.length; i++) {
-				if(!paramElements[i].hasAttribute("value")) continue;
+                if(!paramElements[i].hasAttribute("value")) continue;
                 var paramName = paramElements[i].getAttribute("name").toLowerCase(); // name attribute is mandatory!
-                // this is a bit shaky...
-                // maybe should check first for mimetype and then let getSrcOf depend on type
-                // eg source for silverlight; src for flash, qt, realplayer; filename for wm...
-                // this would require 2 successive canLoads? or just use the type attribute??
-                // it seems to always be specified for SL, but not QT (uses classid instead)
-                // damn... maybe better to pass the whole HTMLToString(element) to the global page after all?
-                if(paramName == "previewimage") {
-                    var tmpAnchor2 = document.createElement("a");
-                    tmpAnchor2.href = paramElements[i].getAttribute("value");
-                    element.image = tmpAnchor2.href;
-                } else if(paramName == "src") {
-                    srcParam = i;
-                    if(!element.presource) {
-                        var tmpAnchor2 = document.createElement("a");
-                        tmpAnchor2.href = paramElements[i].getAttribute("value");
-                        element.presource = tmpAnchor2.href;
-                    }
-                    //element.otherInfo.src = paramElements[i].getAttribute("value");
-                } else if (paramName == "qtsrc") {
-                    qtsrcParam = i;
-                    var tmpAnchor2 = document.createElement("a");
-                    tmpAnchor2.href = paramElements[i].getAttribute("value");
-                    element.presource = tmpAnchor2.href;
-                    //element.otherInfo.qtsrc = paramElements[i].getAttribute("value");
-				} else if (paramName == "target") element.otherInfo.target = paramElements[i].getAttribute("value");
-                else if(paramName == "movie" || paramName == "source" || paramName == "href" || paramName == "filename") { //|| paramName == "url") { // for oleobject, not supported on Safari (what about the Win version?)
-                	tmpAnchor.href = paramElements[i].getAttribute("value");
+                switch(paramName) {
+                    case "source": // Silverlight true source
+                        tmpAnchor.href = paramElements[i].getAttribute("value");
+                        info.src = tmpAnchor.href;
+                        break;
+                    case "qtsrc": // QuickTime true source
+                        tmpAnchor.href = paramElements[i].getAttribute("value");
+                        info.src = tmpAnchor.href;
+                        break;
+                    case "href": // QuickTime
+                        tmpAnchor.href = paramElements[i].getAttribute("value");
+                        info.href = tmpAnchor.href;
+                        break;
+                    case "target": // QuickTime
+                        info.target = paramElements[i].getAttribute("value");
+                        break;
+                    case "previewimage": // DivX
+                        tmpAnchor.href = paramElements[i].getAttribute("value");
+                        info.image = tmpAnchor.href;
+                        break;
                 }
             }
-            if(tmpAnchor.href) return tmpAnchor.href;
-            if(qtsrcParam != null) {
-                element.presource = null;
-                tmpAnchor.href = paramElements[qtsrcParam].getAttribute("value");
-                return tmpAnchor.href;
-            } else if(srcParam != null) {
-                element.presource = null;
-                tmpAnchor.href = paramElements[srcParam].getAttribute("value");
-                return tmpAnchor.href;
-            }
-            if(element.data) {
-                tmpAnchor.href = element.data;
-                return tmpAnchor.href;
-            } else {
-                var embedElements = element.getElementsByTagName("embed");
-                if(embedElements.length == 0) return "";
-                embedElements[0].tag = "embed";
-                return getSrcOf(embedElements[0]);
-            }
-            return "";
-            break;
-        case "applet":
-            if(element.code) {
-				tmpAnchor.href = element.code;
-			} else if(element.hasAttribute("archive")) {
-				tmpAnchor.href = element.getAttribute("archive");
-			} else return "";
-            return tmpAnchor.href;
             break;
     }
+    if(!info.src) {
+        if(!url) info.src = "";
+        else {
+            tmpAnchor.href = url;
+            info.src = tmpAnchor.href;
+        }
+    }
+    return info;
 }
 
 function getParamsOf(element) {
@@ -132,7 +104,7 @@ function getTypeOf(element) {
                 var paramElements = element.getElementsByTagName("param");
                 for (i = 0; i < paramElements.length; i++) {
                     if(paramElements[i].getAttribute("name").toLowerCase() == "type") {
-                    	return paramElements[i].getAttribute("value");
+                        return paramElements[i].getAttribute("value");
                     }
                 }
                 var embedChildren = element.getElementsByTagName("embed");

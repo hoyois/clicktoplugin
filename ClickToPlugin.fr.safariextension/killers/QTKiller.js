@@ -1,5 +1,5 @@
 function QTKiller() {
-	this.name = "QTKiller";
+    this.name = "QTKiller";
 }
 
 
@@ -13,11 +13,11 @@ QTKiller.prototype.processElement = function(data, callback) {
     var playlist = null;
     if(data.presrc) playlist = [{"mediaType": "video", "mediaURL": data.presrc}, {"mediaType": "video", "mediaURL": data.src}];
     else playlist = [{"mediaType": "video", "mediaURL": data.src}];
-	var videoData = {
-		"noPlaylistControls": true,
+    var videoData = {
+        "noPlaylistControls": true,
         "playlist": playlist,
         "badgeLabel": "Video"
     };
 
-	callback(videoData);
+    callback(videoData);
 };
