@@ -87,7 +87,7 @@ function blockOrAllow(data) { // returns null if element can be loaded, the name
     
     // Exception: ask the user what to do if a QT object would launch QTP
     if(data.launchInQTP) {
-        if(confirm("Un objet QuickTime voudrait lancer le lecture de\n\n" + data.src + "\n\ndans QuickTime Player. Voulez-vous l'autoriser?")) {
+        if(confirm("Un objet QuickTime voudrait lancer le lecture de\n\n" + data.launchInQTP + "\n\ndans QuickTime Player. Voulez-vous l'autoriser?")) {
             return null;
         }
     }
