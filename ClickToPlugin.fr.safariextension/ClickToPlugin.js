@@ -323,11 +323,9 @@ ClickToPlugin.prototype.loadMediaForElement = function(elementID) {
     this.mediaPlayers[elementID].initialize(this.settings["H264behavior"], w, h, this.settings["volume"], contextInfo);
     // mediaElement.allowedToLoad = true; // not used
 
-    // Load first track
-    this.mediaPlayers[elementID].loadTrack(0);
-
-    // Replace placeholder
+    // Replace placeholder and load first track
     placeholderElement.parentNode.replaceChild(this.mediaPlayers[elementID].containerElement, placeholderElement);
+    this.mediaPlayers[elementID].loadTrack(0);
     this.numberOfUnblockedElements++;
     this.placeholderElements[elementID] = null;
     
