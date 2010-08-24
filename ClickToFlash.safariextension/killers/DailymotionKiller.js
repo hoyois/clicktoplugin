@@ -22,7 +22,7 @@ DailymotionKiller.prototype.processElement = function(data, callback) {
 
 DailymotionKiller.prototype.processElementFromSequence = function(sequence, callback) {
     var posterURL = null;
-	var videoURL = null;
+    var videoURL = null;
     var badgeLabel = "H.264";
     if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV) {
         var URLindex = sequence.indexOf("sdURL");
@@ -32,7 +32,7 @@ DailymotionKiller.prototype.processElementFromSequence = function(sequence, call
             videoURL = s.replace(/\\\//g,"/");
         }
     }
-    var URLindex = sequence.indexOf("hqURL"); // there's also an sdURL but it is an FLV video
+    var URLindex = sequence.indexOf("hqURL");
     if (URLindex != -1) {
         var s = sequence.substring(URLindex+8);
         s = s.substring(0,s.indexOf("\""));
@@ -47,12 +47,11 @@ DailymotionKiller.prototype.processElementFromSequence = function(sequence, call
             videoURL = s.replace(/\\\//g,"/");
         }
     }
-	URLindex = sequence.indexOf("videoPreviewURL");
+    URLindex = sequence.indexOf("videoPreviewURL");
     if (URLindex != -1) {
         var s = sequence.substring(URLindex+18);
         s = s.substring(0,s.indexOf("\""));
         posterURL = s.replace(/\\\//g,"/");
-        //alert(posterURL);
     }
     var videoData = {
         "playlist": [{"mediaType": "video", "posterURL": posterURL, "mediaURL": videoURL}],
@@ -68,10 +67,10 @@ DailymotionKiller.prototype.processElementFromVideoID = function(videoID, callba
     req.open("GET", "http://www.dailymotion.com/video/" + videoID, true);
     req.onload = function() {
         var sequence = req.responseText.match(toMatch)[0];
-		var callbackForEmbed = function(videoData) {
-			videoData.playlist[0].siteInfo = {"name": "Dailymotion", "url": "http://www.dailymotion.com/video/" + videoID};
-			callback(videoData);
-		}
+        var callbackForEmbed = function(videoData) {
+            videoData.playlist[0].siteInfo = {"name": "Dailymotion", "url": "http://www.dailymotion.com/video/" + videoID};
+            callback(videoData);
+        }
         if(sequence) {_this.processElementFromSequence(unescape(sequence), callbackForEmbed);}
     };
     // BEGIN DEBUG

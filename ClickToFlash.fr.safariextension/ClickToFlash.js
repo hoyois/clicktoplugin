@@ -6,25 +6,25 @@ function ClickToFlash() {
     
     this.blockedElements = new Array();// array containing the Flash HTML elements
     this.placeholderElements = new Array();// array containing the corresponding placeholder elements
-	this.mediaPlayers = new Array();// array containing the HTML5 media players
+    this.mediaPlayers = new Array();// array containing the HTML5 media players
     
     this.settings = null;
     this.instance = null;
     this.numberOfBlockedElements = 0;
-	this.numberOfUnblockedElements = 0;
+    this.numberOfUnblockedElements = 0;
     
-	var _this = this;	
-	
-	this.respondToMessageTrampoline = function(event) {
+    var _this = this;    
+    
+    this.respondToMessageTrampoline = function(event) {
         _this.respondToMessage(event);
     };
-	
-	this.handleBeforeLoadEventTrampoline = function(event) {
-		_this.handleBeforeLoadEvent(event);
-	};
-	
-	safari.self.addEventListener("message", this.respondToMessageTrampoline, false);
-	document.addEventListener("beforeload", this.handleBeforeLoadEventTrampoline, true);
+    
+    this.handleBeforeLoadEventTrampoline = function(event) {
+        _this.handleBeforeLoadEvent(event);
+    };
+    
+    safari.self.addEventListener("message", this.respondToMessageTrampoline, false);
+    document.addEventListener("beforeload", this.handleBeforeLoadEventTrampoline, true);
     /* NOTE ALPHA (READ IF YOU WANT TO PLAY WITH THE CODE!)
     It sometimes happen, though the reason is still mysterious to me, that several 'beforeload' events
     are fired with the SAME target. It's just a fact of life (or a webkit bug?) we have to live with.
@@ -43,13 +43,9 @@ function ClickToFlash() {
     If the two events have the same target, then element1.elementID will be changed to 2,
     which can yield undesirable results if element1 is still being processed.
     
-    ALSO, this is the reason for the error 'element.parentNode is null' towards the end of this document:
-    element2 loses its parentNode when element1.parentNode.replaceChild(..., element1) is executed.
-    
-    Of course, when such a redundant event happens, we should ignore it altogether. As of now,
-    redundant events are never passed to killers. Further optimization will be possible once a Webkit
-    bug is fixed (already is in the nightlies).
+    Of course, when such a redundant event happens, we should ignore it as soon as early as possible.
     */
+    
     document.oncontextmenu = function(event) {
         safari.self.tab.setContextMenuEventUserInfo(event, {"location": window.location.href, "blocked": _this.numberOfBlockedElements - _this.numberOfUnblockedElements});
     };
@@ -62,31 +58,41 @@ ClickToFlash.prototype.clearAll = function(elementID) {
 };
 
 ClickToFlash.prototype.respondToMessage = function(event) {
-    if (event.name == "mediaData") {
-        if(event.message.CTFInstance != this.instance) return; // ignore message from other CTF instances
-        this.prepMedia(event.message);
-    } else if (event.name == "loadContent") {
-        var loadData = event.message.split(","); // [0] CTFInstance, [1] elementID, [2] message
-        if (loadData[0] != this.instance) return; // ignore message from other CTF instances
-        if (loadData[2] == "flash") {
-            this.loadFlashForElement(loadData[1]);
-        } else if (loadData[2] == "video") {
-            this.loadMediaForElement(loadData[1]);
-        } else if (loadData[2] == "reloadFlash") {
-            this.loadInPlugin(loadData[1]);
-        } else if (loadData[2] == "remove") {
-            this.removeElement(loadData[1]);
-		} else if (loadData[2] == "qtp") {
-	    	this.launchInQuickTimePlayer(loadData[1]);
-        } else if (loadData[2] == "show") {
-            alert(document.HTMLToString(this.blockedElements[loadData[1]]));
-        }
-    } else if (event.name == "updateVolume") {
-        this.setVolumeTo(event.message);
-    } else if (event.name == "updateOpacity") {
-		this.setOpacityTo(event.message);
-	} else if(event.name == "loadAll") {
-        this.loadAll();
+    switch(event.name) {
+        case "mediaData":
+            if(event.message.instance != this.instance) return; // ignore message from other CTF instances
+            this.prepMedia(event.message);
+            break;
+        case "loadContent":
+            var loadData = event.message.split(","); // [0] CTFInstance, [1] elementID, [2] message
+            if (loadData[0] != this.instance) return; // ignore message from other CTF instances
+            switch(loadData[2]) {
+                case "plugin":
+                    this.loadFlashForElement(loadData[1]);
+                    break;
+                case "remove":
+                    this.removeElement(loadData[1]);
+                    break;
+                case "reload":
+                    this.reloadInPlugin(loadData[1]);
+                    break;
+                case "qtp":
+                    this.launchInQuickTimePlayer(loadData[1]);
+                    break;
+                case "show":
+                    alert(document.HTMLToString(this.blockedElements[loadData[1]]));
+                    break;
+            }
+            break;
+        case "loadAll":
+            this.loadAll();
+            break;
+        case "updateVolume":
+            this.setVolumeTo(event.message);
+            break;
+        case "updateOpacity":
+            this.setOpacityTo(event.message);
+            break;
     }
 };
 
@@ -94,16 +100,15 @@ ClickToFlash.prototype.respondToMessage = function(event) {
 According to the W3C HTML5 spec, to activate a plugin,
 -> an 'embed' element must have either the 'src' or the 'type' attribute with nonempty value
 -> an 'object' element must have either the 'data' or the 'type' attribute with nonempty value.
-In the real world, however, (AS IS RECOMMANDED ON ADOBE'S WEBSITE, BY THE WAY!)
-one often finds an 'object' with neither 'data' nor 'type', with an 'embed' element
-as child with 'src' and/or 'type' attribute set.
+In the real world, however, one often finds an 'object' with neither 'data' nor 'type',
+with an 'embed' element as child with 'src' and/or 'type' attribute set.
 */
 
 ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
-	const element = event.target;
+    const element = event.target;
     
     // deal with sIFR script first
-    if(element instanceof HTMLScriptElement && element.getAttribute("src").indexOf("sifr.js") != (-1)) {
+    if(element instanceof HTMLScriptElement && element.src.indexOf("sifr.js") != (-1)) {
         var sIFRData = safari.self.tab.canLoad(event, "sIFR");
         if(!sIFRData.canLoad) {
             // BEGIN DEBUG
@@ -121,7 +126,8 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
     // the beforeload event is fired again but this time the
     // flash element must not be blocked
     if (element.allowedToLoad) return;
-	if (element instanceof HTMLEmbedElement) {
+    
+    if (element instanceof HTMLEmbedElement) {
         element.tag = "embed";
     } else if (element instanceof HTMLObjectElement) {
         element.tag = "object";
@@ -129,11 +135,24 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
         return;
     }
     
-    element.source = getSrcOf(element);
-    element.MIMEType = getTypeOf(element);
-    if(allowElement(element.MIMEType, element.source)) return;
+    // Check if it is Flash
+    if(!(/.(swf|spl)(\?|$)/.test(event.url))) {
+        // Check MIME type (elements with no source still launch the plugin if they have the right type)
+        var type = getTypeOf(element);
+        if(type != "application/x-shockwave-flash" && type != "application/futuresplash") {
+            return;
+        }
+    }
     
     // At this point we know we're dealing with Evil itself
+    
+    // Need to store the absolute source of the element
+    if(!event.url) element.source = "";
+    else {
+        var tmpAnchor = document.createElement("a");
+        tmpAnchor.href = event.url;
+        element.source = tmpAnchor.href;
+    }
     
     // Load the user settings
     if(this.settings == null) {
@@ -141,7 +160,7 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
     }
     
     // Deal with sIFR Flash
-    if (element.className == "sIFR-flash" || element.getAttribute("sifr")) {
+    if (element.className == "sIFR-flash" || element.hasAttribute("sifr")) {
         if (this.settings["sifrReplacement"] == "autoload") {
             // BEGIN DEBUG
             if(this.settings["debug"]) {
@@ -195,8 +214,7 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
     }
     
     // At this point we know we have to block 'element' from loading
-    
-    var elementID = this.numberOfBlockedElements++; // DO NOT STORE THIS AS A PROPERTY OF element!! see NOTE ALPHA above
+    var elementID = this.numberOfBlockedElements++;
     
     // Give an address to this CTF instance to receive messages
     if(this.instance == null) {
@@ -215,38 +233,37 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
 
 ClickToFlash.prototype.prepMedia = function(mediaData) {
     if(mediaData.playlist.length == 0 || !mediaData.playlist[0].mediaURL) return;
-	if(!this.mediaPlayers[mediaData.elementID]) {
-		this.mediaPlayers[mediaData.elementID] = new mediaPlayer(mediaData.isAudio ? "audio" : "video");
-	}
-	if(mediaData.loadAfter) { // just adding stuff to the playlist
-		// BEGIN DEBUG
-	    if(this.settings["debug"]) {
-	        if(!confirm("Preparing to add " + mediaData.playlist.length + " tracks to the playlist for element " + this.instance +"."+ mediaData.elementID)) return;
-	    }
-	    // END DEBUG
-		this.mediaPlayers[mediaData.elementID].playlistLength -= mediaData.missed;
-		this.mediaPlayers[mediaData.elementID].addToPlaylist(mediaData.playlist);
-		return;
-	}
-	// BEGIN DEBUG
-	if(this.settings["debug"]) {
-        var showPlaylist = "(" + mediaData.playlist.length + " track" + (mediaData.playlist.length > 1 ? "s" : "") + ")";
+    if(!this.mediaPlayers[mediaData.elementID]) {
+        this.mediaPlayers[mediaData.elementID] = new mediaPlayer(mediaData.isAudio ? "audio" : "video");
+    }
+    if(mediaData.loadAfter) { // just adding stuff to the playlist
+        // BEGIN DEBUG
+        if(this.settings["debug"]) {
+            if(!confirm("Preparing to add " + mediaData.playlist.length + " tracks to the playlist for element " + this.instance +"."+ mediaData.elementID)) return;
+        }
+        // END DEBUG
+        this.mediaPlayers[mediaData.elementID].playlistLength -= mediaData.missed;
+        this.mediaPlayers[mediaData.elementID].addToPlaylist(mediaData.playlist);
+        return;
+    }
+    // BEGIN DEBUG
+    if(this.settings["debug"]) {
+        var showPlaylist = "(" + mediaData.playlist.length + " track" + (mediaData.playlist.length > 1 ? "s" : "");
+        if(mediaData.playlistLength) showPlaylist += ", expecting " + mediaData.playlistLength;
+        showPlaylist += ")";
         for (var i = 0; i < mediaData.playlist.length; i++) {
-            showPlaylist += "\n[" + (i + 1) + "] (" + mediaData.playlist[i].mediaType + ")" + (mediaData.playlist[i].mediaType == "video" ? ("\nposterURL: " + mediaData.playlist[i].posterURL) : "") + "\nmediaURL: " + mediaData.playlist[i].mediaURL + "\n";
+            showPlaylist += "\n[" + (i + 1) + "] (" + mediaData.playlist[i].mediaType + ")" + "\nposterURL: " + mediaData.playlist[i].posterURL + "\nmediaURL: " + mediaData.playlist[i].mediaURL + "\n";
         }
         if(!confirm("Preparing media for element " + this.instance +"."+ mediaData.elementID +
         ":\n\nbadgeLabel: " + mediaData.badgeLabel + "\n\nPLAYLIST " + showPlaylist)) return;
     }
     // END DEBUG
 
-	// do it backward just in case a loadAfter came first
-	// can happen for embedded playlists
-	
-	this.mediaPlayers[mediaData.elementID].addToPlaylist(mediaData.playlist, true);
-	this.mediaPlayers[mediaData.elementID].playlistLength = mediaData.playlistLength ? mediaData.playlistLength : mediaData.playlist.length;
-	this.mediaPlayers[mediaData.elementID].startTrack = mediaData.startTrack ? mediaData.startTrack : 0;
-	
-	this.mediaPlayers[mediaData.elementID].usePlaylistControls = this.settings["usePlaylists"] && !mediaData.noPlaylistControls && this.mediaPlayers[mediaData.elementID].playlistLength > 1;
+    this.mediaPlayers[mediaData.elementID].addToPlaylist(mediaData.playlist, true);
+    this.mediaPlayers[mediaData.elementID].playlistLength = mediaData.playlistLength ? mediaData.playlistLength : mediaData.playlist.length;
+    this.mediaPlayers[mediaData.elementID].startTrack = mediaData.startTrack ? mediaData.startTrack : 0;
+    
+    this.mediaPlayers[mediaData.elementID].usePlaylistControls = this.settings["usePlaylists"] && !mediaData.noPlaylistControls && this.mediaPlayers[mediaData.elementID].playlistLength > 1;
 
     // Check if we should load video at once
     if(this.settings["H264autoload"]) {
@@ -255,17 +272,17 @@ ClickToFlash.prototype.prepMedia = function(mediaData) {
     }
     var badgeLabel = mediaData.badgeLabel;
     if(!badgeLabel) badgeLabel = "Video";
-	
+    
     this.displayBadge(badgeLabel, mediaData.elementID);
 };
 
 ClickToFlash.prototype.loadFlashForElement = function(elementID) {
     var placeholderElement = this.placeholderElements[elementID];
-	var element = this.blockedElements[elementID];
-	element.allowedToLoad = true;
+    var element = this.blockedElements[elementID];
+    element.allowedToLoad = true;
     if(placeholderElement.parentNode) {
         placeholderElement.parentNode.replaceChild(element, placeholderElement);
-		this.numberOfUnblockedElements++;
+        this.numberOfUnblockedElements++;
         this.clearAll(elementID); // no turning back from loading Flash...
     }
 };
@@ -276,14 +293,14 @@ ClickToFlash.prototype.loadAll = function() {
             this.loadFlashForElement(i);
         }
     }
-	this.numberOfUnblockedElements = this.numberOfBlockedElements;
+    this.numberOfUnblockedElements = this.numberOfBlockedElements;
 };
 
-ClickToFlash.prototype.loadInPlugin = function(elementID) {
+ClickToFlash.prototype.reloadInPlugin = function(elementID) {
     var containerElement = this.mediaPlayers[elementID].containerElement;
-	var element = this.blockedElements[elementID];
-	element.allowedToLoad = true;
-	containerElement.parentNode.replaceChild(element, containerElement);
+    var element = this.blockedElements[elementID];
+    element.allowedToLoad = true;
+    containerElement.parentNode.replaceChild(element, containerElement);
     this.clearAll(elementID);
 };
 
@@ -291,55 +308,55 @@ ClickToFlash.prototype.loadMediaForElement = function(elementID) {
     var placeholderElement = this.placeholderElements[elementID];
     
     var contextInfo = {
-        "CTFInstance": this.instance,
+        "instance": this.instance,
         "elementID": elementID,
         "isH264": true
-		//"blocked": this.numberOfBlockedElements - this.numberOfUnblockedElements
+        //"blocked": this.numberOfBlockedElements - this.numberOfUnblockedElements
     };
 
-	// Initialize player
-	var w = parseInt(placeholderElement.style.width.replace("px",""));
-	var h = parseInt(placeholderElement.style.height.replace("px",""));
-	this.mediaPlayers[elementID].initialize(this.settings["H264behavior"], w, h, this.settings["volume"], contextInfo);
-    //mediaElement.allowedToLoad = true; // not used for now
+    // Initialize player
+    var w = parseInt(placeholderElement.style.width.replace("px",""));
+    var h = parseInt(placeholderElement.style.height.replace("px",""));
+    this.mediaPlayers[elementID].initialize(this.settings["H264behavior"], w, h, this.settings["volume"], contextInfo);
+    // mediaElement.allowedToLoad = true; // not used
 
-	// Load first track
-	this.mediaPlayers[elementID].loadTrack(0);
+    // Load first track
+    this.mediaPlayers[elementID].loadTrack(0);
 
-	// Replace placeholder
-	placeholderElement.parentNode.replaceChild(this.mediaPlayers[elementID].containerElement, placeholderElement);
-	this.numberOfUnblockedElements++;
+    // Replace placeholder
+    placeholderElement.parentNode.replaceChild(this.mediaPlayers[elementID].containerElement, placeholderElement);
+    this.numberOfUnblockedElements++;
     this.placeholderElements[elementID] = null;
     
 };
 
 ClickToFlash.prototype.launchInQuickTimePlayer = function(elementID) {
-	var track = this.mediaPlayers[elementID].currentTrack;
-	var element = null;
-	if(track == null) {
-		track = 0;
-		element = this.placeholderElements[elementID];
-	} else {
-		element = this.mediaPlayers[elementID].containerElement;
-	}
+    var track = this.mediaPlayers[elementID].currentTrack;
+    var element = null;
+    if(track == null) {
+        track = 0;
+        element = this.placeholderElements[elementID];
+    } else {
+        element = this.mediaPlayers[elementID].containerElement;
+    }
     var mediaURL = this.mediaPlayers[elementID].playlist[track].mediaURL;
-	var QTObject = document.createElement("embed");
-	QTObject.allowedToLoad = true;
-	QTObject.className = "CTFQTObject";
-	QTObject.setAttribute("type", "video/quicktime");
-	QTObject.setAttribute("width", "0");
-	QTObject.setAttribute("height", "0");
-	// need an external URL for source, since QT plugin doesn't accept safari-extension:// protocol
-	// Apple has a small 1px image for this exact purpose
-	QTObject.setAttribute("src", "http://images.apple.com/apple-events/includes/qtbutton.mov");
-	QTObject.setAttribute("href", mediaURL);
-	QTObject.setAttribute("target", "quicktimeplayer");
-	QTObject.setAttribute("autohref", "true");
-	QTObject.setAttribute("controller", "false");
-	//QTObject.setAttribute("postdomevents", "true");
-	element.appendChild(QTObject);
-	// There doesn't seem to exist an appropriate event, so we just wait a bit...
-	setTimeout(function() {element.removeChild(QTObject);}, 100);
+    var QTObject = document.createElement("embed");
+    QTObject.allowedToLoad = true;
+    QTObject.className = "CTFQTObject";
+    QTObject.setAttribute("type", "video/quicktime");
+    QTObject.setAttribute("width", "0");
+    QTObject.setAttribute("height", "0");
+    // need an external URL for source, since QT plugin doesn't accept safari-extension:// protocol
+    // Apple has a small 1px image for this exact purpose
+    QTObject.setAttribute("src", "http://images.apple.com/apple-events/includes/qtbutton.mov");
+    QTObject.setAttribute("href", mediaURL);
+    QTObject.setAttribute("target", "quicktimeplayer");
+    QTObject.setAttribute("autohref", "true");
+    QTObject.setAttribute("controller", "false");
+    // QTObject.setAttribute("postdomevents", "true");
+    element.appendChild(QTObject);
+    // There doesn't seem to exist an appropriate event, so we just wait a bit...
+    setTimeout(function() {element.removeChild(QTObject);}, 100);
 };
 
 ClickToFlash.prototype.setVolumeTo = function(volume) {
@@ -360,7 +377,7 @@ ClickToFlash.prototype.removeElement = function(elementID) {
         element = element.parentNode;
     }
     element.parentNode.removeChild(element);
-	this.numberOfUnblockedElements++;
+    this.numberOfUnblockedElements++;
     this.clearAll(elementID);
 };
 
@@ -380,11 +397,11 @@ ClickToFlash.prototype.displayBadge = function(badgeLabel, elementID) {
     this.placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild.className = "logoContainer hidden";
     this.placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild.childNodes[1].className = "logo tmp";
     
-    this.unhideLogo(elementID);
+    this.unhideLogo(elementID, 0);
 };
 
 // NOTE: this function should never be called directly (use displayBadge instead)
-ClickToFlash.prototype.unhideLogo = function(elementID) {
+ClickToFlash.prototype.unhideLogo = function(elementID, i) {
     var logoContainer = this.placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild;
     var w0 = this.placeholderElements[elementID].offsetWidth;
     var h0 = this.placeholderElements[elementID].offsetHeight;
@@ -394,10 +411,11 @@ ClickToFlash.prototype.unhideLogo = function(elementID) {
     var h2 = logoContainer.childNodes[1].offsetHeight;
     
     if(w2 == 0 || h2 == 0 || w1 == 0 || h1 == 0 || w0 == 0 || h0 == 0) {
+        if(i > 9) return;
         // 2 options: leave the logo hidden (no big deal, and rarely happens), 
-        // or run unhideLogo again later (this might cause unexpected results due to asynchronicity)
+        // or run unhideLogo again later <- THIS
         var _this = this;
-        setTimeout(function() {_this.unhideLogo(elementID);}, 100); // there's no hurry here
+        setTimeout(function() {_this.unhideLogo(elementID, ++i);}, 100); // there's no hurry here
         return;
     }
     
@@ -422,22 +440,22 @@ ClickToFlash.prototype.unhideLogo = function(elementID) {
 };
 
 ClickToFlash.prototype.clickPlaceholder = function(elementID) {
-	if (this.mediaPlayers[elementID] && this.mediaPlayers[elementID].startTrack != null) {
-		this.loadMediaForElement(elementID);
-	} else {
+    if (this.mediaPlayers[elementID] && this.mediaPlayers[elementID].startTrack != null) {
+        this.loadMediaForElement(elementID);
+    } else {
         this.loadFlashForElement(elementID);
-	}
+    }
 };
 
 ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
     
     // Creating the placeholder element
-	var placeholderElement = document.createElement("div");
-	placeholderElement.style.width = element.offsetWidth + "px";
-	placeholderElement.style.height = element.offsetHeight + "px";
-	placeholderElement.style.opacity = this.settings["opacity"];
+    var placeholderElement = document.createElement("div");
+    placeholderElement.style.width = element.offsetWidth + "px";
+    placeholderElement.style.height = element.offsetHeight + "px";
+    placeholderElement.style.opacity = this.settings["opacity"];
     
-	placeholderElement.className = "clickToFlashPlaceholder";
+    placeholderElement.className = "clickToFlashPlaceholder";
     
     // Replacing element by placeholderElement
     if (element.parentNode) {
@@ -449,52 +467,52 @@ ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
             alert("Ignoring duplicate element " + this.instance + "." + elementID + ".");
         }
         // END DEBUG
-		this.numberOfUnblockedElements++;
+        this.numberOfUnblockedElements++;
         return;
     }
 
-	var _this = this;
-	placeholderElement.onclick = function(event){_this.clickPlaceholder(elementID);};
-	placeholderElement.oncontextmenu = function(event) {
-		var contextInfo = {
-            "CTFInstance": _this.instance,
+    var _this = this;
+    placeholderElement.onclick = function(event){_this.clickPlaceholder(elementID);};
+    placeholderElement.oncontextmenu = function(event) {
+        var contextInfo = {
+            "instance": _this.instance,
             "elementID": elementID,
             "src": element.source 
         };
         if (_this.mediaPlayers[elementID] && _this.mediaPlayers[elementID].startTrack != null) {
-			contextInfo.hasH264 = true;
+            contextInfo.hasH264 = true;
             _this.mediaPlayers[elementID].setContextInfo(event, contextInfo);
         } else {
-			contextInfo.hasH264 = false;
-			safari.self.tab.setContextMenuEventUserInfo(event, contextInfo);
-			event.stopPropagation();
+            contextInfo.hasH264 = false;
+            safari.self.tab.setContextMenuEventUserInfo(event, contextInfo);
+            event.stopPropagation();
         }
-	};
+    };
     
     // Building the placeholder
-	var container = document.createElement("div");
-	container.className = "clickToFlashPlaceholderContainer";
-	placeholderElement.appendChild(container);
-	
-	var verticalPositionElement = document.createElement("div");
-	verticalPositionElement.className = "logoVerticalPosition";
-	container.appendChild(verticalPositionElement);
+    var container = document.createElement("div");
+    container.className = "clickToFlashPlaceholderContainer";
+    placeholderElement.appendChild(container);
+    
+    var verticalPositionElement = document.createElement("div");
+    verticalPositionElement.className = "logoVerticalPosition";
+    container.appendChild(verticalPositionElement);
 
-	var horizontalPositionElement = document.createElement("div");
-	horizontalPositionElement.className = "logoHorizontalPosition";
-	verticalPositionElement.appendChild(horizontalPositionElement);
+    var horizontalPositionElement = document.createElement("div");
+    horizontalPositionElement.className = "logoHorizontalPosition";
+    verticalPositionElement.appendChild(horizontalPositionElement);
 
-	var logoContainer = document.createElement("div");
-	logoContainer.className = "logoContainer nodisplay"; // keep the logo hidden at first
-	horizontalPositionElement.appendChild(logoContainer);
-	
-	var logoElement = document.createElement("div");
-	logoElement.className = "logo";
-	logoContainer.appendChild(logoElement);
-	
-	var logoInsetElement = document.createElement("div");
-	logoInsetElement.className = "logo inset";
-	logoContainer.appendChild(logoInsetElement);
+    var logoContainer = document.createElement("div");
+    logoContainer.className = "logoContainer nodisplay"; // keep the logo hidden at first
+    horizontalPositionElement.appendChild(logoContainer);
+    
+    var logoElement = document.createElement("div");
+    logoElement.className = "logo";
+    logoContainer.appendChild(logoElement);
+    
+    var logoInsetElement = document.createElement("div");
+    logoInsetElement.className = "logo inset";
+    logoContainer.appendChild(logoInsetElement);
     
     // Filling the main arrays
     this.blockedElements[elementID] = element;
@@ -505,11 +523,11 @@ ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
     if(this.settings["useH264"]) {
         if(!this.directKill(elementID)) {
             var elementData = {
+                "instance": this.instance,
+                "elementID": elementID,
                 "src": element.source,
                 "params": getParamsOf(element),
-                "elementID": elementID,
-                "CTFInstance": this.instance,
-				"location": window.location.href
+                "location": window.location.href
             };
             safari.self.tab.dispatchMessage("killFlash", elementData);
         }
@@ -517,7 +535,7 @@ ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
     
 };
 
-// Sometimes a flash <object> tag is just a wrapper for an HTML5 video element
+// Sometimes an <object> has a media element as fallback content
 ClickToFlash.prototype.directKill = function(elementID) {
     var mediaElements = this.blockedElements[elementID].getElementsByTagName("video");
     var audioElements = this.blockedElements[elementID].getElementsByTagName("audio");
@@ -548,7 +566,7 @@ ClickToFlash.prototype.directKill = function(elementID) {
     var mediaData = {
         "elementID": elementID,
         "playlist": [{"mediaType": mediaType, "posterURL": mediaElements[0].getAttribute("poster"), "mediaURL": mediaURL}],
-        "badgeLabel": "Video"
+        "badgeLabel": mediaType == "audio" ? "Audio" : "Video"
     };
     this.prepMedia(mediaData);
     return true;
