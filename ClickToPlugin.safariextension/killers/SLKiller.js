@@ -1,5 +1,5 @@
 function SLKiller() {
-	this.name = "SLKiller";
+    this.name = "SLKiller";
 }
 
 
@@ -14,9 +14,9 @@ SLKiller.prototype.processElement = function(data, callback) {
     if(!videoURL.match(/\.((wm(?!x))|(asf))/)) return;
     var posterURL = getSLVariable(data.params, "thumbnail");
     
-	var videoData = {
+    var videoData = {
         "playlist": [{"mediaType": "video",  "posterURL": posterURL, "mediaURL": videoURL}],
         "badgeLabel": "Video"
     }
-	callback(videoData);
+    callback(videoData);
 };

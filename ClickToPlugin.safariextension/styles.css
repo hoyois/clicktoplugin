@@ -1,11 +1,11 @@
 /* Reset random stuff that might be set by the parent page */
 .clickToFlashPlaceholder * {
-	margin: 0 !important;
-	padding: 0 !important;
-	border: 0 !important;
-	border-radius: 0 !important;
-	text-align: left !important;
-	background: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    text-align: left !important;
+    background: none !important;
 }
 
 /*********************
@@ -13,11 +13,11 @@
  *********************/
 
 .clickToFlashPlaceholder {
-	background: -webkit-gradient(linear, left top, left bottom, from(rgba(235, 235, 235, 1)), to(rgba(190, 190, 190, 1))) !important;
-	border: 1px solid rgba(0, 0, 0, 0.5) !important;
-	-webkit-user-select: none !important;
-	display: inline-block !important;
-	-webkit-box-sizing: border-box !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(rgba(235, 235, 235, 1)), to(rgba(190, 190, 190, 1))) !important;
+    border: 1px solid rgba(0, 0, 0, 0.5) !important;
+    -webkit-user-select: none !important;
+    display: inline-block !important;
+    -webkit-box-sizing: border-box !important;
 }
 
 .clickToFlashPlaceholder.notable {
@@ -29,39 +29,39 @@
 }
 
 .clickToFlashPlaceholder:active {
-	background: -webkit-gradient(linear, left bottom, left top, from(rgba(225, 225, 225, 1)), to(rgba(200, 200, 200, 1))) !important;
+    background: -webkit-gradient(linear, left bottom, left top, from(rgba(225, 225, 225, 1)), to(rgba(200, 200, 200, 1))) !important;
 }
 
 .clickToFlashPlaceholderContainer {
-	position: relative !important;
-	width: inherit !important;
-	height: inherit !important;
-	margin: -1px !important;
+    position: relative !important;
+    width: inherit !important;
+    height: inherit !important;
+    margin: -1px !important;
     overflow: visible !important;
 }
 
 div.logoVerticalPosition {
-	display: table-cell !important; 
-	vertical-align: middle !important;
-	width: inherit !important;
-	height: inherit !important;
+    display: table-cell !important; 
+    vertical-align: middle !important;
+    width: inherit !important;
+    height: inherit !important;
 }
 
 .logoHorizontalPosition {
-	float: left !important;
-	position: relative !important;
-	left: 50% !important;
-	height: auto !important;
-	width: auto !important;
+    float: left !important;
+    position: relative !important;
+    left: 50% !important;
+    height: auto !important;
+    width: auto !important;
     overflow: visible !important;
 }
 
 .clickToFlashPlaceholder .logoContainer {
-	float: left !important;
-	position: relative !important;
-	left: -50% !important;
-	width: auto !important;
-	height: auto !important;
+    float: left !important;
+    position: relative !important;
+    left: -50% !important;
+    width: auto !important;
+    height: auto !important;
     overflow: visible !important;
 }
 
@@ -75,40 +75,41 @@ div.logoVerticalPosition {
 }
 
 .clickToFlashPlaceholder .logo {
-	border-radius: 8px !important;
-	border: 4px solid rgba(0, 0, 0, 0.3) !important;
-	font-size: 20px !important;
+    border-radius: 8px !important;
+    border: 4px solid rgba(0, 0, 0, 0.3) !important;
+    font-size: 20px !important;
     font-style: normal !important;
-	width: auto !important;
+    width: auto !important;
     margin: 0 !important;
-	color: rgba(0, 0, 0, 0.5) !important;
-	font-weight: bold !important;
-	padding: 14px 5px 7px 5px !important;
-	-webkit-user-select: none !important;
-	cursor: default !important;
-	background: none !important;
-	position: relative !important;
-	height: auto !important;
-	line-height: 0 !important;
+    color: rgba(0, 0, 0, 0.5) !important;
+    font-weight: bold !important;
+    padding: 14px 5px 7px 5px !important;
+    -webkit-user-select: none !important;
+    white-space: nowrap !important;
+    cursor: default !important;
+    background: none !important;
+    position: relative !important;
+    height: auto !important;
+    line-height: 0 !important;
     font-family: "Helvetica Neue", Helvetica, sans-serif !important;
 }
 
 .clickToFlashPlaceholder .logo.inset {
-	color: rgba(255, 255, 255, 0.45) !important;
-	border-color: rgba(255, 255, 255, 0.45) !important;
-	position: absolute !important;
-	top: 1px !important;
+    color: rgba(255, 255, 255, 0.45) !important;
+    border-color: rgba(255, 255, 255, 0.45) !important;
+    position: absolute !important;
+    top: 1px !important;
     font-family: "Helvetica Neue", Helvetica, sans-serif !important;
 }
 
 .clickToFlashPlaceholder .logoContainer.mini .logo,
 .clickToFlashPlaceholder .logoContainer.hidden .logo.tmp {
     color: rgba(50, 50, 50, 0.4) !important;
-	font-size: 10px !important;
+    font-size: 10px !important;
     font-style: normal !important;
-	border: 2px solid rgba(50, 50, 50, 0.2) !important;
-	padding: 7px 2px 4px 2px !important;
-	border-radius: 4px !important;
+    border: 2px solid rgba(50, 50, 50, 0.2) !important;
+    padding: 7px 2px 4px 2px !important;
+    border-radius: 4px !important;
 }
 
 .clickToFlashPlaceholder .logoContainer.hidden .logo.tmp {
@@ -116,182 +117,182 @@ div.logoVerticalPosition {
 }
 
 .clickToFlashPlaceholder .logoContainer.mini .logo.inset {
-	color: rgba(255, 255, 255, 0.25) !important;
-	border-color: rgba(255, 255, 255, 0.25) !important;
+    color: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
 }
 
 .CTFvideoContainer {
-	position: relative !important;
-	display: inline-block !important;
-	margin: 0 !important;
-	padding: 0 !important;
+    position: relative !important;
+    display: inline-block !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .CTFvideoElement {
-	display: block !important;
-	position: relative !important;
-	margin: 0px auto 0px auto !important;
+    display: block !important;
+    position: relative !important;
+    margin: 0px auto 0px auto !important;
 }
 
 .CTFQTObject {
-	position: absolute !important;
-	width: 0px !important;
-	height: 0px !important;
+    position: absolute !important;
+    width: 0px !important;
+    height: 0px !important;
 }
 
 /* PLAYLIST CONTROLS */
 .CTFplaylistControls {
-	z-index: 1 !important;
-	-webkit-user-select: none !important;
-	display: block !important;
-	position: relative !important;
-	bottom: 48px !important;
-	margin: 0px auto 0px auto !important;
-	color: white !important;
-	font-family: "Lucida Grande", Helvetica, sans-serif !important;
-	font-style: normal !important;
-	font-size: 10px !important;
-	font-weight: normal !important;
-	padding: 0px !important;
-	height: 24px !important;
-	background-image: url('controls_background.png') !important;
-	background-repeat: repeat-x !important;
-	/*opacity: 0 !important;*/
-	/*-webkit-transition: opacity .5s linear !important;*/
-	pointer-events: none !important;
-	text-rendering: auto !important;
+    z-index: 1 !important;
+    -webkit-user-select: none !important;
+    display: block !important;
+    position: relative !important;
+    bottom: 48px !important;
+    margin: 0px auto 0px auto !important;
+    color: white !important;
+    font-family: "Lucida Grande", Helvetica, sans-serif !important;
+    font-style: normal !important;
+    font-size: 10px !important;
+    font-weight: normal !important;
+    padding: 0px !important;
+    height: 24px !important;
+    background-image: url('controls_background.png') !important;
+    background-repeat: repeat-x !important;
+    /*opacity: 0 !important;*/
+    /*-webkit-transition: opacity .5s linear !important;*/
+    pointer-events: none !important;
+    text-rendering: auto !important;
 }
 
 .CTFtitleText {
-	color: white !important;
-	pointer-events: auto !important;
-	text-decoration: none !important;
-	border: 0 !important;
+    color: white !important;
+    pointer-events: auto !important;
+    text-decoration: none !important;
+    border: 0 !important;
 }
 
 .CTFtitleText:hover {
-	text-decoration: underline !important;
+    text-decoration: underline !important;
 }
 
 /*:hover.CTFplaylistControls {
-	opacity: 1 !important;
+    opacity: 1 !important;
 }*/
 
 .CTFplaylistControls div {
-	height: inherit !important;
+    height: inherit !important;
 }
 
 .CTFtrackSelect div.CTFprevButton {
-	display: table-cell !important;
-	vertical-align: middle !important;
-	height: inherit !important;
-	margin: 0 !important;
-	padding: 0 !important;
-	width: 35px !important;
-	background-image: url('prev.png') !important;
-	background-repeat: no-repeat !important;
-	background-position: center center !important;
-	pointer-events: auto !important;
+    display: table-cell !important;
+    vertical-align: middle !important;
+    height: inherit !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 37px !important;
+    background-image: url('prev.png') !important;
+    background-repeat: no-repeat !important;
+    background-position: center center !important;
+    pointer-events: auto !important;
 }
 
 .CTFtrackSelect div.CTFprevButton:active {
-	background-image: url('prev_active.png') !important;
+    background-image: url('prev_active.png') !important;
 }
 
 .CTFtrackSelect form.CTFtrackInput {
-	display: table-cell !important;
-	vertical-align: middle !important;
-	height: inherit !important;
-	padding: 0 !important;
-	margin: 0 !important;
+    display: table-cell !important;
+    vertical-align: middle !important;
+    height: inherit !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 .CTFtrackSelect div.CTFnextButton {
-	display: table-cell !important;
-	vertical-align: middle !important;
-	height: inherit !important;
-	margin: 0 0 0 0 !important;
-	padding: 0 0 0 0 !important;
-	width: 35px !important;
-	background-image: url('next.png') !important;
-	background-repeat: no-repeat !important;
-	background-position: center center !important;
-	pointer-events: auto !important;
+    display: table-cell !important;
+    vertical-align: middle !important;
+    height: inherit !important;
+    margin: 0 0 0 0 !important;
+    padding: 0 0 0 0 !important;
+    width: 37px !important;
+    background-image: url('next.png') !important;
+    background-repeat: no-repeat !important;
+    background-position: center center !important;
+    pointer-events: auto !important;
 }
 
 .CTFtrackSelect div.CTFnextButton:active {
-	background-image: url('next_active.png') !important;
+    background-image: url('next_active.png') !important;
 }
 
 .CTFtrackTitle {
-	position: absolute !important;
-	top: 0px !important;
-	left: 0px !important;
-	height: 24px !important;
+    position: absolute !important;
+    top: 0px !important;
+    left: 0px !important;
+    height: 24px !important;
 }
 
 .CTFtrackSelect {
-	position: absolute !important;
-	top: 0px !important;
-	right: 6px !important;
-	/*margin: 0 2px 0 0 !important;*/
+    position: absolute !important;
+    top: 0px !important;
+    right: 4px !important;
+    /*margin: 0 2px 0 0 !important;*/
 }
 
 .CTFtrackTitle div.CTFtrackTitleText {
-	display: table-cell !important;
-	vertical-align: middle !important;
-	height: inherit !important;
-	padding: 0 5px 0 7px !important;
+    display: table-cell !important;
+    vertical-align: middle !important;
+    height: inherit !important;
+    padding: 0 5px 0 7px !important;
 }
 .CTFtrackTitle div.CTFtrackTitleText p {
-	color: white !important;
-	font-family: "Lucida Grande", Helvetica, sans-serif !important;
-	font-style: normal !important;
-	font-size: 10px !important;
-	font-weight: normal !important;
-	margin: 0 !important;
-	padding: 0 !important;
-	white-space: nowrap !important;
-	overflow: hidden !important;
-	text-overflow: ellipsis !important;
-	text-align: left !important;
-	line-height: normal !important;
+    color: white !important;
+    font-family: "Lucida Grande", Helvetica, sans-serif !important;
+    font-style: normal !important;
+    font-size: 10px !important;
+    font-weight: normal !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    text-align: left !important;
+    line-height: normal !important;
 }
 
 
 
 .CTFtrackSelect input {
-	background-color: rgba(255, 255, 255, 0.1) !important;
-	border: 1px solid rgba(0, 0, 0, 1) !important;
-	color: white !important;
-	font-family: "Lucida Grande", Helvetica, sans-serif !important;
-	font-style: normal !important;
-	font-size: 10px !important;
-	font-weight: normal !important;
-	margin: 0 !important;
-	padding: 0 !important;
-	text-align: right !important;
-	pointer-events: auto !important;
-	height: 12px !important;
-	line-height: 1 !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(0, 0, 0, 1) !important;
+    color: white !important;
+    font-family: "Lucida Grande", Helvetica, sans-serif !important;
+    font-style: normal !important;
+    font-size: 10px !important;
+    font-weight: normal !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: right !important;
+    pointer-events: auto !important;
+    height: 12px !important;
+    line-height: 1 !important;
 }
 
 .CTFtrackSelect span {
-	color: white !important;
-	font-family: "Lucida Grande", Helvetica, sans-serif !important;
-	font-style: normal !important;
-	font-size: 10px !important;
-	font-weight: normal !important;
-	line-height: 1 !important;
+    color: white !important;
+    font-family: "Lucida Grande", Helvetica, sans-serif !important;
+    font-style: normal !important;
+    font-size: 10px !important;
+    font-weight: normal !important;
+    line-height: 1 !important;
 }
 
 /*need the specificity*/
 div.CTFplaylistControls div.CTFhoverElement {
-	position: absolute !important;
-	left: 28px !important;
-	top: 18px !important;
-	width: 24px !important;
-	height: 6px !important;
-	pointer-events: auto !important;
+    position: absolute !important;
+    left: 28px !important;
+    top: 18px !important;
+    width: 24px !important;
+    height: 6px !important;
+    pointer-events: auto !important;
 }
 
