@@ -313,6 +313,8 @@
 		<string>Slider</string>
 	</dict>
 	<dict>
+		<key>DefaultValue</key>
+		<string></string>
 		<key>Key</key>
 		<string>debug</string>
 	</dict>

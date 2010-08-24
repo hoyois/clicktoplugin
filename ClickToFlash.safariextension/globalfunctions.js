@@ -1,20 +1,25 @@
-function makeAbsoluteURI(url) {
+function makeAbsoluteURI(url, location) {
     if(!url) return "";
-    var tmpAnchor = document.createElement("a");
-    tmpAnchor.href = url;
-    return tmpAnchor.href;
+    if(/\/\//.test(url)) return url; // already absolute
+    location = location.replace(/\/[^\/]*$/, "/");
+    if(url[0]=="/") url = url.substring(1);
+    if(url[0]=="/") {
+        url = url.substring(1);
+        location = location.replace(/\/\/.*$/,"//");
+    }
+    return location + url;
 }
 
 function getFlashVariable(flashvars, key) {
-	if (!flashvars) return "";
-	var flashVarsArray = flashvars.split("&");
-	for (var i = 0; i < flashVarsArray.length; i++) {
-		var keyValuePair = flashVarsArray[i].split("=");
-		if (keyValuePair[0] == key) {
-			return keyValuePair[1];
-		}
-	}
-	return "";
+    if (!flashvars) return "";
+    var flashVarsArray = flashvars.split("&");
+    for (var i = 0; i < flashVarsArray.length; i++) {
+        var keyValuePair = flashVarsArray[i].split("=");
+        if (keyValuePair[0] == key) {
+            return keyValuePair[1];
+        }
+    }
+    return "";
 }
 
 function getMIMEType(resourceURL, handleMIMEType) {

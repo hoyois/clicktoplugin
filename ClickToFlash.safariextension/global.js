@@ -31,16 +31,8 @@ function respondToCanLoad(message) {
     }
 }
 
-function printMedia(mediaType) {
-    switch(mediaType) {
-        case "video": return "Video";
-        case "audio": return "Audio";
-        default: return "Video";
-    }
-}
-
 function handleContextMenu(event) {
-    if(!event.userInfo.CTFInstance) {
+    if(!event.userInfo.instance) {
         if(safari.extension.settings["useLAcontext"] && event.userInfo.blocked > 0) event.contextMenu.appendContextMenuItem("loadall", "Load All Flash (" + event.userInfo.blocked + ")");
         if(safari.extension.settings["useWLcontext"]) {
             event.contextMenu.appendContextMenuItem("locwhitelist", "Add Location to Whitelist\u2026");
@@ -48,48 +40,48 @@ function handleContextMenu(event) {
         return;
     }
     if(event.userInfo.isH264) {
-        event.contextMenu.appendContextMenuItem(event.userInfo.CTFInstance + "," + event.userInfo.elementID + ",reloadFlash", "Reload in Flash");
-		if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.CTFInstance + "," + event.userInfo.elementID + ",qtp", "View in QuickTime Player");
-		if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", "View on " + event.userInfo.siteInfo.name);
+        event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",reload", "Reload in Flash");
+        if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",qtp", "View in QuickTime Player");
+        if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", "View on " + event.userInfo.siteInfo.name);
     } else {
         if(event.userInfo.hasH264) {
-			event.contextMenu.appendContextMenuItem(event.userInfo.CTFInstance + "," + event.userInfo.elementID + ",flash", "Load Flash");
-			event.contextMenu.appendContextMenuItem(event.userInfo.CTFInstance + "," + event.userInfo.elementID + ",remove", "Hide Flash");
-			if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.CTFInstance + "," + event.userInfo.elementID + ",qtp", "View in QuickTime Player");
-			if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", "View on " + event.userInfo.siteInfo.name);
+            event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",plugin", "Load Flash");
+            event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",remove", "Hide Flash");
+            if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",qtp", "View in QuickTime Player");
+            if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", "View on " + event.userInfo.siteInfo.name);
         } else {
-			event.contextMenu.appendContextMenuItem(event.userInfo.CTFInstance + "," + event.userInfo.elementID + ",remove", "Hide Flash");
-		}
+            event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",remove", "Hide Flash");
+        }
         if(safari.extension.settings["useWLcontext"]) {
             event.contextMenu.appendContextMenuItem("srcwhitelist", "Add Source to Whitelist\u2026");
         }
         // BEGIN DEBUG
         if(safari.extension.settings["debug"]) {
-            event.contextMenu.appendContextMenuItem(event.userInfo.CTFInstance + "," + event.userInfo.elementID + ",show", "Show Element " + event.userInfo.CTFInstance + "." + event.userInfo.elementID);
+            event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",show", "Show Element " + event.userInfo.instance + "." + event.userInfo.elementID);
         }
         //END DEBUG
     }
 }
 
 function doCommand(event) {
-	switch(event.command) {
-		case "gotosite":
-			var newTab = safari.application.activeBrowserWindow.openTab("foreground");
-	        newTab.url = event.userInfo.siteInfo.url;
-			break;
-		case "locwhitelist":
-			handleWhitelisting(true, event.userInfo.location);
-			break;
-		case "srcwhitelist":
-			handleWhitelisting(false, event.userInfo.src);
-			break;
-		case "loadall":
-			safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("loadAll", "");
-			break;
-		default:
-			safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("loadContent", event.command);
-			break;
-	}
+    switch(event.command) {
+        case "gotosite":
+            var newTab = safari.application.activeBrowserWindow.openTab("foreground");
+            newTab.url = event.userInfo.siteInfo.url;
+            break;
+        case "locwhitelist":
+            handleWhitelisting(true, event.userInfo.location);
+            break;
+        case "srcwhitelist":
+            handleWhitelisting(false, event.userInfo.src);
+            break;
+        case "loadall":
+            safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("loadAll", "");
+            break;
+        default:
+            safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("loadContent", event.command);
+            break;
+    }
 }
 
 function handleWhitelisting (type, url) {
@@ -107,18 +99,16 @@ function handleWhitelisting (type, url) {
 
 function handleChangeOfSettings(event) {
     if(event.key == "volume") {
-        // send to all pages or just the active one??
         safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("updateVolume", event.newValue);
     } else if(event.key = "opacity") {
-		dispatchMessageToAllPages("updateOpacity", event.newValue);
-	}
+        dispatchMessageToAllPages("updateOpacity", event.newValue);
+    }
 }
 
-function getSettings() {
-	var settings = new Object();
-	settings.useH264 = safari.extension.settings["useH264"];
-	settings.usePlaylists = safari.extension.settings["usePlaylists"];
-	//settings.maxres = safari.extension.settings["maxresolution"];
+function getSettings() { // return the settings injected scripts need
+    var settings = new Object();
+    settings.useH264 = safari.extension.settings["useH264"];
+    settings.usePlaylists = safari.extension.settings["usePlaylists"];
     settings.H264autoload = safari.extension.settings["H264autoload"];
     settings.H264behavior = safari.extension.settings["H264behavior"];
     settings.volume = safari.extension.settings["volume"];
@@ -137,9 +127,9 @@ function getSettings() {
     settings.loadInvisible = safari.extension.settings["loadInvisible"];
     if(settings.loadInvisible) settings.maxinvdim = safari.extension.settings["maxinvdim"];
     settings.sifrReplacement = safari.extension.settings["sifrReplacement"];
-	settings.opacity = safari.extension.settings["opacity"];
+    settings.opacity = safari.extension.settings["opacity"];
     settings.debug = safari.extension.settings["debug"];
-	return settings;
+    return settings;
 }
 
 function killFlash(data) {
@@ -147,21 +137,21 @@ function killFlash(data) {
     if(killerID == null) return; // this flash element can't be killed :(
     // BEGIN DEBUG
     if(safari.extension.settings["debug"]) {
-        if(!confirm("Killer '" + killers[killerID].name + "' thinks it might be able to process target " + data.CTFInstance +"."+ data.elementID + ".")) return;
+        if(!confirm("Killer '" + killers[killerID].name + "' thinks it might be able to process target " + data.instance +"."+ data.elementID + ".")) return;
     }
     // END DEBUG
-    var callback = function(videoData) {
-        videoData.elementID = data.elementID;
-        videoData.CTFInstance = data.CTFInstance;
+    var callback = function(mediaData) {
+        mediaData.elementID = data.elementID;
+        mediaData.instance = data.instance;
         // the following messsage must be dispatched to all pages to make sure that
-        // pages or tabs loading in the background get their videoData
-        dispatchMessageToAllPages("mediaData", videoData);
+        // pages or tabs loading in the background get their mediaData
+        dispatchMessageToAllPages("mediaData", mediaData);
     };
     killers[killerID].processElement(data, callback);
 }
 
 function findKillerFor(data) {
-	for (i = 0; i < killers.length; i++) {
+    for (i = 0; i < killers.length; i++) {
         if(killers[i].canKill(data)) return i;
     }
     return null;
