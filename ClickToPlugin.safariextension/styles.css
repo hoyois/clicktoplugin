@@ -92,6 +92,8 @@ div.logoVerticalPosition {
     height: auto !important;
     line-height: 0 !important;
     font-family: "Helvetica Neue", Helvetica, sans-serif !important;
+    text-decoration: none !important;
+    text-transform: none !important;
 }
 
 .clickToFlashPlaceholder .logo.inset {

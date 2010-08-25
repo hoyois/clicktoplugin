@@ -1,3 +1,9 @@
+function localize(STRING) {
+    var event = document.createEvent("HTMLEvents");
+    event.initEvent("beforeload", false, true);
+    return safari.self.tab.canLoad(event, STRING);
+}
+
 function getInfo(element, url) {
     // gathers attributes of the element that might be needed later on
     // Done by a single function so that we only loop once through the <param> children
@@ -8,6 +14,9 @@ function getInfo(element, url) {
             if(element.hasAttribute("qtsrc")) {
                 tmpAnchor.href = element.getAttribute("qtsrc");
                 info.src = tmpAnchor.href;
+            }
+            if(element.hasAttribute("autohref")) {
+                info.autohref = /^true$/i.test(element.getAttribute("autohref"));
             }
             if(element.hasAttribute("href")) {
                 tmpAnchor.href = element.getAttribute("href");
@@ -23,7 +32,7 @@ function getInfo(element, url) {
             break;
         case "object":
             var paramElements = element.getElementsByTagName("param");
-            for (i = 0; i < paramElements.length; i++) {
+            for (var i = 0; i < paramElements.length; i++) {
                 if(!paramElements[i].hasAttribute("value")) continue;
                 var paramName = paramElements[i].getAttribute("name").toLowerCase(); // name attribute is mandatory!
                 switch(paramName) {
@@ -35,14 +44,17 @@ function getInfo(element, url) {
                         tmpAnchor.href = paramElements[i].getAttribute("value");
                         info.src = tmpAnchor.href;
                         break;
-                    case "href": // QuickTime
+                    case "autohref": // QuickTime redirection
+                        info.autohref = /^true$/i.test(paramElements[i].getAttribute("value"));
+                        break;
+                    case "href": // QuickTime redirection
                         tmpAnchor.href = paramElements[i].getAttribute("value");
                         info.href = tmpAnchor.href;
                         break;
-                    case "target": // QuickTime
+                    case "target": // QuickTime redirection
                         info.target = paramElements[i].getAttribute("value");
                         break;
-                    case "previewimage": // DivX
+                    case "previewimage": // DivX poster
                         tmpAnchor.href = paramElements[i].getAttribute("value");
                         info.image = tmpAnchor.href;
                         break;
@@ -69,7 +81,7 @@ function getParamsOf(element) {
                     break
                 case "object":
                     var paramElements = element.getElementsByTagName("param");
-                    for (i = paramElements.length - 1; i >= 0; i--) {
+                    for (var i = paramElements.length - 1; i >= 0; i--) {
                         if(paramElements[i].getAttribute("name").toLowerCase() == "flashvars") {
                             return paramElements[i].getAttribute("value");
                         }
@@ -81,7 +93,7 @@ function getParamsOf(element) {
         case "Silverlight":
             if(element.tag != "object") return "";
             var paramElements = element.getElementsByTagName("param");
-            for (i = 0; i < paramElements.length; i++) {
+            for (var i = 0; i < paramElements.length; i++) {
                 if(paramElements[i].getAttribute("name").toLowerCase() == "initparams") {
                     return paramElements[i].getAttribute("value").replace(/\s+/g,"");
                 }
@@ -102,7 +114,7 @@ function getTypeOf(element) {
                 return element.type;
             } else {
                 var paramElements = element.getElementsByTagName("param");
-                for (i = 0; i < paramElements.length; i++) {
+                for (var i = 0; i < paramElements.length; i++) {
                     if(paramElements[i].getAttribute("name").toLowerCase() == "type") {
                         return paramElements[i].getAttribute("value");
                     }

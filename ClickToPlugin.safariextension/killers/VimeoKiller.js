@@ -22,6 +22,7 @@ VimeoKiller.prototype.processElement = function(data, callback) {
     
     var req = new XMLHttpRequest();
     // this request needs to be synchronous, otherwise Vimeo scripts cause errors
+    // UPDATE: doesn't seem to be the case anymore. Is it safe to make this asynchronous again?
     req.open('GET', "http://www.vimeo.com/moogaloop/load/clip:" + videoID + "/", false);
     // BEGIN DEBUG
     if(safari.extension.settings["debug"]) {

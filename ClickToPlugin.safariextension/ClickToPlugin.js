@@ -191,7 +191,7 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
     
     element.info = getInfo(element, event.url);
     
-    var pluginName = safari.self.tab.canLoad(event, {"src": element.info.src, "type": getTypeOf(element), "classid": element.getAttribute("classid"), "location": window.location.href, "width": element.offsetWidth, "height": element.offsetHeight, "launchInQTP": element.info.target == "quicktimeplayer" ? element.info.href : null});
+    var pluginName = safari.self.tab.canLoad(event, {"src": element.info.src, "type": getTypeOf(element), "classid": element.getAttribute("classid"), "location": window.location.href, "width": element.offsetWidth, "height": element.offsetHeight, "launchInQTP": (element.info.autohref && element.info.target == "quicktimeplayer" ? element.info.href : null)});
     if(!pluginName) return; // whitelisted
     
     // Load the user settings
@@ -529,8 +529,8 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
                 "instance": this.instance,
                 "elementID": elementID,
                 "plugin": element.plugin,
-                "src": element.info.href ? element.info.href : element.info.src,
-                "presrc": element.info.href ? element.info.src : "",
+                "src": element.info.autohref ? element.info.href : element.info.src,
+                "href": element.info.autohref ? "" : element.info.href,
                 "image": element.info.image,
                 "params": getParamsOf(element),
                 "location": window.location.href
