@@ -55,8 +55,10 @@ mediaPlayer.prototype.initialize = function(buffer, width, height, volume, conte
     this.mediaElement.addEventListener("contextmenu", function(event) {_this.setContextInfo(event, contextInfo);}, false);
     this.mediaElement.addEventListener("loadedmetadata", function() {_this.fixAspectRatio();}, false);
     this.mediaElement.addEventListener("ended", function() {_this.nextTrack();}, false);
-    this.mediaElement.ondblclick = function() {
-        _this.switchLoop();
+    this.mediaElement.ondblclick = function(event) {
+        if(event.target == this && event.offsetY + 24 < this.offsetHeight) {
+            _this.switchLoop();
+        }
     };
     
     if(this.usePlaylistControls) {
@@ -297,7 +299,7 @@ mediaPlayer.prototype.loadTrack = function(track, autoplay) {
         this.playlistControls.getElementsByTagName("form")[0].replaceChild(newInputField, inputField);
         // this.playlistControls.getElementsByTagName("input")[0].setAttribute("value", track + this.startTrack + 1);
     } else {
-        var title = "Download " + (this.playlist[track].mediaType == "audio" ? "Audio" : "Video");
+        var title = this.playlist[track].mediaType == "audio" ? localize("AUDIO_LINK") : localize("VIDEO_LINK");
         title = "<a class=\"CTFtitleText\" href=\"" + this.mediaElement.src + "\">" + title + "</a>";
         this.playlistControls.getElementsByTagName("p")[0].innerHTML = title;
     }
