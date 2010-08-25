@@ -20,40 +20,42 @@ function respondToMessage(event) {
 
 function respondToCanLoad(message) {
     switch(message) {
+        case "getSettings":
+            return getSettings();
+        case "getInstance":
+            return ++CTP_instance;
         case "sIFR":
             if (safari.extension.settings["sifrReplacement"] == "textonly") {
                 return {"canLoad": false, "debug": safari.extension.settings["debug"]};
             } else return {"canLoad": true};
-        case "getInstance":
-            return ++CTF_instance;
-        case "getSettings":
-            return getSettings();
+        default: // return global variable with name: message
+            return this[message];
     }
 }
 
 function handleContextMenu(event) {
     if(!event.userInfo.instance) {
-        if(safari.extension.settings["useLAcontext"] && event.userInfo.blocked > 0) event.contextMenu.appendContextMenuItem("loadall", "Load All Flash (" + event.userInfo.blocked + ")");
+        if(safari.extension.settings["useLAcontext"] && event.userInfo.blocked > 0) event.contextMenu.appendContextMenuItem("loadall", LOAD_ALL_FLASH + " (" + event.userInfo.blocked + ")");
         if(safari.extension.settings["useWLcontext"]) {
-            event.contextMenu.appendContextMenuItem("locwhitelist", "Add Location to Whitelist\u2026");
+            event.contextMenu.appendContextMenuItem("locwhitelist", ADD_TO_LOC_WHITELIST + "\u2026");
         }
         return;
     }
     if(event.userInfo.isH264) {
-        event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",reload", "Reload in Flash");
-        if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",qtp", "View in QuickTime Player");
-        if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", "View on " + event.userInfo.siteInfo.name);
+        event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",reload", RELOAD_IN_PLUGIN("Flash"));
+        if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",qtp", VIEW_IN_QUICKTIME_PLAYER);
+        if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", VIEW_ON_SITE(event.userInfo.siteInfo.name));
     } else {
         if(event.userInfo.hasH264) {
-            event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",plugin", "Load Flash");
-            event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",remove", "Hide Flash");
-            if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",qtp", "View in QuickTime Player");
-            if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", "View on " + event.userInfo.siteInfo.name);
+            event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",plugin", LOAD_PLUGIN("Flash"));
+            event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",remove", REMOVE_PLUGIN("Flash"));
+            if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",qtp", VIEW_IN_QUICKTIME_PLAYER);
+            if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", VIEW_ON_SITE(event.userInfo.siteInfo.name));
         } else {
-            event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",remove", "Hide Flash");
+            event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",remove", REMOVE_PLUGIN("Flash"));
         }
         if(safari.extension.settings["useWLcontext"]) {
-            event.contextMenu.appendContextMenuItem("srcwhitelist", "Add Source to Whitelist\u2026");
+            event.contextMenu.appendContextMenuItem("srcwhitelist", ADD_TO_SRC_WHITELIST + "\u2026");
         }
         // BEGIN DEBUG
         if(safari.extension.settings["debug"]) {
@@ -85,7 +87,7 @@ function doCommand(event) {
 }
 
 function handleWhitelisting (type, url) {
-    var newWLstring = prompt("Allow Flash " + (type ? "on locations" : "from sources") + " matching:", url);
+    var newWLstring = prompt(type ? ADD_TO_LOC_WHITELIST_DIALOG_FLASH : ADD_TO_SRC_WHITELIST_DIALOG_FLASH, url);
     if(newWLstring) {
         safari.extension.settings["use" + (type ? "loc" : "src") + "Whitelist"] = true;
         if(type && safari.extension.settings["locwhitelist"] == "www.example.com, www.example2.com") { // get rid of the example
@@ -151,7 +153,7 @@ function killFlash(data) {
 }
 
 function findKillerFor(data) {
-    for (i = 0; i < killers.length; i++) {
+    for (var i = 0; i < killers.length; i++) {
         if(killers[i].canKill(data)) return i;
     }
     return null;

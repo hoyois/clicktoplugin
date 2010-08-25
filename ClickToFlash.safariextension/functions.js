@@ -1,3 +1,9 @@
+function localize(STRING) {
+    var event = document.createEvent("HTMLEvents");
+    event.initEvent("beforeload", false, true);
+    return safari.self.tab.canLoad(event, STRING);
+}
+
 function getParamsOf(element) {
     switch (element.tag) {
         case "embed":
@@ -5,7 +11,7 @@ function getParamsOf(element) {
             break
         case "object":
             var paramElements = element.getElementsByTagName("param");
-            for (i = paramElements.length - 1; i >= 0; i--) {
+            for (var i = paramElements.length - 1; i >= 0; i--) {
                 if(paramElements[i].getAttribute("name").toLowerCase() == "flashvars") {
                     return paramElements[i].getAttribute("value");
                 }
@@ -25,7 +31,7 @@ function getTypeOf(element) {
                 return element.type;
             } else {
                 var paramElements = element.getElementsByTagName("param");
-                for (i = 0; i < paramElements.length; i++) {
+                for (var i = 0; i < paramElements.length; i++) {
                     if(paramElements[i].getAttribute("name").toLowerCase() == "type") {
                         return paramElements[i].getAttribute("value");
                     }
