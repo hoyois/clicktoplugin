@@ -308,7 +308,7 @@ mediaPlayer.prototype.setContextInfo = function(event, contextInfo) {
     if(track == null) track = 0;
     contextInfo.mediaType = this.playlist[track].mediaType;
     contextInfo.siteInfo = this.playlist[track].siteInfo;
-    contextInfo.isVideo = !!this.currentTrack;
+    contextInfo.isVideo = this.currentTrack != null;
     // if(this.mediaElement) contextInfo.loop = this.mediaElement.hasAttribute("loop");
     // contextInfo.isPlaylist = (this.playlist.length > 1); // not used
     safari.self.tab.setContextMenuEventUserInfo(event, contextInfo);
