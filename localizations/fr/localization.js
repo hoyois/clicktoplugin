@@ -1,4 +1,4 @@
-// ClickToFlash/ClickToPlugin global localization file
+// ClickToFlash/ClickToPlugin localization file
 // Save with encoding: UTF-8
 
 // FRANÇAIS
