@@ -13,23 +13,28 @@
  *********************/
 
 .clickToFlashPlaceholder {
-    background: -webkit-gradient(linear, left top, left bottom, from(rgba(235, 235, 235, 1)), to(rgba(190, 190, 190, 1))) !important;
-    border: 1px solid rgba(0, 0, 0, 0.5) !important;
+    position: relative !important;
+    border: 1px solid rgba(180, 180, 180, 1) !important;
     -webkit-user-select: none !important;
     display: inline-block !important;
     -webkit-box-sizing: border-box !important;
+    /*background-color: black !important;*/
 }
 
-.clickToFlashPlaceholder.notable {
-    display: block !important;
+/*.clickToFlashPlaceholder.noimage {
+    background: -webkit-gradient(linear, left top, left bottom, from(rgba(235, 235, 235, 1)), to(rgba(190, 190, 190, 1))) !important;
 }
 
-.clickToFlashPlaceholder.nodisplay {
-    display: none !important;
-}
-
-.clickToFlashPlaceholder:active {
+.clickToFlashPlaceholder.noimage:active {
     background: -webkit-gradient(linear, left bottom, left top, from(rgba(225, 225, 225, 1)), to(rgba(200, 200, 200, 1))) !important;
+}*/
+
+.clickToFlashPlaceholder.noimage {
+    background: -webkit-gradient(linear, left top, left bottom, from(rgba(245, 245, 245, 1)), to(rgba(210, 210, 210, 1))) !important;
+}
+
+.clickToFlashPlaceholder.noimage:active {
+    background: -webkit-gradient(linear, left bottom, left top, from(rgba(235, 235, 235, 1)), to(rgba(220, 220, 220, 1))) !important;
 }
 
 .clickToFlashPlaceholderContainer {
@@ -76,12 +81,18 @@ div.logoVerticalPosition {
 
 .clickToFlashPlaceholder .logo {
     border-radius: 8px !important;
-    border: 4px solid rgba(0, 0, 0, 0.3) !important;
     font-size: 20px !important;
     font-style: normal !important;
     width: auto !important;
     margin: 0 !important;
-    color: rgba(0, 0, 0, 0.5) !important;
+    /*color: rgba(0, 0, 0, 0.5) !important;
+    border: 4px solid rgba(0, 0, 0, 0.3) !important;*/
+    color: rgba(240, 240, 240, 1) !important;
+    border: 4px solid rgba(240, 240, 240, 1) !important;
+    -webkit-box-shadow: 0 0 2px rgba(0, 0, 0, 1), inset 0 0 2px rgba(0, 0, 0, 1), 0 0 6px rgba(0, 0, 0, 0.6), inset 0 0 6px rgba(0, 0, 0, 0.6) !important;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 1), 0 0 6px rgba(0, 0, 0, 0.6) !important;
+    /*opacity: 1 !important;*/
+    /* -- */
     font-weight: bold !important;
     padding: 14px 5px 7px 5px !important;
     -webkit-user-select: none !important;
@@ -96,12 +107,28 @@ div.logoVerticalPosition {
     text-transform: none !important;
 }
 
+.clickToFlashPlaceholder.noimage .logo {
+    color: rgba(0, 0, 0, 0.35) !important;
+    border: 4px solid rgba(0, 0, 0, 0.25) !important;
+    -webkit-box-shadow: none !important;
+    text-shadow: none !important;
+}
+
 .clickToFlashPlaceholder .logo.inset {
-    color: rgba(255, 255, 255, 0.45) !important;
-    border-color: rgba(255, 255, 255, 0.45) !important;
+    /*display: none !important;*/
+    -webkit-box-shadow: none !important;
+    text-shadow: none !important;
+    color: rgba(175, 175, 175, 0.3) !important;
+    border-color: rgba(175, 175, 175, 0.3) !important;
     position: absolute !important;
     top: 1px !important;
     font-family: "Helvetica Neue", Helvetica, sans-serif !important;
+}
+
+.clickToFlashPlaceholder.noimage .logo.inset {
+    /*display: block !important;*/
+    color: rgba(255, 255, 255, 0.45) !important;
+    border-color: rgba(255, 255, 255, 0.45) !important;
 }
 
 .clickToFlashPlaceholder .logoContainer.mini .logo,
@@ -123,6 +150,18 @@ div.logoVerticalPosition {
     border-color: rgba(255, 255, 255, 0.25) !important;
 }
 
+.clickToFlashPlaceholderDownloadLink {
+    position: absolute !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 16px !important;
+    margin: 0 !important;
+    padding: 8px 0 4px 0 !important;
+    text-align: center !important;
+    font-size: 12px !important;
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+}
+
 .CTFvideoContainer {
     position: relative !important;
     display: inline-block !important;
@@ -132,7 +171,10 @@ div.logoVerticalPosition {
 
 .CTFvideoElement {
     display: block !important;
-    position: relative !important;
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
     margin: 0px auto 0px auto !important;
 }
 
@@ -146,9 +188,12 @@ div.logoVerticalPosition {
 .CTFplaylistControls {
     z-index: 1 !important;
     -webkit-user-select: none !important;
-    display: block !important;
-    position: relative !important;
-    bottom: 48px !important;
+    display: table-cell !important;
+    vertical-align: middle !important;
+    position: absolute !important;
+    bottom: 24px !important;
+    left: 0 !important;
+    right: 0 !important;
     margin: 0px auto 0px auto !important;
     color: white !important;
     font-family: "Lucida Grande", Helvetica, sans-serif !important;
@@ -159,8 +204,6 @@ div.logoVerticalPosition {
     height: 24px !important;
     background-image: url('controls_background.png') !important;
     background-repeat: repeat-x !important;
-    /*opacity: 0 !important;*/
-    /*-webkit-transition: opacity .5s linear !important;*/
     pointer-events: none !important;
     text-rendering: auto !important;
 }
@@ -175,10 +218,6 @@ div.logoVerticalPosition {
 .CTFtitleText:hover {
     text-decoration: underline !important;
 }
-
-/*:hover.CTFplaylistControls {
-    opacity: 1 !important;
-}*/
 
 .CTFplaylistControls div {
     height: inherit !important;

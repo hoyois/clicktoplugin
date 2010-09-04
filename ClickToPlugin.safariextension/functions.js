@@ -34,33 +34,45 @@ function getInfo(element, url) {
             var paramElements = element.getElementsByTagName("param");
             for (var i = 0; i < paramElements.length; i++) {
                 if(!paramElements[i].hasAttribute("value")) continue;
-                var paramName = paramElements[i].getAttribute("name").toLowerCase(); // name attribute is mandatory!
-                switch(paramName) {
-                    case "source": // Silverlight true source
-                        tmpAnchor.href = paramElements[i].getAttribute("value");
-                        info.src = tmpAnchor.href;
-                        break;
-                    case "qtsrc": // QuickTime true source
-                        tmpAnchor.href = paramElements[i].getAttribute("value");
-                        info.src = tmpAnchor.href;
-                        break;
-                    case "autohref": // QuickTime redirection
-                        info.autohref = /^true$/i.test(paramElements[i].getAttribute("value"));
-                        break;
-                    case "href": // QuickTime redirection
-                        tmpAnchor.href = paramElements[i].getAttribute("value");
-                        info.href = tmpAnchor.href;
-                        break;
-                    case "target": // QuickTime redirection
-                        info.target = paramElements[i].getAttribute("value");
-                        break;
-                    case "previewimage": // DivX poster
-                        tmpAnchor.href = paramElements[i].getAttribute("value");
-                        info.image = tmpAnchor.href;
-                        break;
-                }
+                /* NOTE 1
+                The 'name' attribute of a <param> element is mandatory.
+                However, Safari will load an <object> element even if it has <param> children with no 'name',
+                so we have to account for this possibilty, otherwise CTP could easily be circumvented!
+                For these reasons we use try/catch statements.
+                */
+                try{
+                    var paramName = paramElements[i].getAttribute("name").toLowerCase();
+                    switch(paramName) {
+                        case "source": // Silverlight true source
+                            tmpAnchor.href = paramElements[i].getAttribute("value");
+                            info.src = tmpAnchor.href;
+                            break;
+                            case "qtsrc": // QuickTime true source
+                            tmpAnchor.href = paramElements[i].getAttribute("value");
+                            info.src = tmpAnchor.href;
+                            break;
+                            case "autohref": // QuickTime redirection
+                            info.autohref = /^true$/i.test(paramElements[i].getAttribute("value"));
+                            break;
+                            case "href": // QuickTime redirection
+                            tmpAnchor.href = paramElements[i].getAttribute("value");
+                            info.href = tmpAnchor.href;
+                            break;
+                            case "target": // QuickTime redirection
+                            info.target = paramElements[i].getAttribute("value");
+                            break;
+                            case "previewimage": // DivX poster
+                            tmpAnchor.href = paramElements[i].getAttribute("value");
+                            info.image = tmpAnchor.href;
+                            break;
+                    }
+                } catch(err) {}
             }
             break;
+    }
+    if(info.autohref) {
+        info.src =  info.href;
+        delete info.href;
     }
     if(!info.src) {
         if(!url) info.src = "";
@@ -70,38 +82,6 @@ function getInfo(element, url) {
         }
     }
     return info;
-}
-
-function getParamsOf(element) {
-    switch(element.plugin) {
-        case "Flash":
-            switch (element.tag) {
-                case "embed":
-                    return (element.getAttribute("flashvars") ? element.getAttribute("flashvars") : ""); // fixing Safari's buggy JS support
-                    break
-                case "object":
-                    var paramElements = element.getElementsByTagName("param");
-                    for (var i = paramElements.length - 1; i >= 0; i--) {
-                        if(paramElements[i].getAttribute("name").toLowerCase() == "flashvars") {
-                            return paramElements[i].getAttribute("value");
-                        }
-                    }
-                    return "";
-                    break;
-            }
-            break;
-        case "Silverlight":
-            if(element.tag != "object") return "";
-            var paramElements = element.getElementsByTagName("param");
-            for (var i = 0; i < paramElements.length; i++) {
-                if(paramElements[i].getAttribute("name").toLowerCase() == "initparams") {
-                    return paramElements[i].getAttribute("value").replace(/\s+/g,"");
-                }
-            }
-            return "";
-            break;
-        default: return "";
-    }
 }
 
 function getTypeOf(element) {
@@ -115,9 +95,11 @@ function getTypeOf(element) {
             } else {
                 var paramElements = element.getElementsByTagName("param");
                 for (var i = 0; i < paramElements.length; i++) {
-                    if(paramElements[i].getAttribute("name").toLowerCase() == "type") {
-                        return paramElements[i].getAttribute("value");
-                    }
+                    try { // see NOTE 1
+                        if(paramElements[i].getAttribute("name").toLowerCase() == "type") {
+                            return paramElements[i].getAttribute("value");
+                        }
+                    } catch(err) {}
                 }
                 var embedChildren = element.getElementsByTagName("embed");
                 if(embedChildren.length == 0) return "";
@@ -127,6 +109,42 @@ function getTypeOf(element) {
         case "applet":
             return "application/x-java-applet";
             break;
+    }
+}
+
+function getParamsOf(element) {
+    switch(element.plugin) {
+        case "Flash":
+            switch (element.tag) {
+                case "embed":
+                    return (element.hasAttribute("flashvars") ? element.getAttribute("flashvars") : ""); // fixing Safari's buggy JS support
+                    break
+                case "object":
+                    var paramElements = element.getElementsByTagName("param");
+                    for (var i = paramElements.length - 1; i >= 0; i--) {
+                        try{ // see NOTE 1
+                            if(paramElements[i].getAttribute("name").toLowerCase() == "flashvars") {
+                                return paramElements[i].getAttribute("value");
+                            }
+                        } catch(err) {}
+                    }
+                    return "";
+                    break;
+            }
+            break;
+        case "Silverlight":
+            if(element.tag != "object") return "";
+            var paramElements = element.getElementsByTagName("param");
+            for (var i = 0; i < paramElements.length; i++) {
+                try { // see NOTE 1
+                    if(paramElements[i].getAttribute("name").toLowerCase() == "initparams") {
+                        return paramElements[i].getAttribute("value").replace(/\s+/g,"");
+                    }
+                } catch(err) {}
+            }
+            return "";
+            break;
+        default: return "";
     }
 }
 
