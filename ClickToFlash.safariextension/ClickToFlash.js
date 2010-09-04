@@ -140,7 +140,7 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
         var type = getTypeOf(element);
         if(!type) {
             // sources with no extensions may secretly point to a Flash movie, so we have to block them
-            if(/\.([a-zA-Z0-9])+(\?|$)/.test(event.url)) return;
+            if(!event.url || /\.([a-zA-Z0-9])+(\?|$)/.test(event.url)) return;
             else element.label = "?";
         } else if(type != "application/x-shockwave-flash" && type != "application/futuresplash") {
             return;
