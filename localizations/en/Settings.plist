@@ -30,6 +30,16 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>showPoster</string>
+		<key>Title</key>
+		<string>Show preview image on placeholder              </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
 		<string>H264autoload</string>
@@ -40,11 +50,21 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
+		<string></string>
+		<key>Key</key>
+		<string>H264whitelist</string>
+		<key>Title</key>
+		<string>on these sites</string>
+		<key>Type</key>
+		<string>TextField</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
 		<string>autoplay</string>
 		<key>Key</key>
 		<string>H264behavior</string>
 		<key>Title</key>
-		<string>Once loaded</string>
+		<string>Initial behavior</string>
 		<key>Titles</key>
 		<array>
 			<string>Do not buffer</string>
@@ -122,7 +142,7 @@
 	</dict>
 	<dict>
 		<key>Title</key>
-		<string>Whitelist</string>
+		<string>Whitelists</string>
 		<key>Type</key>
 		<string>Group</string>
 	</dict>
@@ -187,12 +207,6 @@
 		<string>TextField</string>
 	</dict>
 	<dict>
-		<key>Title</key>
-		<string>Invisible Flash</string>
-		<key>Type</key>
-		<string>Group</string>
-	</dict>
-	<dict>
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
@@ -248,7 +262,7 @@
 		<key>Key</key>
 		<string>useLAcontext</string>
 		<key>Title</key>
-		<string>Load All Plugins                                             </string>
+		<string>Load All Flash                                                 </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>

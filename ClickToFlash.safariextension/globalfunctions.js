@@ -41,3 +41,22 @@ function canPlayWithQTPlugin(MIMEType) {
 }
 
 const canPlayFLV = canPlayWithQTPlugin("video/x-flv");
+const canPlayWM = canPlayWithQTPlugin("video/x-ms-wmv");
+
+function matchList(list, string) {
+    for(var i = 0; i < list.length; i++) {
+        var s = list[i];
+        // if s is enclosed in parenthesis, interpret as regexp
+        if (s[0] == "(" && s[s.length - 1] == ")") {
+            try{
+                s = new RegExp(s);
+            } catch (err) { // invalid regexp, just ignore
+                continue;
+            }
+        }
+        if(string.match(s)) {
+            return true;
+        }
+    }
+    return false;
+}

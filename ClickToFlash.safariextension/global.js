@@ -1,6 +1,44 @@
 var CTF_instance = 0; // incremented by one whenever a ClickToFlash instance with content is created
 const killers = [new YouTubeKiller(), new VimeoKiller(), new DailymotionKiller(), new VeohKiller(), new JWKiller()];
 
+function blockOrAllow(data) { // check the whitelists and returns null if element can be loaded
+
+    // Deal with invisible plugins
+    if(safari.extension.settings["loadInvisible"]) {
+        if(data.width <= safari.extension.settings["maxinvdim"] && data.height <= safari.extension.settings["maxinvdim"]) {
+            return true;
+        }
+    }
+    
+    // Deal with whitelisted content
+    if(safari.extension.settings["uselocWhitelist"]) {
+        var locwhitelist = safari.extension.settings["locwhitelist"].replace(/\s+/g,"");
+        var locblacklist = safari.extension.settings["locblacklist"].replace(/\s+/g,"");
+        if(locwhitelist) {
+            locwhitelist = locwhitelist.split(/,(?![^\(]*\))/); // matches all , except those in parentheses (used in regexp)
+            if(matchList(locwhitelist, data.location)) return true;
+        }
+        if(locblacklist) {
+            locblacklist = locblacklist.split(/,(?![^\(]*\))/);
+            if(!matchList(locblacklist, data.location)) return true;
+        }
+    }
+    if(safari.extension.settings["usesrcWhitelist"]) {
+        var srcwhitelist = safari.extension.settings["srcwhitelist"].replace(/\s+/g,"");
+        var srcblacklist = safari.extension.settings["srcblacklist"].replace(/\s+/g,"");
+        if(srcwhitelist) {
+            srcwhitelist = srcwhitelist.split(/,(?![^\(]*\))/);
+            if(matchList(srcwhitelist, data.src)) return true;
+        }
+        if(locblacklist) {
+            srcblacklist = srcblacklist.split(/,(?![^\(]*\))/);
+            if(!matchList(srcblacklist, data.src)) return true;
+        }
+    }
+    
+    return false;
+}
+
 // EVENT LISTENERS
 safari.application.addEventListener("message", respondToMessage, false);
 safari.application.addEventListener("contextmenu", handleContextMenu, false);
@@ -19,11 +57,13 @@ function respondToMessage(event) {
 }
 
 function respondToCanLoad(message) {
+    // Make checks in correct order for optimal performance
+    if(message.src != undefined) return blockOrAllow(message);
     switch(message) {
         case "getSettings":
             return getSettings();
         case "getInstance":
-            return ++CTP_instance;
+            return ++CTF_instance;
         case "sIFR":
             if (safari.extension.settings["sifrReplacement"] == "textonly") {
                 return {"canLoad": false, "debug": safari.extension.settings["debug"]};
@@ -41,7 +81,7 @@ function handleContextMenu(event) {
         }
         return;
     }
-    if(event.userInfo.isH264) {
+    if(event.userInfo.isVideo) {
         event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",reload", RELOAD_IN_PLUGIN("Flash"));
         if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",qtp", VIEW_IN_QUICKTIME_PLAYER);
         if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", VIEW_ON_SITE(event.userInfo.siteInfo.name));
@@ -96,6 +136,8 @@ function handleWhitelisting (type, url) {
             var comma = safari.extension.settings[(type ? "loc" : "src") + "whitelist"].replace(/\s+/,"") ? ", " : "";
             safari.extension.settings[(type ? "loc" : "src") + "whitelist"] += comma + newWLstring;
         }
+        // load targeted content at once
+        dispatchMessageToAllPages(type ? "locwhitelist" : "srcwhitelist", newWLstring);
     }
 }
 
@@ -111,23 +153,9 @@ function getSettings() { // return the settings injected scripts need
     var settings = new Object();
     settings.useH264 = safari.extension.settings["useH264"];
     settings.usePlaylists = safari.extension.settings["usePlaylists"];
-    settings.H264autoload = safari.extension.settings["H264autoload"];
+    settings.showPoster = safari.extension.settings["showPoster"];
     settings.H264behavior = safari.extension.settings["H264behavior"];
     settings.volume = safari.extension.settings["volume"];
-    if(safari.extension.settings["uselocWhitelist"]) {
-        settings.locwhitelist = safari.extension.settings["locwhitelist"].replace(/\s+/g,"");
-        settings.locblacklist = safari.extension.settings["locblacklist"].replace(/\s+/g,"");
-        settings.locwhitelist = (settings.locwhitelist ? settings.locwhitelist.split(/,(?![^\(]*\))/) : null);
-        settings.locblacklist = (settings.locblacklist ? settings.locblacklist.split(/,(?![^\(]*\))/) : null);
-    }
-    if(safari.extension.settings["usesrcWhitelist"]) {
-        settings.srcwhitelist = safari.extension.settings["srcwhitelist"].replace(/\s+/g,"");
-        settings.srcblacklist = safari.extension.settings["srcblacklist"].replace(/\s+/g,"");
-        settings.srcwhitelist = (settings.srcwhitelist ? settings.srcwhitelist.split(/,(?![^\(]*\))/) : null);
-        settings.srcblacklist = (settings.srcblacklist ? settings.srcblacklist.split(/,(?![^\(]*\))/) : null);
-    }
-    settings.loadInvisible = safari.extension.settings["loadInvisible"];
-    if(settings.loadInvisible) settings.maxinvdim = safari.extension.settings["maxinvdim"];
     settings.sifrReplacement = safari.extension.settings["sifrReplacement"];
     settings.opacity = safari.extension.settings["opacity"];
     settings.debug = safari.extension.settings["debug"];
@@ -143,6 +171,12 @@ function killFlash(data) {
     }
     // END DEBUG
     var callback = function(mediaData) {
+        if(safari.extension.settings["H264autoload"]) {
+            if(!safari.extension.settings["H264whitelist"]) mediaData.autoload = true;
+            else {
+                mediaData.autoload = matchList(safari.extension.settings["H264whitelist"].replace(/\s+/g, "").split(/,(?![^\(]*\))/), data.location);
+            }
+        }
         mediaData.elementID = data.elementID;
         mediaData.instance = data.instance;
         // the following messsage must be dispatched to all pages to make sure that
