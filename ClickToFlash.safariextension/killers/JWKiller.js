@@ -17,7 +17,7 @@ JWKiller.prototype.processElement = function(data, callback) {
             this.processElementFromPlaylist(playlistURL, data.location, getFlashVariable(data.params, "item"), posterURL, callback);
             return;
         }
-        if(/.xml($|\?)/i.test(sourceURL)) {
+        if(/\.xml($|\?)/i.test(sourceURL)) {
             this.processElementFromPlaylist(sourceURL, data.location, getFlashVariable(data.params, "item"), posterURL, callback);
             return;
         }
@@ -38,9 +38,11 @@ JWKiller.prototype.processElement = function(data, callback) {
 
 // put a more complete function in globalfunctions.js
 function checkSrc(sourceURL) {
-    if (sourceURL.match(/.mp4|.mpe{0,1}g|.mov/i)) return "video";
-    if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && sourceURL.match(/.flv/i)) return "video";
-    if(sourceURL.match(/.mp3|.wav|.aiff|.aac/i)) return "audio";
+    if (sourceURL.match(/\.mp4|\.mpe{0,1}g|\.mov/i)) return "video";
+    if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && sourceURL.match(/\.flv/i)) return "video";
+    if(safari.extension.settings["QTbehavior"] > 1 && canPlayWM && sourceURL.match(/\.wmv|\.asf/i)) return "video";
+    if(sourceURL.match(/\.mp3|\.wav|\.aiff|\.aac/i)) return "audio";
+    if(safari.extension.settings["QTbehavior"] > 1 && canPlayWM && sourceURL.match(/\.wma/i)) return "audio";
     return false;
 };
 
