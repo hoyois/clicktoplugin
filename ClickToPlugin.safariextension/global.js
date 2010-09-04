@@ -2,7 +2,7 @@ var CTP_instance = 0; // incremented by one whenever a ClickToPlugin instance wi
 const killers = [new YouTubeKiller(), new VimeoKiller(), new DailymotionKiller(), new VeohKiller(), new JWKiller(), new SLKiller(), new QTKiller(), new WMKiller(), new DivXKiller()];
 
 function blockOrAllow(data) { // returns null if element can be loaded, the name of the plugin otherwise
-    
+
     // no source and no type -> must allow, it's probably going to pass through here again after being modified by a script
     if(!data.src && !data.type && !data.classid) return null;
 
@@ -59,8 +59,10 @@ function blockOrAllow(data) { // returns null if element can be loaded, the name
     if(MIMEType) plugin = getPluginForType(MIMEType);
     if(!plugin && data.src) {
         var x = getPluginAndTypeForExt(ext);
-        plugin = x.plugin;
-        MIMEType = x.type;
+        if(x) {
+            plugin = x.plugin;
+            MIMEType = x.type;
+        }
     }
     if(plugin) pluginName = getPluginNameFromPlugin(plugin);
     else if(MIMEType) pluginName = getPluginNameFromType(MIMEType);
@@ -139,7 +141,7 @@ function handleContextMenu(event) {
         return;
     }
     var pluginName = /[A-Z]/.test(event.userInfo.plugin) ? event.userInfo.plugin : PLUGIN_GENERIC;
-    if(event.userInfo.isH264) {
+    if(event.userInfo.isVideo) {
         event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",reload", RELOAD_IN_PLUGIN(pluginName));
         if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",qtp", VIEW_IN_QUICKTIME_PLAYER);
         if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", VIEW_ON_SITE(event.userInfo.siteInfo.name));
@@ -194,6 +196,8 @@ function handleWhitelisting (type, url) {
             var comma = safari.extension.settings[(type ? "loc" : "src") + "whitelist"].replace(/\s+/,"") ? ", " : "";
             safari.extension.settings[(type ? "loc" : "src") + "whitelist"] += comma + newWLstring;
         }
+        // load targeted content at once
+        dispatchMessageToAllPages(type ? "locwhitelist" : "srcwhitelist", newWLstring);
     }
 }
 
@@ -209,7 +213,7 @@ function getSettings() { // return the settings injected scripts need
     var settings = new Object();
     settings.useH264 = safari.extension.settings["useH264"];
     settings.usePlaylists = safari.extension.settings["usePlaylists"];
-    settings.H264autoload = safari.extension.settings["H264autoload"];
+    settings.showPoster = safari.extension.settings["showPoster"];
     settings.H264behavior = safari.extension.settings["H264behavior"];
     settings.volume = safari.extension.settings["volume"];
     settings.sifrReplacement = safari.extension.settings["sifrReplacement"];
@@ -227,6 +231,12 @@ function killPlugin(data) {
     }
     // END DEBUG
     var callback = function(mediaData) {
+        if(safari.extension.settings["H264autoload"]) {
+            if(!safari.extension.settings["H264whitelist"]) mediaData.autoload = true;
+            else {
+                mediaData.autoload = matchList(safari.extension.settings["H264whitelist"].replace(/\s+/g, "").split(/,(?![^\(]*\))/), data.location);
+            }
+        }
         mediaData.elementID = data.elementID;
         mediaData.instance = data.instance;
         // the following messsage must be dispatched to all pages to make sure that

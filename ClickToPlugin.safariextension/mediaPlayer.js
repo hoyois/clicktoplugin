@@ -149,9 +149,7 @@ mediaPlayer.prototype.initializePlaylistControls = function() {
         _this.loadTrack(_this.currentTrack + 1, true);
     };
     
-    this.playlistControls.style.opacity = "1";
     this.containerElement.appendChild(this.playlistControls);
-
 };
 
 mediaPlayer.prototype.initializeDownloadControls = function() {
@@ -230,7 +228,7 @@ mediaPlayer.prototype.fixAspectRatio = function() {
     }
     if(this.usePlaylistControls) {
         // need this otherwise a webkit bug messes up font smoothing
-        this.fadeIn(.05);
+        this.fadeIn(0);
     }
     
 };
@@ -266,18 +264,16 @@ mediaPlayer.prototype.loadTrack = function(track, autoplay) {
     if(this.playlist[track].posterURL) {
         if(this.playlist[track].mediaType == "video") {
             this.mediaElement.poster = this.playlist[track].posterURL;
-            this.mediaElement.style.background = "";
+            this.mediaElement.style.background = "none !important";
             // this.mediaElement.style.backgroundSize = "";
         } else {
             if(this.mediaElement.hasAttribute("poster")) this.mediaElement.removeAttribute("poster");
-            this.mediaElement.style.backgroundImage = "url('" + this.playlist[track].posterURL + "')";
-            this.mediaElement.style.backgroundRepeat = "no-repeat";
-            this.mediaElement.style.backgroundPosition = "center center";
-            // this.mediaElement.style.backgroundSize = "100 %";
+            this.mediaElement.style.background = "url('" + this.playlist[track].posterURL + "') center no-repeat border-box !important";
+            this.mediaElement.style.backgroundSize = "contain !important";
         }
     }  else {
         if(this.mediaElement.hasAttribute("poster")) this.mediaElement.removeAttribute("poster");
-        this.mediaElement.style.background = "";
+        this.mediaElement.style.background = "none !important";
     }
     this.currentTrack = track;
     if(autoplay) {
@@ -297,7 +293,9 @@ mediaPlayer.prototype.loadTrack = function(track, autoplay) {
         newInputField.style.width = (8 * this.playlistLength.toString().length) + "px";
         // simply changing the value does not update if user has used the field
         this.playlistControls.getElementsByTagName("form")[0].replaceChild(newInputField, inputField);
-        // this.playlistControls.getElementsByTagName("input")[0].setAttribute("value", track + this.startTrack + 1);
+        // Show playlist controls
+        this.playlistControls.style.WebkitTransition = "";
+        this.playlistControls.style.opacity = "1";
     } else {
         var title = this.playlist[track].mediaType == "audio" ? localize("AUDIO_LINK") : localize("VIDEO_LINK");
         title = "<a class=\"CTFtitleText\" href=\"" + this.mediaElement.src + "\">" + title + "</a>";
@@ -310,6 +308,7 @@ mediaPlayer.prototype.setContextInfo = function(event, contextInfo) {
     if(track == null) track = 0;
     contextInfo.mediaType = this.playlist[track].mediaType;
     contextInfo.siteInfo = this.playlist[track].siteInfo;
+    contextInfo.isVideo = !!this.currentTrack;
     // if(this.mediaElement) contextInfo.loop = this.mediaElement.hasAttribute("loop");
     // contextInfo.isPlaylist = (this.playlist.length > 1); // not used
     safari.self.tab.setContextMenuEventUserInfo(event, contextInfo);

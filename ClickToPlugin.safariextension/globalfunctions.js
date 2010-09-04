@@ -119,7 +119,7 @@ function getPluginAndTypeForExt(ext) {
             }
         }
     }
-    return {"plugin": null, "type": null};
+    return false;
 }
 
 function getPluginNameFromPlugin(plugin) {

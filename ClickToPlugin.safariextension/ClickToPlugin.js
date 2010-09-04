@@ -18,28 +18,29 @@ function ClickToPlugin() {
     this.settings = null;
     this.instance = null;
     this.numberOfBlockedElements = 0;
-    this.numberOfUnblockedElements = 0;
     
     var _this = this;
     
     this.respondToMessageTrampoline = function(event) {
         _this.respondToMessage(event);
     };
-    
-    this.handleEventTrampoline = function(event) {
-        _this.handleEvent(event);
+    this.handleBeforeLoadEventTrampoline = function(event) {
+        _this.handleBeforeLoadEvent(event);
+    };
+    this.handleDOMContentEventTrampoline = function(event) {
+        _this.handleDOMContentEvent(event);
     };
 
     safari.self.addEventListener("message", this.respondToMessageTrampoline, false);
-    document.addEventListener("beforeload", this.handleEventTrampoline, true);
+    document.addEventListener("beforeload", this.handleBeforeLoadEventTrampoline, true);
     // HTML applet elements fire no beforeload event
     // bug filed: https://bugs.webkit.org/show_bug.cgi?id=44023
     // Unsatisfactory workaround (Java will run anyway):
-    document.addEventListener("DOMContentLoaded", this.handleEventTrampoline, false);
-    document.addEventListener("DOMNodeInserted", this.handleEventTrampoline, false);
+    document.addEventListener("DOMContentLoaded", this.handleDOMContentEventTrampoline, false);
+    document.addEventListener("DOMNodeInserted", this.handleDOMContentEventTrampoline, false);
     
     document.oncontextmenu = function(event) {
-        safari.self.tab.setContextMenuEventUserInfo(event, {"location": window.location.href, "blocked": _this.numberOfBlockedElements - _this.numberOfUnblockedElements});
+        safari.self.tab.setContextMenuEventUserInfo(event, {"location": window.location.href, "blocked": this.getElementsByClassName("clickToFlashPlaceholder").length});
     };
 }
 
@@ -52,12 +53,12 @@ ClickToPlugin.prototype.clearAll = function(elementID) {
 ClickToPlugin.prototype.respondToMessage = function(event) {
     switch(event.name) {
         case "mediaData":
-            if(event.message.instance != this.instance) return; // ignore message from other CTP instances
+            if(event.message.instance != this.instance) return; // ignore message from other instances
             this.prepMedia(event.message);
             break;
         case "loadContent":
             var loadData = event.message.split(","); // [0] instance, [1] elementID, [2] message
-            if (loadData[0] != this.instance) return; // ignore message from other CTP instances
+            if (loadData[0] != this.instance) return; // ignore message from other instances
             switch(loadData[2]) {
                 case "plugin":
                     this.loadPluginForElement(loadData[1]);
@@ -79,6 +80,12 @@ ClickToPlugin.prototype.respondToMessage = function(event) {
         case "loadAll":
             this.loadAll();
             break;
+        case "srcwhitelist":
+            this.loadSrc(event.message);
+            break;
+        case "locwhitelist":
+            if(window.location.href.match(event.message)) this.loadAll();
+            break;
         case "updateVolume":
             this.setVolumeTo(event.message);
             break;
@@ -88,24 +95,50 @@ ClickToPlugin.prototype.respondToMessage = function(event) {
     }
 };
 
-/* NOTE on embedded content and plugins
+/* IMPORTANT NOTE on embedded content and plugins
 According to the W3C HTML5 spec, to activate a plugin,
--> an 'embed' element must have either the 'src' or the 'type' attribute with nonempty value
--> an 'object' element must have either the 'data' or the 'type' attribute with nonempty value.
-In the real world, however, one often finds an 'object' with neither 'data' nor 'type',
-with an 'embed' element as child with 'src' and/or 'type' attribute set.
-*/
+-> an 'embed' element must have either the 'src' or the 'type' attribute with nonempty value,
+-> an 'object' element must have either the 'data' or the 'type' attribute with nonempty value,
+   otherwise fallback content is used, if any.
+For <embed> elements, Safari follows this rule. Moreover, if the 'type' attribute is set
+in an <embed> element, Safari completely ignores the 'src' attribute when looking for a plugin.
 
-ClickToPlugin.prototype.handleEvent = function(event) {
-    switch(event.type) {
-        case "beforeload":
-            this.handleBeforeLoadEvent(event);
-            break;
-        default:
-            this.handleDOMContentEvent(event);
-    }
-    
-};
+For <object> elements, however, Safari has its own completely incoherent rules.
+First, it will NEVER use an <embed> element as fallback content to an <object> element
+(in particular, such an <embed> element will never fire a beforeload event).
+It's much worse than that, though. The 'src' and 'type' values of the <embed> tag
+OVERWRITE the 'data' and 'type' values of the <object> tag. Moreover, Safari can also get
+the source and the type from <param> elements named 'src' and 'type'.
+Here's how it proceeds for <object> elements in general:
+
+1. If there is a <param> child named 'type', set 'computed type' to its value.
+If there is a <param> child named 'src', set 'computed source' to its value.
+If both <param> children exist, set X to true, otherwise, X is false.
+
+2. If the <object> element has the 'type' attribute, set 'computed type' to its value.
+If the <object> element has the 'data' attribute, set 'computed source' to its value.
+
+3. If there is an <embed> child with the attribute 'type', set 'computed type' to its value.
+If there is an <embed> child with the attribute 'src', set 'computed source' to its value.
+
+4. If 'computed type' is set, look for a plugin according to the computed type, and go to 6.
+
+5. If 'computed source' is set, look for a plugin according to the computed source, and go to 7.
+
+6. If no plugin is found: if X is true, go to 5, otherwise, go to 8.
+
+7. If no plugin is found, go to 8.
+
+8. Use fallback content (provided, of course, that it isn't an <embed> element)
+
+The computed source is what Safari sends to the plugin, when one is found.
+
+Good luck making sense of that. Other facts of interest are:
+-> Safari ignores the 'classid' attribute.
+-> With the exception discussed above, a beforeload event is fired on every
+unignored <object> or <embed> element, regardless of it having a type or a source
+(the same is true for other elements that fire beforeload events).
+*/
 
 // event.type is DOMContentLoaded or DOMNodeInserted (-> block <applet> tags)
 ClickToPlugin.prototype.handleDOMContentEvent = function(event) {
@@ -199,7 +232,7 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
         this.settings = safari.self.tab.canLoad(event, "getSettings");
     }
     
-    // if useh264...
+    // if useh264... nah, not worth it & breaks whitelisting
     
     // Deal with sIFR Flash
     if (element.className == "sIFR-flash" || element.hasAttribute("sifr")) {
@@ -267,14 +300,41 @@ ClickToPlugin.prototype.prepMedia = function(mediaData) {
     this.mediaPlayers[mediaData.elementID].usePlaylistControls = this.settings["usePlaylists"] && !mediaData.noPlaylistControls && this.mediaPlayers[mediaData.elementID].playlistLength > 1;
 
     // Check if we should load video at once
-    if(this.settings["H264autoload"]) {
+    if(mediaData.autoload) {
         this.loadMediaForElement(mediaData.elementID);
         return;
+    } else {
+        this.showDownloadLink(mediaData.playlist[0].mediaType, mediaData.playlist[0].mediaURL, mediaData.elementID);
+        if(this.settings["showPoster"] && mediaData.playlist[0].posterURL) {
+            // show poster as background image
+            this.placeholderElements[mediaData.elementID].style.opacity = "1";
+            this.placeholderElements[mediaData.elementID].style.background = "url('" + mediaData.playlist[0].posterURL + "') center no-repeat border-box !important";
+            this.placeholderElements[mediaData.elementID].style.backgroundSize = "contain !important";
+            this.placeholderElements[mediaData.elementID].className = "clickToFlashPlaceholder"; // remove 'noimage' class
+        }
     }
+    
     var badgeLabel = mediaData.badgeLabel;
     if(!badgeLabel) badgeLabel = "Video";
     
     this.displayBadge(badgeLabel, mediaData.elementID);
+};
+
+ClickToPlugin.prototype.showDownloadLink = function(mediaType, url, elementID) {
+    var downloadLinkDiv = document.createElement("div");
+    downloadLinkDiv.className = "clickToFlashPlaceholderDownloadLink";
+    downloadLinkDiv.innerHTML = "<a href=\"" + url + "\">" + (mediaType == "audio" ? localize("AUDIO_LINK") : localize("VIDEO_LINK")) + "</a>";
+    
+    downloadLinkDiv.onmouseover = function() {
+        this.style.opacity = "1";
+    };
+    
+    downloadLinkDiv.onmouseout = function() {
+        this.style.opacity = "0";
+    };
+    
+    downloadLinkDiv.style.opacity = "0";
+    this.placeholderElements[elementID].appendChild(downloadLinkDiv);
 };
 
 ClickToPlugin.prototype.loadPluginForElement = function(elementID) {
@@ -283,7 +343,6 @@ ClickToPlugin.prototype.loadPluginForElement = function(elementID) {
     element.allowedToLoad = true;
     if(placeholderElement.parentNode) {
         placeholderElement.parentNode.replaceChild(element, placeholderElement);
-        this.numberOfUnblockedElements++;
         this.clearAll(elementID);
     }
 };
@@ -295,7 +354,14 @@ ClickToPlugin.prototype.loadAll = function() {
             this.loadPluginForElement(i);
         }
     }
-    this.numberOfUnblockedElements = this.numberOfBlockedElements;
+};
+
+ClickToPlugin.prototype.loadSrc = function(string) {
+    for(var i = 0; i < this.numberOfBlockedElements; i++) {
+        if(this.placeholderElements[i] && this.blockedElements[i].info.src.match(string)) {
+            this.loadPluginForElement(i);
+        }
+    }
 };
 
 ClickToPlugin.prototype.reloadInPlugin = function(elementID) {
@@ -312,9 +378,7 @@ ClickToPlugin.prototype.loadMediaForElement = function(elementID) {
     var contextInfo = {
         "instance": this.instance,
         "elementID": elementID,
-        "isH264": true,
         "plugin": this.blockedElements[elementID].plugin
-        //"blocked": this.numberOfBlockedElements - this.numberOfUnblockedElements
     };
 
     // Initialize player
@@ -326,7 +390,6 @@ ClickToPlugin.prototype.loadMediaForElement = function(elementID) {
     // Replace placeholder and load first track
     placeholderElement.parentNode.replaceChild(this.mediaPlayers[elementID].containerElement, placeholderElement);
     this.mediaPlayers[elementID].loadTrack(0);
-    this.numberOfUnblockedElements++;
     this.placeholderElements[elementID] = null;
     
 };
@@ -368,7 +431,7 @@ ClickToPlugin.prototype.setVolumeTo = function(volume) {
 
 ClickToPlugin.prototype.setOpacityTo = function(opacity) {
     for(var i = 0; i < this.numberOfBlockedElements; i++) {
-        if(this.placeholderElements[i]) this.placeholderElements[i].style.opacity = opacity;
+        if(this.placeholderElements[i] && this.placeholderElements[i].className == "clickToFlashPlaceholder noimage") this.placeholderElements[i].style.opacity = opacity;
     }
 };
 
@@ -378,7 +441,6 @@ ClickToPlugin.prototype.removeElement = function(elementID) {
         element = element.parentNode;
     }
     element.parentNode.removeChild(element);
-    this.numberOfUnblockedElements++;
     this.clearAll(elementID);
 };
 
@@ -387,15 +449,13 @@ ClickToPlugin.prototype.removeElement = function(elementID) {
 // The worst that can happen though is the badge overflowing the placeholder, or staying hidden.
 ClickToPlugin.prototype.displayBadge = function(badgeLabel, elementID) {
     if(!badgeLabel) return;
-    // remove the logo before changing the label
-    this.placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild.className = "logoContainer nodisplay";
+    // Hide the logo before changing the label
+    this.placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild.className = "logoContainer hidden";
     // Set the new label
     this.placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild.childNodes[0].innerHTML = badgeLabel;
     this.placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild.childNodes[1].innerHTML = badgeLabel;
     
-    // prepare for logo unhiding
-    this.placeholderElements[elementID].className = "clickToFlashPlaceholder notable";
-    this.placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild.className = "logoContainer hidden";
+    // Prepare for logo unhiding
     this.placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild.childNodes[1].className = "logo tmp";
     
     this.unhideLogo(elementID, 0);
@@ -424,17 +484,14 @@ ClickToPlugin.prototype.unhideLogo = function(elementID, i) {
     
     if (w1 <= w0 - 6 && h1 <= h0 - 6) {
         logoContainer.childNodes[1].className = "logo inset";
-        this.placeholderElements[elementID].className = "clickToFlashPlaceholder";
         logoContainer.className = "logoContainer";
         return;
     } else if (w2 <= w0 - 6 && h2 <= h0 - 6) {
         logoContainer.childNodes[1].className = "logo inset";
-        this.placeholderElements[elementID].className = "clickToFlashPlaceholder";
         logoContainer.className = "logoContainer mini";
         return;
     } else {
         logoContainer.childNodes[1].className = "logo inset";
-        this.placeholderElements[elementID].className = "clickToFlashPlaceholder";
         logoContainer.className = "logoContainer nodisplay";
         return;
     }
@@ -456,7 +513,7 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
     placeholderElement.style.height = element.offsetHeight + "px";
     placeholderElement.style.opacity = this.settings["opacity"];
     
-    placeholderElement.className = "clickToFlashPlaceholder";
+    placeholderElement.className = "clickToFlashPlaceholder noimage";
     
     // Replacing element by placeholderElement
     if (element.parentNode) {
@@ -468,7 +525,6 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
             alert("Ignoring duplicate element " + this.instance + "." + elementID + ".");
         }
         // END DEBUG
-        this.numberOfUnblockedElements++;
         return;
     }
 
@@ -479,8 +535,7 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
             "instance": _this.instance,
             "elementID": elementID,
             "src": element.info.src,
-            "plugin": element.plugin,
-            //"blocked": _this.numberOfBlockedElements - _this.numberOfUnblockedElements
+            "plugin": element.plugin
         };
         if (_this.mediaPlayers[elementID] && _this.mediaPlayers[elementID].startTrack != null) {
             contextInfo.hasH264 = true;
@@ -529,8 +584,8 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
                 "instance": this.instance,
                 "elementID": elementID,
                 "plugin": element.plugin,
-                "src": element.info.autohref ? element.info.href : element.info.src,
-                "href": element.info.autohref ? "" : element.info.href,
+                "src": element.info.src,
+                "href": element.info.href,
                 "image": element.info.image,
                 "params": getParamsOf(element),
                 "location": window.location.href

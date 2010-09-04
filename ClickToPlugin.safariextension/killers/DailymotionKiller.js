@@ -48,12 +48,19 @@ DailymotionKiller.prototype.processElementFromSequence = function(sequence, call
             videoURL = s.replace(/\\\//g,"/");
         }
     }
-    URLindex = sequence.indexOf("videoPreviewURL");
+    URLindex = sequence.indexOf("backgroundImageURL");
     if (URLindex != -1) {
-        var s = sequence.substring(URLindex+18);
+        var s = sequence.substring(URLindex+21);
         s = s.substring(0,s.indexOf("\""));
         posterURL = s.replace(/\\\//g,"/");
-    }
+    } /*else { // needed?
+        URLindex = sequence.indexOf("videoPreviewURL");
+        if (URLindex != -1) {
+            var s = sequence.substring(URLindex+18);
+            s = s.substring(0,s.indexOf("\""));
+            posterURL = s.replace(/\\\//g,"/");
+        }
+    }*/
     var videoData = {
         "playlist": [{"mediaType": "video", "posterURL": posterURL, "mediaURL": videoURL}],
         "badgeLabel": badgeLabel
