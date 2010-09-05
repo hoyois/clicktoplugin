@@ -70,10 +70,6 @@ function getInfo(element, url) {
             }
             break;
     }
-    if(info.autohref) {
-        info.src =  info.href;
-        delete info.href;
-    }
     if(!info.src) {
         if(!url) info.src = "";
         else {
