@@ -57,7 +57,7 @@ const canPlayFLV = canPlayWithQTPlugin("video/x-flv");
 const canPlayWM = canPlayWithQTPlugin("video/x-ms-wmv");
 
 function extractExt(url) {
-    return url.split("?")[0].split(".").pop();
+    return url.split("?")[0].split("#")[0].split(".").pop();
 }
 
 // native MIME types that might realistically appear in <object> tags
