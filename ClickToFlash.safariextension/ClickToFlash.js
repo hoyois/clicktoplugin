@@ -135,12 +135,12 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
     }
 
     // Check if it is Flash
-    if(!(/\.(swf|spl)(\?|$)/.test(event.url))) {
+    if(!(/\.(swf|spl)(\?|#|$)/.test(event.url))) {
         // Check MIME type (elements with no source still launch the plugin if they have the right type)
         var type = getTypeOf(element);
         if(!type) {
             // sources with no extensions may secretly point to a Flash movie, so we have to block them
-            if(!event.url || /\.([a-zA-Z0-9])+(\?|$)/.test(event.url)) return;
+            if(!event.url || /\.([a-zA-Z0-9])+(\?|#|$)/.test(event.url)) return;
             else element.label = "?";
         } else if(type != "application/x-shockwave-flash" && type != "application/futuresplash") {
             return;

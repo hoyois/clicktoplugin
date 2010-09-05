@@ -17,7 +17,7 @@ JWKiller.prototype.processElement = function(data, callback) {
             this.processElementFromPlaylist(playlistURL, data.location, getFlashVariable(data.params, "item"), posterURL, callback);
             return;
         }
-        if(/\.xml($|\?)/i.test(sourceURL)) {
+        if(/\.xml($|#|\?)/i.test(sourceURL)) {
             this.processElementFromPlaylist(sourceURL, data.location, getFlashVariable(data.params, "item"), posterURL, callback);
             return;
         }
