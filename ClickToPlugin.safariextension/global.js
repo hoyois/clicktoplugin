@@ -13,9 +13,6 @@ function blockOrAllow(data) { // returns null if element can be loaded, the name
     } else {
         if(isNativeExt(ext)) return null;
     }
-    
-    // try not to block objects created by other extensions
-    if(data.src.substring(0,19) == "safari-extension://") return null;
 
     // Deal with invisible plugins
     if(safari.extension.settings["loadInvisible"]) {
