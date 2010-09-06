@@ -133,19 +133,18 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
     } else {
         return;
     }
-
+    
     // Check if it is Flash
-    if(!(/\.(swf|spl)(\?|#|$)/.test(event.url))) {
-        // Check MIME type (elements with no source still launch the plugin if they have the right type)
-        var type = getTypeOf(element);
-        if(!type) {
-            // sources with no extensions may secretly point to a Flash movie, so we have to block them
-            if(!event.url || /\.([a-zA-Z0-9])+(\?|#|$)/.test(event.url)) return;
-            else element.label = "?";
-        } else if(type != "application/x-shockwave-flash" && type != "application/futuresplash") {
+    switch(isFlash(element, event.url)) {
+        case "probably":
+            element.label = "Flash";
+            break;
+        case "maybe":
+            element.label = "?";
+            break;
+        default:
             return;
-        } else element.label = "Flash";
-    } else element.label = "Flash";
+    }
     
     // At this point we know we're dealing with Evil itself
     
@@ -239,8 +238,7 @@ ClickToFlash.prototype.prepMedia = function(mediaData) {
         if(this.settings["showPoster"] && mediaData.playlist[0].posterURL) {
             // show poster as background image
             this.placeholderElements[mediaData.elementID].style.opacity = "1";
-            this.placeholderElements[mediaData.elementID].style.background = "url('" + mediaData.playlist[0].posterURL + "') center no-repeat border-box !important";
-            this.placeholderElements[mediaData.elementID].style.backgroundSize = "contain !important";
+            this.placeholderElements[mediaData.elementID].style.backgroundImage = "url('" + mediaData.playlist[0].posterURL + "') !important";
             this.placeholderElements[mediaData.elementID].className = "clickToFlashPlaceholder"; // remove 'noimage' class
         }
     }
@@ -476,29 +474,7 @@ ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
     };
     
     // Building the placeholder
-    var container = document.createElement("div");
-    container.className = "clickToFlashPlaceholderContainer";
-    placeholderElement.appendChild(container);
-    
-    var verticalPositionElement = document.createElement("div");
-    verticalPositionElement.className = "logoVerticalPosition";
-    container.appendChild(verticalPositionElement);
-
-    var horizontalPositionElement = document.createElement("div");
-    horizontalPositionElement.className = "logoHorizontalPosition";
-    verticalPositionElement.appendChild(horizontalPositionElement);
-
-    var logoContainer = document.createElement("div");
-    logoContainer.className = "logoContainer nodisplay"; // keep the logo hidden at first
-    horizontalPositionElement.appendChild(logoContainer);
-    
-    var logoElement = document.createElement("div");
-    logoElement.className = "logo";
-    logoContainer.appendChild(logoElement);
-    
-    var logoInsetElement = document.createElement("div");
-    logoInsetElement.className = "logo inset";
-    logoContainer.appendChild(logoInsetElement);
+    placeholderElement.innerHTML = "<div class=\"clickToFlashPlaceholderContainer\"><div class=\"logoVerticalPosition\"><div class=\"logoHorizontalPosition\"><div class=\"logoContainer nodisplay\"><div class=\"logo\"></div><div class=\"logo inset\"></div></div></div></div></div>";
     
     // Filling the main arrays
     this.blockedElements[elementID] = element;
