@@ -308,8 +308,7 @@ ClickToPlugin.prototype.prepMedia = function(mediaData) {
         if(this.settings["showPoster"] && mediaData.playlist[0].posterURL) {
             // show poster as background image
             this.placeholderElements[mediaData.elementID].style.opacity = "1";
-            this.placeholderElements[mediaData.elementID].style.background = "url('" + mediaData.playlist[0].posterURL + "') center no-repeat border-box !important";
-            this.placeholderElements[mediaData.elementID].style.backgroundSize = "contain !important";
+            this.placeholderElements[mediaData.elementID].style.backgroundImage = "url('" + mediaData.playlist[0].posterURL + "') !important";
             this.placeholderElements[mediaData.elementID].className = "clickToFlashPlaceholder"; // remove 'noimage' class
         }
     }
@@ -548,29 +547,7 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
     };
     
     // Building the placeholder
-    var container = document.createElement("div");
-    container.className = "clickToFlashPlaceholderContainer";
-    placeholderElement.appendChild(container);
-    
-    var verticalPositionElement = document.createElement("div");
-    verticalPositionElement.className = "logoVerticalPosition";
-    container.appendChild(verticalPositionElement);
-
-    var horizontalPositionElement = document.createElement("div");
-    horizontalPositionElement.className = "logoHorizontalPosition";
-    verticalPositionElement.appendChild(horizontalPositionElement);
-
-    var logoContainer = document.createElement("div");
-    logoContainer.className = "logoContainer nodisplay"; // keep the logo hidden at first
-    horizontalPositionElement.appendChild(logoContainer);
-    
-    var logoElement = document.createElement("div");
-    logoElement.className = "logo";
-    logoContainer.appendChild(logoElement);
-    
-    var logoInsetElement = document.createElement("div");
-    logoInsetElement.className = "logo inset";
-    logoContainer.appendChild(logoInsetElement);
+    placeholderElement.innerHTML = "<div class=\"clickToFlashPlaceholderContainer\"><div class=\"logoVerticalPosition\"><div class=\"logoHorizontalPosition\"><div class=\"logoContainer nodisplay\"><div class=\"logo\"></div><div class=\"logo inset\"></div></div></div></div></div>";
     
     // Filling the main arrays
     this.blockedElements[elementID] = element;

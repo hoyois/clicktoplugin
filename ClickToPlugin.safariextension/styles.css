@@ -18,7 +18,10 @@
     -webkit-user-select: none !important;
     display: inline-block !important;
     -webkit-box-sizing: border-box !important;
-    /*background-color: black !important;*/
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-origin: border-box !important;
+    background-size: contain !important;
 }
 
 .clickToFlashPlaceholder.noimage {
@@ -150,6 +153,12 @@ div.logoVerticalPosition {
     font-family: "Helvetica Neue", Helvetica, sans-serif;
 }
 
+.clickToFlashPlaceholderDownloadLink a {
+    display: inline !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
 .CTFvideoContainer {
     position: relative !important;
     display: inline-block !important;
@@ -164,6 +173,10 @@ div.logoVerticalPosition {
     left: 0 !important;
     right: 0 !important;
     margin: 0px auto 0px auto !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-origin: border-box !important;
+    background-size: contain !important;
 }
 
 .CTFQTObject {
@@ -197,7 +210,15 @@ div.logoVerticalPosition {
 }
 
 .CTFtitleText {
+    display: inline !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: none !important;
     color: white !important;
+    font-family: "Lucida Grande", Helvetica, sans-serif !important;
+    font-size: 10px !important;
+    font-weight: normal !important;
+    font-style: normal !important;
     pointer-events: auto !important;
     text-decoration: none !important;
     border: 0 !important;
@@ -273,6 +294,7 @@ div.logoVerticalPosition {
     height: inherit !important;
     padding: 0 5px 0 7px !important;
 }
+
 .CTFtrackTitle div.CTFtrackTitleText p {
     color: white !important;
     font-family: "Lucida Grande", Helvetica, sans-serif !important;
@@ -287,8 +309,6 @@ div.logoVerticalPosition {
     text-align: left !important;
     line-height: normal !important;
 }
-
-
 
 .CTFtrackSelect input {
     background-color: rgba(255, 255, 255, 0.1) !important;

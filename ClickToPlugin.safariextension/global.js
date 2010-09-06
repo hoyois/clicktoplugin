@@ -41,7 +41,8 @@ function blockOrAllow(data) { // returns null if element can be loaded, the name
             srcwhitelist = srcwhitelist.split(/,(?![^\(]*\))/);
             if(matchList(srcwhitelist, data.src)) return null;
         }
-        if(locblacklist) {
+        if(srcblacklist) {
+            alert(srcblacklist + "\n" + data.src);
             srcblacklist = srcblacklist.split(/,(?![^\(]*\))/);
             if(!matchList(srcblacklist, data.src)) return null;
         }
