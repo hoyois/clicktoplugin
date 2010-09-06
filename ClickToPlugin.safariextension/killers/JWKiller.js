@@ -29,10 +29,12 @@ JWKiller.prototype.processElement = function(data, callback) {
     
     var mediaType = checkSrc(sourceURL);
     if(!mediaType) return;
+    var isAudio = mediaType == "audio";
 
     var mediaData = {
         "playlist": [{"mediaType": mediaType, "posterURL": makeAbsoluteURI(posterURL, data.location), "mediaURL": makeAbsoluteURI(sourceURL, data.location)}],
-        "badgeLabel": (mediaType == "video") ? "Video" : "Audio"
+        "badgeLabel": isAudio ? "Audio" : "Video",
+        "isAudio": isAudio
     };
     callback(mediaData);
 };
