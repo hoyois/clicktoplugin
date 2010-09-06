@@ -50,14 +50,6 @@ function getParamsOf(element) {
 
 // Debugging functions
 document.HTMLToString = function(element){
-    if(!element || !element.tagName) return "";
-    var outerElement = this.createElement("div");
-    outerElement.appendChild(element.cloneNode(true));
-    return outerElement.innerHTML;
+    return (new XMLSerializer()).serializeToString(element);
 };
 
-/*document.stringToHTML = function(code){
-    var outerElement = this.createElement("div");
-    outerElement.innerHTML = code;
-    return outerElement.firstChild;
-};*/
