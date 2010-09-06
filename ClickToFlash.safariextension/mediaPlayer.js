@@ -212,9 +212,8 @@ mediaPlayer.prototype.fadeIn = function(delay) {
 mediaPlayer.prototype.fixAspectRatio = function() {
     var w = this.mediaElement.videoWidth;
     var h = this.mediaElement.videoHeight;
-    if(w == 0 || h == 0) { // audio source
-        //this.mediaElement.style.height = "24px"; // the height of the controls
-        this.mediaElement.style.width = this.width + "px"; this.mediaElement.style.height = this.height + "px";
+    if(!w || !h) { // audio source
+        this.mediaElement.style.width = this.width + "px"; this.mediaElement.style.height = (this.height < 24 ? "24" : this.height) + "px";
     } else if (w/h > this.width/this.height) {
         this.mediaElement.style.width = this.width + "px"; this.mediaElement.style.height = "";
     } else {
@@ -264,16 +263,14 @@ mediaPlayer.prototype.loadTrack = function(track, autoplay) {
     if(this.playlist[track].posterURL) {
         if(this.playlist[track].mediaType == "video") {
             this.mediaElement.poster = this.playlist[track].posterURL;
-            this.mediaElement.style.background = "none !important";
-            // this.mediaElement.style.backgroundSize = "";
+            this.mediaElement.style.backgroundImage = "none !important";
         } else {
             if(this.mediaElement.hasAttribute("poster")) this.mediaElement.removeAttribute("poster");
-            this.mediaElement.style.background = "url('" + this.playlist[track].posterURL + "') center no-repeat border-box !important";
-            this.mediaElement.style.backgroundSize = "contain !important";
+            this.mediaElement.style.backgroundImage = "url('" + this.playlist[track].posterURL + "') !important";
         }
     }  else {
         if(this.mediaElement.hasAttribute("poster")) this.mediaElement.removeAttribute("poster");
-        this.mediaElement.style.background = "none !important";
+        this.mediaElement.style.backgroundImage = "none !important";
     }
     this.currentTrack = track;
     if(autoplay) {

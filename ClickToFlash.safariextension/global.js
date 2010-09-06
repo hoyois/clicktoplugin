@@ -30,7 +30,7 @@ function blockOrAllow(data) { // check the whitelists and returns null if elemen
             srcwhitelist = srcwhitelist.split(/,(?![^\(]*\))/);
             if(matchList(srcwhitelist, data.src)) return true;
         }
-        if(locblacklist) {
+        if(srcblacklist) {
             srcblacklist = srcblacklist.split(/,(?![^\(]*\))/);
             if(!matchList(srcblacklist, data.src)) return true;
         }
