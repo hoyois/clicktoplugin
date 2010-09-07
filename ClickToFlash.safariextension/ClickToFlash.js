@@ -12,7 +12,7 @@ function ClickToFlash() {
     this.instance = null;
     this.numberOfBlockedElements = 0;
     
-    var _this = this;    
+    var _this = this;
     
     this.respondToMessageTrampoline = function(event) {
         _this.respondToMessage(event);
@@ -48,7 +48,7 @@ function ClickToFlash() {
     */
     
     document.oncontextmenu = function(event) {
-        safari.self.tab.setContextMenuEventUserInfo(event, {"location": window.location.href, "blocked": this.getElementsByClassName("clickToFlashPlaceholder").length});
+        safari.self.tab.setContextMenuEventUserInfo(event, {"location": window.location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length});
     };
 }
 
@@ -172,7 +172,6 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
                 alert("sIFR text replacement loaded:\n\n" + document.HTMLToString(element));
             }
             // END DEBUG
-            element.allowedToLoad = true;
             return;
         }
     }
@@ -239,7 +238,7 @@ ClickToFlash.prototype.prepMedia = function(mediaData) {
             // show poster as background image
             this.placeholderElements[mediaData.elementID].style.opacity = "1";
             this.placeholderElements[mediaData.elementID].style.backgroundImage = "url('" + mediaData.playlist[0].posterURL + "') !important";
-            this.placeholderElements[mediaData.elementID].className = "clickToFlashPlaceholder"; // remove 'noimage' class
+            this.placeholderElements[mediaData.elementID].className = "CTFplaceholder"; // remove 'noimage' class
         }
     }
     
@@ -251,7 +250,7 @@ ClickToFlash.prototype.prepMedia = function(mediaData) {
 
 ClickToFlash.prototype.showDownloadLink = function(mediaType, url, elementID) {
     var downloadLinkDiv = document.createElement("div");
-    downloadLinkDiv.className = "clickToFlashPlaceholderDownloadLink";
+    downloadLinkDiv.className = "CTFplaceholderDownloadLink";
     downloadLinkDiv.innerHTML = "<a href=\"" + url + "\">" + (mediaType == "audio" ? localize("AUDIO_LINK") : localize("VIDEO_LINK")) + "</a>";
     
     downloadLinkDiv.onmouseover = function() {
@@ -358,7 +357,7 @@ ClickToFlash.prototype.setVolumeTo = function(volume) {
 
 ClickToFlash.prototype.setOpacityTo = function(opacity) {
     for(var i = 0; i < this.numberOfBlockedElements; i++) {
-        if(this.placeholderElements[i] && this.placeholderElements[i].className == "clickToFlashPlaceholder noimage") this.placeholderElements[i].style.opacity = opacity;
+        if(this.placeholderElements[i] && this.placeholderElements[i].className == "CTFplaceholder CTFnoimage") this.placeholderElements[i].style.opacity = opacity;
     }
 };
 
@@ -377,13 +376,13 @@ ClickToFlash.prototype.removeElement = function(elementID) {
 ClickToFlash.prototype.displayBadge = function(badgeLabel, elementID) {
     if(!badgeLabel) return;
     // Hide the logo before changing the label
-    this.placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild.className = "logoContainer hidden";
+    this.placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild.className = "CTFlogoContainer CTFhidden";
     // Set the new label
     this.placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild.childNodes[0].innerHTML = badgeLabel;
     this.placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild.childNodes[1].innerHTML = badgeLabel;
     
     // Prepare for logo unhiding
-    this.placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild.childNodes[1].className = "logo tmp";
+    this.placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild.childNodes[1].className = "CTFlogo CTFtmp";
     
     this.unhideLogo(elementID, 0);
 };
@@ -407,19 +406,19 @@ ClickToFlash.prototype.unhideLogo = function(elementID, i) {
         return;
     }
     
-    if(logoContainer.childNodes[1].className != "logo tmp") return;
+    if(logoContainer.childNodes[1].className != "CTFlogo CTFtmp") return;
     
     if (w1 <= w0 - 6 && h1 <= h0 - 6) {
-        logoContainer.childNodes[1].className = "logo inset";
-        logoContainer.className = "logoContainer";
+        logoContainer.childNodes[1].className = "CTFlogo CTFinset";
+        logoContainer.className = "CTFlogoContainer";
         return;
     } else if (w2 <= w0 - 6 && h2 <= h0 - 6) {
-        logoContainer.childNodes[1].className = "logo inset";
-        logoContainer.className = "logoContainer mini";
+        logoContainer.childNodes[1].className = "CTFlogo CTFinset";
+        logoContainer.className = "CTFlogoContainer CTFmini";
         return;
     } else {
-        logoContainer.childNodes[1].className = "logo inset";
-        logoContainer.className = "logoContainer nodisplay";
+        logoContainer.childNodes[1].className = "CTFlogo CTFinset";
+        logoContainer.className = "CTFlogoContainer CTFnodisplay";
         return;
     }
 };
@@ -440,7 +439,7 @@ ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
     placeholderElement.style.height = element.offsetHeight + "px";
     placeholderElement.style.opacity = this.settings["opacity"];
     
-    placeholderElement.className = "clickToFlashPlaceholder noimage";
+    placeholderElement.className = "CTFplaceholder CTFnoimage";
     
     // Replacing element by placeholderElement
     if (element.parentNode) {
@@ -474,7 +473,7 @@ ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
     };
     
     // Building the placeholder
-    placeholderElement.innerHTML = "<div class=\"clickToFlashPlaceholderContainer\"><div class=\"logoVerticalPosition\"><div class=\"logoHorizontalPosition\"><div class=\"logoContainer nodisplay\"><div class=\"logo\"></div><div class=\"logo inset\"></div></div></div></div></div>";
+    placeholderElement.innerHTML = "<div class=\"CTFplaceholderContainer\"><div class=\"CTFlogoVerticalPosition\"><div class=\"CTFlogoHorizontalPosition\"><div class=\"CTFlogoContainer CTFnodisplay\"><div class=\"CTFlogo\"></div><div class=\"CTFlogo CTFinset\"></div></div></div></div></div>";
     
     // Filling the main arrays
     this.blockedElements[elementID] = element;

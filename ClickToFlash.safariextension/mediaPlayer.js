@@ -1,3 +1,7 @@
+/***************************
+mediaPlayer class definition
+****************************/
+
 function mediaPlayer(playerType) {
     
     // PROPERTIES
@@ -23,7 +27,7 @@ function mediaPlayer(playerType) {
 
 mediaPlayer.prototype.initialize = function(buffer, width, height, volume, contextInfo) {
     this.containerElement = document.createElement("div");
-    this.containerElement.className = "CTFvideoContainer";
+    this.containerElement.className = "CTFmediaPlayer";
     this.mediaElement = document.createElement(this.playerType);
     this.mediaElement.className = "CTFvideoElement";
     this.containerElement.appendChild(this.mediaElement);
@@ -73,34 +77,33 @@ mediaPlayer.prototype.initializePlaylistControls = function() {
     this.playlistControls = document.createElement("div");
     this.playlistControls.className = "CTFplaylistControls";
     
-    var trackTitle = document.createElement("div");
-    trackTitle.className = "CTFtrackTitle";
-    this.playlistControls.appendChild(trackTitle);
+    var playlistControlsLeft = document.createElement("div");
+    playlistControlsLeft.className = "CTFplaylistControlsLeft";
+    this.playlistControls.appendChild(playlistControlsLeft);
     
-    var trackSelect = document.createElement("div");
-    trackSelect.className = "CTFtrackSelect";
-    this.playlistControls.appendChild(trackSelect);
+    var playlistControlsRight = document.createElement("div");
+    playlistControlsRight.className = "CTFplaylistControlsRight";
+    this.playlistControls.appendChild(playlistControlsRight);
     
-    var trackTitleText = document.createElement("div");
-    trackTitleText.className = "CTFtrackTitleText";
-    trackTitle.appendChild(trackTitleText);
+    var trackInfo = document.createElement("div");
+    trackInfo.className = "CTFtrackInfo";
+    playlistControlsLeft.appendChild(trackInfo);
     
-    var trackTitleTextP = document.createElement("p");
-    trackTitleText.appendChild(trackTitleTextP);
+    trackInfo.appendChild(document.createElement("p"));
     
     var prevButton = document.createElement("div");
     prevButton.className = "CTFprevButton";
-    trackSelect.appendChild(prevButton);
+    playlistControlsRight.appendChild(prevButton);
     
-    var trackInput = document.createElement("form");
-    trackInput.className = "CTFtrackInput";
-    trackSelect.appendChild(trackInput);
+    var trackSelect = document.createElement("form");
+    trackSelect.className = "CTFtrackSelect";
+    playlistControlsRight.appendChild(trackSelect);
     
     var nextButton = document.createElement("div");
     nextButton.className = "CTFnextButton";
-    trackSelect.appendChild(nextButton);
+    playlistControlsRight.appendChild(nextButton);
 
-    trackInput.innerHTML = "<input type=\"text\" style=\"width: " + (8 * this.playlistLength.toString().length) + "px\"><span>/" + normalize(this.playlist.length, this.playlistLength) + "</span>";
+    trackSelect.innerHTML = "<input type=\"text\" style=\"width: " + (8 * this.playlistLength.toString().length) + "px\"><span>/" + normalize(this.playlist.length, this.playlistLength) + "</span>";
     
     var _this = this;
     this.mediaElement.onmouseover = function(event) {
@@ -113,7 +116,7 @@ mediaPlayer.prototype.initializePlaylistControls = function() {
     };
     this.mediaElement.onmouseout = function(event) {
         // prevents the default controls from disappearing
-        if(event.relatedTarget && (event.relatedTarget == prevButton || event.relatedTarget == nextButton || event.relatedTarget == trackInput.firstChild || event.relatedTarget == trackTitleTextP.lastChild || event.relatedTarget.hasAttribute("precision"))) {
+        if(event.relatedTarget && (event.relatedTarget == prevButton || event.relatedTarget == nextButton || event.relatedTarget == trackSelect.firstChild || event.relatedTarget.className == "CTFtrackTitle" || event.relatedTarget.hasAttribute("precision"))) {
             event.preventDefault();
         } else {
             this.focus = false;
@@ -128,7 +131,7 @@ mediaPlayer.prototype.initializePlaylistControls = function() {
     this.mediaElement.addEventListener("pause", function(){_this.fadeIn(0);}, false);
     this.mediaElement.addEventListener("play", function(){if(!_this.mediaElement.focus) _this.fadeOut(0);}, false);
     
-    trackInput.onsubmit = function(event) {
+    trackSelect.onsubmit = function(event) {
         event.preventDefault();
         var track = this.getElementsByTagName("input")[0].value;
         if(!(/^\d+$/.test(track))) return;
@@ -158,7 +161,7 @@ mediaPlayer.prototype.initializeDownloadControls = function() {
     
     var hoverElement = document.createElement("div");
     hoverElement.className = "CTFhoverElement";
-    this.playlistControls.innerHTML = "<div class=\"CTFtrackTitle\"><div class=\"CTFtrackTitleText\"><p></p></div></div>";
+    this.playlistControls.innerHTML = "<div class=\"CTFplaylistControlsLeft\"><div class=\"CTFtrackInfo\"><p></p></div></div>";
     
     this.playlistControls.appendChild(hoverElement);
     
@@ -180,13 +183,13 @@ mediaPlayer.prototype.initializeDownloadControls = function() {
     }
     
     hoverElement.onmouseout = function(event) {
-        if(!event.relatedTarget || event.relatedTarget.className != "CTFtitleText") {
+        if(!event.relatedTarget || event.relatedTarget.className != "CTFtrackTitle") {
             this.previousSibling.style.display ="none";
         }
     };
     
     this.mediaElement.onmouseout = function(event) {
-        if(event.relatedTarget && (event.relatedTarget == hoverElement || event.relatedTarget.className == "CTFtitleText")) {
+        if(event.relatedTarget && (event.relatedTarget == hoverElement || event.relatedTarget.className == "CTFtrackTitle")) {
             event.preventDefault();
         }
     }
@@ -222,7 +225,7 @@ mediaPlayer.prototype.fixAspectRatio = function() {
             // Apparently QuickTime uses floor, not round
             var width = Math.floor(w/h*this.height);
             this.playlistControls.style.width = width + "px";
-            if(this.usePlaylistControls) this.playlistControls.getElementsByTagName("p")[0].style.width = (width - this.playlistControls.getElementsByClassName("CTFtrackSelect")[0].offsetWidth - 12) + "px";
+            if(this.usePlaylistControls) this.playlistControls.getElementsByTagName("p")[0].style.width = (width - this.playlistControls.getElementsByClassName("CTFplaylistControlsRight")[0].offsetWidth - 12) + "px";
         }
     }
     if(this.usePlaylistControls) {
@@ -237,7 +240,7 @@ mediaPlayer.prototype.resetAspectRatio = function() {
     this.mediaElement.style.height = this.height + "px";
     if(this.playlistControls) {
         this.playlistControls.style.width = this.width + "px";
-        if(this.usePlaylistControls) this.playlistControls.getElementsByTagName("p")[0].style.width = (this.width - this.playlistControls.getElementsByClassName("CTFtrackSelect")[0].offsetWidth - 12) + "px";
+        if(this.usePlaylistControls) this.playlistControls.getElementsByTagName("p")[0].style.width = (this.width - this.playlistControls.getElementsByClassName("CTFplaylistControlsRight")[0].offsetWidth - 12) + "px";
     }
 };
 
@@ -281,7 +284,7 @@ mediaPlayer.prototype.loadTrack = function(track, autoplay) {
     if(this.usePlaylistControls) {
         var title = this.playlist[track].title;
         if(!title) title = "(no title)";
-        title = "<a class=\"CTFtitleText\" href=\"" + this.mediaElement.src + "\">" + title + "</a>";
+        title = "<a class=\"CTFtrackTitle\" href=\"" + this.mediaElement.src + "\">" + title + "</a>";
         this.playlistControls.getElementsByTagName("p")[0].innerHTML = ((track + this.startTrack) % this.playlistLength + 1) + ". " + title;
         var inputField = this.playlistControls.getElementsByTagName("input")[0];
         var newInputField = document.createElement("input");
@@ -295,7 +298,7 @@ mediaPlayer.prototype.loadTrack = function(track, autoplay) {
         this.playlistControls.style.opacity = "1";
     } else {
         var title = this.playlist[track].mediaType == "audio" ? localize("AUDIO_LINK") : localize("VIDEO_LINK");
-        title = "<a class=\"CTFtitleText\" href=\"" + this.mediaElement.src + "\">" + title + "</a>";
+        title = "<a class=\"CTFtrackTitle\" href=\"" + this.mediaElement.src + "\">" + title + "</a>";
         this.playlistControls.getElementsByTagName("p")[0].innerHTML = title;
     }
 };
@@ -306,8 +309,6 @@ mediaPlayer.prototype.setContextInfo = function(event, contextInfo) {
     contextInfo.mediaType = this.playlist[track].mediaType;
     contextInfo.siteInfo = this.playlist[track].siteInfo;
     contextInfo.isVideo = this.currentTrack != null;
-    // if(this.mediaElement) contextInfo.loop = this.mediaElement.hasAttribute("loop");
-    // contextInfo.isPlaylist = (this.playlist.length > 1); // not used
     safari.self.tab.setContextMenuEventUserInfo(event, contextInfo);
     event.stopPropagation();
 };
