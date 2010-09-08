@@ -4,7 +4,7 @@ function VimeoKiller() {
 
 VimeoKiller.prototype.canKill = function(data) {
     if(data.plugin != "Flash" || !safari.extension.settings["replaceFlash"]) return false;
-    return !!data.src.match("moogaloop");
+    return (data.src.match("moogaloop") || data.src.match("moogalover"));
 };
 
 VimeoKiller.prototype.processElement = function(data, callback) {

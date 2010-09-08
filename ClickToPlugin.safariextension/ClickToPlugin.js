@@ -266,6 +266,38 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
     this.processBlockedElement(element, elementID);
 };
 
+ClickToPlugin.prototype.loadPluginForElement = function(elementID) {
+    this.blockedElements[elementID].allowedToLoad = true;
+    if(this.placeholderElements[elementID].parentNode) {
+        this.placeholderElements[elementID].parentNode.removeChild(this.placeholderElements[elementID]);
+        this.blockedElements[elementID].style.display = this.blockedElements[elementID].display; // remove display:none
+        this.clearAll(elementID);
+    }
+};
+
+ClickToPlugin.prototype.reloadInPlugin = function(elementID) {
+    this.blockedElements[elementID].allowedToLoad = true;
+    this.mediaPlayers[elementID].containerElement.parentNode.removeChild(this.mediaPlayers[elementID].containerElement);
+    this.blockedElements[elementID].style.display = this.blockedElements[elementID].display; // remove display:none
+    this.clearAll(elementID);
+};
+
+ClickToPlugin.prototype.loadAll = function() {
+    for(var i = 0; i < this.numberOfBlockedElements; i++) {
+        if(this.placeholderElements[i]) {
+            this.loadPluginForElement(i);
+        }
+    }
+};
+
+ClickToPlugin.prototype.loadSrc = function(string) {
+    for(var i = 0; i < this.numberOfBlockedElements; i++) {
+        if(this.placeholderElements[i] && this.blockedElements[i].info.src.match(string)) {
+            this.loadPluginForElement(i);
+        }
+    }
+};
+
 ClickToPlugin.prototype.prepMedia = function(mediaData) {
     if(mediaData.playlist.length == 0 || !mediaData.playlist[0].mediaURL) return;
     if(!this.mediaPlayers[mediaData.elementID]) {
@@ -337,43 +369,6 @@ ClickToPlugin.prototype.showDownloadLink = function(mediaType, url, elementID) {
     this.placeholderElements[elementID].appendChild(downloadLinkDiv);
 };
 
-ClickToPlugin.prototype.loadPluginForElement = function(elementID) {
-    var placeholderElement = this.placeholderElements[elementID];
-    var element = this.blockedElements[elementID];
-    element.allowedToLoad = true;
-    if(placeholderElement.parentNode) {
-        placeholderElement.parentNode.removeChild(placeholderElement);
-        element.style.display = element.display; // remove display:none
-        this.clearAll(elementID);
-    }
-};
-
-
-ClickToPlugin.prototype.loadAll = function() {
-    for(var i = 0; i < this.numberOfBlockedElements; i++) {
-        if(this.placeholderElements[i]) {
-            this.loadPluginForElement(i);
-        }
-    }
-};
-
-ClickToPlugin.prototype.loadSrc = function(string) {
-    for(var i = 0; i < this.numberOfBlockedElements; i++) {
-        if(this.placeholderElements[i] && this.blockedElements[i].info.src.match(string)) {
-            this.loadPluginForElement(i);
-        }
-    }
-};
-
-ClickToPlugin.prototype.reloadInPlugin = function(elementID) {
-    var containerElement = this.mediaPlayers[elementID].containerElement;
-    var element = this.blockedElements[elementID];
-    element.allowedToLoad = true;
-    containerElement.parentNode.removeChild(containerElement);
-    element.style.display = element.display; // remove display:none
-    this.clearAll(elementID);
-};
-
 ClickToPlugin.prototype.loadMediaForElement = function(elementID) {
     var placeholderElement = this.placeholderElements[elementID];
     
@@ -438,8 +433,10 @@ ClickToPlugin.prototype.setOpacityTo = function(opacity) {
 };
 
 ClickToPlugin.prototype.removeElement = function(elementID) {
+    if(this.blockedElements[elementID].parentNode) {
+        this.blockedElements[elementID].parentNode.removeChild(this.blockedElements[elementID]);
+    }
     var element = this.placeholderElements[elementID];
-    element.parentNode.removeChild(this.blockedElements[elementID]);
     while(element.parentNode.childNodes.length == 1) {
         element = element.parentNode;
     }
@@ -518,11 +515,10 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
     
     placeholderElement.className = "CTFplaceholder CTFnoimage";
     
-    // Insert placeholder in document just before the element
+    // Hide the original element
     if (element.style.display != "none") {
         element.display = element.style.display;
         element.style.display = "none !important";
-        if(element.parentNode) element.parentNode.insertBefore(placeholderElement, element);
     } else {
         // the same element has fired the 'beforeload' event more than once: ignore
         // BEGIN DEBUG
@@ -532,6 +528,12 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
         // END DEBUG
         return;
     }
+    
+    // Insert the placeholder just after the element
+    if(element.parentNode) {
+        element.parentNode.insertBefore(placeholderElement, element.nextSibling);
+        element.parentNode.addEventListener("DOMNodeRemoved", function(event) {if(event.target == element && placeholderElement.parentNode) placeholderElement.parentNode.removeChild(placeholderElement);}, false);
+    } else return;
 
     var _this = this;
     placeholderElement.onclick = function(event){_this.clickPlaceholder(elementID);};
@@ -576,7 +578,6 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
             safari.self.tab.dispatchMessage("killPlugin", elementData);
         }
     }
-    
 };
 
 // Sometimes an <object> has a media element as fallback content
