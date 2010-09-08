@@ -9,10 +9,11 @@ function ClickToPlugin() {
     this.mediaPlayers = new Array();// array containing the HTML5 media players
     
     /*
-    Each item in blockedElement will acquire 3 additional properties:
+    Each item in blockedElement will acquire 4 additional properties:
     -> tag: 'embed', 'object', or 'applet'
     -> plugin: the name of the plugin that would handle the element
-    -> info: an object; info.src is the source of the embedded content
+    -> info: an object gathering relevent attributes of the element
+    -> display: the inline value of the CSS 'display' property
     */
     
     this.settings = null;
@@ -341,7 +342,8 @@ ClickToPlugin.prototype.loadPluginForElement = function(elementID) {
     var element = this.blockedElements[elementID];
     element.allowedToLoad = true;
     if(placeholderElement.parentNode) {
-        placeholderElement.parentNode.replaceChild(element, placeholderElement);
+        placeholderElement.parentNode.removeChild(placeholderElement);
+        element.style.display = element.display; // remove display:none
         this.clearAll(elementID);
     }
 };
@@ -367,7 +369,8 @@ ClickToPlugin.prototype.reloadInPlugin = function(elementID) {
     var containerElement = this.mediaPlayers[elementID].containerElement;
     var element = this.blockedElements[elementID];
     element.allowedToLoad = true;
-    containerElement.parentNode.replaceChild(element, containerElement);
+    containerElement.parentNode.removeChild(containerElement);
+    element.style.display = element.display; // remove display:none
     this.clearAll(elementID);
 };
 
@@ -436,6 +439,7 @@ ClickToPlugin.prototype.setOpacityTo = function(opacity) {
 
 ClickToPlugin.prototype.removeElement = function(elementID) {
     var element = this.placeholderElements[elementID];
+    element.parentNode.removeChild(this.blockedElements[elementID]);
     while(element.parentNode.childNodes.length == 1) {
         element = element.parentNode;
     }
@@ -498,7 +502,7 @@ ClickToPlugin.prototype.unhideLogo = function(elementID, i) {
 
 ClickToPlugin.prototype.clickPlaceholder = function(elementID) {
     if (this.mediaPlayers[elementID] && this.mediaPlayers[elementID].startTrack != null) {
-         this.loadMediaForElement(elementID);
+        this.loadMediaForElement(elementID);
     } else {
         this.loadPluginForElement(elementID);
     }
@@ -506,7 +510,7 @@ ClickToPlugin.prototype.clickPlaceholder = function(elementID) {
 
 ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
     
-    // Creating the placeholder element
+    // Create the placeholder element
     var placeholderElement = document.createElement("div");
     placeholderElement.style.width = element.offsetWidth + "px";
     placeholderElement.style.height = element.offsetHeight + "px";
@@ -514,9 +518,11 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
     
     placeholderElement.className = "CTFplaceholder CTFnoimage";
     
-    // Replacing element by placeholderElement
-    if (element.parentNode) {
-        element.parentNode.replaceChild(placeholderElement, element);
+    // Insert placeholder in document just before the element
+    if (element.style.display != "none") {
+        element.display = element.style.display;
+        element.style.display = "none !important";
+        if(element.parentNode) element.parentNode.insertBefore(placeholderElement, element);
     } else {
         // the same element has fired the 'beforeload' event more than once: ignore
         // BEGIN DEBUG
@@ -546,10 +552,10 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
         }
     };
     
-    // Building the placeholder
+    // Build the placeholder
     placeholderElement.innerHTML = "<div class=\"CTFplaceholderContainer\"><div class=\"CTFlogoVerticalPosition\"><div class=\"CTFlogoHorizontalPosition\"><div class=\"CTFlogoContainer CTFnodisplay\"><div class=\"CTFlogo\"></div><div class=\"CTFlogo CTFinset\"></div></div></div></div></div>";
     
-    // Filling the main arrays
+    // Fill the main arrays
     this.blockedElements[elementID] = element;
     this.placeholderElements[elementID] = placeholderElement;
     // Display the badge
