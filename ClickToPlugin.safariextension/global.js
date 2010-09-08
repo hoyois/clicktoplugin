@@ -4,7 +4,7 @@ const killers = [new YouTubeKiller(), new VimeoKiller(), new DailymotionKiller()
 function blockOrAllow(data) { // returns null if element can be loaded, the name of the plugin otherwise
 
     // no source and no type -> must allow, it's probably going to pass through here again after being modified by a script
-    if(!data.src && !data.type && !data.classid) return null;
+    if(!data.src && !data.type) return null;
 
     // native Safari support
     var ext = extractExt(data.src); // used later as well
@@ -13,9 +13,9 @@ function blockOrAllow(data) { // returns null if element can be loaded, the name
     } else {
         if(isNativeExt(ext)) return null;
     }
-
+    
     // Deal with invisible plugins
-    if(safari.extension.settings["loadInvisible"]) {
+    if(safari.extension.settings["loadInvisible"] && data.width > 0 && data.height > 0) {
         if(data.width <= safari.extension.settings["maxinvdim"] && data.height <= safari.extension.settings["maxinvdim"]) {
             return null;
         }
