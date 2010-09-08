@@ -2,7 +2,6 @@
 
 /* Reset author CSS */
 .CTFplaceholder *, .CTFmediaPlayer * {
-    background: none !important;
     border: 0 !important;
     border-radius: 0 !important;
     border-spacing: 0 !important;
@@ -20,6 +19,7 @@
 
 .CTFplaceholder a, .CTFmediaPlayer a {
     display: inline !important;
+    cursor: auto !important;
 }
 
 /******************
@@ -27,6 +27,7 @@ Placeholder element
 ******************/
 
 .CTFplaceholder * {
+    background: none !important;
     width: auto !important;
     height: auto !important;
 }
@@ -200,9 +201,14 @@ Media player
     height: 24px !important;
     z-index: 1 !important;
     -webkit-user-select: none !important;
+    background: none !important;
     background-image: url('controls_background.png') !important;
     background-repeat: repeat-x !important;
     pointer-events: none !important;
+}
+
+.CTFmediaPlayer .CTFplaylistControls * {
+    background: none !important;
 }
 
 .CTFmediaPlayer .CTFhoverElement {

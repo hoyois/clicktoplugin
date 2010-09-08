@@ -194,6 +194,38 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
     this.processBlockedElement(element, elementID);
 };
 
+ClickToFlash.prototype.loadPluginForElement = function(elementID) {
+    this.blockedElements[elementID].allowedToLoad = true;
+    if(this.placeholderElements[elementID].parentNode) {
+        this.placeholderElements[elementID].parentNode.removeChild(this.placeholderElements[elementID]);
+        this.blockedElements[elementID].style.display = this.blockedElements[elementID].display; // remove display:none
+        this.clearAll(elementID);
+    }
+};
+
+ClickToFlash.prototype.reloadInPlugin = function(elementID) {
+    this.blockedElements[elementID].allowedToLoad = true;
+    this.mediaPlayers[elementID].containerElement.parentNode.removeChild(this.mediaPlayers[elementID].containerElement);
+    this.blockedElements[elementID].style.display = this.blockedElements[elementID].display; // remove display:none
+    this.clearAll(elementID);
+};
+
+ClickToFlash.prototype.loadAll = function() {
+    for(var i = 0; i < this.numberOfBlockedElements; i++) {
+        if(this.placeholderElements[i]) {
+            this.loadPluginForElement(i);
+        }
+    }
+};
+
+ClickToFlash.prototype.loadSrc = function(string) {
+    for(var i = 0; i < this.numberOfBlockedElements; i++) {
+        if(this.placeholderElements[i] && this.blockedElements[i].info.src.match(string)) {
+            this.loadPluginForElement(i);
+        }
+    }
+};
+
 ClickToFlash.prototype.prepMedia = function(mediaData) {
     if(mediaData.playlist.length == 0 || !mediaData.playlist[0].mediaURL) return;
     if(!this.mediaPlayers[mediaData.elementID]) {
@@ -265,40 +297,6 @@ ClickToFlash.prototype.showDownloadLink = function(mediaType, url, elementID) {
     this.placeholderElements[elementID].appendChild(downloadLinkDiv);
 };
 
-ClickToFlash.prototype.loadPluginForElement = function(elementID) {
-    var placeholderElement = this.placeholderElements[elementID];
-    var element = this.blockedElements[elementID];
-    element.allowedToLoad = true;
-    if(placeholderElement.parentNode) {
-        placeholderElement.parentNode.replaceChild(element, placeholderElement);
-        this.clearAll(elementID);
-    }
-};
-
-ClickToFlash.prototype.loadAll = function() {
-    for(var i = 0; i < this.numberOfBlockedElements; i++) {
-        if(this.placeholderElements[i]) {
-            this.loadPluginForElement(i);
-        }
-    }
-};
-
-ClickToFlash.prototype.loadSrc = function(string) {
-    for(var i = 0; i < this.numberOfBlockedElements; i++) {
-        if(this.placeholderElements[i] && this.blockedElements[i].info.src.match(string)) {
-            this.loadPluginForElement(i);
-        }
-    }
-};
-
-ClickToFlash.prototype.reloadInPlugin = function(elementID) {
-    var containerElement = this.mediaPlayers[elementID].containerElement;
-    var element = this.blockedElements[elementID];
-    element.allowedToLoad = true;
-    containerElement.parentNode.replaceChild(element, containerElement);
-    this.clearAll(elementID);
-};
-
 ClickToFlash.prototype.loadMediaForElement = function(elementID) {
     var placeholderElement = this.placeholderElements[elementID];
     
@@ -362,6 +360,9 @@ ClickToFlash.prototype.setOpacityTo = function(opacity) {
 };
 
 ClickToFlash.prototype.removeElement = function(elementID) {
+    if(this.blockedElements[elementID].parentNode) {
+        this.blockedElements[elementID].parentNode.removeChild(this.blockedElements[elementID]);
+    }
     var element = this.placeholderElements[elementID];
     while(element.parentNode.childNodes.length == 1) {
         element = element.parentNode;
@@ -433,7 +434,7 @@ ClickToFlash.prototype.clickPlaceholder = function(elementID) {
 
 ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
     
-    // Creating the placeholder element
+    // Create the placeholder element
     var placeholderElement = document.createElement("div");
     placeholderElement.style.width = element.offsetWidth + "px";
     placeholderElement.style.height = element.offsetHeight + "px";
@@ -441,9 +442,10 @@ ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
     
     placeholderElement.className = "CTFplaceholder CTFnoimage";
     
-    // Replacing element by placeholderElement
-    if (element.parentNode) {
-        element.parentNode.replaceChild(placeholderElement, element);
+    // Hide the original element
+    if (element.style.display != "none") {
+        element.display = element.style.display;
+        element.style.display = "none !important";
     } else {
         // the same element has fired the 'beforeload' event more than once: ignore
         // BEGIN DEBUG
@@ -453,6 +455,12 @@ ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
         // END DEBUG
         return;
     }
+    
+    // Insert the placeholder just after the element
+    if(element.parentNode) {
+        element.parentNode.insertBefore(placeholderElement, element.nextSibling);
+        element.parentNode.addEventListener("DOMNodeRemoved", function(event) {if(event.target == element && placeholderElement.parentNode) placeholderElement.parentNode.removeChild(placeholderElement);}, false);
+    } else return;
 
     var _this = this;
     placeholderElement.onclick = function(event){_this.clickPlaceholder(elementID);};

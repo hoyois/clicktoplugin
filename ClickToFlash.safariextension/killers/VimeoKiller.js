@@ -3,7 +3,7 @@ function VimeoKiller() {
 }
 
 VimeoKiller.prototype.canKill = function(data) {
-    return !!data.src.match("moogaloop");
+    return (data.src.match("moogaloop") || data.src.match("moogalover"));
 };
 
 VimeoKiller.prototype.processElement = function(data, callback) {
