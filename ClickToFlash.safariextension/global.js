@@ -4,7 +4,7 @@ const killers = [new YouTubeKiller(), new VimeoKiller(), new DailymotionKiller()
 function blockOrAllow(data) { // check the whitelists and returns null if element can be loaded
 
     // Deal with invisible plugins
-    if(safari.extension.settings["loadInvisible"]) {
+    if(safari.extension.settings["loadInvisible"] && data.width > 0 && data.height > 0) {
         if(data.width <= safari.extension.settings["maxinvdim"] && data.height <= safari.extension.settings["maxinvdim"]) {
             return true;
         }
