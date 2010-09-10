@@ -433,10 +433,8 @@ ClickToPlugin.prototype.setOpacityTo = function(opacity) {
 };
 
 ClickToPlugin.prototype.removeElement = function(elementID) {
-    if(this.blockedElements[elementID].parentNode) {
-        this.blockedElements[elementID].parentNode.removeChild(this.blockedElements[elementID]);
-    }
-    var element = this.placeholderElements[elementID];
+    var element = this.blockedElements[elementID];
+    element.parentNode.removeChild(this.placeholderElements[elementID]);
     while(element.parentNode.childNodes.length == 1) {
         element = element.parentNode;
     }
@@ -529,13 +527,14 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
         return;
     }
     
+    var _this = this;
+    
     // Insert the placeholder just after the element
     if(element.parentNode) {
         element.parentNode.insertBefore(placeholderElement, element.nextSibling);
-        element.parentNode.addEventListener("DOMNodeRemoved", function(event) {if(event.target == element && placeholderElement.parentNode) placeholderElement.parentNode.removeChild(placeholderElement);}, false);
+        element.parentNode.addEventListener("DOMNodeRemoved", function(event) {if(event.target == element && placeholderElement.parentNode) {placeholderElement.parentNode.removeChild(placeholderElement); _this.clearAll(elementID);}}, false);
     } else return;
 
-    var _this = this;
     placeholderElement.onclick = function(event){_this.clickPlaceholder(elementID);};
     placeholderElement.oncontextmenu = function(event) {
         var contextInfo = {
