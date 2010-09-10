@@ -220,7 +220,7 @@ ClickToFlash.prototype.loadAll = function() {
 
 ClickToFlash.prototype.loadSrc = function(string) {
     for(var i = 0; i < this.numberOfBlockedElements; i++) {
-        if(this.placeholderElements[i] && this.blockedElements[i].info.src.match(string)) {
+        if(this.placeholderElements[i] && this.blockedElements[i].source.match(string)) {
             this.loadPluginForElement(i);
         }
     }
