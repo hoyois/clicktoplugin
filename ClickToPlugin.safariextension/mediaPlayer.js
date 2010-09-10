@@ -218,12 +218,12 @@ mediaPlayer.prototype.fixAspectRatio = function() {
     if(!w || !h) { // audio source
         this.mediaElement.style.width = this.width + "px"; this.mediaElement.style.height = (this.height < 24 ? "24" : this.height) + "px";
     } else if (w/h > this.width/this.height) {
-        this.mediaElement.style.width = this.width + "px"; this.mediaElement.style.height = "";
+        // No rounding to avoid stretching in fullscreen
+        this.mediaElement.style.width = this.width + "px"; this.mediaElement.style.height = h/w*this.width + "px";
     } else {
-        this.mediaElement.style.height = this.height + "px"; this.mediaElement.style.width = "";
+        var width = w/h*this.height;
+        this.mediaElement.style.height = this.height + "px"; this.mediaElement.style.width = width + "px";
         if(this.playlistControls) {
-            // Apparently QuickTime uses floor, not round
-            var width = Math.floor(w/h*this.height);
             this.playlistControls.style.width = width + "px";
             if(this.usePlaylistControls) this.playlistControls.getElementsByTagName("p")[0].style.width = (width - this.playlistControls.getElementsByClassName("CTFplaylistControlsRight")[0].offsetWidth - 12) + "px";
         }
