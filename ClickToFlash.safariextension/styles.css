@@ -177,6 +177,7 @@ Media player
     display: inline-block !important;
     margin: 0 !important;
     padding: 0 !important;
+    /* z-index: 1 !important; */
 }
 
 .CTFmediaPlayer .CTFvideoElement {
