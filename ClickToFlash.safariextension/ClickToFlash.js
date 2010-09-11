@@ -198,6 +198,7 @@ ClickToFlash.prototype.loadPluginForElement = function(elementID) {
     this.blockedElements[elementID].allowedToLoad = true;
     if(this.placeholderElements[elementID].parentNode) {
         this.placeholderElements[elementID].parentNode.removeChild(this.placeholderElements[elementID]);
+        this.blockedElements[elementID].style.display = "";
         this.blockedElements[elementID].style.display = this.blockedElements[elementID].display; // remove display:none
         this.clearAll(elementID);
     }
@@ -206,6 +207,7 @@ ClickToFlash.prototype.loadPluginForElement = function(elementID) {
 ClickToFlash.prototype.reloadInPlugin = function(elementID) {
     this.blockedElements[elementID].allowedToLoad = true;
     this.mediaPlayers[elementID].containerElement.parentNode.removeChild(this.mediaPlayers[elementID].containerElement);
+    this.blockedElements[elementID].style.display = "";
     this.blockedElements[elementID].style.display = this.blockedElements[elementID].display; // remove display:none
     this.clearAll(elementID);
 };
@@ -432,6 +434,19 @@ ClickToFlash.prototype.clickPlaceholder = function(elementID) {
 
 ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
     
+    // An element already blocked may fire a beforeload event again if its CSS display:none is removed.
+    // In this case, the placeholder must not be duplicated.
+    // Until Webkit comes up with a replacement to DOMAttrModified, there's no event we can use to check this, so we have to loop...
+    // We'll assume that no script removes the "style" attribute to improve performance
+    if(element.hasAttribute("style")) {
+        for(var i = 0; i < elementID; i++) {
+            if(element == this.blockedElements[i] && this.placeholderElements[i] && this.placeholderElements[i].parentNode) { 
+                element.style.display = "none !important";
+                return;
+            }
+        }
+    }
+    
     // Create the placeholder element
     var placeholderElement = document.createElement("div");
     placeholderElement.style.width = element.offsetWidth + "px";
@@ -444,15 +459,7 @@ ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
     if (element.style.display != "none") {
         element.display = element.style.display;
         element.style.display = "none !important";
-    } else {
-        // the same element has fired the 'beforeload' event more than once: ignore
-        // BEGIN DEBUG
-        if(this.settings["debug"]) {
-            alert("Ignoring duplicate element " + this.instance + "." + elementID + ".");
-        }
-        // END DEBUG
-        return;
-    }
+    } else return;
     
     var _this = this;
     
