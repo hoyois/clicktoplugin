@@ -542,7 +542,7 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
         element.parentNode.addEventListener("DOMNodeRemoved", function(event) {if(event.target == element && placeholderElement.parentNode) {placeholderElement.parentNode.removeChild(placeholderElement); _this.clearAll(elementID);}}, false);
     } else return;
 
-    placeholderElement.onclick = function(event){_this.clickPlaceholder(elementID);};
+    placeholderElement.onclick = function(event){_this.clickPlaceholder(elementID); event.stopPropagation();};
     placeholderElement.oncontextmenu = function(event) {
         var contextInfo = {
             "instance": _this.instance,
