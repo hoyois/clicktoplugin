@@ -120,6 +120,16 @@
 		<key>DefaultValue</key>
 		<true/>
 		<key>Key</key>
+		<string>replaceDivX</string>
+		<key>Title</key>
+		<string>DivX                                              </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
 		<string>usePlaylists</string>
 		<key>Title</key>
 		<string>Utiliser les listes de lecture                               </string>
@@ -440,13 +450,19 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string></string>
+		<false/>
 		<key>Key</key>
 		<string>debug</string>
 		<key>Title</key>
-		<string>Activer le mode de débogage                           </string>
+		<string>Activer le blocage manuel                                 </string>
 		<key>Type</key>
-		<string>Hidden</string>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>mustUpdateWhitelists</string>
 	</dict>
 </array>
 </plist>

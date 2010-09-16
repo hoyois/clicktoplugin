@@ -11,6 +11,7 @@ const LOAD_ALL_FLASH = "Load All Flash";
 const ADD_TO_LOC_WHITELIST = "Add Location to Whitelist";
 const ADD_TO_SRC_WHITELIST = "Add Source to Whitelist";
 const VIEW_IN_QUICKTIME_PLAYER = "View in QuickTime Player";
+const SHOW_ELEMENT = "Show Element";
 const LOAD_PLUGIN = function(plugin) {return "Load " + plugin;};
 const REMOVE_PLUGIN = function(plugin) {return "Hide " + plugin;};
 const RELOAD_IN_PLUGIN = function(plugin) {return "Reload in " + plugin;};

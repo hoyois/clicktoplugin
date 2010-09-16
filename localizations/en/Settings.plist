@@ -120,6 +120,16 @@
 		<key>DefaultValue</key>
 		<true/>
 		<key>Key</key>
+		<string>replaceDivX</string>
+		<key>Title</key>
+		<string>DivX                                              </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
 		<string>usePlaylists</string>
 		<key>Title</key>
 		<string>Use playlists                                                   </string>
@@ -428,9 +438,19 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string></string>
+		<false/>
 		<key>Key</key>
 		<string>debug</string>
+		<key>Title</key>
+		<string>Block content manually                                  </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>mustUpdateWhitelists</string>
 	</dict>
 </array>
 </plist>

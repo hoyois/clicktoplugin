@@ -11,6 +11,7 @@ const LOAD_ALL_FLASH = "Débloquer Flash sur cette page";
 const ADD_TO_LOC_WHITELIST = "Ajouter à la liste blanche";
 const ADD_TO_SRC_WHITELIST = "Ajouter à la liste blanche";
 const VIEW_IN_QUICKTIME_PLAYER = "Ouvrir avec QuickTime PLayer";
+const SHOW_ELEMENT = "Voir l'élément";
 const LOAD_PLUGIN = function(plugin) {return "Lancer " + plugin;};
 const REMOVE_PLUGIN = function(plugin) {return "Supprimer " + plugin;};
 const RELOAD_IN_PLUGIN = function(plugin) {return "Restaurer " + plugin;};
