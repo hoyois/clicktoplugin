@@ -9,7 +9,7 @@ DailymotionKiller.prototype.canKill = function(data) {
 
 DailymotionKiller.prototype.processElement = function(data, callback) {
     if(data.params) {
-        this.processElementFromSequence(unescape(getFlashVariable(data.params, "sequence")), callback);
+        this.processElementFromSequence(decodeURIComponent(getFlashVariable(data.params, "sequence")), callback);
         return;
     }
     // The vid has no flashvars... It has to be an embed
@@ -71,20 +71,15 @@ DailymotionKiller.prototype.processElementFromSequence = function(sequence, call
 DailymotionKiller.prototype.processElementFromVideoID = function(videoID, callback) {
     var toMatch = /addVariable\(\"sequence\",\s*\"[^\"]*\"/; //"//
     var _this = this;
-    var req = new XMLHttpRequest ();
-    req.open("GET", "http://www.dailymotion.com/video/" + videoID, true);
-    req.onload = function() {
-        var sequence = req.responseText.match(toMatch)[0];
+    var xhr = new XMLHttpRequest ();
+    xhr.open("GET", "http://www.dailymotion.com/video/" + videoID, true);
+    xhr.onload = function() {
+        var sequence = xhr.responseText.match(toMatch)[0];
         var callbackForEmbed = function(videoData) {
             videoData.playlist[0].siteInfo = {"name": "Dailymotion", "url": "http://www.dailymotion.com/video/" + videoID};
             callback(videoData);
         }
-        if(sequence) {_this.processElementFromSequence(unescape(sequence), callbackForEmbed);}
+        if(sequence) {_this.processElementFromSequence(decodeURIComponent(sequence), callbackForEmbed);}
     };
-    // BEGIN DEBUG
-    if(safari.extension.settings["debug"]) {
-        if(!confirm("Killer '" + this.name + "' is about to send an asynchronous AJAX request to:\n\n" + "http://www.dailymotion.com/video/" + videoID)) return;
-    }
-    // END DEBUG
-    req.send(null);
+    xhr.send(null);
 };

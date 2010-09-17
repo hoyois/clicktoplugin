@@ -209,7 +209,7 @@ mediaPlayer.prototype.fadeOut = function(delay) {
 
 mediaPlayer.prototype.fadeIn = function(delay) {
     this.playlistControls.style.WebkitTransition = "opacity .05s linear " + delay + "s";
-    this.playlistControls.style.opacity = "0.93";
+    this.playlistControls.style.opacity = "0.9";
 };
 
 mediaPlayer.prototype.fixAspectRatio = function() {

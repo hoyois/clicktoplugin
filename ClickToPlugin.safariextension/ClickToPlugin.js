@@ -74,7 +74,7 @@ ClickToPlugin.prototype.respondToMessage = function(event) {
                     this.launchInQuickTimePlayer(loadData[1]);
                     break;
                 case "show":
-                    alert(document.HTMLToString(this.blockedElements[loadData[1]]));
+                    this.showElement(loadData[1]);
                     break;
             }
             break;
@@ -142,6 +142,7 @@ unignored <object> or <embed> element, regardless of it having a type or a sourc
 */
 
 // event.type is DOMContentLoaded or DOMNodeInserted (-> block <applet> tags)
+// When webkit bug 44023 is addressed, this function can be removed
 ClickToPlugin.prototype.handleDOMContentEvent = function(event) {
     if(event.target.nodeType != 1 && event.target.nodeType != 9) return; // the node is not an HTML Element nor the document
     const applets = event.target.getElementsByTagName("applet");
@@ -184,7 +185,11 @@ ClickToPlugin.prototype.handleDOMContentEvent = function(event) {
         var elementID = this.numberOfBlockedElements++;
         // BEGIN DEBUG
         if(this.settings["debug"]) {
-            if(!confirm("ClickToPlugin is about to block embedded content " + this.instance + "." + elementID + ":\n\n" + document.HTMLToString(element))) return;
+            var e = appletElements[i], positionX = 0, positionY = 0;
+            do {
+                positionX += e.offsetLeft; positionY += e.offsetTop;
+            } while(e = e.offsetParent);
+            if(!confirm("ClickToPlugin is about to block embedded content " + this.instance + "." + elementID + ":\n" + "\nType: Java\nLocation: " + window.location.href + "\nSource: " + appletElements[i].info.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + appletElements[i].offsetWidth + "x" + appletElements[i].offsetHeight)) return;
         }
         // END DEBUG
         
@@ -201,7 +206,7 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
         if(!sIFRData.canLoad) {
             // BEGIN DEBUG
             if(sIFRData.debug) {
-                if(!confirm("ClickToPlugin has detected an sIFR script and is about to block it:\n\n" + document.HTMLToString(element))) return;
+                if(!confirm("ClickToPlugin is about to block an sIFR script:\n\n" + element.src)) return;
             }
             // END DEBUG
             event.preventDefault(); // prevents loading of sifr.js
@@ -215,10 +220,10 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
     // flash element must not be blocked
     if (element.allowedToLoad) return;
     
-    if (element instanceof HTMLEmbedElement) {
-        element.tag = "embed";
-    } else if (element instanceof HTMLObjectElement) {
+    if (element instanceof HTMLObjectElement) {
         element.tag = "object";
+    } else if (element instanceof HTMLEmbedElement) {
+        element.tag = "embed";
     } else {
         return;
     }
@@ -233,18 +238,9 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
         this.settings = safari.self.tab.canLoad(event, "getSettings");
     }
     
-    // if useh264... nah, not worth it & breaks whitelisting
-    
     // Deal with sIFR Flash
     if (element.className == "sIFR-flash" || element.hasAttribute("sifr")) {
-        if (this.settings["sifrReplacement"] == "autoload") {
-            // BEGIN DEBUG
-            if(this.settings["debug"]) {
-                alert("sIFR text replacement loaded:\n\n" + document.HTMLToString(element));
-            }
-            // END DEBUG
-            return;
-        }
+        if (this.settings["sifrReplacement"] == "autoload") return;
     }
     
     // At this point we know we have to block 'element' from loading
@@ -258,7 +254,11 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
     
     // BEGIN DEBUG
     if(this.settings["debug"]) {
-        if(!confirm("ClickToPlugin is about to block embedded content " + this.instance + "." + elementID + ":\n\n" + document.HTMLToString(element))) return;
+        var e = element, positionX = 0, positionY = 0;
+        do {
+            positionX += e.offsetLeft; positionY += e.offsetTop;
+        } while(e = e.offsetParent);
+        if(!confirm("ClickToPlugin is about to block embedded content " + this.instance + "." + elementID + ":\n" + "\nType: " + pluginName + "\nLocation: " + window.location.href + "\nSource: " + element.info.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + element.offsetWidth + "x" + element.offsetHeight)) return;
     }
     // END DEBUG
     
@@ -306,27 +306,10 @@ ClickToPlugin.prototype.prepMedia = function(mediaData) {
         this.mediaPlayers[mediaData.elementID] = new mediaPlayer(mediaData.isAudio ? "audio" : "video");
     }
     if(mediaData.loadAfter) { // just adding stuff to the playlist
-        // BEGIN DEBUG
-        if(this.settings["debug"]) {
-            if(!confirm("Preparing to add " + mediaData.playlist.length + " tracks to the playlist for element " + this.instance +"."+ mediaData.elementID)) return;
-        }
-        // END DEBUG
         this.mediaPlayers[mediaData.elementID].playlistLength -= mediaData.missed;
         this.mediaPlayers[mediaData.elementID].addToPlaylist(mediaData.playlist);
         return;
     }
-    // BEGIN DEBUG
-    if(this.settings["debug"]) {
-        var showPlaylist = "(" + mediaData.playlist.length + " track" + (mediaData.playlist.length > 1 ? "s" : "");
-        if(mediaData.playlistLength) showPlaylist += ", expecting " + mediaData.playlistLength;
-        showPlaylist += ")";
-        for (var i = 0; i < mediaData.playlist.length; i++) {
-            showPlaylist += "\n[" + (i + 1) + "] (" + mediaData.playlist[i].mediaType + ")" + "\nposterURL: " + mediaData.playlist[i].posterURL + "\nmediaURL: " + mediaData.playlist[i].mediaURL + "\n";
-        }
-        if(!confirm("Preparing media for element " + this.instance +"."+ mediaData.elementID +
-        ":\n\nbadgeLabel: " + mediaData.badgeLabel + "\n\nPLAYLIST " + showPlaylist)) return;
-    }
-    // END DEBUG
     
     this.mediaPlayers[mediaData.elementID].addToPlaylist(mediaData.playlist, true);
     this.mediaPlayers[mediaData.elementID].playlistLength = mediaData.playlistLength ? mediaData.playlistLength : mediaData.playlist.length;
@@ -372,8 +355,6 @@ ClickToPlugin.prototype.showDownloadLink = function(mediaType, url, elementID) {
 };
 
 ClickToPlugin.prototype.loadMediaForElement = function(elementID) {
-    var placeholderElement = this.placeholderElements[elementID];
-    
     var contextInfo = {
         "instance": this.instance,
         "elementID": elementID,
@@ -381,13 +362,13 @@ ClickToPlugin.prototype.loadMediaForElement = function(elementID) {
     };
 
     // Initialize player
-    var w = parseInt(placeholderElement.style.width.replace("px",""));
-    var h = parseInt(placeholderElement.style.height.replace("px",""));
+    var w = parseInt(this.placeholderElements[elementID].style.width.replace("px",""));
+    var h = parseInt(this.placeholderElements[elementID].style.height.replace("px",""));
     this.mediaPlayers[elementID].initialize(this.settings["H264behavior"], w, h, this.settings["volume"], contextInfo);
     // mediaElement.allowedToLoad = true; // not used
 
     // Replace placeholder and load first track
-    placeholderElement.parentNode.replaceChild(this.mediaPlayers[elementID].containerElement, placeholderElement);
+    this.placeholderElements[elementID].parentNode.replaceChild(this.mediaPlayers[elementID].containerElement, this.placeholderElements[elementID]);
     this.mediaPlayers[elementID].loadTrack(0);
     this.placeholderElements[elementID] = null;
     
@@ -403,6 +384,10 @@ ClickToPlugin.prototype.launchInQuickTimePlayer = function(elementID) {
         element = this.mediaPlayers[elementID].containerElement;
     }
     var mediaURL = this.mediaPlayers[elementID].playlist[track].mediaURL;
+    // Relative URLs need to be resolved for QTP
+    var tmpAnchor = document.createElement("a");
+    tmpAnchor.href = mediaURL;
+    mediaURL = tmpAnchor.href;
     var QTObject = document.createElement("embed");
     QTObject.allowedToLoad = true;
     QTObject.className = "CTFQTObject";
@@ -442,6 +427,10 @@ ClickToPlugin.prototype.removeElement = function(elementID) {
     }
     element.parentNode.removeChild(element);
     this.clearAll(elementID);
+};
+
+ClickToPlugin.prototype.showElement = function(elementID) {
+    alert("Location: " + window.location.href + "\nSource: " + this.blockedElements[elementID].info.src + "\n\n" + document.HTMLToString(this.blockedElements[elementID]));
 };
 
 // I really don't like the next two methods, but can't come up with something better
@@ -532,7 +521,7 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
     if (element.style.display != "none") {
         element.display = element.style.display;
         element.style.display = "none !important";
-    } else return;
+    } else return; // happens for duplicate beforeload events
     
     var _this = this;
     
@@ -571,15 +560,22 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
     // Look for video replacements
     if(this.settings["useH264"]) {
         if(!this.directKill(elementID)) {
+            // Need to pass the base URL to the killers so that they can resolve URLs, eg. for AJAX requests.
+            // According to RFC1808, the base URL is given by the <base> tag if present,
+            // else by the 'Content-Base' HTTP header if present, else by the current URL.
+            // Fortunately the magical anchor trick takes care of all this for us!!
+            var tmpAnchor = document.createElement("a");
+            tmpAnchor.href = "./";
             var elementData = {
                 "instance": this.instance,
                 "elementID": elementID,
                 "plugin": element.plugin,
                 "src": element.info.src,
+                "location": window.location.href,
+                "baseURL": tmpAnchor.href,
                 "href": element.info.href,
                 "image": element.info.image,
-                "params": getParamsOf(element),
-                "location": window.location.href
+                "params": getParamsOf(element)
             };
             safari.self.tab.dispatchMessage("killPlugin", elementData);
         }
@@ -609,11 +605,6 @@ ClickToPlugin.prototype.directKill = function(elementID) {
     }
     if(!mediaURL) return false;
     
-    // BEGIN DEBUG
-    if(this.settings["debug"]) {
-        if(!confirm("Blocked element " + this.instance + "." + elementID + " is about to be suffer a direct kill.")) return false;
-    }
-    // END DEBUG
     var mediaData = {
         "elementID": elementID,
         "playlist": [{"mediaType": mediaType, "posterURL": mediaElements[0].getAttribute("poster"), "mediaURL": mediaURL}],

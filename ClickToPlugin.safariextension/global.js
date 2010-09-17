@@ -1,5 +1,15 @@
 var CTP_instance = 0; // incremented by one whenever a ClickToPlugin instance with content is created
-const killers = [new YouTubeKiller(), new VimeoKiller(), new DailymotionKiller(), new VeohKiller(), new JWKiller(), new SLKiller(), new QTKiller(), new WMKiller(), new DivXKiller()];
+const killers = [new YouTubeKiller(), new VimeoKiller(), new DailymotionKiller(), new VeohKiller(), new GenericKiller(), new SLKiller(), new QTKiller(), new WMKiller(), new DivXKiller()];
+
+// Temporary
+if(safari.extension.settings["mustUpdateWhitelists"]) {
+    safari.extension.settings["mustUpdateWhitelists"] = false;
+    function updateWL(string) {
+        safari.extension.settings[string] = safari.extension.settings[string].replace(/\s+/g, "").replace(/,/g, " ");
+    }
+    updateWL("redlist"); updateWL("greenlist"); updateWL("H264whitelist");
+    updateWL("locwhitelist"); updateWL("locblacklist"); updateWL("srcwhitelist"); updateWL("srcblacklist");
+}
 
 function blockOrAllow(data) { // returns null if element can be loaded, the name of the plugin otherwise
 
@@ -23,27 +33,19 @@ function blockOrAllow(data) { // returns null if element can be loaded, the name
     
     // Deal with whitelisted content
     if(safari.extension.settings["uselocWhitelist"]) {
-        var locwhitelist = safari.extension.settings["locwhitelist"].replace(/\s+/g,"");
-        var locblacklist = safari.extension.settings["locblacklist"].replace(/\s+/g,"");
-        if(locwhitelist) {
-            locwhitelist = locwhitelist.split(/,(?![^\(]*\))/); // matches all , except those in parentheses (used in regexp)
-            if(matchList(locwhitelist, data.location)) return null;
+        if(safari.extension.settings["locwhitelist"]) {
+            if(matchList(safari.extension.settings["locwhitelist"].split(/\s+/), data.location)) return null;
         }
-        if(locblacklist) {
-            locblacklist = locblacklist.split(/,(?![^\(]*\))/);
-            if(!matchList(locblacklist, data.location)) return null;
+        if(safari.extension.settings["locblacklist"]) {
+            if(!matchList(safari.extension.settings["locblacklist"].split(/\s+/), data.location)) return null;
         }
     }
     if(safari.extension.settings["usesrcWhitelist"]) {
-        var srcwhitelist = safari.extension.settings["srcwhitelist"].replace(/\s+/g,"");
-        var srcblacklist = safari.extension.settings["srcblacklist"].replace(/\s+/g,"");
-        if(srcwhitelist) {
-            srcwhitelist = srcwhitelist.split(/,(?![^\(]*\))/);
-            if(matchList(srcwhitelist, data.src)) return null;
+        if(safari.extension.settings["srcwhitelist"]) {
+            if(matchList(safari.extension.settings["srcwhitelist"].split(/\s+/), data.src)) return null;
         }
-        if(srcblacklist) {
-            srcblacklist = srcblacklist.split(/,(?![^\(]*\))/);
-            if(!matchList(srcblacklist, data.src)) return null;
+        if(safari.extension.settings["srcblacklist"]) {
+            if(!matchList(safari.extension.settings["srcblacklist"].split(/\s+/), data.src)) return null;
         }
     }
     
@@ -64,22 +66,16 @@ function blockOrAllow(data) { // returns null if element can be loaded, the name
     if(plugin) pluginName = getPluginNameFromPlugin(plugin);
     else if(MIMEType) pluginName = getPluginNameFromType(MIMEType);
     else if(data.classid) pluginName = getPluginNameFromClassid(data.classid.replace("clsid:", ""));
+    // else if(data.src) pluginName = getPluginNameFromExt(ext);
 
     if(safari.extension.settings["allowQT"] && pluginName == "QuickTime") return null;
     
     // Use greenlist/redlist
     if(MIMEType) {
         if(safari.extension.settings["block"] == "useRedlist") {
-            var redlist = safari.extension.settings["redlist"].replace(/\s+/g,"");
-            if(!redlist) return null;
-            redlist = redlist.split(/,(?![^\(]*\))/);
-            if(!matchList(redlist, MIMEType, true)) return null;
+            if(!matchList(safari.extension.settings["redlist"].split(/\s+/), MIMEType)) return null;
         } else if(safari.extension.settings["block"] == "useGreenlist") {
-            var greenlist = safari.extension.settings["greenlist"].replace(/\s+/g,"");
-            if(greenlist) {
-                greenlist = greenlist.split(/,(?![^\(]*\))/);
-                if(matchList(greenlist, MIMEType, true)) return null;
-            }
+            if(matchList(safari.extension.settings["greenlist"].split(/\s+/), MIMEType)) return null;
         }
     }
     // At this point we know we should block the element
@@ -114,7 +110,7 @@ function respondToMessage(event) {
 
 function respondToCanLoad(message) {
     // Make checks in correct order for optimal performance
-    if(message.src != undefined) return blockOrAllow(message);
+    if(message.src !== undefined) return blockOrAllow(message);
     switch(message) {
         case "getSettings":
             return getSettings();
@@ -156,7 +152,7 @@ function handleContextMenu(event) {
         }
         // BEGIN DEBUG
         if(safari.extension.settings["debug"]) {
-            event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",show", "Show Element " + event.userInfo.instance + "." + event.userInfo.elementID);
+            event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",show", SHOW_ELEMENT + " " + event.userInfo.instance + "." + event.userInfo.elementID);
         }
         //END DEBUG
     }
@@ -187,11 +183,11 @@ function handleWhitelisting (type, url) {
     var newWLstring = prompt(type ? ADD_TO_LOC_WHITELIST_DIALOG : ADD_TO_SRC_WHITELIST_DIALOG, url);
     if(newWLstring) {
         safari.extension.settings["use" + (type ? "loc" : "src") + "Whitelist"] = true;
-        if(type && safari.extension.settings["locwhitelist"] == "www.example.com, www.example2.com") { // get rid of the example
+        if(type && safari.extension.settings["locwhitelist"] == "www.example.com www.example2.com") { // get rid of the example
             safari.extension.settings[(type ? "loc" : "src") + "whitelist"] = newWLstring;
         } else {
-            var comma = safari.extension.settings[(type ? "loc" : "src") + "whitelist"].replace(/\s+/,"") ? ", " : "";
-            safari.extension.settings[(type ? "loc" : "src") + "whitelist"] += comma + newWLstring;
+            var space = safari.extension.settings[(type ? "loc" : "src") + "whitelist"] ? " " : "";
+            safari.extension.settings[(type ? "loc" : "src") + "whitelist"] += space + newWLstring;
         }
         // load targeted content at once
         dispatchMessageToAllPages(type ? "locwhitelist" : "srcwhitelist", newWLstring);
@@ -219,19 +215,22 @@ function getSettings() { // return the settings injected scripts need
     return settings;
 }
 
+function findKillerFor(data) {
+    for (var i = 0; i < killers.length; i++) {
+        if(killers[i].canKill(data)) return i;
+    }
+    return null;
+}
+
 function killPlugin(data) {
     var killerID = findKillerFor(data);
     if(killerID == null) return;
-    // BEGIN DEBUG
-    if(safari.extension.settings["debug"]) {
-        if(!confirm("Killer '" + killers[killerID].name + "' thinks it might be able to process target " + data.instance +"."+ data.elementID + ".")) return;
-    }
-    // END DEBUG
+    
     var callback = function(mediaData) {
         if(safari.extension.settings["H264autoload"]) {
             if(!safari.extension.settings["H264whitelist"]) mediaData.autoload = true;
             else {
-                mediaData.autoload = matchList(safari.extension.settings["H264whitelist"].replace(/\s+/g, "").split(/,(?![^\(]*\))/), data.location);
+                mediaData.autoload = matchList(safari.extension.settings["H264whitelist"].split(/\s+/), data.location);
             }
         }
         mediaData.elementID = data.elementID;
@@ -241,23 +240,5 @@ function killPlugin(data) {
         dispatchMessageToAllPages("mediaData", mediaData);
     };
     killers[killerID].processElement(data, callback);
-}
-
-function findKillerFor(data) {
-    for (var i = 0; i < killers.length; i++) {
-        if(killers[i].canKill(data)) return i;
-    }
-    return null;
-}
-
-function dispatchMessageToAllPages(name, message) {
-    for(var i = 0; i < safari.application.browserWindows.length; i++) {
-        for(var j = 0; j < safari.application.browserWindows[i].tabs.length; j++) {
-            // must be careful here since tabs such as Bookmarks or Top Sites do not have the .page proxy
-            if(safari.application.browserWindows[i].tabs[j].page) {
-                safari.application.browserWindows[i].tabs[j].page.dispatchMessage(name, message);
-            }
-        }
-    }
 }
 
