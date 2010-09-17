@@ -19,19 +19,19 @@ VimeoKiller.prototype.processElement = function(data, callback) {
     var videoURL = null;
     var badgeLabel = "H.264";
     
-    var req = new XMLHttpRequest();
-    req.open('GET', "http://www.vimeo.com/moogaloop/load/clip:" + videoID + "/", true);
-    req.onload = function() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', "http://www.vimeo.com/moogaloop/load/clip:" + videoID + "/", true);
+    xhr.onload = function() {
         if (safari.extension.settings["maxresolution"] > 1) {
-            if(req.responseXML.getElementsByTagName("isHD").length > 0) {
-                if(req.responseXML.getElementsByTagName("isHD")[0].childNodes[0].nodeValue == "1") badgeLabel = "HD&nbsp;H.264";
+            if(xhr.responseXML.getElementsByTagName("isHD").length > 0) {
+                if(xhr.responseXML.getElementsByTagName("isHD")[0].childNodes[0].nodeValue == "1") badgeLabel = "HD&nbsp;H.264";
             }
         }
-        if(req.responseXML.getElementsByTagName("request_signature").length > 0 && req.responseXML.getElementsByTagName("request_signature_expires").length > 0) {
-            videoURL = "http://www.vimeo.com/moogaloop/play/clip:" + videoID + "/" + req.responseXML.getElementsByTagName("request_signature")[0].childNodes[0].nodeValue+ "/" + req.responseXML.getElementsByTagName("request_signature_expires")[0].childNodes[0].nodeValue+"/?q=" + ((badgeLabel == "H.264") ? "sd" : "hd");
+        if(xhr.responseXML.getElementsByTagName("request_signature").length > 0 && xhr.responseXML.getElementsByTagName("request_signature_expires").length > 0) {
+            videoURL = "http://www.vimeo.com/moogaloop/play/clip:" + videoID + "/" + xhr.responseXML.getElementsByTagName("request_signature")[0].childNodes[0].nodeValue+ "/" + xhr.responseXML.getElementsByTagName("request_signature_expires")[0].childNodes[0].nodeValue+"/?q=" + ((badgeLabel == "H.264") ? "sd" : "hd");
         }
-        if(req.responseXML.getElementsByTagName("thumbnail").length > 0) {
-            posterURL = req.responseXML.getElementsByTagName("thumbnail")[0].childNodes[0].nodeValue;
+        if(xhr.responseXML.getElementsByTagName("thumbnail").length > 0) {
+            posterURL = xhr.responseXML.getElementsByTagName("thumbnail")[0].childNodes[0].nodeValue;
         }
         var siteInfo = null;
         if(!data.location.match("vimeo.com/") || data.location == "http://vimeo.com/" || data.location.match("player.vimeo.com/")) siteInfo = {"name": "Vimeo", "url": "http://vimeo.com/" + videoID};
@@ -50,25 +50,9 @@ VimeoKiller.prototype.processElement = function(data, callback) {
                 if(MIMEType.split(";")[0] != "video/x-flv") {
                     callback(videoData);
                 } 
-                // BEGIN DEBUG
-                else if(safari.extension.settings["debug"]) {
-                    alert("Video found by killer 'VimeoKiller' has MIME type " + MIMEType + " and cannot be played natively by QuickTime.");
-                }               
-                // END DEBUD
             };
-            // BEGIN DEBUG
-            if(safari.extension.settings["debug"]) {
-                if(!confirm("Killer '" + this.name + "' is about to send an asynchronous AJAX request to:\n\n" + videoURL)) return;
-            }
-            // END DEBUG
             getMIMEType(videoURL, handleMIMEType);
         }
     };
-    
-    // BEGIN DEBUG
-    if(safari.extension.settings["debug"]) {
-        if(!confirm("Killer '" + this.name + "' is about to send a synchronous AJAX request to:\n\n" + "http://www.vimeo.com/moogaloop/load/clip:" + videoID + "/")) return;
-    }
-    // END DEBUG
-    req.send(null);
+    xhr.send(null);
 };

@@ -1,13 +1,33 @@
-function makeAbsoluteURI(url, location) {
-    if(!url) return "";
-    if(/\/\//.test(url)) return url; // already absolute
-    location = location.replace(/\/[^\/]*$/, "/");
-    if(url[0]=="/") url = url.substring(1);
-    if(url[0]=="/") {
-        url = url.substring(1);
-        location = location.replace(/\/\/.*$/,"//");
+function dispatchMessageToAllPages(name, message) {
+    for(var i = 0; i < safari.application.browserWindows.length; i++) {
+        for(var j = 0; j < safari.application.browserWindows[i].tabs.length; j++) {
+            // must be careful here since tabs such as Bookmarks or Top Sites do not have the .page proxy
+            if(safari.application.browserWindows[i].tabs[j].page) {
+                safari.application.browserWindows[i].tabs[j].page.dispatchMessage(name, message);
+            }
+        }
     }
-    return location + url;
+}
+
+function makeAbsoluteURL(url, base) {
+    if(!url) return "";
+    if(/:\/\//.test(url)) return url; // already absolute
+    if(url[0] == "/") {
+        url = url.substring(1);
+        if(url[0] == "/") {
+            url = url.substring(1);
+            base = base.replace(/\/\/.*$/,"//");
+        } else {
+            base = /[^\/]*\/\/[^\/]*\//.exec(base)[0];
+        }
+    }
+    return base + url;
+}
+
+function hasFlashVariable(flashvars, key) {
+    var s = "(^|&)" + key + "=";
+    s = new RegExp(s);
+    return s.test(flashvars);
 }
 
 function getFlashVariable(flashvars, key) {
@@ -22,41 +42,101 @@ function getFlashVariable(flashvars, key) {
     return "";
 }
 
+// In this function 'ext' is a string representing a regular expression, eg. "mp4|mpe?g"
+function hasExt(ext, url) {
+    url = url.split("?")[0].split("#")[0];
+    ext = new RegExp("\.(" + ext + ")$", "i");
+    return ext.test(url);
+}
+
+// this function is not to be trusted...
+function canPlayTypeWithHTML5(MIMEType) {
+    return document.createElement("video").canPlayType(MIMEType);
+}
+const canPlayFLV = canPlayTypeWithHTML5("video/x-flv");
+
+// and certainly not this this one! but it does the job reasonably well
+function willPlaySrcWithHTML5(url) {
+    url = url.split("?")[0].split("#")[0];
+    if (/\.(mp4|mpe?g|mov|m4v)$/i.test(url)) return "video";
+    if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && /\.flv$/i.test(url)) return "video";
+    if(/\.(mp3|wav|midi?|aif(f|c)?|aac|m4a)$/i.test(url)) return "audio";
+    if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && /\.fla$/i.test(url)) return "video";
+    return "";
+}
+
 function getMIMEType(resourceURL, handleMIMEType) {
-    request = new XMLHttpRequest();
-    request.open('HEAD', resourceURL, true);
+    xhr = new XMLHttpRequest();
+    xhr.open('HEAD', resourceURL, true);
     var gotContentType = false;
-    request.onreadystatechange = function () {
-        if(!gotContentType && request.getResponseHeader('Content-Type')) {
+    xhr.onreadystatechange = function () {
+        if(!gotContentType && xhr.getResponseHeader('Content-Type')) {
             gotContentType = true;
-            handleMIMEType(request.getResponseHeader('Content-Type'));
-            request.abort();
+            handleMIMEType(xhr.getResponseHeader('Content-Type'));
+            xhr.abort();
         }
     };
-    request.send(null);
+    xhr.send(null);
 }
 
-function canPlayWithQTPlugin(MIMEType) {
-    return !!document.createElement("video").canPlayType(MIMEType);
+function parseXSPFPlaylist(playlistURL, altPosterURL, track, handlePlaylistData) {
+    xhr = new XMLHttpRequest();
+    xhr.open('GET', playlistURL, true);
+    xhr.onload = function() {
+        var x = xhr.responseXML.getElementsByTagName("track");
+        var playlist = new Array();
+        var isAudio = true;
+        var startTrack = track;
+        if(!(track >= 0 && track < x.length)) track = 0;
+        var list, I, mediaURL, posterURL, title;
+        
+        for(var i = 0; i < x.length; i++) {
+            I = (i + track) % x.length;
+            list = x[I].getElementsByTagName("location");
+            if(list.length > 0) mediaURL = list[0].firstChild.nodeValue;
+            else if(i == 0) return;
+            else continue;
+            var mediaType = willPlaySrcWithHTML5(mediaURL);
+            if(!mediaType) {
+                if(i == 0) return;
+                if(i >= x.length - track) --startTrack;
+                continue;
+            }
+            if(mediaType == "video") isAudio = false;
+            
+            list = x[I].getElementsByTagName("image");
+            if(list.length > 0) posterURL = list[0].firstChild.nodeValue;
+            if(i == 0 && !posterURL) posterURL = altPosterURL;
+            list = x[I].getElementsByTagName("title");
+            if(list.length > 0) title = list[0].firstChild.nodeValue;
+            playlist.push({"mediaType": mediaType, "mediaURL": mediaURL, "posterURL": posterURL, "title": title});
+        }
+        var playlistData = {
+            "playlist": playlist,
+            "startTrack": startTrack,
+            "isAudio": isAudio
+        };
+        handlePlaylistData(playlistData);
+    };
+    xhr.send(null);
 }
-
-const canPlayFLV = canPlayWithQTPlugin("video/x-flv");
-const canPlayWM = canPlayWithQTPlugin("video/x-ms-wmv");
 
 function matchList(list, string) {
+    var s;
     for(var i = 0; i < list.length; i++) {
-        var s = list[i];
-        // if s is enclosed in parenthesis, interpret as regexp
-        if (s[0] == "(" && s[s.length - 1] == ")") {
+        s = list[i];
+        if(!s) continue;
+        if(/^\(.*\)$/.test(s)) { // if s is enclosed in parenthesis, interpret as regexp
             try{
                 s = new RegExp(s);
             } catch (err) { // invalid regexp, just ignore
                 continue;
             }
-        }
-        if(string.match(s)) {
-            return true;
+            if(s.test(string)) return true;
+        } else { // otherwise, regular string match
+            if(string.indexOf(s) != -1) return true;
         }
     }
     return false;
 }
+

@@ -15,11 +15,20 @@
     right: auto !important;
     bottom: auto !important;
     left: auto !important;
+    float: none !important;
+}
+
+.CTFplaceholder div, .CTFmediaPlayer div {
+    display: block !important;
 }
 
 .CTFplaceholder a, .CTFmediaPlayer a {
     display: inline !important;
     cursor: auto !important;
+}
+
+.CTFplaceholder a:hover, .CTFmediaPlayer a:hover {
+    text-decoration: underline !important;
 }
 
 /******************
@@ -84,7 +93,6 @@ Placeholder element
 }
 
 .CTFplaceholder .CTFlogoContainer.CTFhidden {
-    display: block !important; /* even crucial!!*/
     visibility: hidden !important;
 }
 
@@ -237,6 +245,7 @@ Media player
 }
 
 .CTFmediaPlayer .CTFtrackInfo p {
+    display: block !important;
     line-height: normal !important;
     text-align: left !important;
     white-space: nowrap !important;
@@ -246,10 +255,6 @@ Media player
 
 .CTFmediaPlayer .CTFtrackTitle {
     pointer-events: auto !important;
-}
-
-.CTFmediaPlayer .CTFtrackTitle:hover {
-    text-decoration: underline !important;
 }
 
 /* Right playlist controls */
@@ -297,6 +302,7 @@ Media player
 }
 
 .CTFmediaPlayer .CTFtrackSelect input {
+    display: inline-block !important;
     border: 1px solid rgba(0, 0, 0, 1) !important;
     height: 12px !important;
     line-height: 1 !important;
@@ -306,6 +312,7 @@ Media player
 }
 
 .CTFmediaPlayer .CTFtrackSelect span {
+    display: inline !important;
     line-height: 1 !important;
 }
 
