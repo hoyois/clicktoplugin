@@ -42,7 +42,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string>flash, futuresplash, silverlight</string>
+		<string>flash futuresplash silverlight</string>
 		<key>Key</key>
 		<string>redlist</string>
 		<key>Title</key>
@@ -113,6 +113,16 @@
 		<string>replaceWM</string>
 		<key>Title</key>
 		<string>Windows Media                             </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>replaceDivX</string>
+		<key>Title</key>
+		<string>DivX                                              </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -256,7 +266,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string>www.example.com, www.example2.com</string>
+		<string>www.example.com www.example2.com</string>
 		<key>Key</key>
 		<string>locwhitelist</string>
 		<key>Title</key>
@@ -428,9 +438,19 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string></string>
+		<false/>
 		<key>Key</key>
 		<string>debug</string>
+		<key>Title</key>
+		<string>Block content manually                                  </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>mustUpdateWhitelists</string>
 	</dict>
 </array>
 </plist>

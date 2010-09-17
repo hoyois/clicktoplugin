@@ -454,7 +454,7 @@
 		<key>Key</key>
 		<string>debug</string>
 		<key>Title</key>
-		<string>Activer le blocage manuel                                 </string>
+		<string>Bloquer manuellement                                      </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>

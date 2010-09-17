@@ -2,16 +2,19 @@ function WMKiller() {
     this.name = "WMKiller";
 }
 
-
 WMKiller.prototype.canKill = function(data) {
-    return (data.plugin == "WM" && safari.extension.settings["replaceWM"] && safari.extension.settings["QTbehavior"] > 1 && canPlayWM && data.src.match(/\.((wm(?!x)|asf))/i));
+    return (data.plugin == "WM" && safari.extension.settings["replaceWM"] && safari.extension.settings["QTbehavior"] > 1 && canPlayWM);
 };
 
-// should check media type...
 WMKiller.prototype.processElement = function(data, callback) {
-    var videoData = {
+    var mediaType = willPlaySrcWithHTML5(data.src);
+    if(!mediaType) return;
+    var isAudio = mediaType == "audio";
+    
+    var mediaData = {
         "playlist": [{"mediaType": "video", "mediaURL": data.src}],
-        "badgeLabel": "Video"
+        "badgeLabel": isAudio ? "Audio" : "Video",
+        "isAudio": isAudio
     };
-    callback(videoData);
+    callback(mediaData);
 };

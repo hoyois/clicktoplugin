@@ -4,7 +4,8 @@ function DivXKiller() {
 
 
 DivXKiller.prototype.canKill = function(data) {
-    return (data.plugin == "DivX" && safari.extension.settings["QTbehavior"] > 1 && canPlayFLV);
+    if(!safari.extension.settings["replaceDivX"]) return false;
+    return ((data.plugin == "DivX" || hasExt("divx", data.src)) && safari.extension.settings["QTbehavior"] > 1 && canPlayDivX);
 };
 
 
