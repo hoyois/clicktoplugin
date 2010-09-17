@@ -330,13 +330,19 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string></string>
+		<false/>
 		<key>Key</key>
 		<string>debug</string>
 		<key>Title</key>
-		<string>Activer le mode de débogage                           </string>
+		<string>Bloquer manuellement                                      </string>
 		<key>Type</key>
-		<string>Hidden</string>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>mustUpdateWhitelists</string>
 	</dict>
 </array>
 </plist>

@@ -51,11 +51,11 @@ YouTubeKiller.prototype.processElement = function(data, callback) {
 };
 
 YouTubeKiller.prototype.buildVideoIDList = function(flashvars, location, playlistID, i, videoIDList, callback) {
-    req = new XMLHttpRequest();
-    req.open('GET', "http://gdata.youtube.com/feeds/api/playlists/" + playlistID + "?start-index=" + (50*i + 1) + "&max-results=50", true);
+    xhr = new XMLHttpRequest();
+    xhr.open('GET', "http://gdata.youtube.com/feeds/api/playlists/" + playlistID + "?start-index=" + (50*i + 1) + "&max-results=50", true);
     var _this = this;
-    req.onload = function() {
-        var entries = req.responseXML.getElementsByTagName("entry");
+    xhr.onload = function() {
+        var entries = xhr.responseXML.getElementsByTagName("entry");
         for(var j = 0; j < entries.length; j++) {
             try{
                 videoIDList.push(entries[j].getElementsByTagNameNS("http://search.yahoo.com/mrss/", "player")[0].getAttribute("url").match(/\?v=[^(&|\?)]*(?=(&|\?))/)[0].replace("?v=",""));
@@ -93,21 +93,15 @@ YouTubeKiller.prototype.buildVideoIDList = function(flashvars, location, playlis
         }
         _this.buildVideoIDList(flashvars, location, playlistID, ++i, videoIDList, callback);
     };
-    // BEGIN DEBUG
-    if(safari.extension.settings["debug"]) {
-        if(!confirm("Killer '" + this.name + "' is about to send an asynchronous AJAX request to:\n\n" + "http://gdata.youtube.com/feeds/api/playlists/" + playlistID + "?start-index=" + (50*i + 1) + "&max-results=50")) return;
-    }
-    // END DEBUG
-    req.send(null);
+    xhr.send(null);
 };
 
 YouTubeKiller.prototype.buildPlaylist = function(videoIDList, playlistID, isFirst, n, callback) {
     if(videoIDList.length == 0) return;
     var j = 0;
     var jmax = videoIDList.length;
-    if(isFirst) --n;
-    if(jmax > n) jmax = n; // load by groups of n
-    if(isFirst) ++n;
+    if(isFirst) if(jmax > n-1) jmax = n-1;
+    else if(jmax > n) jmax = n; // load by groups of n
     var mediaData = {"loadAfter": true, "missed": 0, "playlist": []};
     var _this = this;
     var next = function(videoData) {
@@ -192,8 +186,9 @@ YouTubeKiller.prototype.processElementFromFlashVars = function(flashvars, locati
         this.processElementFromVideoID(videoID, callback);
         return;
     }
-    var title = unescape(getFlashVariable(flashvars, "rec_title")).substring(3).replace(/\+/g, " ");
-    var urlMap = unescape(getFlashVariable(flashvars, "fmt_url_map"));
+    var title = decodeURIComponent(getFlashVariable(flashvars, "rec_title")).substring(3).replace(/\+/g, " ");
+    var urlMap = decodeURIComponent(getFlashVariable(flashvars, "fmt_url_map"));
+    if(!urlMap) return;
     var x = this.getMediaDataFromURLMap(videoID, videoHash, urlMap);
     var videoData = {
         "playlist": [{"title": title, "mediaType": "video", "posterURL": x.posterURL, "mediaURL": x.videoURL}],
@@ -207,17 +202,17 @@ YouTubeKiller.prototype.processElementFromVideoID = function(videoID, callback) 
     var toMatch = /\"fmt_url_map\":\s\"[^\"]*\"/; //"// works for both Flash and HTML5 Beta player pages
     var toMatch2 = /\"t\":\s\"[^\"]*\"/; //"//
     var _this = this;
-    var req = new XMLHttpRequest ();
-    req.open("GET", "http://www.youtube.com/watch?v=" + videoID, true);
-    req.onload = function() {
+    var xhr = new XMLHttpRequest ();
+    xhr.open("GET", "http://www.youtube.com/watch?v=" + videoID, true);
+    xhr.onload = function() {
         var title = "";
         if(safari.extension.settings["usePlaylists"]) {
             var toMatchTitle = /<meta\sname=\"title\"\scontent=\"[^\"]*\"/;
-            var matchTitle = req.responseText.match(toMatchTitle);
+            var matchTitle = xhr.responseText.match(toMatchTitle);
             if(matchTitle) title = matchTitle[0].replace(/<meta\sname=\"title\"\scontent=/, "").replace(/\"/g,"");
         }
-        var matches = req.responseText.match(toMatch);
-        var matches2 = req.responseText.match(toMatch2);
+        var matches = xhr.responseText.match(toMatch);
+        var matches2 = xhr.responseText.match(toMatch2);
         var urlMap = null;
         var videoHash = null;
         if(matches) urlMap = matches[0].replace(/\"fmt_url_map\":\s/,"").replace(/\"/g,"").replace(/\\\//g,"/");//"//
@@ -233,12 +228,7 @@ YouTubeKiller.prototype.processElementFromVideoID = function(videoID, callback) 
             callback({"playlist": []});
         }
     };
-    // BEGIN DEBUG
-    if(safari.extension.settings["debug"]) {
-        if(!confirm("Killer '" + this.name + "' is about to send an asynchronous AJAX request to:\n\n" + "http://www.youtube.com/watch?v=" + videoID)) return;
-    }
-    // END DEBUG
-    req.send(null);
+    xhr.send(null);
 };
 
 // The following function now doesn't work here because the global page
@@ -274,11 +264,6 @@ YouTubeKiller.prototype.getSDH264FromFmt18 = function(posterURL, videoID, callba
     var toMatch = /flashvars=\\\"[^\"]*\\\"/; //"//
     var req = new XMLHttpRequest ();
     req.open("GET", "http://www.youtube.com/watch?v=" + videoID + "&fmt=18", true);
-    // BEGIN DEBUG
-    if(safari.extension.settings["debug"]) {
-        if(!confirm("Killer '" + this.name + "' is about to send an asynchronous AJAX request to:\n\n" + "http://www.youtube.com/watch?v=" + videoID + "&fmt=18")) return;
-    }
-    // END DEBUG
     req.onload = function() {
         //alert("request sent. Answer is:\n\n" + req.responseText);
         //setTimeout(alert("request sent. Answer is:\n\n" + req.responseText),0);
@@ -287,7 +272,7 @@ YouTubeKiller.prototype.getSDH264FromFmt18 = function(posterURL, videoID, callba
         //alert(req.responseXML);
         //if(req.status != "200") {alert("AJAX request failed"); return;}
         var flashvars = req.responseText.match(toMatch)[0].replace("flashvars=","").replace(/\\\"/g,"");//"//
-        var formatInfo = unescape(getFlashVariable(flashvars, "fmt_url_map")).split(",");
+        var formatInfo = decodeURIComponent(getFlashVariable(flashvars, "fmt_url_map")).split(",");
         var availableFormats = [];
         var videoURL = null;
         for (var i = 0; i < formatInfo.length; i += 1) {
