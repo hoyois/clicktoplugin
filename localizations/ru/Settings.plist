@@ -328,9 +328,19 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string></string>
+		<false/>
 		<key>Key</key>
 		<string>debug</string>
+		<key>Title</key>
+		<string>Подтверждать действия вручную        </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>mustUpdateWhitelists</string>
 	</dict>
 </array>
 </plist>

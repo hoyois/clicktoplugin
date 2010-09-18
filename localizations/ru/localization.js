@@ -1,29 +1,30 @@
-// ClickToFlash/ClickToPlugin global localization file
+// ClickToFlash/ClickToPlugin localization file
 // Save with encoding: UTF-8
 
-// FRANÇAIS
+// ENGLISH
 
 const PLUGIN_GENERIC = "Plugin";
 
 // Contextual menu items
-const LOAD_ALL_PLUGINS = "Débloquer tous les plugins";
-const LOAD_ALL_FLASH = "Débloquer Flash sur cette page";
-const ADD_TO_LOC_WHITELIST = "Ajouter à la liste blanche";
-const ADD_TO_SRC_WHITELIST = "Ajouter à la liste blanche";
-const VIEW_IN_QUICKTIME_PLAYER = "Ouvrir avec QuickTime PLayer";
-const LOAD_PLUGIN = function(plugin) {return "Lancer " + plugin;};
-const REMOVE_PLUGIN = function(plugin) {return "Supprimer " + plugin;};
-const RELOAD_IN_PLUGIN = function(plugin) {return "Restaurer " + plugin;};
-const VIEW_ON_SITE = function(site) {return "Voir la vidéo sur " + site;};
+const LOAD_ALL_PLUGINS = "Load All Plugins";
+const LOAD_ALL_FLASH = "Load All Flash";
+const ADD_TO_LOC_WHITELIST = "Add Location to Whitelist";
+const ADD_TO_SRC_WHITELIST = "Add Source to Whitelist";
+const VIEW_IN_QUICKTIME_PLAYER = "View in QuickTime Player";
+const SHOW_ELEMENT = "Show Element";
+const LOAD_PLUGIN = function(plugin) {return "Load " + plugin;};
+const REMOVE_PLUGIN = function(plugin) {return "Hide " + plugin;};
+const RELOAD_IN_PLUGIN = function(plugin) {return "Reload in " + plugin;};
+const VIEW_ON_SITE = function(site) {return "View on " + site;};
 
 // Dialogs
-const QT_CONFIRM_LAUNCH_DIALOG = function(url) {return "Un objet QuickTime voudrait lancer le lecture de\n\n" + url + "\n\ndans QuickTime Player. Voulez-vous l'autoriser?";};
-const ADD_TO_LOC_WHITELIST_DIALOG = "Autoriser les plugins si l'adresse de la page contient";
-const ADD_TO_SRC_WHITELIST_DIALOG = "Autoriser les plugins provenant de";
-const ADD_TO_LOC_WHITELIST_DIALOG_FLASH = "Autoriser Flash si l'adresse de la page contient";
-const ADD_TO_SRC_WHITELIST_DIALOG_FLASH = "Autoriser les éléments Flash provenant de";
+const QT_CONFIRM_LAUNCH_DIALOG = function(url) {return "A QuickTime object would like to play\n\n" + url + "\n\nin QuickTime Player. Do you want to allow it?";};
+const ADD_TO_LOC_WHITELIST_DIALOG = "Allow embedded content on locations matching:";
+const ADD_TO_SRC_WHITELIST_DIALOG = "Allow embedded content from sources matching:";
+const ADD_TO_LOC_WHITELIST_DIALOG_FLASH = "Allow Flash on locations matching:";
+const ADD_TO_SRC_WHITELIST_DIALOG_FLASH = "Allow Flash from sources matching:";
 
 // Injected scripts
-const VIDEO_LINK = "Télécharger la vidéo";
-const AUDIO_LINK = "Télécharger l'audio";
+const VIDEO_LINK = "Download Video";
+const AUDIO_LINK = "Download Audio";
 
