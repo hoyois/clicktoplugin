@@ -11,6 +11,7 @@ const LOAD_ALL_FLASH = "Подгрузить Flash";
 const ADD_TO_LOC_WHITELIST = "Поместить адрес в Белый Список";
 const ADD_TO_SRC_WHITELIST = "Поместить источник в Белый Список";
 const VIEW_IN_QUICKTIME_PLAYER = "Смотреть в проигрывателе QuickTime";
+const SHOW_ELEMENT = "Осмотреть дополнение";
 const LOAD_PLUGIN = function(plugin) {return "Подгрузить " + plugin;};
 const REMOVE_PLUGIN = function(plugin) {return "Скрыть " + plugin;};
 const RELOAD_IN_PLUGIN = function(plugin) {return "Показать в " + plugin;};
