@@ -398,6 +398,7 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
         element.parentNode.replaceChild(placeholderElement, element);
     } else return; // happens if element has fired beforeload twice
     
+    // Place the blocked element in the stack
     if(this.stack ===  null) {
         this.stack = document.createElement("div");
         this.stack.id = "CTFstack";
@@ -405,7 +406,12 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
         this.stack.innerHTML = "<div class=\"CTFnodisplay\"><div class=\"CTFnodisplay\"></div></div>";
         document.body.appendChild(this.stack);
     }
-    this.stack.lastChild.firstChild.appendChild(element);
+    try {
+        this.stack.firstChild.firstChild.appendChild(element);
+    } catch(err) { // some script has modified the stack structure. No big deal, we just reset it
+        this.stack.innerHTML = "<div class=\"CTFnodisplay\"><div class=\"CTFnodisplay\"></div></div>";
+        this.stack.firstChild.firstChild.appendChild(element);
+    }
     
     var _this = this;
     
