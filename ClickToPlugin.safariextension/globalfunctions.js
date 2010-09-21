@@ -131,7 +131,7 @@ function parseXSPFPlaylist(playlistURL, altPosterURL, track, handlePlaylistData)
         var isAudio = true;
         var startTrack = track;
         if(!(track >= 0 && track < x.length)) track = 0;
-        var list, I, mediaURL, posterURL, title;
+        var list, I, mediaType, mediaURL, posterURL, title;
         
         for(var i = 0; i < x.length; i++) {
             I = (i + track) % x.length;
@@ -139,7 +139,7 @@ function parseXSPFPlaylist(playlistURL, altPosterURL, track, handlePlaylistData)
             if(list.length > 0) mediaURL = list[0].firstChild.nodeValue;
             else if(i == 0) return;
             else continue;
-            var mediaType = willPlaySrcWithHTML5(mediaURL);
+            mediaType = willPlaySrcWithHTML5(mediaURL);
             if(!mediaType) {
                 if(i == 0) return;
                 if(i >= x.length - track) --startTrack;
