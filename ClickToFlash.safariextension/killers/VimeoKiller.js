@@ -16,9 +16,9 @@ VimeoKiller.prototype.processElement = function(data, callback) {
     if(!videoID) return;
     
     var posterURL = null;
-    var videoURL = null;//"/play_redirect?clip_id=" + videoID + "&quality=mobile&codecs=H264";
+    var videoURL = null;
     var badgeLabel = "H.264";
-    //callback({"playlist": [{"mediaType": "video", "mediaURL": videoURL}]}); return;
+    
     var xhr = new XMLHttpRequest();
     xhr.open('GET', "http://www.vimeo.com/moogaloop/load/clip:" + videoID + "/", true);
     xhr.onload = function() {
