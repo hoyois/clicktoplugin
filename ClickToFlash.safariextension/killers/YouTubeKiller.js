@@ -34,8 +34,6 @@ YouTubeKiller.prototype.processElement = function(data, callback) {
             index = data.src.indexOf(".com/p/");
             if(index == -1) return;
             var playlistID = data.src.substring(index + 7);
-            index = playlistID.indexOf(".com/p/");
-            if(index != -1) playlistID = playlistID.substring(index + 7);
             index = playlistID.search(/\?|&/);
             if(index != -1) playlistID = playlistID.substring(0,index);
             this.buildVideoIDList(null, data.location, playlistID, 0, new Array(), callback);
@@ -43,8 +41,6 @@ YouTubeKiller.prototype.processElement = function(data, callback) {
         return;
     }
     var videoID = data.src.substring(index + 7);
-    index = videoID.indexOf(".com/v/");
-    if(index != -1) videoID = videoID.substring(index + 7);
     index = videoID.search(/\?|&/);
     if(index != -1) videoID = videoID.substring(0,index);
     this.processElementFromVideoID(videoID, callback);

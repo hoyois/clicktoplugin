@@ -218,27 +218,13 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<real>1</real>
+		<string>1x1</string>
 		<key>Key</key>
 		<string>maxinvdim</string>
 		<key>Title</key>
 		<string>size is at most</string>
-		<key>Titles</key>
-		<array>
-			<string>1 x 1 px</string>
-			<string>2 x 2 px</string>
-			<string>4 x 4 px</string>
-			<string>8 x 8 px</string>
-		</array>
 		<key>Type</key>
-		<string>PopUpButton</string>
-		<key>Values</key>
-		<array>
-			<real>1</real>
-			<real>2</real>
-			<real>4</real>
-			<real>8</real>
-		</array>
+		<string>TextField</string>
 	</dict>
 	<dict>
 		<key>Title</key>
@@ -341,6 +327,12 @@
 		<true/>
 		<key>Key</key>
 		<string>mustUpdateWhitelists</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>mustUpdateInvDim</string>
 	</dict>
 </array>
 </plist>
