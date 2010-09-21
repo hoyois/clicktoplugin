@@ -49,7 +49,8 @@ function getParamsOf(element) {
 }
 
 function isFlash(element, url) {
-    if(/\.(swf|spl)(\?|#|$)/.test(url)) return "probably";
+    url = url.split("?")[0].split("#")[0];
+    if(/\.(swf|spl)$/.test(url)) return "probably";
     var type = getTypeOf(element);
     if(type == "application/x-shockwave-flash" || type == "application/futuresplash") {
         return "probably";
@@ -66,11 +67,12 @@ function isFlash(element, url) {
             }
         }
         // A source might point to a Flash movie through server-side scripting.
-        // To be 100% sure of not letting Flash through, one would have either to block
-        // everything at this point, or check all other plugins as in CTP...
+        // To be 100% sure of not letting Flash through, one would have to block
+        // everything at this point (even AJAX is not guaranteed because the
+        // server may return different MIME types for AJAX requests...)
         // but this situation never occurs in practice anyway, so it's not worth it.
         // We'll just block if source has no extension or is a common server-side script.
-        if(!(/\.([a-zA-Z0-9])+(\?|#|$)/.test(url)) || /\.(php|aspx?)(\?|#|$)/.test(url)) {
+        if(!(/\.[a-zA-Z0-9]+$/.test(url)) || /\.(php|aspx?)$/.test(url)) {
             return "maybe";
         }
         return "";

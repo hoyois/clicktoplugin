@@ -1,23 +1,23 @@
 /****************************
 ClickToFlash class definition
-*****************************/
+****************************/
 
 function ClickToFlash() {
     
-    this.blockedElements = new Array();// array containing the Flash HTML elements
-    this.placeholderElements = new Array();// array containing the corresponding placeholder elements
-    this.mediaPlayers = new Array();// array containing the HTML5 media players
+    this.blockedElements = new Array(); // array containing the blocked HTML elements
+    this.placeholderElements = new Array(); // array containing the corresponding placeholder elements
+    this.mediaPlayers = new Array(); // array containing the HTML5 media players
     
     this.settings = null;
     this.instance = null;
     this.numberOfBlockedElements = 0;
+    this.stack = null;
     
     var _this = this;
     
     this.respondToMessageTrampoline = function(event) {
         _this.respondToMessage(event);
     };
-    
     this.handleBeforeLoadEventTrampoline = function(event) {
         _this.handleBeforeLoadEvent(event);
     };
@@ -107,7 +107,7 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
     const element = event.target;
     
     // deal with sIFR script first
-    if(element instanceof HTMLScriptElement && element.src.indexOf("sifr.js") != (-1)) {
+    if(element instanceof HTMLScriptElement && element.src.indexOf("sifr.js") != -1) {
         var sIFRData = safari.self.tab.canLoad(event, "sIFR");
         if(!sIFRData.canLoad) {
             // BEGIN DEBUG
@@ -160,7 +160,7 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
     if(safari.self.tab.canLoad(event, {"src": element.source, "location": window.location.href, "width": element.offsetWidth, "height": element.offsetHeight})) return;
     
     // Load the user settings
-    if(this.settings == null) {
+    if(this.settings === null) {
         this.settings = safari.self.tab.canLoad(event, "getSettings");
     }
     
@@ -173,10 +173,10 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
     var elementID = this.numberOfBlockedElements++;
     
     // Give an address to this CTF instance to receive messages
-    if(this.instance == null) {
+    if(this.instance === null) {
         this.instance = safari.self.tab.canLoad(event, "getInstance");
     }
-
+    
     // BEGIN DEBUG
     if(this.settings["debug"]) {
         var e = element, positionX = 0, positionY = 0;
@@ -184,28 +184,27 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
             positionX += e.offsetLeft; positionY += e.offsetTop;
         } while(e = e.offsetParent);
         if(!confirm("ClickToFlash is about to block element " + this.instance + "." + elementID + ":\n" + "\nLocation: " + window.location.href + "\nSource: " + element.source + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + element.offsetWidth + "x" + element.offsetHeight)) return;
-    } 
+    }
     // END DEBUG
     
     event.preventDefault(); // prevents 'element' from loading
-    this.processBlockedElement(element, elementID);
+    
+    if(event.url) { // only build placeholder if there's any chance of restoring original content
+        this.processBlockedElement(element, elementID);
+    }
 };
 
 ClickToFlash.prototype.loadPluginForElement = function(elementID) {
     this.blockedElements[elementID].allowedToLoad = true;
     if(this.placeholderElements[elementID].parentNode) {
-        this.placeholderElements[elementID].parentNode.removeChild(this.placeholderElements[elementID]);
-        this.blockedElements[elementID].style.display = "";
-        this.blockedElements[elementID].style.display = this.blockedElements[elementID].display; // remove display:none
+        this.placeholderElements[elementID].parentNode.replaceChild(this.blockedElements[elementID], this.placeholderElements[elementID]);
         this.clearAll(elementID);
     }
 };
 
 ClickToFlash.prototype.reloadInPlugin = function(elementID) {
     this.blockedElements[elementID].allowedToLoad = true;
-    this.mediaPlayers[elementID].containerElement.parentNode.removeChild(this.mediaPlayers[elementID].containerElement);
-    this.blockedElements[elementID].style.display = "";
-    this.blockedElements[elementID].style.display = this.blockedElements[elementID].display; // remove display:none
+    this.mediaPlayers[elementID].containerElement.parentNode.replaceChild(this.blockedElements[elementID], this.mediaPlayers[elementID].containerElement);
     this.clearAll(elementID);
 };
 
@@ -301,7 +300,7 @@ ClickToFlash.prototype.loadMediaForElement = function(elementID) {
 ClickToFlash.prototype.launchInQuickTimePlayer = function(elementID) {
     var track = this.mediaPlayers[elementID].currentTrack;
     var element = null;
-    if(track == null) {
+    if(track === null) {
         track = 0;
         element = this.placeholderElements[elementID];
     } else {
@@ -344,8 +343,7 @@ ClickToFlash.prototype.setOpacityTo = function(opacity) {
 };
 
 ClickToFlash.prototype.removeElement = function(elementID) {
-    var element = this.blockedElements[elementID];
-    element.parentNode.removeChild(this.placeholderElements[elementID]);
+    var element = this.placeholderElements[elementID];
     while(element.parentNode.childNodes.length == 1) {
         element = element.parentNode;
     }
@@ -360,6 +358,7 @@ ClickToFlash.prototype.showElement = function(elementID) {
 // I really don't like the next two methods, but can't come up with something better
 // They are certainly NOT theoretically sound (due to asynchronicity)
 // The worst that can happen though is the badge overflowing the placeholder, or staying hidden.
+// In 2 months of use, I've never seen either happen
 ClickToFlash.prototype.displayBadge = function(badgeLabel, elementID) {
     if(!badgeLabel) return;
     // Hide the logo before changing the label
@@ -420,19 +419,6 @@ ClickToFlash.prototype.clickPlaceholder = function(elementID) {
 
 ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
     
-    // An element already blocked may fire a beforeload event again if its CSS display:none is removed.
-    // In this case, the placeholder must not be duplicated.
-    // Until Webkit comes up with a replacement to DOMAttrModified, there's no event we can use to check this, so we have to loop...
-    // We'll assume that no script removes the "style" attribute to improve performance
-    if(element.hasAttribute("style")) {
-        for(var i = 0; i < elementID; i++) {
-            if(element == this.blockedElements[i] && this.placeholderElements[i] && this.placeholderElements[i].parentNode) { 
-                element.style.display = "none !important";
-                return;
-            }
-        }
-    }
-    
     // Create the placeholder element
     var placeholderElement = document.createElement("div");
     placeholderElement.style.width = element.offsetWidth + "px";
@@ -441,20 +427,22 @@ ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
     
     placeholderElement.className = "CTFplaceholder CTFnoimage";
     
-    // Hide the original element
-    if (element.style.display != "none") {
-        element.display = element.style.display;
-        element.style.display = "none !important";
-    } else return; // happens for duplicate beforeload events
+    // Replace the element by the placeholder
+    if(element.parentNode) {
+        element.parentNode.replaceChild(placeholderElement, element);
+    } else return; // happens if element has fired beforeload twice
+    
+    if(this.stack ===  null) {
+        this.stack = document.createElement("div");
+        this.stack.id = "CTFstack";
+        this.stack.className = "CTFnodisplay";
+        this.stack.innerHTML = "<div class=\"CTFnodisplay\"><div class=\"CTFnodisplay\"></div></div>";
+        document.body.appendChild(this.stack);
+    }
+    this.stack.lastChild.firstChild.appendChild(element);
     
     var _this = this;
     
-    // Insert the placeholder just after the element
-    if(element.parentNode) {
-        element.parentNode.insertBefore(placeholderElement, element.nextSibling);
-        element.parentNode.addEventListener("DOMNodeRemoved", function(event) {if(event.target == element && placeholderElement.parentNode) {placeholderElement.parentNode.removeChild(placeholderElement); _this.clearAll(elementID);}}, false);
-    } else return;
-
     placeholderElement.onclick = function(event){_this.clickPlaceholder(elementID); event.stopPropagation();};
     placeholderElement.oncontextmenu = function(event) {
         var contextInfo = {

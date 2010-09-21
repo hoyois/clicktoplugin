@@ -9,6 +9,7 @@
     text-indent: 0 !important;
     text-decoration: none !important;
     text-transform: none !important;
+    text-shadow: none !important;
     margin: 0 !important;
     padding: 0 !important;
     top: auto !important;
@@ -25,10 +26,27 @@
 .CTFplaceholder a, .CTFmediaPlayer a {
     display: inline !important;
     cursor: auto !important;
+    line-height: normal !important;
 }
 
 .CTFplaceholder a:hover, .CTFmediaPlayer a:hover {
     text-decoration: underline !important;
+}
+
+/**************
+Generic classes
+**************/
+
+.CTFnodisplay, .CTFplaceholder .CTFnodisplay, .CTFmediaPlayer .CTFnodisplay {
+    display: none !important;
+}
+
+/************
+Stack element
+************/
+
+#CTFstack {
+    display: none !important;
 }
 
 /******************
@@ -94,10 +112,6 @@ Placeholder element
 
 .CTFplaceholder .CTFlogoContainer.CTFhidden {
     visibility: hidden !important;
-}
-
-.CTFplaceholder .CTFlogoContainer.CTFnodisplay {
-    display: none !important;
 }
 
 .CTFplaceholder .CTFlogo {
@@ -181,11 +195,10 @@ Media player
 }
 
 .CTFmediaPlayer {
-    position: relative !important;
     display: inline-block !important;
+    position: relative !important;
     margin: 0 !important;
     padding: 0 !important;
-    /* z-index: 1 !important; */
 }
 
 .CTFmediaPlayer .CTFvideoElement {
@@ -230,6 +243,13 @@ Media player
 }
 
 /* Left playlist controls */
+.CTFmediaPlayer .CTFplaylistControlsLeft {
+    position: absolute !important;
+    top: 0px !important;
+    left: 0px !important;
+    height: inherit !important;
+}
+
 .CTFmediaPlayer .CTFplaylistControlsLeft {
     position: absolute !important;
     top: 0px !important;

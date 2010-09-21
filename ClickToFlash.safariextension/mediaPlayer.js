@@ -161,30 +161,30 @@ mediaPlayer.prototype.initializeDownloadControls = function() {
     
     var hoverElement = document.createElement("div");
     hoverElement.className = "CTFhoverElement";
-    this.playlistControls.innerHTML = "<div class=\"CTFplaylistControlsLeft\"><div class=\"CTFtrackInfo\"><p></p></div></div>";
+    this.playlistControls.innerHTML = "<div class=\"CTFplaylistControlsLeft CTFnodisplay\"><div class=\"CTFtrackInfo\"><p></p></div></div>";
     
     this.playlistControls.appendChild(hoverElement);
     
     var _this = this;
     
     this.playlistControls.firstChild.onmouseout = function(event) {
-        this.nextSibling.style.display = "block";
+        this.nextSibling.className = "CTFhoverElement";
         _this.fadeOut(0)
     };
     
     this.playlistControls.firstChild.onmouseover = function(event) {
         if(event.relatedTarget && event.relatedTarget.className == "CTFhoverElement") {
-            this.nextSibling.style.display = "none";
+            this.nextSibling.className = "CTFhoverElement CTFnodisplay";
             _this.fadeIn(0)
         }
     };
     hoverElement.onmouseover = function(event) {
-        this.previousSibling.style.display ="block";
+        this.previousSibling.className ="CTFplaylistControlsLeft";
     }
     
     hoverElement.onmouseout = function(event) {
         if(!event.relatedTarget || event.relatedTarget.className != "CTFtrackTitle") {
-            this.previousSibling.style.display ="none";
+            this.previousSibling.className ="CTFplaylistControlsLeft CTFnodisplay";
         }
     };
     
@@ -194,10 +194,9 @@ mediaPlayer.prototype.initializeDownloadControls = function() {
         }
     }
     
-    this.playlistControls.addEventListener("webkitTransitionEnd", function() {if(this.style.opacity == "0") this.firstChild.style.display = "none";}, false);
+    this.playlistControls.addEventListener("webkitTransitionEnd", function() {if(this.style.opacity == "0") this.firstChild.className = "CTFplaylistControlsLeft CTFnodisplay";}, false);
     
     this.playlistControls.style.opacity = "0";
-    this.playlistControls.firstChild.style.display = "none";
     
     this.containerElement.appendChild(this.playlistControls);
 };
@@ -305,7 +304,7 @@ mediaPlayer.prototype.loadTrack = function(track, autoplay) {
 
 mediaPlayer.prototype.setContextInfo = function(event, contextInfo) {
     var track = this.currentTrack;
-    if(track == null) track = 0;
+    if(track === null) track = 0;
     contextInfo.mediaType = this.playlist[track].mediaType;
     contextInfo.siteInfo = this.playlist[track].siteInfo;
     contextInfo.isVideo = this.currentTrack != null;

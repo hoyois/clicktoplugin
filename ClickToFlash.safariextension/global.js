@@ -1,22 +1,29 @@
 var CTF_instance = 0; // incremented by one whenever a ClickToFlash instance with content is created
 const killers = [new YouTubeKiller(), new VimeoKiller(), new DailymotionKiller(), new VeohKiller(), new GenericKiller()];
 
-// Temporary
+// UPDATE SETTINGS
 if(safari.extension.settings["mustUpdateWhitelists"]) {
     safari.extension.settings["mustUpdateWhitelists"] = false;
     function updateWL(string) {
-        safari.extension.settings[string] = safari.extension.settings[string].replace(/\s+/g, "").replace(/,/g, " ");
+        if(/,/.test(safari.extension.settings[string])) safari.extension.settings[string] = safari.extension.settings[string].replace(/\s+/g, "").replace(/,/g, " ");
     }
     updateWL("H264whitelist");
     updateWL("locwhitelist"); updateWL("locblacklist"); updateWL("srcwhitelist"); updateWL("srcblacklist");
 }
+if(safari.extension.settings["mustUpdateInvDim"]) {
+    safari.extension.settings["mustUpdateInvDim"] = false;
+    if(!/x/.test(safari.extension.settings["maxinvdim"])) safari.extension.settings["maxinvdim"] = safari.extension.settings["maxinvdim"] + "x" + safari.extension.settings["maxinvdim"];
+}
+// END UPDATE
 
 function blockOrAllow(data) { // check the whitelists and returns null if element can be loaded
 
     // Deal with invisible plugins
     if(safari.extension.settings["loadInvisible"] && data.width > 0 && data.height > 0) {
-        if(data.width <= safari.extension.settings["maxinvdim"] && data.height <= safari.extension.settings["maxinvdim"]) {
-            return true;
+        var dim = safari.extension.settings["maxinvdim"];
+        if(/^\d+x\d+$/.test(dim)) {
+            dim = dim.split("x");
+            if(data.width <= parseInt(dim[0]) && data.height <= parseInt(dim[1])) return null;
         }
     }
     
@@ -173,7 +180,7 @@ function findKillerFor(data) {
 
 function killFlash(data) {
     var killerID = findKillerFor(data);
-    if(killerID == null) return; // this flash element can't be killed :(
+    if(killerID === null) return; // this flash element can't be killed :(
     
     var callback = function(mediaData) {
         if(safari.extension.settings["H264autoload"]) {
