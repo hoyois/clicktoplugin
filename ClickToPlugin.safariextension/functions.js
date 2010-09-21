@@ -47,21 +47,21 @@ function getInfo(element, url) {
                             tmpAnchor.href = paramElements[i].getAttribute("value");
                             info.src = tmpAnchor.href;
                             break;
-                            case "qtsrc": // QuickTime true source
+                        case "qtsrc": // QuickTime true source
                             tmpAnchor.href = paramElements[i].getAttribute("value");
                             info.src = tmpAnchor.href;
                             break;
-                            case "autohref": // QuickTime redirection
+                        case "autohref": // QuickTime redirection
                             info.autohref = /^true$/i.test(paramElements[i].getAttribute("value"));
                             break;
-                            case "href": // QuickTime redirection
+                        case "href": // QuickTime redirection
                             tmpAnchor.href = paramElements[i].getAttribute("value");
                             info.href = tmpAnchor.href;
                             break;
-                            case "target": // QuickTime redirection
+                        case "target": // QuickTime redirection
                             info.target = paramElements[i].getAttribute("value");
                             break;
-                            case "previewimage": // DivX poster
+                        case "previewimage": // DivX poster
                             tmpAnchor.href = paramElements[i].getAttribute("value");
                             info.image = tmpAnchor.href;
                             break;
@@ -101,9 +101,6 @@ function getTypeOf(element) {
                 if(embedChildren.length == 0) return "";
                 return embedChildren[0].type;
             }
-            break;
-        case "applet":
-            return "application/x-java-applet";
             break;
     }
 }
