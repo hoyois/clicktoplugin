@@ -16,14 +16,14 @@ if(safari.extension.settings["mustUpdateInvDim"]) {
 }
 // END UPDATE
 
-function blockOrAllow(data) { // check the whitelists and returns null if element can be loaded
+function blockOrAllow(data) { // check the whitelists and returns true if element can be loaded
 
     // Deal with invisible plugins
     if(safari.extension.settings["loadInvisible"] && data.width > 0 && data.height > 0) {
         var dim = safari.extension.settings["maxinvdim"];
         if(/^\d+x\d+$/.test(dim)) {
             dim = dim.split("x");
-            if(data.width <= parseInt(dim[0]) && data.height <= parseInt(dim[1])) return null;
+            if(data.width <= parseInt(dim[0]) && data.height <= parseInt(dim[1])) return true;
         }
     }
     
@@ -135,12 +135,12 @@ function doCommand(event) {
     }
 }
 
-function handleWhitelisting (type, url) {
+function handleWhitelisting(type, url) {
     var newWLstring = prompt(type ? ADD_TO_LOC_WHITELIST_DIALOG_FLASH : ADD_TO_SRC_WHITELIST_DIALOG_FLASH, url);
     if(newWLstring) {
         safari.extension.settings["use" + (type ? "loc" : "src") + "Whitelist"] = true;
         if(type && safari.extension.settings["locwhitelist"] == "www.example.com www.example2.com") { // get rid of the example
-            safari.extension.settings[(type ? "loc" : "src") + "whitelist"] = newWLstring;
+            safari.extension.settings["locwhitelist"] = newWLstring;
         } else {
             var space = safari.extension.settings[(type ? "loc" : "src") + "whitelist"] ? " " : "";
             safari.extension.settings[(type ? "loc" : "src") + "whitelist"] += space + newWLstring;
