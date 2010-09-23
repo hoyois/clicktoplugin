@@ -101,8 +101,7 @@ function parseXSPFPlaylist(playlistURL, altPosterURL, track, handlePlaylistData)
                 if(i == 0) return;
                 if(i >= x.length - track) --startTrack;
                 continue;
-            }
-            if(mediaType == "video") isAudio = false;
+            } else if(mediaType == "video") isAudio = false;
             
             list = x[I].getElementsByTagName("image");
             if(list.length > 0) posterURL = list[0].firstChild.nodeValue;
