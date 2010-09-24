@@ -14,7 +14,7 @@
 		<key>Key</key>
 		<string>useH264</string>
 		<key>Title</key>
-		<string>尋找 Flash 的替代影片</string>
+		<string>尋找 Flash 的替代影片         </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -24,7 +24,7 @@
 		<key>Key</key>
 		<string>usePlaylists</string>
 		<key>Title</key>
-		<string>使用播放列表</string>
+		<string>使用播放列表                       </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -34,7 +34,7 @@
 		<key>Key</key>
 		<string>showPoster</string>
 		<key>Title</key>
-		<string>在暫存區中顯示預覽影像</string>
+		<string>在暫存區中顯示預覽影像       </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -44,7 +44,7 @@
 		<key>Key</key>
 		<string>H264autoload</string>
 		<key>Title</key>
-		<string>自動載入影片播放器</string>
+		<string>自動載入影片播放器             </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -152,7 +152,7 @@
 		<key>Key</key>
 		<string>uselocWhitelist</string>
 		<key>Title</key>
-		<string>允許 Flash，如果它的網址</string>
+		<string>允許 Flash，如果它的網址    </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -182,7 +182,7 @@
 		<key>Key</key>
 		<string>usesrcWhitelist</string>
 		<key>Title</key>
-		<string>允許 Flash，如果它的來源</string>
+		<string>允許 Flash，如果它的來源    </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -212,33 +212,19 @@
 		<key>Key</key>
 		<string>loadInvisible</string>
 		<key>Title</key>
-		<string>允許 Flash，如果</string>
+		<string>允許 Flash，如果                 </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<real>1</real>
+		<string>1x1</string>
 		<key>Key</key>
 		<string>maxinvdim</string>
 		<key>Title</key>
 		<string>尺寸不大於</string>
-		<key>Titles</key>
-		<array>
-			<string>1 x 1 px</string>
-			<string>2 x 2 px</string>
-			<string>4 x 4 px</string>
-			<string>8 x 8 px</string>
-		</array>
 		<key>Type</key>
-		<string>PopUpButton</string>
-		<key>Values</key>
-		<array>
-			<real>1</real>
-			<real>2</real>
-			<real>4</real>
-			<real>8</real>
-		</array>
+		<string>TextField</string>
 	</dict>
 	<dict>
 		<key>Title</key>
@@ -252,7 +238,7 @@
 		<key>Key</key>
 		<string>useWLcontext</string>
 		<key>Title</key>
-		<string>加入白名單</string>
+		<string>加入白名單                          </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -262,7 +248,7 @@
 		<key>Key</key>
 		<string>useLAcontext</string>
 		<key>Title</key>
-		<string>載入所有的 Flash</string>
+		<string>載入所有的 Flash                 </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -272,7 +258,7 @@
 		<key>Key</key>
 		<string>useVScontext</string>
 		<key>Title</key>
-		<string>於網站上檢視</string>
+		<string>於網站上檢視                       </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -332,7 +318,7 @@
 		<key>Key</key>
 		<string>debug</string>
 		<key>Title</key>
-		<string>手動阻擋內容</string>
+		<string>手動阻擋內容                       </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -341,6 +327,12 @@
 		<true/>
 		<key>Key</key>
 		<string>mustUpdateWhitelists</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>mustUpdateInvDim</string>
 	</dict>
 </array>
 </plist>
