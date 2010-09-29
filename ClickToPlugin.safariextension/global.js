@@ -16,43 +16,40 @@ if(safari.extension.settings["mustUpdateInvDim"]) {
 }
 // END UPDATE
 
-function blockOrAllow(data) { // returns null if element can be loaded, the name of the plugin otherwise
+function blockOrAllow(data) { // returns true if element can be loaded, the name of the plugin otherwise
 
     // no source and no type -> must allow, it's probably going to pass through here again after being modified by a script
-    if(!data.src && !data.type) return null;
+    if(!data.src && !data.type) return true;
 
     // native Safari support
     var ext = extractExt(data.src); // used later as well
     if(data.type) {
-        if(isNativeType(data.type)) return null;
+        if(isNativeType(data.type)) return true;
     } else {
-        if(isNativeExt(ext)) return null;
+        if(isNativeExt(ext)) return true;
     }
     
     // Deal with invisible plugins
     if(safari.extension.settings["loadInvisible"] && data.width > 0 && data.height > 0) {
-        var dim = safari.extension.settings["maxinvdim"];
-        if(/^\d+x\d+$/.test(dim)) {
-            dim = dim.split("x");
-            if(data.width <= parseInt(dim[0]) && data.height <= parseInt(dim[1])) return null;
-        }
+        var dim = safari.extension.settings["maxinvdim"].split("x");
+        if(data.width <= parseInt(dim[0]) && data.height <= parseInt(dim[1])) return true;
     }
     
     // Deal with whitelisted content
     if(safari.extension.settings["uselocWhitelist"]) {
         if(safari.extension.settings["locwhitelist"]) {
-            if(matchList(safari.extension.settings["locwhitelist"].split(/\s+/), data.location)) return null;
+            if(matchList(safari.extension.settings["locwhitelist"].split(/\s+/), data.location)) return true;
         }
         if(safari.extension.settings["locblacklist"]) {
-            if(!matchList(safari.extension.settings["locblacklist"].split(/\s+/), data.location)) return null;
+            if(!matchList(safari.extension.settings["locblacklist"].split(/\s+/), data.location)) return true;
         }
     }
     if(safari.extension.settings["usesrcWhitelist"]) {
         if(safari.extension.settings["srcwhitelist"]) {
-            if(matchList(safari.extension.settings["srcwhitelist"].split(/\s+/), data.src)) return null;
+            if(matchList(safari.extension.settings["srcwhitelist"].split(/\s+/), data.src)) return true;
         }
         if(safari.extension.settings["srcblacklist"]) {
-            if(!matchList(safari.extension.settings["srcblacklist"].split(/\s+/), data.src)) return null;
+            if(!matchList(safari.extension.settings["srcblacklist"].split(/\s+/), data.src)) return true;
         }
     }
     
@@ -75,14 +72,14 @@ function blockOrAllow(data) { // returns null if element can be loaded, the name
     else if(data.classid) pluginName = getPluginNameFromClassid(data.classid.replace("clsid:", ""));
     // else if(data.src) pluginName = getPluginNameFromExt(ext);
 
-    if(safari.extension.settings["allowQT"] && pluginName == "QuickTime") return null;
+    if(safari.extension.settings["allowQT"] && pluginName == "QuickTime") return true;
     
     // Use greenlist/redlist
     if(MIMEType) {
         if(safari.extension.settings["block"] == "useRedlist") {
-            if(!matchList(safari.extension.settings["redlist"].split(/\s+/), MIMEType)) return null;
+            if(!matchList(safari.extension.settings["redlist"].split(/\s+/), MIMEType)) return true;
         } else if(safari.extension.settings["block"] == "useGreenlist") {
-            if(matchList(safari.extension.settings["greenlist"].split(/\s+/), MIMEType)) return null;
+            if(matchList(safari.extension.settings["greenlist"].split(/\s+/), MIMEType)) return true;
         }
     }
     // At this point we know we should block the element
@@ -90,9 +87,14 @@ function blockOrAllow(data) { // returns null if element can be loaded, the name
     // Exception: ask the user what to do if a QT object would launch QTP
     if(data.launchInQTP) {
         if(confirm(QT_CONFIRM_LAUNCH_DIALOG(data.launchInQTP))) {
-            return null;
+            return true;
         }
     }
+    
+    // Exception 2: JS-Silverlight interaction?
+    /*if(pluginName == "Silverlight" && !data.src) {
+        if(!confirm(SL_CONFIRM_BLOCK_DIALOG(data.width + "x" + data.height))) return null;
+    }*/
     
     return pluginName;
 }
@@ -186,12 +188,12 @@ function doCommand(event) {
     }
 }
 
-function handleWhitelisting (type, url) {
+function handleWhitelisting(type, url) {
     var newWLstring = prompt(type ? ADD_TO_LOC_WHITELIST_DIALOG : ADD_TO_SRC_WHITELIST_DIALOG, url);
     if(newWLstring) {
         safari.extension.settings["use" + (type ? "loc" : "src") + "Whitelist"] = true;
         if(type && safari.extension.settings["locwhitelist"] == "www.example.com www.example2.com") { // get rid of the example
-            safari.extension.settings[(type ? "loc" : "src") + "whitelist"] = newWLstring;
+            safari.extension.settings["locwhitelist"] = newWLstring;
         } else {
             var space = safari.extension.settings[(type ? "loc" : "src") + "whitelist"] ? " " : "";
             safari.extension.settings[(type ? "loc" : "src") + "whitelist"] += space + newWLstring;

@@ -4,11 +4,11 @@ function YouTubeKiller() {
 
 YouTubeKiller.prototype.canKill = function(data) {
     if(data.plugin != "Flash" || !safari.extension.settings["replaceFlash"]) return false;
-    return (data.src.match("ytimg.com") || data.src.match("youtube.com") || data.src.match("youtube-nocookie.com"));
+    return (data.src.indexOf("ytimg.com") != -1 || data.src.indexOf("youtube.com") != -1 || data.src.indexOf("youtube-nocookie.com") != -1);
 };
 
 YouTubeKiller.prototype.processElement = function(data, callback) {
-    if(data.params) {
+    if(data.params) { // on-site video
         if(safari.extension.settings["usePlaylists"]) {
             var URLvars = data.location.split(/#!|\?/)[1];
             var playlistID = null;
@@ -28,23 +28,15 @@ YouTubeKiller.prototype.processElement = function(data, callback) {
         } else this.processElementFromFlashVars(data.params, data.location, callback);
         return;
     }
-    // The vid has no flashvars... Only hope is that it is a YouTube /v/ embed
-    var index = data.src.indexOf(".com/v/");
-    if(index == -1) {
-        if(safari.extension.settings["usePlaylists"]) {
-            index = data.src.indexOf(".com/p/");
-            if(index == -1) return;
-            var playlistID = data.src.substring(index + 7);
-            index = playlistID.search(/\?|&/);
-            if(index != -1) playlistID = playlistID.substring(0,index);
-            this.buildVideoIDList(null, data.location, playlistID, 0, new Array(), callback);
+    // Embedded YT video
+    var matches = data.src.match(/\.com\/([vp])\/([^&?]+)(?:[&?]|$)/);
+    if(matches) {
+        if(matches[1] == "v") { // video
+            this.processElementFromVideoID(matches[2], callback);
+        } else { // playlist
+            this.buildVideoIDList(false, data.location, matches[2], 0, new Array(), callback);
         }
-        return;
     }
-    var videoID = data.src.substring(index + 7);
-    index = videoID.search(/\?|&/);
-    if(index != -1) videoID = videoID.substring(0,index);
-    this.processElementFromVideoID(videoID, callback);
 };
 
 YouTubeKiller.prototype.buildVideoIDList = function(flashvars, location, playlistID, i, videoIDList, callback) {
@@ -54,8 +46,8 @@ YouTubeKiller.prototype.buildVideoIDList = function(flashvars, location, playlis
     xhr.onload = function() {
         var entries = xhr.responseXML.getElementsByTagName("entry");
         for(var j = 0; j < entries.length; j++) {
-            try{
-                videoIDList.push(entries[j].getElementsByTagNameNS("http://search.yahoo.com/mrss/", "player")[0].getAttribute("url").match(/\?v=[^(&|\?)]*(?=(&|\?))/)[0].replace("?v=",""));
+            try{ // being lazy
+                videoIDList.push(entries[j].getElementsByTagNameNS("http://search.yahoo.com/mrss/", "player")[0].getAttribute("url").match(/\?v=([^&?']+)[&?']/)[1]);
             } catch(err) {}
         }
         if(entries.length < 50) {// we've got the whole list of videoIDs
@@ -64,9 +56,9 @@ YouTubeKiller.prototype.buildVideoIDList = function(flashvars, location, playlis
             if(flashvars) {
                 var videoID = getFlashVariable(flashvars, "video_id");
                 if(!videoID) { // new YT AJAX player
-                    var matches = location.match(/(!|&)v=[^&]+(&|$)/);
+                    var matches = location.match(/[!&]v=([^&]+)(?:&|$)/);
                     if(!matches) return;
-                    videoID = matches[0].substring(3).replace("&", "");
+                    videoID = matches[1];
                     flashvars = null;
                 }
                 for(var j = 0; j < videoIDList.length; j++) {
@@ -97,8 +89,8 @@ YouTubeKiller.prototype.buildPlaylist = function(videoIDList, playlistID, isFirs
     if(videoIDList.length == 0) return;
     var j = 0;
     var jmax = videoIDList.length;
-    if(isFirst) if(jmax > n-1) jmax = n-1;
-    else if(jmax > n) jmax = n; // load by groups of n
+    if(isFirst) {if(jmax > n-1) jmax = n-1;}
+    else {if(jmax > n) jmax = n;} // load by groups of n
     var mediaData = {"loadAfter": true, "missed": 0, "playlist": []};
     var _this = this;
     var next = function(videoData) {
@@ -155,16 +147,6 @@ YouTubeKiller.prototype.getMediaDataFromURLMap = function(videoID, videoHash, ur
             videoURL = availableFormats[34];
         }*/
     }
-    // What follows can be used in case Youtube breaks the get_video mechanism
-    /*else if (availableFormats[18]) {
-        videoURL = availableFormats[18];
-    } else {
-        // Possibility 1: the real hacky stuff! gets the H264 source URL from Youtube's HTML5 beta player if possible, else reverts to Flash
-        // this.getSDH264FromHTML5beta(posterURL, videoID, callback); return;
-        // Possibility 2: a little simpler and more successful: get H264 source by adding &fmt=18 to the URL
-        this.getSDH264FromFmt18(posterURL, videoID, callback); return;
-        // NOTE: possibility 2 seems to always work, so possibility 1 is never needed
-    }*/
     return {"posterURL": posterURL, "videoURL": videoURL, "badgeLabel": badgeLabel};
 };
 
@@ -172,9 +154,9 @@ YouTubeKiller.prototype.processElementFromFlashVars = function(flashvars, locati
     var videoID = getFlashVariable(flashvars, "video_id");
     // see http://apiblog.youtube.com/2010/03/upcoming-change-to-youtube-video-page.html:
     if(!videoID) { // new YT AJAX player (not yet used?)
-        var matches = location.match(/(!|&)v=[^&]+(&|$)/);
+        var matches = location.match(/[!&]v=([^&]+)(?:&|$)/);
         if(!matches) return;
-        videoID = matches[0].substring(3).replace("&", "");
+        videoID = matches[1];
         this.processElementFromVideoID(videoID, callback);
         return;
     }
@@ -195,25 +177,23 @@ YouTubeKiller.prototype.processElementFromFlashVars = function(flashvars, locati
 };
 
 YouTubeKiller.prototype.processElementFromVideoID = function(videoID, callback) {
-    if(!videoID) return; // needed!
-    var toMatch = /\"fmt_url_map\":\s\"[^\"]*\"/; //"// works for both Flash and HTML5 Beta player pages
-    var toMatch2 = /\"t\":\s\"[^\"]*\"/; //"//
+    if(!videoID) return; // needed!?
+    var urlMapMatch = /\"fmt_url_map\":\s\"([^"]*)\"/; // works for both Flash and HTML5 Beta player pages
+    var hashMatch = /\"t\":\s\"([^"]*)\"/;
     var _this = this;
     var xhr = new XMLHttpRequest ();
     xhr.open("GET", "http://www.youtube.com/watch?v=" + videoID, true);
     xhr.onload = function() {
-        var title = "";
+        var matches, title, urlMap, videoHash;
         if(safari.extension.settings["usePlaylists"]) {
-            var toMatchTitle = /<meta\sname=\"title\"\scontent=\"[^\"]*\"/;
-            var matchTitle = xhr.responseText.match(toMatchTitle);
-            if(matchTitle) title = matchTitle[0].replace(/<meta\sname=\"title\"\scontent=/, "").replace(/\"/g,"");
+            var titleMatch = /<meta\sname=\"title\"\scontent=\"([^"]*)\"/;
+            matches = xhr.responseText.match(titleMatch);
+            if(matches) title = matches[1];
         }
-        var matches = xhr.responseText.match(toMatch);
-        var matches2 = xhr.responseText.match(toMatch2);
-        var urlMap = null;
-        var videoHash = null;
-        if(matches) urlMap = matches[0].replace(/\"fmt_url_map\":\s/,"").replace(/\"/g,"").replace(/\\\//g,"/");//"//
-        if(matches2) videoHash = escape(matches2[0].replace(/\"t\":\s/,"").replace(/\"/g,""));//"//
+        matches = xhr.responseText.match(urlMapMatch);
+        if(matches) urlMap = matches[1].replace(/\\\//g,"/");
+        matches = xhr.responseText.match(hashMatch);
+        if(matches) videoHash = encodeURIComponent(matches[1]);
         if(urlMap && videoHash) {
             var x = _this.getMediaDataFromURLMap(videoID, videoHash, urlMap);
             var videoData = {
@@ -228,66 +208,3 @@ YouTubeKiller.prototype.processElementFromVideoID = function(videoID, callback) 
     xhr.send(null);
 };
 
-// The following function now doesn't work here because the global page
-// of an extension cannot access cookies
-// anyway it's not needed, but it's a nice proof of concept
-/*function getSDH264FromHTML5beta(posterURL, videoID, callback) {
-    document.cookie = "PREF=" + "f2\=40000000" + "; domain=" + ".youtube.com";
-    var toMatch = /setAvailableFormat\(\"[^\"]*\"/; //comment starts here"// fixing some broken syntax highlighting...
-    var req = new XMLHttpRequest ();
-    req.open("GET", "http://www.youtube.com/watch?v=" + videoID, false);
-    alert("sending AJAX request...");
-    req.send(null);
-    //req.onload=function() {
-        alert(req.responseText);
-        var match = req.responseText.match(toMatch);
-        var url = null;
-        if(match) {alert("hey");
-            url = match[0].replace("setAvailableFormat(","").replace(/\"/g,"");//"//
-            // I believe any H264 video playing in the HTML5 beta player will also
-            // appear in flashvars upon adding &fmt=18 to the URL. Therefore,
-            // this function should never be called. I put an alert here in case
-            // I am mistaken.
-            alert("Using H.264 source from HTML5 Beta player");
-        } //else { url = getSDH264FromYoutube2(killer, element, callback);}
-        //document.cookie = "PREF=" + "; domain=" + ".youtube.com";
-        return url;
-    //};
-}
-
-
-// this function still works fine, though
-YouTubeKiller.prototype.getSDH264FromFmt18 = function(posterURL, videoID, callback) {
-    var toMatch = /flashvars=\\\"[^\"]*\\\"/; //"//
-    var req = new XMLHttpRequest ();
-    req.open("GET", "http://www.youtube.com/watch?v=" + videoID + "&fmt=18", true);
-    req.onload = function() {
-        //alert("request sent. Answer is:\n\n" + req.responseText);
-        //setTimeout(alert("request sent. Answer is:\n\n" + req.responseText),0);
-        //req.overrideMimeType('text/xml');
-        //req.onload=function() {
-        //alert(req.responseXML);
-        //if(req.status != "200") {alert("AJAX request failed"); return;}
-        var flashvars = req.responseText.match(toMatch)[0].replace("flashvars=","").replace(/\\\"/g,"");//"//
-        var formatInfo = decodeURIComponent(getFlashVariable(flashvars, "fmt_url_map")).split(",");
-        var availableFormats = [];
-        var videoURL = null;
-        for (var i = 0; i < formatInfo.length; i += 1) {
-            var format = formatInfo[i].split("|"); 
-            availableFormats[format[0]] = format[1];
-        }
-        if (availableFormats[18]) {
-            videoURL = availableFormats[18];
-            //alert("Using H.264 source from fmt=18");
-        } //else {// url = null; }
-        if(videoURL) {
-            var videoData = {
-                "posterURL": posterURL,
-                "videoURL": videoURL,
-                "badgeLabel": "H.264"
-            };
-            callback(videoData);
-        }
-    };
-    req.send(null);
-};*/
