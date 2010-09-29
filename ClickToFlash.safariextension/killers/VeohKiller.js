@@ -3,7 +3,7 @@ function VeohKiller() {
 }
 
 VeohKiller.prototype.canKill = function(data) {
-    return (safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && data.src.match("veoh.com/static/swf/webplayer"));
+    return (safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && data.src.indexOf("veoh.com/static/swf/webplayer") != -1);
 };
 
 VeohKiller.prototype.processElement = function(data, callback) {
@@ -12,8 +12,8 @@ VeohKiller.prototype.processElement = function(data, callback) {
     if(data.params) videoID = getFlashVariable(data.params, "permalinkId");
     else { // embedded video
         isEmbed = true;
-        var matches = data.src.match(/permalinkId=([^&]*)(?=&)/);
-        if(matches) videoID = matches[0].replace("permalinkId=","");
+        var matches = data.src.match(/permalinkId=([^&]+)(?:&|$)/);
+        if(matches) videoID = matches[1];
     }
     var posterURL = null;
     var videoURL = null;

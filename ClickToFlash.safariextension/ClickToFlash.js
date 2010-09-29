@@ -92,7 +92,7 @@ ClickToFlash.prototype.respondToMessage = function(event) {
             this.loadSrc(event.message);
             break;
         case "locwhitelist":
-            if(window.location.href.match(event.message)) this.loadAll();
+            if(window.location.href.indexOf(event.message) != -1) this.loadAll();
             break;
         case "updateVolume":
             this.setVolumeTo(event.message);
@@ -189,7 +189,7 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
     
     event.preventDefault(); // prevents 'element' from loading
     
-    if(event.url) { // only build placeholder if there's any chance of restoring original content
+    if(event.url || element.id) {
         this.processBlockedElement(element, elementID);
     }
 };
@@ -218,7 +218,7 @@ ClickToFlash.prototype.loadAll = function() {
 
 ClickToFlash.prototype.loadSrc = function(string) {
     for(var i = 0; i < this.numberOfBlockedElements; i++) {
-        if(this.placeholderElements[i] && this.blockedElements[i].source.match(string)) {
+        if(this.placeholderElements[i] && this.blockedElements[i].source.indexOf(string) != -1) {
             this.loadPluginForElement(i);
         }
     }
@@ -226,6 +226,8 @@ ClickToFlash.prototype.loadSrc = function(string) {
 
 ClickToFlash.prototype.prepMedia = function(mediaData) {
     if(mediaData.playlist.length == 0 || !mediaData.playlist[0].mediaURL) return;
+    if(!this.blockedElements[mediaData.elementID]) return; // User has loaded Flash already
+    
     if(!this.mediaPlayers[mediaData.elementID]) {
         this.mediaPlayers[mediaData.elementID] = new mediaPlayer(mediaData.isAudio ? "audio" : "video");
     }
@@ -252,6 +254,7 @@ ClickToFlash.prototype.prepMedia = function(mediaData) {
             this.placeholderElements[mediaData.elementID].style.opacity = "1";
             this.placeholderElements[mediaData.elementID].style.backgroundImage = "url('" + mediaData.playlist[0].posterURL + "') !important";
             this.placeholderElements[mediaData.elementID].className = "CTFplaceholder"; // remove 'noimage' class
+            this.placeholderElements[mediaData.elementID].removeAttribute("title"); // remove tooltip
         }
     }
     
@@ -266,16 +269,9 @@ ClickToFlash.prototype.showDownloadLink = function(mediaType, url, elementID) {
     downloadLinkDiv.className = "CTFplaceholderDownloadLink";
     downloadLinkDiv.innerHTML = "<a href=\"" + url + "\">" + (mediaType == "audio" ? localize("AUDIO_LINK") : localize("VIDEO_LINK")) + "</a>";
     
-    downloadLinkDiv.onmouseover = function() {
-        this.style.opacity = "1";
-    };
+    downloadLinkDiv.firstChild.onclick = downloadTarget;
     
-    downloadLinkDiv.onmouseout = function() {
-        this.style.opacity = "0";
-    };
-    
-    downloadLinkDiv.style.opacity = "0";
-    this.placeholderElements[elementID].appendChild(downloadLinkDiv);
+    this.placeholderElements[elementID].firstChild.appendChild(downloadLinkDiv);
 };
 
 ClickToFlash.prototype.loadMediaForElement = function(elementID) {
@@ -299,7 +295,7 @@ ClickToFlash.prototype.loadMediaForElement = function(elementID) {
 
 ClickToFlash.prototype.launchInQuickTimePlayer = function(elementID) {
     var track = this.mediaPlayers[elementID].currentTrack;
-    var element = null;
+    var element;
     if(track === null) {
         track = 0;
         element = this.placeholderElements[elementID];
@@ -421,11 +417,23 @@ ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
     
     // Create the placeholder element
     var placeholderElement = document.createElement("div");
-    placeholderElement.style.width = element.offsetWidth + "px";
-    placeholderElement.style.height = element.offsetHeight + "px";
+    placeholderElement.title = element.source; // tooltip
+    placeholderElement.className = "CTFplaceholder CTFnoimage";
+    placeholderElement.style.width = element.offsetWidth + "px !important";
+    placeholderElement.style.height = element.offsetHeight + "px !important";
     placeholderElement.style.opacity = this.settings["opacity"];
     
-    placeholderElement.className = "CTFplaceholder CTFnoimage";
+    // Copy CSS box & positioning properties that have an effect on page layout
+    // Note: 'display' is set to 'inline-block', which is always the effective value for 'replaced elements'
+    var style = getComputedStyle(element, null);
+    placeholderElement.style.setProperty("position", style.getPropertyValue("position"), "important");
+    placeholderElement.style.setProperty("clear", style.getPropertyValue("clear"), "important");
+    placeholderElement.style.setProperty("float", style.getPropertyValue("float"), "important");
+    placeholderElement.style.setProperty("margin-top", style.getPropertyValue("margin-top"), "important");
+    placeholderElement.style.setProperty("margin-right", style.getPropertyValue("margin-right"), "important");
+    placeholderElement.style.setProperty("margin-bottom", style.getPropertyValue("margin-bottom"), "important");
+    placeholderElement.style.setProperty("margin-left", style.getPropertyValue("margin-left"), "important");
+    placeholderElement.style.setProperty("z-index", style.getPropertyValue("z-index"), "important");
     
     // Replace the element by the placeholder
     if(element.parentNode) {
