@@ -11,7 +11,7 @@ function dispatchMessageToAllPages(name, message) {
 
 function makeAbsoluteURL(url, base) {
     if(!url) return "";
-    if(/:\/\//.test(url)) return url; // already absolute
+    if(/\/\//.test(url)) return url; // already absolute
     if(url[0] == "/") {
         url = url.substring(1);
         if(url[0] == "/") {
@@ -25,7 +25,7 @@ function makeAbsoluteURL(url, base) {
 }
 
 function hasFlashVariable(flashvars, key) {
-    var s = "(^|&)" + key + "=";
+    var s = "(?:^|&)" + key + "=";
     s = new RegExp(s);
     return s.test(flashvars);
 }
@@ -43,7 +43,7 @@ function getFlashVariable(flashvars, key) {
 }
 
 function hasSLVariable(initParams, key) {
-    var s = "(^|,)" + key + "=";
+    var s = "(?:^|,)" + key + "=";
     s = new RegExp(s, "i");
     return s.test(initParams);
 }
@@ -61,13 +61,14 @@ function getSLVariable(initParams, key) {
 }
 
 function extractExt(url) {
-    return url.split("?")[0].split("#")[0].split(".").pop();
+    url = url.split(/[?#]/)[0];
+    return url.substring(url.lastIndexOf(".") + 1);
 }
 
 // In this function 'ext' is a string representing a regular expression, eg. "mp4|mpe?g"
 function hasExt(ext, url) {
-    url = url.split("?")[0].split("#")[0];
-    ext = new RegExp("\.(" + ext + ")$", "i");
+    url = extractExt(url);
+    ext = new RegExp("^(?:" + ext + ")$", "i");
     return ext.test(url);
 }
 
@@ -81,14 +82,14 @@ const canPlayDivX = canPlayFLV; // 'video/divx' always returns "", probably a Pe
 
 // and certainly not this this one! but it does the job reasonably well
 function willPlaySrcWithHTML5(url) {
-    url = url.split("?")[0].split("#")[0];
-    if (/\.(mp4|mpe?g|mov|m4v)$/i.test(url)) return "video";
-    if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && /\.flv$/i.test(url)) return "video";
-    if(safari.extension.settings["QTbehavior"] > 1 && canPlayWM && /\.(wm(v|p)?|asf)$/i.test(url)) return "video";
-    if(safari.extension.settings["QTbehavior"] > 1 && canPlayDivX && /\.divx$/i.test(url)) return "video";
-    if(/\.(mp3|wav|midi?|aif(f|c)?|aac|m4a)$/i.test(url)) return "audio";
-    if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && /\.fla$/i.test(url)) return "video";
-    if(safari.extension.settings["QTbehavior"] > 1 && canPlayWM && /\.wma$/i.test(url)) return "audio";
+    url = extractExt(url);
+    if (/^(?:mp4|mpe?g|mov|m4v)$/i.test(url)) return "video";
+    if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && /^flv$/i.test(url)) return "video";
+    if(safari.extension.settings["QTbehavior"] > 1 && canPlayWM && /^(?:wm[vp]?|asf)$/i.test(url)) return "video";
+    if(safari.extension.settings["QTbehavior"] > 1 && canPlayDivX && /^divx$/i.test(url)) return "video";
+    if(/^(?:mp3|wav|midi?|aif[fc]?|aac|m4a)$/i.test(url)) return "audio";
+    if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && /^fla$/i.test(url)) return "video";
+    if(safari.extension.settings["QTbehavior"] > 1 && canPlayWM && /^wma$/i.test(url)) return "audio";
     return "";
 }
 
@@ -144,8 +145,7 @@ function parseXSPFPlaylist(playlistURL, altPosterURL, track, handlePlaylistData)
                 if(i == 0) return;
                 if(i >= x.length - track) --startTrack;
                 continue;
-            }
-            if(mediaType == "video") isAudio = false;
+            } else if(mediaType == "video") isAudio = false;
             
             list = x[I].getElementsByTagName("image");
             if(list.length > 0) posterURL = list[0].firstChild.nodeValue;
@@ -212,9 +212,9 @@ function getPluginAndTypeForExt(ext) {
 function getPluginNameFromPlugin(plugin) {
     if(plugin.name == "Shockwave Flash") return "Flash";
     if(plugin.name == "Silverlight Plug-In") return "Silverlight";
-    if(plugin.name.match("Java")) return "Java";
-    if(plugin.name.match("QuickTime")) return "QuickTime";
-    if(plugin.name.match("Flip4Mac")) return "WM";
+    if(plugin.name.indexOf("Java") != -1) return "Java";
+    if(plugin.name.indexOf("QuickTime") != -1) return "QuickTime";
+    if(plugin.name.indexOf("Flip4Mac") != -1) return "WM";
     if(plugin.name == "iPhotoPhotocast") return "iPhoto";
     if(plugin.name == "Quartz Composer Plug-In") return "Quartz";
     if(plugin.name == "VideoLAN VLC Plug-in") return "VLC";

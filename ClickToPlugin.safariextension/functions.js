@@ -4,6 +4,23 @@ function localize(STRING) {
     return safari.self.tab.canLoad(event, STRING);
 }
 
+function downloadURL(url) {
+    var downloadLink = document.createElement("a");
+    downloadLink.href = url;
+    
+    var event = document.createEvent("MouseEvents");
+    event.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, false, true, false, false, 0, null);
+    
+    downloadLink.dispatchEvent(event);
+}
+
+// 'event' is a click event fired by an anchor
+function downloadTarget(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    downloadURL(event.target.href);
+}
+
 function getInfo(element, url) {
     // gathers attributes of the element that might be needed later on
     // Done by a single function so that we only loop once through the <param> children
@@ -145,3 +162,4 @@ function getParamsOf(element) {
 document.HTMLToString = function(element){
     return (new XMLSerializer()).serializeToString(element);
 };
+

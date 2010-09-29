@@ -61,9 +61,7 @@ Placeholder element
 
 .CTFplaceholder {
     display: inline-block !important;
-    position: relative !important;
     border: 1px solid rgba(180, 180, 180, 1) !important;
-    margin: 0 !important;
     padding: 0 !important;
     -webkit-user-select: none !important;
     -webkit-box-sizing: border-box !important;
@@ -71,6 +69,7 @@ Placeholder element
     background-repeat: no-repeat !important;
     background-origin: border-box !important;
     background-size: contain !important;
+    overflow: hidden !important;
 }
 
 .CTFplaceholder.CTFnoimage {
@@ -179,6 +178,15 @@ Placeholder element
     padding: 8px 0 4px 0 !important;
     text-align: center !important;
     font-size: 12px !important;
+    line-height: normal !important;
+}
+
+.CTFplaceholder .CTFplaceholderDownloadLink a {
+    visibility: hidden !important;
+}
+
+.CTFplaceholder .CTFplaceholderDownloadLink:hover a {
+    visibility: visible !important;
 }
 
 /***********
@@ -325,13 +333,14 @@ Media player
     display: inline-block !important;
     border: 1px solid rgba(0, 0, 0, 1) !important;
     height: 12px !important;
+    -webkit-box-sizing: content-box !important;
     line-height: 1 !important;
     background-color: rgba(255, 255, 255, 0.1) !important;
     text-align: right !important;
     pointer-events: auto !important;
 }
 
-.CTFmediaPlayer .CTFtrackSelect span {
+.CTFmediaPlayer span {
     display: inline !important;
     line-height: 1 !important;
 }
