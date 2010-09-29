@@ -16,6 +16,8 @@ function mediaPlayer(playerType) {
     
     this.containerElement = null;
     this.mediaElement = null; // the HTML video/audio element
+    this.downloadLink = null;
+    
     // dimensions of the container
     this.width = null;
     this.height = null;
@@ -65,6 +67,11 @@ mediaPlayer.prototype.initialize = function(buffer, width, height, volume, conte
         }
     };
     
+    // Initialize download link
+    this.downloadLink = document.createElement("a");
+    this.downloadLink.className = "CTFtrackTitle";
+    this.downloadLink.onclick = downloadTarget;
+    
     if(this.usePlaylistControls) {
         this.initializePlaylistControls();
     } else {
@@ -90,6 +97,8 @@ mediaPlayer.prototype.initializePlaylistControls = function() {
     playlistControlsLeft.appendChild(trackInfo);
     
     trackInfo.appendChild(document.createElement("p"));
+    trackInfo.firstChild.appendChild(document.createElement("span"));
+    trackInfo.firstChild.appendChild(this.downloadLink);
     
     var prevButton = document.createElement("div");
     prevButton.className = "CTFprevButton";
@@ -162,6 +171,7 @@ mediaPlayer.prototype.initializeDownloadControls = function() {
     var hoverElement = document.createElement("div");
     hoverElement.className = "CTFhoverElement";
     this.playlistControls.innerHTML = "<div class=\"CTFplaylistControlsLeft CTFnodisplay\"><div class=\"CTFtrackInfo\"><p></p></div></div>";
+    this.playlistControls.firstChild.firstChild.firstChild.appendChild(this.downloadLink);
     
     this.playlistControls.appendChild(hoverElement);
     
@@ -211,6 +221,11 @@ mediaPlayer.prototype.fadeIn = function(delay) {
     this.playlistControls.style.opacity = "0.9";
 };
 
+/*mediaPlayer.prototype.getCurrentTrackURL = function() {
+    if(this.currentTrack === null) return this.playlist[0].mediaURL;
+    else return this.playlist[this.currentTrack].mediaURL;
+};*/
+
 mediaPlayer.prototype.fixAspectRatio = function() {
     var w = this.mediaElement.videoWidth;
     var h = this.mediaElement.videoHeight;
@@ -224,7 +239,7 @@ mediaPlayer.prototype.fixAspectRatio = function() {
         this.mediaElement.style.height = this.height + "px"; this.mediaElement.style.width = width + "px";
         if(this.playlistControls) {
             this.playlistControls.style.width = width + "px";
-            if(this.usePlaylistControls) this.playlistControls.getElementsByTagName("p")[0].style.width = (width - this.playlistControls.getElementsByClassName("CTFplaylistControlsRight")[0].offsetWidth - 12) + "px";
+            if(this.usePlaylistControls) this.downloadLink.parentNode.style.width = (width - this.playlistControls.getElementsByClassName("CTFplaylistControlsRight")[0].offsetWidth - 12) + "px";
         }
     }
     if(this.usePlaylistControls) {
@@ -239,7 +254,7 @@ mediaPlayer.prototype.resetAspectRatio = function() {
     this.mediaElement.style.height = this.height + "px";
     if(this.playlistControls) {
         this.playlistControls.style.width = this.width + "px";
-        if(this.usePlaylistControls) this.playlistControls.getElementsByTagName("p")[0].style.width = (this.width - this.playlistControls.getElementsByClassName("CTFplaylistControlsRight")[0].offsetWidth - 12) + "px";
+        if(this.usePlaylistControls) this.downloadLink.parentNode.style.width = (this.width - this.playlistControls.getElementsByClassName("CTFplaylistControlsRight")[0].offsetWidth - 12) + "px";
     }
 };
 
@@ -279,16 +294,21 @@ mediaPlayer.prototype.loadTrack = function(track, autoplay) {
         this.mediaElement.setAttribute("preload", "auto");
         this.mediaElement.setAttribute("autoplay", "autoplay");
     }
-
+    
+    // Set download link
+    this.downloadLink.href = this.playlist[track].mediaURL;
+    var title;
     if(this.usePlaylistControls) {
-        var title = this.playlist[track].title;
+        title = this.playlist[track].title;
         if(!title) title = "(no title)";
-        title = "<a class=\"CTFtrackTitle\" href=\"" + this.mediaElement.src + "\">" + title + "</a>";
-        this.playlistControls.getElementsByTagName("p")[0].innerHTML = ((track + this.startTrack) % this.playlistLength + 1) + ". " + title;
+        track = this.printTrack(track);
+        this.downloadLink.previousSibling.innerHTML = track + ". ";
+        this.downloadLink.innerHTML = title;
+        
         var inputField = this.playlistControls.getElementsByTagName("input")[0];
         var newInputField = document.createElement("input");
         newInputField.setAttribute("type", "text");
-        newInputField.setAttribute("value", (track + this.startTrack) % this.playlistLength + 1);
+        newInputField.setAttribute("value", track);
         newInputField.style.width = (8 * this.playlistLength.toString().length) + "px";
         // simply changing the value does not update if user has used the field
         this.playlistControls.getElementsByTagName("form")[0].replaceChild(newInputField, inputField);
@@ -296,10 +316,13 @@ mediaPlayer.prototype.loadTrack = function(track, autoplay) {
         this.playlistControls.style.WebkitTransition = "";
         this.playlistControls.style.opacity = "1";
     } else {
-        var title = this.playlist[track].mediaType == "audio" ? localize("AUDIO_LINK") : localize("VIDEO_LINK");
-        title = "<a class=\"CTFtrackTitle\" href=\"" + this.mediaElement.src + "\">" + title + "</a>";
-        this.playlistControls.getElementsByTagName("p")[0].innerHTML = title;
+        title = this.playlist[track].mediaType == "audio" ? localize("AUDIO_LINK") : localize("VIDEO_LINK");
+        this.downloadLink.innerHTML = title;
     }
+};
+
+mediaPlayer.prototype.printTrack = function(track) {
+    return (track + this.startTrack) % this.playlistLength + 1;
 };
 
 mediaPlayer.prototype.setContextInfo = function(event, contextInfo) {
@@ -316,7 +339,7 @@ mediaPlayer.prototype.addToPlaylist = function(playlist, init) {
     if(init) this.playlist = playlist.concat(this.playlist);
     else this.playlist = this.playlist.concat(playlist);
     if(this.usePlaylistControls && this.playlistControls) {
-        this.playlistControls.getElementsByTagName("span")[0].innerHTML = "/" + normalize(this.playlist.length + this.startTrack, this.playlistLength);
+        this.playlistControls.getElementsByTagName("span")[1].innerHTML = "/" + normalize(this.playlist.length + this.startTrack, this.playlistLength);
     }
 };
 

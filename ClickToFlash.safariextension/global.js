@@ -20,11 +20,8 @@ function blockOrAllow(data) { // check the whitelists and returns true if elemen
 
     // Deal with invisible plugins
     if(safari.extension.settings["loadInvisible"] && data.width > 0 && data.height > 0) {
-        var dim = safari.extension.settings["maxinvdim"];
-        if(/^\d+x\d+$/.test(dim)) {
-            dim = dim.split("x");
-            if(data.width <= parseInt(dim[0]) && data.height <= parseInt(dim[1])) return true;
-        }
+        var dim = safari.extension.settings["maxinvdim"].split("x");
+        if(data.width <= parseInt(dim[0]) && data.height <= parseInt(dim[1])) return true;
     }
     
     // Deal with whitelisted content

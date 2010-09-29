@@ -11,7 +11,7 @@ function dispatchMessageToAllPages(name, message) {
 
 function makeAbsoluteURL(url, base) {
     if(!url) return "";
-    if(/:\/\//.test(url)) return url; // already absolute
+    if(/\/\//.test(url)) return url; // already absolute
     if(url[0] == "/") {
         url = url.substring(1);
         if(url[0] == "/") {
@@ -25,7 +25,7 @@ function makeAbsoluteURL(url, base) {
 }
 
 function hasFlashVariable(flashvars, key) {
-    var s = "(^|&)" + key + "=";
+    var s = "(?:^|&)" + key + "=";
     s = new RegExp(s);
     return s.test(flashvars);
 }
@@ -42,10 +42,15 @@ function getFlashVariable(flashvars, key) {
     return "";
 }
 
+function extractExt(url) {
+    url = url.split(/[?#]/)[0];
+    return url.substring(url.lastIndexOf(".") + 1);
+}
+
 // In this function 'ext' is a string representing a regular expression, eg. "mp4|mpe?g"
 function hasExt(ext, url) {
-    url = url.split("?")[0].split("#")[0];
-    ext = new RegExp("\.(" + ext + ")$", "i");
+    url = extractExt(url);
+    ext = new RegExp("^(?:" + ext + ")$", "i");
     return ext.test(url);
 }
 
@@ -57,11 +62,11 @@ const canPlayFLV = canPlayTypeWithHTML5("video/x-flv");
 
 // and certainly not this this one! but it does the job reasonably well
 function willPlaySrcWithHTML5(url) {
-    url = url.split("?")[0].split("#")[0];
-    if (/\.(mp4|mpe?g|mov|m4v)$/i.test(url)) return "video";
-    if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && /\.flv$/i.test(url)) return "video";
-    if(/\.(mp3|wav|midi?|aif(f|c)?|aac|m4a)$/i.test(url)) return "audio";
-    if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && /\.fla$/i.test(url)) return "video";
+    url = extractExt(url);
+    if (/^(?:mp4|mpe?g|mov|m4v)$/i.test(url)) return "video";
+    if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && /^flv$/i.test(url)) return "video";
+    if(/^(?:mp3|wav|midi?|aif(f|c)?|aac|m4a)$/i.test(url)) return "audio";
+    if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && /^fla$/i.test(url)) return "video";
     return "";
 }
 
