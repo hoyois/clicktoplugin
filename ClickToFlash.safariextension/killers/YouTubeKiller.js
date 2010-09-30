@@ -49,37 +49,41 @@ YouTubeKiller.prototype.buildVideoIDList = function(flashvars, location, playlis
                 videoIDList.push(entries[j].getElementsByTagNameNS("http://search.yahoo.com/mrss/", "player")[0].getAttribute("url").match(/\?v=([^&?']+)[&?']/)[1]);
             } catch(err) {}
         }
-        if(entries.length < 50) {// we've got the whole list of videoIDs
-            var track = 0;
-            var length = videoIDList.length;
-            if(flashvars) {
-                var videoID = getFlashVariable(flashvars, "video_id");
-                if(!videoID) { // new YT AJAX player
-                    var matches = location.match(/[!&]v=([^&]+)(?:&|$)/);
-                    if(!matches) return;
-                    videoID = matches[1];
-                    flashvars = null;
-                }
-                for(var j = 0; j < videoIDList.length; j++) {
-                    if(videoIDList[0] == videoID) {track = j; break;}
-                    videoIDList.push(videoIDList.shift());
-                }
+        var links = xhr.responseXML.getElementsByTagName("link");
+        for(var j = 0; j < links.length; j++) {
+            if(links[j].getAttribute("rel") == "next") {
+                _this.buildVideoIDList(flashvars, location, playlistID, ++i, videoIDList, callback);
+                return;
             }
-            var callbackForPlaylist = function(videoData) {
-                videoData.playlistLength = length;
-                videoData.startTrack = track;
-                if(videoData.playlist[0].siteInfo) videoData.playlist[0].siteInfo.url += "&p=" + playlistID;
-                callback(videoData);
-            };
-            // load the first video at once
-            if(flashvars) _this.processElementFromFlashVars(flashvars, location, callbackForPlaylist);
-            else _this.processElementFromVideoID(videoIDList[0], callbackForPlaylist);
-            videoIDList.shift();
-            // load the rest of the playlist 3 by 3
-            _this.buildPlaylist(videoIDList, playlistID, true, 3, callback);
-            return;
         }
-        _this.buildVideoIDList(flashvars, location, playlistID, ++i, videoIDList, callback);
+        // We've got the whole list of videoIDs
+        var track = 0;
+        var length = videoIDList.length;
+        if(flashvars) {
+            var videoID = getFlashVariable(flashvars, "video_id");
+            if(!videoID) { // new YT AJAX player
+                var matches = location.match(/[!&]v=([^&]+)(?:&|$)/);
+                if(!matches) return;
+                videoID = matches[1];
+                flashvars = null;
+            }
+            for(var j = 0; j < videoIDList.length; j++) {
+                if(videoIDList[0] == videoID) {track = j; break;}
+                videoIDList.push(videoIDList.shift());
+            }
+        }
+        var callbackForPlaylist = function(videoData) {
+            videoData.playlistLength = length;
+            videoData.startTrack = track;
+            if(videoData.playlist[0].siteInfo) videoData.playlist[0].siteInfo.url += "&p=" + playlistID;
+            callback(videoData);
+        };
+        // load the first video at once
+        if(flashvars) _this.processElementFromFlashVars(flashvars, location, callbackForPlaylist);
+        else _this.processElementFromVideoID(videoIDList[0], callbackForPlaylist);
+        videoIDList.shift();
+        // load the rest of the playlist 3 by 3
+        _this.buildPlaylist(videoIDList, playlistID, true, 3, callback);
     };
     xhr.send(null);
 };
@@ -187,7 +191,7 @@ YouTubeKiller.prototype.processElementFromVideoID = function(videoID, callback) 
         if(safari.extension.settings["usePlaylists"]) {
             var titleMatch = /<meta\sname=\"title\"\scontent=\"([^"]*)\"/;
             matches = xhr.responseText.match(titleMatch);
-            if(matches) title = matches[1];
+            if(matches) title = matches[1].replace(/&amp;/g, "&");
         }
         matches = xhr.responseText.match(urlMapMatch);
         if(matches) urlMap = matches[1].replace(/\\\//g,"/");
