@@ -112,7 +112,7 @@ mediaPlayer.prototype.initializePlaylistControls = function() {
     nextButton.className = "CTFnextButton";
     playlistControlsRight.appendChild(nextButton);
 
-    trackSelect.innerHTML = "<input type=\"text\" style=\"width: " + (8 * this.playlistLength.toString().length) + "px\"><span>/" + normalize(this.playlist.length, this.playlistLength) + "</span>";
+    trackSelect.innerHTML = "<input type=\"text\" style=\"width: " + (7 * (this.playlistLength.toString().length - 1) + 8) + "px\"><span>/" + normalize(this.playlist.length, this.playlistLength) + "</span>";
     
     var _this = this;
     this.mediaElement.onmouseover = function(event) {
@@ -309,7 +309,7 @@ mediaPlayer.prototype.loadTrack = function(track, autoplay) {
         var newInputField = document.createElement("input");
         newInputField.setAttribute("type", "text");
         newInputField.setAttribute("value", track);
-        newInputField.style.width = (8 * this.playlistLength.toString().length) + "px";
+        newInputField.style.width = (7 * (this.playlistLength.toString().length - 1) + 8) + "px";
         // simply changing the value does not update if user has used the field
         this.playlistControls.getElementsByTagName("form")[0].replaceChild(newInputField, inputField);
         // Show playlist controls
