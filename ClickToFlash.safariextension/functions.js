@@ -66,8 +66,9 @@ function getParamsOf(element) {
 }
 
 function isFlash(element, url) {
-    url = url.split("?")[0].split("#")[0];
-    if(/\.(swf|spl)$/.test(url)) return "probably";
+    url = url.split(/[?#]/)[0];
+    url = url.substring(url.lastIndexOf(".") + 1);
+    if(url == "swf" || url == "spl") return "probably";
     var type = getTypeOf(element);
     if(type == "application/x-shockwave-flash" || type == "application/futuresplash") {
         return "probably";
@@ -89,7 +90,7 @@ function isFlash(element, url) {
         // server may return different MIME types for AJAX requests...)
         // but this situation never occurs in practice anyway, so it's not worth it.
         // We'll just block if source has no extension or is a common server-side script.
-        if(!(/\.[a-zA-Z0-9]+$/.test(url)) || /\.(php|aspx?)$/.test(url)) {
+        if(!(/^[a-zA-Z0-9]+$/.test(url)) || /^(?:php|aspx?)$/.test(url)) {
             return "maybe";
         }
         return "";
