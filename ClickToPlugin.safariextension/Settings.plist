@@ -320,7 +320,7 @@
 		<key>Key</key>
 		<string>loadInvisible</string>
 		<key>Title</key>
-		<string>Allow elements to load if                               </string>
+		<string>Allow embedded content if                            </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -357,6 +357,16 @@
 		<string>useLAcontext</string>
 		<key>Title</key>
 		<string>Load All Plugins                                             </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>useDVcontext</string>
+		<key>Title</key>
+		<string>Download Video                                             </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -431,18 +441,6 @@
 		<string>Block content manually                                  </string>
 		<key>Type</key>
 		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
-		<string>mustUpdateWhitelists</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
-		<string>mustUpdateInvDim</string>
 	</dict>
 </array>
 </plist>

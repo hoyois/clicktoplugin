@@ -1,9 +1,3 @@
-function localize(STRING) {
-    var event = document.createEvent("HTMLEvents");
-    event.initEvent("beforeload", false, true);
-    return safari.self.tab.canLoad(event, STRING);
-}
-
 function downloadURL(url) {
     var downloadLink = document.createElement("a");
     downloadLink.href = url;
@@ -12,13 +6,6 @@ function downloadURL(url) {
     event.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, false, true, false, false, 0, null);
     
     downloadLink.dispatchEvent(event);
-}
-
-// 'event' is a click event fired by an anchor
-function downloadTarget(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    downloadURL(event.target.href);
 }
 
 function getInfo(element, url) {

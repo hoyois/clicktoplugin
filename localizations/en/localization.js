@@ -10,6 +10,8 @@ const LOAD_ALL_PLUGINS = "Load All Plugins";
 const LOAD_ALL_FLASH = "Load All Flash";
 const ADD_TO_LOC_WHITELIST = "Add Location to Whitelist";
 const ADD_TO_SRC_WHITELIST = "Add Source to Whitelist";
+const DOWNLOAD_VIDEO = "Download Video";
+const DOWNLOAD_AUDIO = "Download Audio";
 const VIEW_IN_QUICKTIME_PLAYER = "View in QuickTime Player";
 const SHOW_ELEMENT = "Show Element";
 const LOAD_PLUGIN = function(plugin) {return "Load " + plugin;};
@@ -23,8 +25,4 @@ const ADD_TO_LOC_WHITELIST_DIALOG = "Allow embedded content on locations matchin
 const ADD_TO_SRC_WHITELIST_DIALOG = "Allow embedded content from sources matching:";
 const ADD_TO_LOC_WHITELIST_DIALOG_FLASH = "Allow Flash on locations matching:";
 const ADD_TO_SRC_WHITELIST_DIALOG_FLASH = "Allow Flash from sources matching:";
-
-// Injected scripts
-const VIDEO_LINK = "Download Video";
-const AUDIO_LINK = "Download Audio";
 
