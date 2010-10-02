@@ -10,6 +10,8 @@ const LOAD_ALL_PLUGINS = "Débloquer tous les plugins";
 const LOAD_ALL_FLASH = "Débloquer Flash sur cette page";
 const ADD_TO_LOC_WHITELIST = "Ajouter à la liste blanche";
 const ADD_TO_SRC_WHITELIST = "Ajouter à la liste blanche";
+const DOWNLOAD_VIDEO = "Télécharger la vidéo";
+const DOWNLOAD_AUDIO = "Télécharger l'audio";
 const VIEW_IN_QUICKTIME_PLAYER = "Ouvrir avec QuickTime PLayer";
 const SHOW_ELEMENT = "Voir l'élément";
 const LOAD_PLUGIN = function(plugin) {return "Lancer " + plugin;};
@@ -23,8 +25,4 @@ const ADD_TO_LOC_WHITELIST_DIALOG = "Autoriser les plugins si l'adresse de la pa
 const ADD_TO_SRC_WHITELIST_DIALOG = "Autoriser les plugins provenant de";
 const ADD_TO_LOC_WHITELIST_DIALOG_FLASH = "Autoriser Flash si l'adresse de la page contient";
 const ADD_TO_SRC_WHITELIST_DIALOG_FLASH = "Autoriser les éléments Flash provenant de";
-
-// Injected scripts
-const VIDEO_LINK = "Télécharger la vidéo";
-const AUDIO_LINK = "Télécharger l'audio";
 

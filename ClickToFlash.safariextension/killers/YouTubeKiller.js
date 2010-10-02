@@ -123,7 +123,7 @@ YouTubeKiller.prototype.getMediaDataFromURLMap = function(videoID, videoHash, ur
     }
     
     var posterURL = "http://i.ytimg.com/vi/" + videoID + "/hqdefault.jpg";
-    // this is the 360p MP4 video URL, always available
+    // this is the 360p MP4 video URL, (almost) always available
     var videoURL = "http://www.youtube.com/get_video?fmt=18&asv=&video_id=" + videoID + "&t=" + videoHash;
     var badgeLabel = "H.264";
     
@@ -141,14 +141,10 @@ YouTubeKiller.prototype.getMediaDataFromURLMap = function(videoID, videoHash, ur
     } else if (availableFormats[22] && safari.extension.settings["maxresolution"] > 1) {// 720p
         badgeLabel = "HD&nbsp;H.264";
         videoURL = availableFormats[22];
-    } else if (safari.extension.settings["QTbehavior"] > 2 && canPlayFLV) {
-        if (availableFormats[35]) { // 480p FLV
-            videoURL = availableFormats[35];
-        }
-        // fmt 34 is 360p 16:9 most of the time, but there are some videos for which 18 is better than 34.
-        /*else if (availableFormats[34]) { // 360p FLV
-            videoURL = availableFormats[34];
-        }*/
+    } else if (availableFormats[35] && safari.extension.settings["QTbehavior"] > 2 && canPlayFLV) {// 480p FLV
+        videoURL = availableFormats[35];
+    } else if (availableFormats[18]) {// <=360p
+        videoURL = availableFormats[18];
     }
     return {"posterURL": posterURL, "videoURL": videoURL, "badgeLabel": badgeLabel};
 };
@@ -168,12 +164,12 @@ YouTubeKiller.prototype.processElementFromFlashVars = function(flashvars, locati
         this.processElementFromVideoID(videoID, callback);
         return;
     }
-    var title = decodeURIComponent(getFlashVariable(flashvars, "rec_title")).substring(3).replace(/\+/g, " ");
+    var title = decodeURIComponent(getFlashVariable(flashvars, "rec_title")).substring(4).replace(/\+/g, " ");
     var urlMap = decodeURIComponent(getFlashVariable(flashvars, "fmt_url_map"));
     if(!urlMap) return;
     var x = this.getMediaDataFromURLMap(videoID, videoHash, urlMap);
     var videoData = {
-        "playlist": [{"title": title, "mediaType": "video", "posterURL": x.posterURL, "mediaURL": x.videoURL}],
+        "playlist": [{"title": title, "mediaType": "video", "posterURL": x.posterURL, "mediaURL": x.videoURL + "&title=" + encodeURIComponent(title)}],
         "badgeLabel": x.badgeLabel
     };
     callback(videoData);
@@ -183,16 +179,14 @@ YouTubeKiller.prototype.processElementFromVideoID = function(videoID, callback) 
     if(!videoID) return; // needed!?
     var urlMapMatch = /\"fmt_url_map\":\s\"([^"]*)\"/; // works for both Flash and HTML5 Beta player pages
     var hashMatch = /\"t\":\s\"([^"]*)\"/;
+    var titleMatch = /\"rec_title\":\s\"((?:\\\"|[^"])*)\"/;
     var _this = this;
     var xhr = new XMLHttpRequest ();
     xhr.open("GET", "http://www.youtube.com/watch?v=" + videoID, true);
     xhr.onload = function() {
         var matches, title, urlMap, videoHash;
-        if(safari.extension.settings["usePlaylists"]) {
-            var titleMatch = /<meta\sname=\"title\"\scontent=\"([^"]*)\"/;
-            matches = xhr.responseText.match(titleMatch);
-            if(matches) title = matches[1].replace(/&amp;/g, "&");
-        }
+        matches = xhr.responseText.match(titleMatch);
+        if(matches) title = matches[1].substring(4).replace(/\\["/]/g, function(s){return s.charAt(1);});
         matches = xhr.responseText.match(urlMapMatch);
         if(matches) urlMap = matches[1].replace(/\\\//g,"/");
         matches = xhr.responseText.match(hashMatch);
@@ -200,7 +194,7 @@ YouTubeKiller.prototype.processElementFromVideoID = function(videoID, callback) 
         if(urlMap && videoHash) {
             var x = _this.getMediaDataFromURLMap(videoID, videoHash, urlMap);
             var videoData = {
-                "playlist": [{"title": title, "siteInfo": {"name": "YouTube", "url": "http://www.youtube.com/watch?v=" + videoID}, "mediaType": "video", "posterURL": x.posterURL, "mediaURL": x.videoURL}],
+                "playlist": [{"title": title, "siteInfo": {"name": "YouTube", "url": "http://www.youtube.com/watch?v=" + videoID}, "mediaType": "video", "posterURL": x.posterURL, "mediaURL": x.videoURL + "&title=" + encodeURIComponent(title)}],
                 "badgeLabel": x.badgeLabel
             };
             callback(videoData);

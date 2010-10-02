@@ -1,9 +1,3 @@
-function localize(STRING) {
-    var event = document.createEvent("HTMLEvents");
-    event.initEvent("beforeload", false, true);
-    return safari.self.tab.canLoad(event, STRING);
-}
-
 function downloadURL(url) {
     var downloadLink = document.createElement("a");
     downloadLink.href = url;
@@ -12,13 +6,6 @@ function downloadURL(url) {
     event.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, false, true, false, false, 0, null);
     
     downloadLink.dispatchEvent(event);
-}
-
-// 'event' is a click event fired by an anchor
-function downloadTarget(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    downloadURL(event.target.href);
 }
 
 function getTypeOf(element) {
@@ -85,9 +72,7 @@ function isFlash(element, url) {
             }
         }
         // A source might point to a Flash movie through server-side scripting.
-        // To be 100% sure of not letting Flash through, one would have to block
-        // everything at this point (even AJAX is not guaranteed because the
-        // server may return different MIME types for AJAX requests...)
+        // To correctly detect Flash one would have to make an AJAX request at this point...
         // but this situation never occurs in practice anyway, so it's not worth it.
         // We'll just block if source has no extension or is a common server-side script.
         if(!(/^[a-zA-Z0-9]+$/.test(url)) || /^(?:php|aspx?)$/.test(url)) {

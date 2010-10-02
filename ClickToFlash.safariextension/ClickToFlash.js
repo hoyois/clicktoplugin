@@ -12,6 +12,12 @@ function ClickToFlash() {
     this.instance = null;
     this.numberOfBlockedElements = 0;
     this.stack = null;
+    /*
+    The stack is a <div> appended as a child of <body> in which the blocked elements are stored unmodified.
+    This allows scripts that need to set custom JS properties to those elements (or otherwise modify them) to work.
+    The stack itself has display:none so that plugins are not instantiated.
+    Scripts that try to interact with the plugin will still fail, of course. No way around that.
+    */
     
     var _this = this;
     
@@ -76,6 +82,9 @@ ClickToFlash.prototype.respondToMessage = function(event) {
                     break;
                 case "reload":
                     this.reloadInPlugin(loadData[1]);
+                    break;
+                case "download":
+                    this.downloadMedia(loadData[1]);
                     break;
                 case "qtp":
                     this.launchInQuickTimePlayer(loadData[1]);
@@ -248,7 +257,6 @@ ClickToFlash.prototype.prepMedia = function(mediaData) {
         this.loadMediaForElement(mediaData.elementID);
         return;
     } else {
-        this.showDownloadLink(mediaData.playlist[0].mediaType, mediaData.playlist[0].mediaURL, mediaData.elementID);
         if(this.settings["showPoster"] && mediaData.playlist[0].posterURL) {
             // show poster as background image
             this.placeholderElements[mediaData.elementID].style.opacity = "1";
@@ -262,16 +270,6 @@ ClickToFlash.prototype.prepMedia = function(mediaData) {
     if(!badgeLabel) badgeLabel = "Video";
     
     this.displayBadge(badgeLabel, mediaData.elementID);
-};
-
-ClickToFlash.prototype.showDownloadLink = function(mediaType, url, elementID) {
-    var downloadLinkDiv = document.createElement("div");
-    downloadLinkDiv.className = "CTFplaceholderDownloadLink";
-    downloadLinkDiv.innerHTML = "<a href=\"" + url + "\">" + (mediaType == "audio" ? localize("AUDIO_LINK") : localize("VIDEO_LINK")) + "</a>";
-    
-    downloadLinkDiv.firstChild.onclick = downloadTarget;
-    
-    this.placeholderElements[elementID].firstChild.appendChild(downloadLinkDiv);
 };
 
 ClickToFlash.prototype.loadMediaForElement = function(elementID) {
@@ -291,6 +289,12 @@ ClickToFlash.prototype.loadMediaForElement = function(elementID) {
     this.mediaPlayers[elementID].loadTrack(0);
     this.placeholderElements[elementID] = null;
     
+};
+
+ClickToFlash.prototype.downloadMedia = function(elementID) {
+    var track = this.mediaPlayers[elementID].currentTrack;
+    if(track === null) track = 0;
+    downloadURL(this.mediaPlayers[elementID].playlist[track].mediaURL);
 };
 
 ClickToFlash.prototype.launchInQuickTimePlayer = function(elementID) {

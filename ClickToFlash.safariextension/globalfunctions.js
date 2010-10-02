@@ -65,7 +65,7 @@ function willPlaySrcWithHTML5(url) {
     url = extractExt(url);
     if (/^(?:mp4|mpe?g|mov|m4v)$/i.test(url)) return "video";
     if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && /^flv$/i.test(url)) return "video";
-    if(/^(?:mp3|wav|midi?|aif(f|c)?|aac|m4a)$/i.test(url)) return "audio";
+    if(/^(?:mp3|wav|midi?|aif[fc]?|aac|m4a)$/i.test(url)) return "audio";
     if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && /^fla$/i.test(url)) return "video";
     return "";
 }
