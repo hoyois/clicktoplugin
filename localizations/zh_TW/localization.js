@@ -10,6 +10,8 @@ const LOAD_ALL_PLUGINS = "載入所有的 Plugins";
 const LOAD_ALL_FLASH = "載入所有的 Flash";
 const ADD_TO_LOC_WHITELIST = "將網址加入白名單";
 const ADD_TO_SRC_WHITELIST = "將來源加入白名單";
+const DOWNLOAD_VIDEO = "下載影片";
+const DOWNLOAD_AUDIO = "下載音訊";
 const VIEW_IN_QUICKTIME_PLAYER = "在 QuickTime Player 中檢視";
 const SHOW_ELEMENT = "顯示元件";
 const LOAD_PLUGIN = function(plugin) {return "載入 " + plugin;};
@@ -23,8 +25,4 @@ const ADD_TO_LOC_WHITELIST_DIALOG = "允許位於下列網址的嵌入式內容�
 const ADD_TO_SRC_WHITELIST_DIALOG = "允許來自於下列來源的嵌入式內容";
 const ADD_TO_LOC_WHITELIST_DIALOG_FLASH = "允許位於下列網址的 Flash：";
 const ADD_TO_SRC_WHITELIST_DIALOG_FLASH = "允許來自於下列來源的 Flash：";
-
-// Injected scripts
-const VIDEO_LINK = "下載影片";
-const AUDIO_LINK = "下載音訊";
 

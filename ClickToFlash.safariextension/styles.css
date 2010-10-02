@@ -23,16 +23,6 @@
     display: block !important;
 }
 
-.CTFplaceholder a, .CTFmediaPlayer a {
-    display: inline !important;
-    cursor: auto !important;
-    line-height: normal !important;
-}
-
-.CTFplaceholder a:hover, .CTFmediaPlayer a:hover {
-    text-decoration: underline !important;
-}
-
 /**************
 Generic classes
 **************/
@@ -181,14 +171,6 @@ Placeholder element
     line-height: normal !important;
 }
 
-.CTFplaceholder .CTFplaceholderDownloadLink a {
-    visibility: hidden !important;
-}
-
-.CTFplaceholder .CTFplaceholderDownloadLink:hover a {
-    visibility: visible !important;
-}
-
 /***********
 Media player
 ***********/
@@ -241,15 +223,6 @@ Media player
     background: none !important;
 }
 
-.CTFmediaPlayer .CTFhoverElement {
-    position: absolute !important;
-    left: 28px !important;
-    top: 18px !important;
-    width: 24px !important;
-    height: 6px !important;
-    pointer-events: auto !important;
-}
-
 /* Left playlist controls */
 .CTFmediaPlayer .CTFplaylistControlsLeft {
     position: absolute !important;
@@ -279,10 +252,6 @@ Media player
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-}
-
-.CTFmediaPlayer .CTFtrackTitle {
-    pointer-events: auto !important;
 }
 
 /* Right playlist controls */
@@ -340,7 +309,7 @@ Media player
     pointer-events: auto !important;
 }
 
-.CTFmediaPlayer span {
+.CTFmediaPlayer .CTFtrackSelect span {
     display: inline !important;
     line-height: 1 !important;
 }

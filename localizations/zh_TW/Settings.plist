@@ -254,6 +254,16 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>useDVcontext</string>
+		<key>Title</key>
+		<string>下載影片                             </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
 		<string>useVScontext</string>
@@ -321,18 +331,6 @@
 		<string>手動阻擋內容                       </string>
 		<key>Type</key>
 		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
-		<string>mustUpdateWhitelists</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
-		<string>mustUpdateInvDim</string>
 	</dict>
 </array>
 </plist>
