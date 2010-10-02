@@ -42,7 +42,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string>flash, futuresplash, silverlight</string>
+		<string>flash futuresplash silverlight</string>
 		<key>Key</key>
 		<string>redlist</string>
 		<key>Title</key>
@@ -266,7 +266,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string>www.example.com, www.example2.com</string>
+		<string>www.example.com www.example2.com</string>
 		<key>Key</key>
 		<string>locwhitelist</string>
 		<key>Title</key>
@@ -320,33 +320,19 @@
 		<key>Key</key>
 		<string>loadInvisible</string>
 		<key>Title</key>
-		<string>Allow elements to load if                               </string>
+		<string>Allow embedded content if                            </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<real>1</real>
+		<string>1x1</string>
 		<key>Key</key>
 		<string>maxinvdim</string>
 		<key>Title</key>
 		<string>size is at most</string>
-		<key>Titles</key>
-		<array>
-			<string>1 x 1 px</string>
-			<string>2 x 2 px</string>
-			<string>4 x 4 px</string>
-			<string>8 x 8 px</string>
-		</array>
 		<key>Type</key>
-		<string>PopUpButton</string>
-		<key>Values</key>
-		<array>
-			<real>1</real>
-			<real>2</real>
-			<real>4</real>
-			<real>8</real>
-		</array>
+		<string>TextField</string>
 	</dict>
 	<dict>
 		<key>Title</key>
@@ -371,6 +357,16 @@
 		<string>useLAcontext</string>
 		<key>Title</key>
 		<string>Load All Plugins                                             </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>useDVcontext</string>
+		<key>Title</key>
+		<string>Download Video                                             </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -445,12 +441,6 @@
 		<string>Block content manually                                  </string>
 		<key>Type</key>
 		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
-		<string>mustUpdateWhitelists</string>
 	</dict>
 </array>
 </plist>

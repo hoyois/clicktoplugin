@@ -1,21 +1,6 @@
 var CTP_instance = 0; // incremented by one whenever a ClickToPlugin instance with content is created
 const killers = [new YouTubeKiller(), new VimeoKiller(), new DailymotionKiller(), new VeohKiller(), new GenericKiller(), new SLKiller(), new QTKiller(), new WMKiller(), new DivXKiller()];
 
-// UPDATE SETTINGS
-if(safari.extension.settings["mustUpdateWhitelists"]) {
-    safari.extension.settings["mustUpdateWhitelists"] = false;
-    function updateWL(string) {
-        if(/,/.test(safari.extension.settings[string])) safari.extension.settings[string] = safari.extension.settings[string].replace(/\s+/g, "").replace(/,/g, " ");
-    }
-    updateWL("redlist"); updateWL("greenlist"); updateWL("H264whitelist");
-    updateWL("locwhitelist"); updateWL("locblacklist"); updateWL("srcwhitelist"); updateWL("srcblacklist");
-}
-if(safari.extension.settings["mustUpdateInvDim"]) {
-    safari.extension.settings["mustUpdateInvDim"] = false;
-    if(!/x/.test(safari.extension.settings["maxinvdim"])) safari.extension.settings["maxinvdim"] = safari.extension.settings["maxinvdim"] + "x" + safari.extension.settings["maxinvdim"];
-}
-// END UPDATE
-
 function blockOrAllow(data) { // returns true if element can be loaded, the name of the plugin otherwise
 
     // no source and no type -> must allow, it's probably going to pass through here again after being modified by a script
@@ -129,8 +114,6 @@ function respondToCanLoad(message) {
             if (safari.extension.settings["sifrReplacement"] == "textonly") {
                 return {"canLoad": false, "debug": safari.extension.settings["debug"]};
             } else return {"canLoad": true};
-        default: // return global variable with name message
-            return this[message];
     }
 }
 
@@ -145,14 +128,16 @@ function handleContextMenu(event) {
     var pluginName = /[A-Z]/.test(event.userInfo.plugin) ? event.userInfo.plugin : PLUGIN_GENERIC;
     if(event.userInfo.isVideo) {
         event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",reload", RELOAD_IN_PLUGIN(pluginName));
-        if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",qtp", VIEW_IN_QUICKTIME_PLAYER);
+        if(safari.extension.settings["useDVcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",download", event.userInfo.mediaType == "audio" ? DOWNLOAD_AUDIO : DOWNLOAD_VIDEO);
         if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", VIEW_ON_SITE(event.userInfo.siteInfo.name));
+        if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",qtp", VIEW_IN_QUICKTIME_PLAYER);
     } else {
         if(event.userInfo.hasH264) {
             event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",plugin", LOAD_PLUGIN(pluginName));
             event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",remove", REMOVE_PLUGIN(pluginName));
-            if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",qtp", VIEW_IN_QUICKTIME_PLAYER);
+            if(safari.extension.settings["useDVcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",download", event.userInfo.mediaType == "audio" ? DOWNLOAD_AUDIO : DOWNLOAD_VIDEO);
             if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", VIEW_ON_SITE(event.userInfo.siteInfo.name));
+            if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",qtp", VIEW_IN_QUICKTIME_PLAYER);
         } else {
             event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",remove", REMOVE_PLUGIN(pluginName));
         }

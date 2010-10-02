@@ -10,6 +10,8 @@ const LOAD_ALL_PLUGINS = "Подгрузить все Дополнения";
 const LOAD_ALL_FLASH = "Подгрузить Flash";
 const ADD_TO_LOC_WHITELIST = "Поместить адрес в Белый Список";
 const ADD_TO_SRC_WHITELIST = "Поместить источник в Белый Список";
+const DOWNLOAD_VIDEO = "Скачать Видео";
+const DOWNLOAD_AUDIO = "Скачать Звук";
 const VIEW_IN_QUICKTIME_PLAYER = "Смотреть в проигрывателе QuickTime";
 const SHOW_ELEMENT = "Осмотреть дополнение";
 const LOAD_PLUGIN = function(plugin) {return "Подгрузить " + plugin;};
@@ -23,8 +25,4 @@ const ADD_TO_LOC_WHITELIST_DIALOG = "Показывать дополнения �
 const ADD_TO_SRC_WHITELIST_DIALOG = "Показывать дополнения с источников с адресом вида:";
 const ADD_TO_LOC_WHITELIST_DIALOG_FLASH = "Показывать Flash в страницах с адресом вида:";
 const ADD_TO_SRC_WHITELIST_DIALOG_FLASH = "Показывать Flash с источников с адресом вида:";
-
-// Injected scripts
-const VIDEO_LINK = "Скачать Видео";
-const AUDIO_LINK = "Скачать Звук";
 
