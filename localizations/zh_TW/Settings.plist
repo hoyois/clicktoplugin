@@ -158,7 +158,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string>www.example.com, www.example2.com</string>
+		<string>www.example.com www.example2.com</string>
 		<key>Key</key>
 		<string>locwhitelist</string>
 		<key>Title</key>

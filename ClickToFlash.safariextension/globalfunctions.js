@@ -9,16 +9,17 @@ function dispatchMessageToAllPages(name, message) {
     }
 }
 
+// not meant to follow the specs, but works in practice
+const protocolMatch = /^[^\/:]+:/;
+const authorityMatch = /^[^\/:]+:\/\/[^\/]+/;
 function makeAbsoluteURL(url, base) {
     if(!url) return "";
-    if(/\/\//.test(url)) return url; // already absolute
-    if(url[0] == "/") {
-        url = url.substring(1);
-        if(url[0] == "/") {
-            url = url.substring(1);
-            base = base.replace(/\/\/.*$/,"//");
-        } else {
-            base = /[^\/]*\/\/[^\/]*\//.exec(base)[0];
+    if(protocolMatch.test(url)) return url; // already absolute
+    if(url.charAt(0) === "/") {
+        if(url.charAt(1) === "/") { // relative to protocol
+            base = base.match(protocolMatch)[0];
+        } else { // relative to authority
+            base = base.match(authorityMatch)[0];
         }
     }
     return base + url;
