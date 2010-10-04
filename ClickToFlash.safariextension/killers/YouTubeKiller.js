@@ -179,14 +179,14 @@ YouTubeKiller.prototype.processElementFromVideoID = function(videoID, callback) 
     if(!videoID) return; // needed!?
     var urlMapMatch = /\"fmt_url_map\":\s\"([^"]*)\"/; // works for both Flash and HTML5 Beta player pages
     var hashMatch = /\"t\":\s\"([^"]*)\"/;
-    var titleMatch = /\"rec_title\":\s\"((?:\\\"|[^"])*)\"/;
+    var titleMatch = /\"rec_title\":\s\"Re:\s((?:\\\"|[^"])*)\"/;
     var _this = this;
     var xhr = new XMLHttpRequest ();
     xhr.open("GET", "http://www.youtube.com/watch?v=" + videoID, true);
     xhr.onload = function() {
         var matches, title, urlMap, videoHash;
         matches = xhr.responseText.match(titleMatch);
-        if(matches) title = matches[1].substring(4).replace(/\\["/]/g, function(s){return s.charAt(1);});
+        if(matches) title = matches[1].replace(/\\["/]/g, function(s){return s.charAt(1);});
         matches = xhr.responseText.match(urlMapMatch);
         if(matches) urlMap = matches[1].replace(/\\\//g,"/");
         matches = xhr.responseText.match(hashMatch);
