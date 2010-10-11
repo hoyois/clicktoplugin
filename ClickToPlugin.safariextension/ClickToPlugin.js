@@ -56,26 +56,25 @@ ClickToPlugin.prototype.respondToMessage = function(event) {
             this.prepMedia(event.message);
             break;
         case "loadContent":
-            var loadData = event.message.split(","); // [0] instance, [1] elementID, [2] message
-            if (loadData[0] != this.instance) return; // ignore message from other instances
-            switch(loadData[2]) {
+            if(event.message.instance !== this.instance) return; // ignore message from other instances
+            switch(event.message.command) {
                 case "plugin":
-                    this.loadPluginForElement(loadData[1]);
+                    this.loadPluginForElement(event.message.elementID);
                     break;
                 case "remove":
-                    this.removeElement(loadData[1]);
+                    this.removeElement(event.message.elementID);
                     break;
                 case "reload":
-                    this.reloadInPlugin(loadData[1]);
+                    this.reloadInPlugin(event.message.elementID);
                     break;
                 case "download":
-                    this.downloadMedia(loadData[1]);
+                    this.downloadMedia(event.message.elementID);
                     break;
                 case "qtp":
-                    this.launchInQuickTimePlayer(loadData[1]);
+                    this.viewInQuickTimePlayer(event.message.elementID);
                     break;
                 case "show":
-                    this.showElement(loadData[1]);
+                    this.showElement(event.message.elementID);
                     break;
             }
             break;
@@ -263,7 +262,7 @@ ClickToPlugin.prototype.downloadMedia = function(elementID) {
     downloadURL(this.mediaPlayers[elementID].playlist[track].mediaURL);
 };
 
-ClickToPlugin.prototype.launchInQuickTimePlayer = function(elementID) {
+ClickToPlugin.prototype.viewInQuickTimePlayer = function(elementID) {
     var track = this.mediaPlayers[elementID].currentTrack;
     var element;
     if(track === null) {
@@ -415,6 +414,7 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
         this.stack = document.createElement("div");
         this.stack.id = "CTFstack";
         this.stack.className = "CTFnodisplay";
+        this.stack.style.display = "none !important";
         this.stack.innerHTML = "<div class=\"CTFnodisplay\"><div class=\"CTFnodisplay\"></div></div>";
         document.body.appendChild(this.stack);
     }
