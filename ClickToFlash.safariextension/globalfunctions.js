@@ -11,7 +11,7 @@ function dispatchMessageToAllPages(name, message) {
 
 // not meant to follow the specs, but works in practice
 const protocolMatch = /^[^\/:]+:/;
-const authorityMatch = /^[^\/:]+:\/\/[^\/]+/;
+const authorityMatch = /^[^\/:]+:\/\/[^\/]*/;
 function makeAbsoluteURL(url, base) {
     if(!url) return "";
     if(protocolMatch.test(url)) return url; // already absolute

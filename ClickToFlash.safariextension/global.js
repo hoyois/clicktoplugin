@@ -71,26 +71,26 @@ function handleContextMenu(event) {
         return;
     }
     if(event.userInfo.isVideo) {
-        event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",reload", RELOAD_IN_PLUGIN("Flash"));
-        if(safari.extension.settings["useDVcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",download", event.userInfo.mediaType == "audio" ? DOWNLOAD_AUDIO : DOWNLOAD_VIDEO);
-        if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",qtp", VIEW_IN_QUICKTIME_PLAYER);
+        event.contextMenu.appendContextMenuItem("reload", RELOAD_IN_PLUGIN("Flash"));
+        if(safari.extension.settings["useDVcontext"]) event.contextMenu.appendContextMenuItem("download", event.userInfo.mediaType == "audio" ? DOWNLOAD_AUDIO : DOWNLOAD_VIDEO);
+        if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem("qtp", VIEW_IN_QUICKTIME_PLAYER);
         if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", VIEW_ON_SITE(event.userInfo.siteInfo.name));
     } else {
         if(event.userInfo.hasH264) {
-            event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",plugin", LOAD_PLUGIN("Flash"));
-            event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",remove", REMOVE_PLUGIN("Flash"));
-            if(safari.extension.settings["useDVcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",download", event.userInfo.mediaType == "audio" ? DOWNLOAD_AUDIO : DOWNLOAD_VIDEO);
-            if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",qtp", VIEW_IN_QUICKTIME_PLAYER);
+            event.contextMenu.appendContextMenuItem("plugin", LOAD_PLUGIN("Flash"));
+            event.contextMenu.appendContextMenuItem("remove", REMOVE_PLUGIN("Flash"));
+            if(safari.extension.settings["useDVcontext"]) event.contextMenu.appendContextMenuItem("download", event.userInfo.mediaType == "audio" ? DOWNLOAD_AUDIO : DOWNLOAD_VIDEO);
+            if(safari.extension.settings["useQTcontext"]) event.contextMenu.appendContextMenuItem("qtp", VIEW_IN_QUICKTIME_PLAYER);
             if(event.userInfo.siteInfo && safari.extension.settings["useVScontext"]) event.contextMenu.appendContextMenuItem("gotosite", VIEW_ON_SITE(event.userInfo.siteInfo.name));
         } else {
-            event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",remove", REMOVE_PLUGIN("Flash"));
+            event.contextMenu.appendContextMenuItem("remove", REMOVE_PLUGIN("Flash"));
         }
         if(safari.extension.settings["useWLcontext"]) {
             event.contextMenu.appendContextMenuItem("srcwhitelist", ADD_TO_SRC_WHITELIST + "\u2026");
         }
         // BEGIN DEBUG
         if(safari.extension.settings["debug"]) {
-            event.contextMenu.appendContextMenuItem(event.userInfo.instance + "," + event.userInfo.elementID + ",show", SHOW_ELEMENT + " " + event.userInfo.instance + "." + event.userInfo.elementID);
+            event.contextMenu.appendContextMenuItem("show", SHOW_ELEMENT + " " + event.userInfo.instance + "." + event.userInfo.elementID);
         }
         //END DEBUG
     }
@@ -112,7 +112,7 @@ function doCommand(event) {
             safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("loadAll", "");
             break;
         default:
-            safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("loadContent", event.command);
+            safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("loadContent", {"instance": event.userInfo.instance, "elementID": event.userInfo.elementID, "command": event.command});
             break;
     }
 }
