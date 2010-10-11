@@ -11,6 +11,7 @@ GenericKiller.prototype.processElement = function(data, callback) {
     var playlistURL = decodeURIComponent(getFlashVariable(data.params, "playlistfile")); // JW player & TS player
     var sourceURL = decodeURIComponent(getFlashVariable(data.params, "file")); // JW player
     if(!sourceURL) sourceURL = decodeURIComponent(getFlashVariable(data.params, "load")); // TS player
+    if(!sourceURL) sourceURL = decodeURIComponent(getFlashVariable(data.params, "src")); // generic player
     
     // Playlist support
     if(safari.extension.settings["usePlaylists"]) {
