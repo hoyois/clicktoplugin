@@ -4,7 +4,7 @@ function GenericKiller() {
 
 GenericKiller.prototype.canKill = function(data) {
     // streams are not supported
-    return (!hasFlashVariable(data.params, "streamer") && (hasFlashVariable(data.params, "file") || hasFlashVariable(data.params, "load") || hasFlashVariable(data.params, "playlistfile")));
+    return (!hasFlashVariable(data.params, "streamer") && (hasFlashVariable(data.params, "file") || hasFlashVariable(data.params, "load") || hasFlashVariable(data.params, "playlistfile") || hasFlashVariable(data.params, "src")));
 };
 
 GenericKiller.prototype.processElement = function(data, callback) {
