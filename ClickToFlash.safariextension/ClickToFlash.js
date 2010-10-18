@@ -54,7 +54,7 @@ function ClickToFlash() {
     */
     
     document.oncontextmenu = function(event) {
-        safari.self.tab.setContextMenuEventUserInfo(event, {"location": window.location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length});
+        safari.self.tab.setContextMenuEventUserInfo(event, {"location": window.location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length, "invisible": this.getElementsByClassName("CTFinvisible").length});
     };
 }
 
@@ -95,6 +95,9 @@ ClickToFlash.prototype.respondToMessage = function(event) {
             break;
         case "loadAll":
             this.loadAll();
+            break;
+        case "loadInvisible":
+            this.loadInvisible();
             break;
         case "srcwhitelist":
             this.loadSrc(event.message);
@@ -142,7 +145,7 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
         return;
     }
     
-    // Check if it is Flash
+    // Check if it is Flash (lousy, CTP is better)
     switch(isFlash(element, event.url)) {
         case "probably":
             element.label = "Flash";
@@ -164,8 +167,10 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
         element.source = tmpAnchor.href;
     }
     
+    element.dim = {"width": element.offsetWidth, "height": element.offsetHeight};
+    
     // Check whitelists and invisible elements settings
-    if(safari.self.tab.canLoad(event, {"src": element.source, "location": window.location.href, "width": element.offsetWidth, "height": element.offsetHeight})) return;
+    if(safari.self.tab.canLoad(event, {"src": element.source, "location": window.location.href, "dim": element.dim})) return;
     
     // Load the user settings
     if(this.settings === null) {
@@ -173,8 +178,8 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
     }
     
     // Deal with sIFR Flash
-    if (element.className == "sIFR-flash" || element.hasAttribute("sifr")) {
-        if (this.settings["sifrReplacement"] == "autoload") return;
+    if (element.className === "sIFR-flash" || element.hasAttribute("sifr")) {
+        if (this.settings["sifrReplacement"] === "autoload") return;
     }
     
     // At this point we know we have to block 'element' from loading
@@ -232,6 +237,14 @@ ClickToFlash.prototype.loadSrc = function(string) {
     }
 };
 
+ClickToFlash.prototype.loadInvisible = function() {
+    for(var i = 0; i < this.numberOfBlockedElements; i++) {
+        if(this.placeholderElements[i] && this.placeholderElements[i].firstChild.className === "CTFplaceholderContainer CTFinvisible") {
+            this.loadPluginForElement(i);
+        }
+    }
+};
+
 ClickToFlash.prototype.prepMedia = function(mediaData) {
     if(mediaData.playlist.length == 0 || !mediaData.playlist[0].mediaURL) return;
     if(!this.blockedElements[mediaData.elementID]) return; // User has loaded Flash already
@@ -278,9 +291,7 @@ ClickToFlash.prototype.loadMediaForElement = function(elementID) {
     };
 
     // Initialize player
-    var w = parseInt(this.placeholderElements[elementID].style.width.replace("px",""));
-    var h = parseInt(this.placeholderElements[elementID].style.height.replace("px",""));
-    this.mediaPlayers[elementID].initialize(this.settings["H264behavior"], w, h, this.settings["volume"], contextInfo);
+    this.mediaPlayers[elementID].initialize(this.settings["H264behavior"], this.blockedElements[elementID].dim.width, this.blockedElements[elementID].dim.height, this.settings["volume"], contextInfo);
     // mediaElement.allowedToLoad = true; // not used
 
     // Replace placeholder and load first track
@@ -422,8 +433,8 @@ ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
     var placeholderElement = document.createElement("div");
     placeholderElement.title = element.source; // tooltip
     placeholderElement.className = "CTFplaceholder CTFnoimage";
-    placeholderElement.style.width = element.offsetWidth + "px !important";
-    placeholderElement.style.height = element.offsetHeight + "px !important";
+    placeholderElement.style.width = element.dim.width + "px !important";
+    placeholderElement.style.height = element.dim.height + "px !important";
     placeholderElement.style.opacity = this.settings["opacity"];
     
     // Copy CSS box & positioning properties that have an effect on page layout
@@ -439,7 +450,7 @@ ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
     placeholderElement.style.setProperty("z-index", style.getPropertyValue("z-index"), "important");
     
     // Replace the element by the placeholder
-    if(element.parentNode) {
+    if(element.parentNode && element.parentNode.className !== "CTFnodisplay") {
         element.parentNode.replaceChild(placeholderElement, element);
     } else return; // happens if element has fired beforeload twice
     
@@ -478,8 +489,9 @@ ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
         }
     };
     
-    // Build the placeholder
+    // Building the placeholder
     placeholderElement.innerHTML = "<div class=\"CTFplaceholderContainer\"><div class=\"CTFlogoVerticalPosition\"><div class=\"CTFlogoHorizontalPosition\"><div class=\"CTFlogoContainer CTFnodisplay\"><div class=\"CTFlogo\"></div><div class=\"CTFlogo CTFinset\"></div></div></div></div></div>";
+    if(element.dim.width > 0 && element.dim.height > 0 && element.dim.width <= this.settings.maxinvdim.width && element.dim.height <= this.settings.maxinvdim.height) placeholderElement.firstChild.className += " CTFinvisible";
     
     // Fill the main arrays
     this.blockedElements[elementID] = element;
@@ -500,8 +512,9 @@ ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
                 "elementID": elementID,
                 "src": element.source,
                 "location": window.location.href,
+                "title": document.title,
                 "baseURL": tmpAnchor.href,
-                "params": getParamsOf(element)
+                "params": getParams(element)
             };
             safari.self.tab.dispatchMessage("killFlash", elementData);
         }

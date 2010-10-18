@@ -63,6 +63,19 @@ Placeholder element
     overflow: hidden !important;
 }
 
+/* For pixel-perfect layout, we still need: */
+.CTFplaceholder[style*="width: 0px"], .CTFplaceholder[style*="height: 0px"] {
+    border-style: none !important;
+}
+
+.CTFplaceholder[style*="width: 1px"] {
+    border-left-style: none !important;
+}
+
+.CTFplaceholder[style*="height: 1px"] {
+    border-top-style: none !important;
+}
+
 .CTFplaceholder.CTFnoimage {
     background: -webkit-gradient(linear, left top, left bottom, from(rgba(245, 245, 245, 1)), to(rgba(210, 210, 210, 1))) !important;
 }
@@ -144,32 +157,26 @@ Placeholder element
 
 .CTFplaceholder .CTFlogoContainer.CTFmini .CTFlogo,
 .CTFplaceholder .CTFlogoContainer.CTFhidden .CTFlogo.CTFtmp {
-    border: 2px solid rgba(50, 50, 50, 0.2) !important;
+    /*border: 2px solid rgba(50, 50, 50, 0.2) !important;*/
+    border-width: 2px !important;
     border-radius: 4px !important;
-    color: rgba(50, 50, 50, 0.4) !important;
+    /*color: rgba(50, 50, 50, 0.4) !important;*/
     font-size: 10px !important;
     padding: 7px 2px 4px 2px !important;
+}
+
+.CTFplaceholder.CTFnoimage .CTFlogoContainer.CTFmini .CTFlogo {
+    border-color: rgba(50, 50, 50, 0.2) !important;
+    color: rgba(50, 50, 50, 0.4) !important;
 }
 
 .CTFplaceholder .CTFlogoContainer.CTFhidden .CTFlogo.CTFtmp {
     position: absolute !important;
 }
 
-.CTFplaceholder .CTFlogoContainer.CTFmini .CTFlogo.CTFinset {
-    color: rgba(255, 255, 255, 0.25) !important;
+.CTFplaceholder.CTFnoimage .CTFlogoContainer.CTFmini .CTFlogo.CTFinset {
     border-color: rgba(255, 255, 255, 0.25) !important;
-}
-
-.CTFplaceholder .CTFplaceholderDownloadLink {
-    position: absolute !important;
-    bottom: 0 !important;
-    width: 100% !important;
-    height: 16px !important;
-    margin: 0 !important;
-    padding: 8px 0 4px 0 !important;
-    text-align: center !important;
-    font-size: 12px !important;
-    line-height: normal !important;
+    color: rgba(255, 255, 255, 0.25) !important;
 }
 
 /***********
