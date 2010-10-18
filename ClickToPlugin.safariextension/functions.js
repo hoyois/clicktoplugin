@@ -8,10 +8,13 @@ function downloadURL(url) {
     downloadLink.dispatchEvent(event);
 }
 
-function getInfo(element, url) {
-    // gathers attributes of the element that might be needed later on
-    // Done by a single function so that we only loop once through the <param> children
+function getAttributes(element, url) {
+    // Gathers essential attributes of the element that are needed to decide blocking.
+    // Done by a single function so that we only loop once through the <param> children.
+    // NOTE: the source used by Safari to choose a plugin is always 'url'; the value info.src
+    // returned by this function is the source that is relevant for whitelisting
     var info = new Object();
+    info.type = element.type;
     var tmpAnchor = document.createElement("a");
     switch (element.tag) {
         case "embed":
@@ -29,12 +32,9 @@ function getInfo(element, url) {
             if(element.hasAttribute("target")) {
                 info.target = element.getAttribute("target");
             }
-            if(element.hasAttribute("previewimage")) {
-                tmpAnchor.href = element.getAttribute("previewimage");
-                info.image = tmpAnchor.href;
-            }
             break;
         case "object":
+            info.classid = element.getAttribute("classid");
             var paramElements = element.getElementsByTagName("param");
             for (var i = 0; i < paramElements.length; i++) {
                 if(!paramElements[i].hasAttribute("value")) continue;
@@ -47,6 +47,9 @@ function getInfo(element, url) {
                 try{
                     var paramName = paramElements[i].getAttribute("name").toLowerCase();
                     switch(paramName) {
+                        case "type": // to be fixed in WebKit?
+                            if(!info.type) info.type = paramElements[i].getAttribute("value");
+                            break;
                         case "source": // Silverlight true source
                             tmpAnchor.href = paramElements[i].getAttribute("value");
                             info.src = tmpAnchor.href;
@@ -65,13 +68,13 @@ function getInfo(element, url) {
                         case "target": // QuickTime redirection
                             info.target = paramElements[i].getAttribute("value");
                             break;
-                        case "previewimage": // DivX poster
-                            tmpAnchor.href = paramElements[i].getAttribute("value");
-                            info.image = tmpAnchor.href;
-                            break;
                     }
                 } catch(err) {}
             }
+            // The following is not needed anymore in the latest Webkit:
+            // enclosed embeds are FINALLY treated as fallback!
+            var embedChild = element.getElementsByTagName("embed")[0];
+            if(embedChild && embedChild.type) info.type = embedChild.type;
             break;
     }
     if(!info.src) {
@@ -84,43 +87,18 @@ function getInfo(element, url) {
     return info;
 }
 
-function getTypeOf(element) {
-    switch (element.tag) {
-        case "embed":
-            return element.type;
-            break;
-        case "object":
-            if(element.type) {
-                return element.type;
-            } else {
-                var paramElements = element.getElementsByTagName("param");
-                for (var i = 0; i < paramElements.length; i++) {
-                    try { // see NOTE 1
-                        if(paramElements[i].getAttribute("name").toLowerCase() == "type") {
-                            return paramElements[i].getAttribute("value");
-                        }
-                    } catch(err) {}
-                }
-                var embedChildren = element.getElementsByTagName("embed");
-                if(embedChildren.length == 0) return "";
-                return embedChildren[0].type;
-            }
-            break;
-    }
-}
-
-function getParamsOf(element) {
+function getParams(element) {
     switch(element.plugin) {
-        case "Flash":
+        case "Flash": // need flashvars
             switch (element.tag) {
                 case "embed":
-                    return (element.hasAttribute("flashvars") ? element.getAttribute("flashvars") : ""); // fixing Safari's buggy JS support
+                    return (element.hasAttribute("flashvars") ? element.getAttribute("flashvars") : ""); // fixing Safari's buggy JS
                     break
                 case "object":
                     var paramElements = element.getElementsByTagName("param");
                     for (var i = paramElements.length - 1; i >= 0; i--) {
                         try{ // see NOTE 1
-                            if(paramElements[i].getAttribute("name").toLowerCase() == "flashvars") {
+                            if(paramElements[i].getAttribute("name").toLowerCase() === "flashvars") {
                                 return paramElements[i].getAttribute("value");
                             }
                         } catch(err) {}
@@ -129,18 +107,35 @@ function getParamsOf(element) {
                     break;
             }
             break;
-        case "Silverlight":
+        case "Silverlight": // need initparams
             if(element.tag != "object") return "";
             var paramElements = element.getElementsByTagName("param");
             for (var i = 0; i < paramElements.length; i++) {
                 try { // see NOTE 1
-                    if(paramElements[i].getAttribute("name").toLowerCase() == "initparams") {
+                    if(paramElements[i].getAttribute("name").toLowerCase() === "initparams") {
                         return paramElements[i].getAttribute("value").replace(/\s+/g,"");
                     }
                 } catch(err) {}
             }
             return "";
             break;
+        case "DivX": // need previewimage
+            switch(element.tag) {
+                case "embed":
+                    return element.getAttribute("previewimage");
+                    break
+                case "object":
+                    var paramElements = element.getElementsByTagName("param");
+                    for (var i = 0; i < paramElements.length; i++) {
+                        try{ // see NOTE 1
+                            if(paramElements[i].getAttribute("name").toLowerCase() === "previewimage") {
+                                return paramElements[i].getAttribute("value");
+                            }
+                        } catch(err) {}
+                    }
+                    return "";
+                    break;
+            }
         default: return "";
     }
 }

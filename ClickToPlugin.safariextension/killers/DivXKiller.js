@@ -11,7 +11,7 @@ DivXKiller.prototype.canKill = function(data) {
 
 DivXKiller.prototype.processElement = function(data, callback) {
     var videoData = {
-        "playlist": [{"mediaType": "video", "posterURL": data.image, "mediaURL": data.src}],
+        "playlist": [{"mediaType": "video", "posterURL": data.params, "mediaURL": data.src}],
         "badgeLabel": "Video"
     };
     callback(videoData);
