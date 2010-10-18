@@ -188,13 +188,26 @@ function matchList(list, string) {
 Plugin detection methods
 ***********************/
 
-function getPluginForType(MIMEType) { // MIMEType is a string
+function getTypeForClassid(classid) {
+    switch(classid.toLowerCase()) {
+        case "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000": return "application/x-shockwave-flash";
+        case "clsid:22d6f312-b0f6-11d0-94ab-0080c74c7e95": return "application/x-mplayer2";
+        case "clsid:6bf52a52-394a-11d3-b153-00c04f79faa6": return "application/x-mplayer2";
+        case "clsid:02bf25d5-8c17-4b23-bc80-d3488abddc6b": return "video/quicktime";
+        case "clsid:cfcdaa03-8be4-11cf-b84b-0020afbbccfa": return "audio/x-pn-realaudio-plugin";
+        case "clsid:67dabfbf-d0ab-41fa-9c46-cc0f21721616": return "video/divx"; // not in WebKit
+        case "clsid:166b1bca-3f9c-11cf-8075-444553540000": return "application/x-director";
+        default: return false;
+    }
+}
+
+function getPluginForType(type) { // type is a string
     for(var i = 0; i < navigator.plugins.length; i++) {
         for(var j = 0; j < navigator.plugins[i].length; j++) {
-            if(navigator.plugins[i][j].type == MIMEType) return navigator.plugins[i];
+            if(navigator.plugins[i][j].type == type) return navigator.plugins[i];
         }
     }
-    return null;
+    return false;
 }
 
 function getPluginAndTypeForExt(ext) {
@@ -211,51 +224,29 @@ function getPluginAndTypeForExt(ext) {
 }
 
 function getPluginNameFromPlugin(plugin) {
-    if(plugin.name == "Shockwave Flash") return "Flash";
-    if(plugin.name == "Silverlight Plug-In") return "Silverlight";
+    if(plugin.name === "Shockwave Flash") return "Flash";
+    if(plugin.name === "Silverlight Plug-In") return "Silverlight";
     if(plugin.name.indexOf("Java") != -1) return "Java";
     if(plugin.name.indexOf("QuickTime") != -1) return "QuickTime";
     if(plugin.name.indexOf("Flip4Mac") != -1) return "WM";
-    if(plugin.name == "iPhotoPhotocast") return "iPhoto";
-    if(plugin.name == "Quartz Composer Plug-In") return "Quartz";
-    if(plugin.name == "VideoLAN VLC Plug-in") return "VLC";
-    if(plugin.name == "DivX Web Player") return "DivX";
-    if(plugin.name == ("RealPlayer Plugin.plugin")) return "Real";
+    if(plugin.name === "iPhotoPhotocast") return "iPhoto";
+    if(plugin.name === "Quartz Composer Plug-In") return "Quartz";
+    if(plugin.name === "VideoLAN VLC Plug-in") return "VLC";
+    if(plugin.name === "DivX Web Player") return "DivX";
+    if(plugin.name === "RealPlayer Plugin.plugin") return "Real";
     return plugin.name;
 }
 
 function getPluginNameFromType(type) { // only used if no installed plugin is found
-    if(/shockwave-flash/.test(type) || /futuresplash/.test(type)) return "Flash";
-    if(/silverlight/.test(type)) return "Silverlight";
+    if(type === "application/x-shockwave-flash") return "Flash";
+    if(type === "application/futuresplash") return "Flash";
+    if(type === "application/x-silverlight-2") return "Silverlight";
+    if(type === "application/x-silverlight") return "Silverlight";
     if(/x-java/.test(type)) return "Java";
     if(/x-ms/.test(type)) return "WM";
     if(/x-pn/.test(type)) return "Real";
     type = type.split(";")[0];
-    if(type == "video/divx") return "DivX";
+    if(type === "video/divx") return "DivX";
     return type.split("/")[1];
 }
 
-function getPluginNameFromClassid(classid) { // last resort
-    switch(classid.toLowerCase()) {
-        case "d27cdb6e-ae6d-11cf-96b8-444553540000": return "Flash";
-        case "22d6f312-b0f6-11d0-94ab-0080c74c7e95": return "WM";
-        case "6bf52a52-394a-11d3-b153-00c04f79faa6": return "WM";
-        case "02bf25d5-8c17-4b23-bc80-d3488abddc6b": return "QuickTime";
-        case "cfcdaa03-8be4-11cf-b84b-0020afbbccfa": return "Real";
-        case "67dabfbf-d0ab-41fa-9c46-cc0f21721616": return "DivX";
-        default: return "?";
-    }
-}
-
-/*
-LIST OF CLASSIDs
-QuickTime: 02BF25D5-8C17-4B23-BC80-D3488ABDDC6B
-WMP 6: 22d6f312-b0f6-11d0-94ab-0080c74c7e95
-WMP >6: 6BF52A52-394A-11D3-B153-00C04F79FAA6
-Flash: d27cdb6e-ae6d-11cf-96b8-444553540000
-Real Player: CFCDAA03-8BE4-11cf-B84B-0020AFBBCCFA
-?? calendar: 8E27C92B-1264-101C-8A2F-040224009C02
-?? graphics: 369303C2-D7AC-11D0-89D5-00A0C90833E6
-?? slider: F08DF954-8592-11D1-B16A-00C0F0283628
-DivX: 67DABFBF-D0AB-41fa-9C46-CC0F21721616
-*/

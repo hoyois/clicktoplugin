@@ -9,10 +9,11 @@ function ClickToPlugin() {
     this.mediaPlayers = new Array(); // array containing the HTML5 media players
     
     /*
-    Each item in blockedElements will acquire 3 additional properties:
-    -> tag: 'embed', 'object', or 'applet'
+    Each item in blockedElements will acquire 4 additional properties:
+    -> tag: 'embed' or 'object'
     -> plugin: the name of the plugin that would handle the element
-    -> info: an object gathering relevent attributes of the element
+    -> attr: an object gathering relevent attributes of the element
+    -> dim: the offset width and height of the element
     */
     
     this.settings = null;
@@ -39,7 +40,7 @@ function ClickToPlugin() {
     document.addEventListener("beforeload", this.handleBeforeLoadEventTrampoline, true);
     
     document.oncontextmenu = function(event) {
-        safari.self.tab.setContextMenuEventUserInfo(event, {"location": window.location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length});
+        safari.self.tab.setContextMenuEventUserInfo(event, {"location": window.location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length, "invisible": this.getElementsByClassName("CTFinvisible").length});
     };
 }
 
@@ -80,6 +81,9 @@ ClickToPlugin.prototype.respondToMessage = function(event) {
             break;
         case "loadAll":
             this.loadAll();
+            break;
+        case "loadInvisible":
+            this.loadInvisible();
             break;
         case "srcwhitelist":
             this.loadSrc(event.message);
@@ -127,9 +131,10 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
         return;
     }
     
-    element.info = getInfo(element, event.url);
+    element.attr = getAttributes(element, event.url);
+    element.dim = {"width": element.offsetWidth, "height": element.offsetHeight};
     
-    element.plugin = safari.self.tab.canLoad(event, {"src": element.info.src, "type": getTypeOf(element), "classid": element.getAttribute("classid"), "location": window.location.href, "width": element.offsetWidth, "height": element.offsetHeight, "launchInQTP": (element.info.autohref && element.info.target == "quicktimeplayer" ? element.info.href : null)});
+    element.plugin = safari.self.tab.canLoad(event, {"attr": element.attr, "location": window.location.href, "dim": element.dim, "className": element.className});
     if(true === element.plugin) return; // whitelisted
     
     // Load the user settings
@@ -138,8 +143,8 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
     }
     
     // Deal with sIFR Flash
-    if (element.className == "sIFR-flash" || element.hasAttribute("sifr")) {
-        if (this.settings["sifrReplacement"] == "autoload") return;
+    if (element.className === "sIFR-flash" || element.hasAttribute("sifr")) {
+        if (this.settings["sifrReplacement"] === "autoload") return;
     }
     
     // At this point we know we have to block 'element' from loading
@@ -156,7 +161,7 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
         do {
             positionX += e.offsetLeft; positionY += e.offsetTop;
         } while(e = e.offsetParent);
-        if(!confirm("ClickToPlugin is about to block element " + this.instance + "." + elementID + ":\n" + "\nType: " + element.plugin + "\nLocation: " + window.location.href + "\nSource: " + element.info.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + element.offsetWidth + "x" + element.offsetHeight)) return;
+        if(!confirm("ClickToPlugin is about to block element " + this.instance + "." + elementID + ":\n" + "\nType: " + element.plugin + "\nLocation: " + window.location.href + "\nSource: " + element.attr.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + element.dim.width + "x" + element.dim.height)) return;
     }
     // END DEBUG
     
@@ -191,7 +196,15 @@ ClickToPlugin.prototype.loadAll = function() {
 
 ClickToPlugin.prototype.loadSrc = function(string) {
     for(var i = 0; i < this.numberOfBlockedElements; i++) {
-        if(this.placeholderElements[i] && this.blockedElements[i].info.src.indexOf(string) != -1) {
+        if(this.placeholderElements[i] && this.blockedElements[i].attr.src.indexOf(string) != -1) {
+            this.loadPluginForElement(i);
+        }
+    }
+};
+
+ClickToPlugin.prototype.loadInvisible = function() {
+    for(var i = 0; i < this.numberOfBlockedElements; i++) {
+        if(this.placeholderElements[i] && this.placeholderElements[i].firstChild.className === "CTFplaceholderContainer CTFinvisible") {
             this.loadPluginForElement(i);
         }
     }
@@ -244,9 +257,7 @@ ClickToPlugin.prototype.loadMediaForElement = function(elementID) {
     };
 
     // Initialize player
-    var w = parseInt(this.placeholderElements[elementID].style.width.replace("px",""));
-    var h = parseInt(this.placeholderElements[elementID].style.height.replace("px",""));
-    this.mediaPlayers[elementID].initialize(this.settings["H264behavior"], w, h, this.settings["volume"], contextInfo);
+    this.mediaPlayers[elementID].initialize(this.settings["H264behavior"], this.blockedElements[elementID].dim.width, this.blockedElements[elementID].dim.height, this.settings["volume"], contextInfo);
     // mediaElement.allowedToLoad = true; // not used
 
     // Replace placeholder and load first track
@@ -317,7 +328,7 @@ ClickToPlugin.prototype.removeElement = function(elementID) {
 };
 
 ClickToPlugin.prototype.showElement = function(elementID) {
-    alert("Location: " + window.location.href + "\nSource: " + this.blockedElements[elementID].info.src + "\n\n" + document.HTMLToString(this.blockedElements[elementID]));
+    alert("Location: " + window.location.href + "\nSource: " + this.blockedElements[elementID].attr.src + "\n\n" + document.HTMLToString(this.blockedElements[elementID]));
 };
 
 // I really don't like the next two methods, but can't come up with something better
@@ -386,10 +397,10 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
     
     // Create the placeholder element
     var placeholderElement = document.createElement("div");
-    placeholderElement.title = element.info.src; // tooltip
+    placeholderElement.title = element.attr.src; // tooltip
     placeholderElement.className = "CTFplaceholder CTFnoimage";
-    placeholderElement.style.width = element.offsetWidth + "px !important";
-    placeholderElement.style.height = element.offsetHeight + "px !important";
+    placeholderElement.style.width = element.dim.width + "px !important";
+    placeholderElement.style.height = element.dim.height + "px !important";
     placeholderElement.style.opacity = this.settings["opacity"];
     
     // Copy CSS box & positioning properties that have an effect on page layout
@@ -405,7 +416,7 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
     placeholderElement.style.setProperty("z-index", style.getPropertyValue("z-index"), "important");
     
     // Replace the element by the placeholder
-    if(element.parentNode) {
+    if(element.parentNode && element.parentNode.className !== "CTFnodisplay") {
         element.parentNode.replaceChild(placeholderElement, element);
     } else return; // happens if element has fired beforeload twice
     
@@ -432,7 +443,7 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
         var contextInfo = {
             "instance": _this.instance,
             "elementID": elementID,
-            "src": element.info.src,
+            "src": element.attr.src,
             "plugin": element.plugin
         };
         if (_this.mediaPlayers[elementID] && _this.mediaPlayers[elementID].startTrack != null) {
@@ -445,8 +456,9 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
         }
     };
     
-    // Build the placeholder
+    // Building the placeholder
     placeholderElement.innerHTML = "<div class=\"CTFplaceholderContainer\"><div class=\"CTFlogoVerticalPosition\"><div class=\"CTFlogoHorizontalPosition\"><div class=\"CTFlogoContainer CTFnodisplay\"><div class=\"CTFlogo\"></div><div class=\"CTFlogo CTFinset\"></div></div></div></div></div>";
+    if(element.dim.width > 0 && element.dim.height > 0 && element.dim.width <= this.settings.maxinvdim.width && element.dim.height <= this.settings.maxinvdim.height) placeholderElement.firstChild.className += " CTFinvisible";
     
     // Fill the main arrays
     this.blockedElements[elementID] = element;
@@ -466,12 +478,12 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
                 "instance": this.instance,
                 "elementID": elementID,
                 "plugin": element.plugin,
-                "src": element.info.src,
+                "src": element.attr.src,
                 "location": window.location.href,
+                "title": document.title,
                 "baseURL": tmpAnchor.href,
-                "href": element.info.href,
-                "image": element.info.image,
-                "params": getParamsOf(element)
+                "href": element.attr.href,
+                "params": getParams(element)
             };
             safari.self.tab.dispatchMessage("killPlugin", elementData);
         }

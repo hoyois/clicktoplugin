@@ -23,9 +23,9 @@ YouTubeKiller.prototype.processElement = function(data, callback) {
                 }
             }
             if(playlistID) {
-                this.buildVideoIDList(data.params, data.location, playlistID, 0, new Array(), callback);
-            } else this.processElementFromFlashVars(data.params, data.location, callback);
-        } else this.processElementFromFlashVars(data.params, data.location, callback);
+                this.buildVideoIDList(data.params, data.title, data.location, playlistID, 0, new Array(), callback);
+            } else this.processElementFromFlashVars(data.params, data.title, data.location, callback);
+        } else this.processElementFromFlashVars(data.params, data.title, data.location, callback);
         return;
     }
     // Embedded YT video
@@ -34,12 +34,12 @@ YouTubeKiller.prototype.processElement = function(data, callback) {
         if(matches[1] == "v") { // video
             this.processElementFromVideoID(matches[2], callback);
         } else { // playlist
-            this.buildVideoIDList(false, data.location, matches[2], 0, new Array(), callback);
+            this.buildVideoIDList(false, data.title, data.location, matches[2], 0, new Array(), callback);
         }
     }
 };
 
-YouTubeKiller.prototype.buildVideoIDList = function(flashvars, location, playlistID, i, videoIDList, callback) {
+YouTubeKiller.prototype.buildVideoIDList = function(flashvars, documentTitle, location, playlistID, i, videoIDList, callback) {
     xhr = new XMLHttpRequest();
     xhr.open('GET', "http://gdata.youtube.com/feeds/api/playlists/" + playlistID + "?start-index=" + (50*i + 1) + "&max-results=50", true);
     var _this = this;
@@ -53,7 +53,7 @@ YouTubeKiller.prototype.buildVideoIDList = function(flashvars, location, playlis
         var links = xhr.responseXML.getElementsByTagName("link");
         for(var j = 0; j < links.length; j++) {
             if(links[j].getAttribute("rel") == "next") {
-                _this.buildVideoIDList(flashvars, location, playlistID, ++i, videoIDList, callback);
+                _this.buildVideoIDList(flashvars, documentTitle, location, playlistID, ++i, videoIDList, callback);
                 return;
             }
         }
@@ -80,7 +80,7 @@ YouTubeKiller.prototype.buildVideoIDList = function(flashvars, location, playlis
             callback(videoData);
         };
         // load the first video at once
-        if(flashvars) _this.processElementFromFlashVars(flashvars, location, callbackForPlaylist);
+        if(flashvars) _this.processElementFromFlashVars(flashvars, documentTitle, location, callbackForPlaylist);
         else _this.processElementFromVideoID(videoIDList[0], callbackForPlaylist);
         videoIDList.shift();
         // load the rest of the playlist 3 by 3
@@ -150,7 +150,7 @@ YouTubeKiller.prototype.getMediaDataFromURLMap = function(videoID, videoHash, ur
     return {"posterURL": posterURL, "videoURL": videoURL, "badgeLabel": badgeLabel};
 };
 
-YouTubeKiller.prototype.processElementFromFlashVars = function(flashvars, location, callback) {
+YouTubeKiller.prototype.processElementFromFlashVars = function(flashvars, documentTitle, location, callback) {
     var videoID = getFlashVariable(flashvars, "video_id");
     // see http://apiblog.youtube.com/2010/03/upcoming-change-to-youtube-video-page.html:
     if(!videoID) { // new YT AJAX player (not yet used?)
@@ -165,7 +165,9 @@ YouTubeKiller.prototype.processElementFromFlashVars = function(flashvars, locati
         this.processElementFromVideoID(videoID, callback);
         return;
     }
-    var title = decodeURIComponent(getFlashVariable(flashvars, "rec_title")).substring(4).replace(/\+/g, " ");
+    var title = decodeURIComponent(getFlashVariable(flashvars, "rec_title"));
+    if(title) title = title.substring(4).replace(/\+/g, " ");
+    else if(/^YouTube\s-\s/.test(documentTitle)) title = documentTitle.substring(10);
     var urlMap = decodeURIComponent(getFlashVariable(flashvars, "fmt_url_map"));
     if(!urlMap) return;
     var x = this.getMediaDataFromURLMap(videoID, videoHash, urlMap);
@@ -180,14 +182,15 @@ YouTubeKiller.prototype.processElementFromVideoID = function(videoID, callback) 
     if(!videoID) return; // needed!?
     var urlMapMatch = /\"fmt_url_map\":\s\"([^"]*)\"/; // works for both Flash and HTML5 Beta player pages
     var hashMatch = /\"t\":\s\"([^"]*)\"/;
-    var titleMatch = /\"rec_title\":\s\"Re:\s((?:\\\"|[^"])*)\"/;
+    //var titleMatch = /\"rec_title\":\s\"Re:\s((?:\\\"|[^"])*)\"/; // not always available
+    var titleMatch = /document\.title\s=\s'YouTube\s-\s((?:\\'|[^'])*)'/;
     var _this = this;
     var xhr = new XMLHttpRequest ();
     xhr.open("GET", "http://www.youtube.com/watch?v=" + videoID, true);
     xhr.onload = function() {
         var matches, title, urlMap, videoHash;
         matches = xhr.responseText.match(titleMatch);
-        if(matches) title = matches[1].replace(/\\["/]/g, function(s){return s.charAt(1);});
+        if(matches) title = matches[1].replace(/\\["'\/\\]/g, function(s){return s.charAt(1);});
         matches = xhr.responseText.match(urlMapMatch);
         if(matches) urlMap = matches[1].replace(/\\\//g,"/");
         matches = xhr.responseText.match(hashMatch);
