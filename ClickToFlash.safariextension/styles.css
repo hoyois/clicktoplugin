@@ -157,10 +157,8 @@ Placeholder element
 
 .CTFplaceholder .CTFlogoContainer.CTFmini .CTFlogo,
 .CTFplaceholder .CTFlogoContainer.CTFhidden .CTFlogo.CTFtmp {
-    /*border: 2px solid rgba(50, 50, 50, 0.2) !important;*/
     border-width: 2px !important;
     border-radius: 4px !important;
-    /*color: rgba(50, 50, 50, 0.4) !important;*/
     font-size: 10px !important;
     padding: 7px 2px 4px 2px !important;
 }
