@@ -8,6 +8,8 @@ const PLUGIN_GENERIC = "Plugin";
 // Contextual menu items
 const LOAD_ALL_PLUGINS = "Load All Plugins";
 const LOAD_ALL_FLASH = "Load All Flash";
+const LOAD_INVISIBLE_PLUGINS = "Load Invisible Plugins";
+const LOAD_INVISIBLE_FLASH = "Load Invisible Flash";
 const ADD_TO_LOC_WHITELIST = "Add Location to Whitelist";
 const ADD_TO_SRC_WHITELIST = "Add Source to Whitelist";
 const DOWNLOAD_VIDEO = "Download Video";
