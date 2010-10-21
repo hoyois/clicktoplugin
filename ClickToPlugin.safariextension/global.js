@@ -96,6 +96,7 @@ function blockOrAllow(data) { // returns true if element can be loaded, the name
         if(isNativeType(data.attr.type)) return true;
     } else {
         // This is a vulnerability: e.g. a .png file can be served as Flash and won't be blocked...
+        // This only works with native extensions, though. See below
         if(isNativeExt(ext)) return true;
     }
     
@@ -120,6 +121,9 @@ function blockOrAllow(data) { // returns true if element can be loaded, the name
     if(!type) {
         if(data.attr.classid) type = getTypeForClassid(data.attr.classid);
         if(!type) {
+            // For extensions in Info.plist (except css, pdf, xml, xbl), WebKit checks Content-type header at this point
+            // and only does the following if it matches no plugin.
+            // Thus, these extensions can be used to circumvent blocking...
             var x = getPluginAndTypeForExt(ext);
             if(x) {
                 type = x.type;
@@ -127,8 +131,7 @@ function blockOrAllow(data) { // returns true if element can be loaded, the name
             }
         } else plugin = getPluginForType(type);
     } else plugin = getPluginForType(type);
-    // If type is not set at this point, WebKit uses the HTTP header and/or (?) determines the type from the resource itself
-    // We'll just block everything.
+    // If type is not set at this point, WebKit uses the HTTP header. We'll just block everything.
     // We could check the HTTP header, but only asynchronously, which means we should later clone this element
     // upon restore otherwise WebKit would use fallback content (bug 44827)
     

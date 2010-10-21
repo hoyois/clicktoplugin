@@ -161,21 +161,17 @@ YouTubeKiller.prototype.processElementFromFlashVars = function(flashvars, docume
         return;
     }
     var videoHash = getFlashVariable(flashvars, "t");
-    if(!videoHash) {
+    if(!videoHash) { // channel page
         this.processElementFromVideoID(videoID, callback);
         return;
     }
+    var urlMap = decodeURIComponent(getFlashVariable(flashvars, "fmt_url_map"));
+    if(!urlMap) return;
     var title = decodeURIComponent(getFlashVariable(flashvars, "rec_title"));
     if(title) title = title.substring(4).replace(/\+/g, " ");
     else if(/^YouTube\s-\s/.test(documentTitle)) title = documentTitle.substring(10);
-    var urlMap = decodeURIComponent(getFlashVariable(flashvars, "fmt_url_map"));
-    if(!urlMap) return;
-    var x = this.getMediaDataFromURLMap(videoID, videoHash, urlMap);
-    var videoData = {
-        "playlist": [{"title": title, "mediaType": "video", "posterURL": x.posterURL, "mediaURL": x.videoURL + "&title=" + encodeURIComponent(title)}],
-        "badgeLabel": x.badgeLabel
-    };
-    callback(videoData);
+    
+    this.finalizeProcessing(videoID, videoHash, urlMap, title, false, callback);
 };
 
 YouTubeKiller.prototype.processElementFromVideoID = function(videoID, callback) {
@@ -195,17 +191,25 @@ YouTubeKiller.prototype.processElementFromVideoID = function(videoID, callback) 
         if(matches) urlMap = matches[1].replace(/\\\//g,"/");
         matches = xhr.responseText.match(hashMatch);
         if(matches) videoHash = encodeURIComponent(matches[1]);
+        
         if(urlMap && videoHash) {
-            var x = _this.getMediaDataFromURLMap(videoID, videoHash, urlMap);
-            var videoData = {
-                "playlist": [{"title": title, "siteInfo": {"name": "YouTube", "url": "http://www.youtube.com/watch?v=" + videoID}, "mediaType": "video", "posterURL": x.posterURL, "mediaURL": x.videoURL + "&title=" + encodeURIComponent(title)}],
-                "badgeLabel": x.badgeLabel
-            };
-            callback(videoData);
+            _this.finalizeProcessing(videoID, videoHash, urlMap, title, true, callback);
         } else { // happens if YT just removed content and didn't update its playlists yet
             callback({"playlist": []});
         }
     };
     xhr.send(null);
+};
+
+YouTubeKiller.prototype.finalizeProcessing = function(videoID, videoHash, urlMap, title, isEmbed, callback) {
+    var x = this.getMediaDataFromURLMap(videoID, videoHash, urlMap);
+    var downloadTitle = escape(title); // using escape here because YT needs latin1, and it cannot handle other Unicode chars anyway
+    if(/%u/.test(downloadTitle)) downloadTitle = ""; // revert to 'videoplayback' if the title will be garbled
+    var videoData = {
+        "playlist": [{"title": title, "mediaType": "video", "posterURL": x.posterURL, "mediaURL": x.videoURL + "&title=" + downloadTitle}],
+        "badgeLabel": x.badgeLabel
+    };
+    if(isEmbed) videoData.playlist[0].siteInfo = {"name": "YouTube", "url": "http://www.youtube.com/watch?v=" + videoID};
+    callback(videoData);
 };
 
