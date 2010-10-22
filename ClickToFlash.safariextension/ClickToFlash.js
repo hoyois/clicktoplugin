@@ -145,6 +145,11 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
         return;
     }
     
+    if(element.source) { // fired beforeload twice
+        event.preventDefault();
+        return;
+    }
+    
     // Check if it is Flash (lousy, CTP is better)
     switch(isFlash(element, event.url)) {
         case "probably":
@@ -450,9 +455,7 @@ ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
     placeholderElement.style.setProperty("z-index", style.getPropertyValue("z-index"), "important");
     
     // Replace the element by the placeholder
-    if(element.parentNode && element.parentNode.className !== "CTFnodisplay") {
-        element.parentNode.replaceChild(placeholderElement, element);
-    } else return; // happens if element has fired beforeload twice
+    element.parentNode.replaceChild(placeholderElement, element);
     
     // Place the blocked element in the stack
     if(this.stack ===  null) {

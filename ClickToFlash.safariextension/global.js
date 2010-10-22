@@ -93,8 +93,8 @@ function blockOrAllow(data) { // check the whitelists and returns true if elemen
         if(locblacklist && !matchList(locblacklist, data.location)) return true;
     }
     if(safari.extension.settings["usesrcWhitelist"]) {
-        if(srcwhitelist && matchList(srcwhitelist, data.attr.src)) return true;
-        if(srcblacklist && !matchList(srcblacklist, data.attr.src)) return true;
+        if(srcwhitelist && matchList(srcwhitelist, data.src)) return true;
+        if(srcblacklist && !matchList(srcblacklist, data.src)) return true;
     }
     
     return false;
