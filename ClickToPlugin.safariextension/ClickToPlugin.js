@@ -131,6 +131,10 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
         return;
     }
     
+    if(element.attr) { // fired beforeload twice
+        event.preventDefault();
+        return;
+    }
     element.attr = getAttributes(element, event.url);
     element.dim = {"width": element.offsetWidth, "height": element.offsetHeight};
     
@@ -416,9 +420,7 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
     placeholderElement.style.setProperty("z-index", style.getPropertyValue("z-index"), "important");
     
     // Replace the element by the placeholder
-    if(element.parentNode && element.parentNode.className !== "CTFnodisplay") {
-        element.parentNode.replaceChild(placeholderElement, element);
-    } else return; // happens if element has fired beforeload twice
+    element.parentNode.replaceChild(placeholderElement, element);
     
     // Place the blocked element in the stack
     if(this.stack ===  null) {
