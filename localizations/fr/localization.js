@@ -3,11 +3,13 @@
 
 // FRANÇAIS
 
-const PLUGIN_GENERIC = "Plugin";
+const PLUGIN_GENERIC = "le plugin";
 
 // Contextual menu items
 const LOAD_ALL_PLUGINS = "Débloquer tous les plugins";
-const LOAD_ALL_FLASH = "Débloquer Flash sur cette page";
+const LOAD_ALL_FLASH = "Débloquer tout le Flash";
+const LOAD_INVISIBLE_PLUGINS = "Débloquer les plugins invisibles";
+const LOAD_INVISIBLE_FLASH = "Débloquer le Flash invisible";
 const ADD_TO_LOC_WHITELIST = "Ajouter à la liste blanche";
 const ADD_TO_SRC_WHITELIST = "Ajouter à la liste blanche";
 const DOWNLOAD_VIDEO = "Télécharger la vidéo";
