@@ -4,7 +4,7 @@
 <array>
 	<dict>
 		<key>Title</key>
-		<string>Предпочтения по MIME</string>
+		<string>MIME 設定</string>
 		<key>Type</key>
 		<string>Group</string>
 	</dict>
@@ -14,12 +14,12 @@
 		<key>Key</key>
 		<string>block</string>
 		<key>Title</key>
-		<string>Block</string>
+		<string>阻擋</string>
 		<key>Titles</key>
 		<array>
-			<string>все виды MIME</string>
-			<string>не входящие в Зеленый Список</string>
-			<string>входящие в Красный Список</string>
+			<string>所有 MIME 類型</string>
+			<string>所有 MIME 不符合白名單的類型</string>
+			<string>符合黑名單的 MIME 類型</string>
 		</array>
 		<key>Type</key>
 		<string>RadioButtons</string>
@@ -36,7 +36,7 @@
 		<key>Key</key>
 		<string>greenlist</string>
 		<key>Title</key>
-		<string>Зеленый Список</string>
+		<string>白名單</string>
 		<key>Type</key>
 		<string>TextField</string>
 	</dict>
@@ -46,7 +46,7 @@
 		<key>Key</key>
 		<string>redlist</string>
 		<key>Title</key>
-		<string>Красный Список</string>
+		<string>黑名單</string>
 		<key>Type</key>
 		<string>TextField</string>
 	</dict>
@@ -56,13 +56,13 @@
 		<key>Key</key>
 		<string>allowQT</string>
 		<key>Title</key>
-		<string>Позволить Дополнение QuickTime                      </string>
+		<string>允許 QuickTime 外掛模組       </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
 	<dict>
 		<key>Title</key>
-		<string>Предпочтения касательно Видео</string>
+		<string>影片設定</string>
 		<key>Type</key>
 		<string>Group</string>
 	</dict>
@@ -72,7 +72,7 @@
 		<key>Key</key>
 		<string>useH264</string>
 		<key>Title</key>
-		<string>Показать альтернативу проигрывателям             </string>
+		<string>對下列類型尋找替代影片          </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -82,7 +82,7 @@
 		<key>Key</key>
 		<string>replaceFlash</string>
 		<key>Title</key>
-		<string>Flash                                             </string>
+		<string>Flash                            </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -92,7 +92,7 @@
 		<key>Key</key>
 		<string>replaceSL</string>
 		<key>Title</key>
-		<string>Silverlight                                      </string>
+		<string>Silverlight                     </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -102,7 +102,7 @@
 		<key>Key</key>
 		<string>replaceQT</string>
 		<key>Title</key>
-		<string>QuickTime                                    </string>
+		<string>QuickTime                   </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -112,7 +112,7 @@
 		<key>Key</key>
 		<string>replaceWM</string>
 		<key>Title</key>
-		<string>Windows Media                             </string>
+		<string>Windows Media            </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -122,7 +122,7 @@
 		<key>Key</key>
 		<string>replaceDivX</string>
 		<key>Title</key>
-		<string>DivX                                              </string>
+		<string>DivX                             </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -132,7 +132,7 @@
 		<key>Key</key>
 		<string>usePlaylists</string>
 		<key>Title</key>
-		<string>Воспользоваться playlist сайта                             </string>
+		<string>使用播放列表                           </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -142,7 +142,7 @@
 		<key>Key</key>
 		<string>showPoster</string>
 		<key>Title</key>
-		<string>Показать картинку на заплашке                          </string>
+		<string>在暫存區中顯示預覽影像           </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -152,7 +152,7 @@
 		<key>Key</key>
 		<string>H264autoload</string>
 		<key>Title</key>
-		<string>Показать альтернативный проигрыватель сразу</string>
+		<string>自動載入影片播放器                 </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -162,7 +162,7 @@
 		<key>Key</key>
 		<string>H264whitelist</string>
 		<key>Title</key>
-		<string>на сайтах</string>
+		<string>在這些網站</string>
 		<key>Type</key>
 		<string>TextField</string>
 	</dict>
@@ -172,12 +172,12 @@
 		<key>Key</key>
 		<string>H264behavior</string>
 		<key>Title</key>
-		<string>При загрузке, сразу</string>
+		<string>初始動作</string>
 		<key>Titles</key>
 		<array>
-			<string>Видео не загружать</string>
-			<string>Начинать загружать</string>
-			<string>Загрузить, и проиграть</string>
+			<string>不緩衝</string>
+			<string>開始緩衝</string>
+			<string>開始緩衝並且自動播放</string>
 		</array>
 		<key>Type</key>
 		<string>PopUpButton</string>
@@ -194,12 +194,12 @@
 		<key>Key</key>
 		<string>QTbehavior</string>
 		<key>Title</key>
-		<string>Не-свои форматы</string>
+		<string>非原生解碼器</string>
 		<key>Titles</key>
 		<array>
-			<string>Не использовать</string>
-			<string>За неимением выбора</string>
-			<string>Свободно пользоваться</string>
+			<string>不使用</string>
+			<string>作為最後的選擇</string>
+			<string>自由使用</string>
 		</array>
 		<key>Type</key>
 		<string>PopUpButton</string>
@@ -216,7 +216,7 @@
 		<key>Key</key>
 		<string>maxresolution</string>
 		<key>Title</key>
-		<string>Макс. разрешение</string>
+		<string>最高解析度</string>
 		<key>Titles</key>
 		<array>
 			<string>480p</string>
@@ -244,13 +244,13 @@
 		<key>StepValue</key>
 		<real>0.01</real>
 		<key>Title</key>
-		<string>Уровень звука</string>
+		<string>音量</string>
 		<key>Type</key>
 		<string>Slider</string>
 	</dict>
 	<dict>
 		<key>Title</key>
-		<string>Белые Списки</string>
+		<string>白名單</string>
 		<key>Type</key>
 		<string>Group</string>
 	</dict>
@@ -260,7 +260,7 @@
 		<key>Key</key>
 		<string>uselocWhitelist</string>
 		<key>Title</key>
-		<string>Встроенные Дополнения на страницах с адресом вида</string>
+		<string>允許嵌入式內容，如果它的網址</string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -270,7 +270,7 @@
 		<key>Key</key>
 		<string>locwhitelist</string>
 		<key>Title</key>
-		<string>показать</string>
+		<string>符合</string>
 		<key>Type</key>
 		<string>TextField</string>
 	</dict>
@@ -280,7 +280,7 @@
 		<key>Key</key>
 		<string>locblacklist</string>
 		<key>Title</key>
-		<string>запретить</string>
+		<string>不符合</string>
 		<key>Type</key>
 		<string>TextField</string>
 	</dict>
@@ -290,7 +290,7 @@
 		<key>Key</key>
 		<string>usesrcWhitelist</string>
 		<key>Title</key>
-		<string>Дополнения с источников по адресам вида                   </string>
+		<string>允許嵌入式內容，如果它的來源</string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -300,7 +300,7 @@
 		<key>Key</key>
 		<string>srcwhitelist</string>
 		<key>Title</key>
-		<string>показать</string>
+		<string>符合</string>
 		<key>Type</key>
 		<string>TextField</string>
 	</dict>
@@ -310,7 +310,7 @@
 		<key>Key</key>
 		<string>srcblacklist</string>
 		<key>Title</key>
-		<string>запретить</string>
+		<string>不符合</string>
 		<key>Type</key>
 		<string>TextField</string>
 	</dict>
@@ -320,7 +320,7 @@
 		<key>Key</key>
 		<string>loadInvisible</string>
 		<key>Title</key>
-		<string>Подгружать вставки размером                                         </string>
+		<string>允許載入元素，如果                 </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -330,13 +330,13 @@
 		<key>Key</key>
 		<string>maxinvdim</string>
 		<key>Title</key>
-		<string>не более</string>
+		<string>尺寸不大於</string>
 		<key>Type</key>
 		<string>TextField</string>
 	</dict>
 	<dict>
 		<key>Title</key>
-		<string>Пункты контекстного Меню</string>
+		<string>特色選單項目</string>
 		<key>Type</key>
 		<string>Group</string>
 	</dict>
@@ -346,7 +346,7 @@
 		<key>Key</key>
 		<string>useWLcontext</string>
 		<key>Title</key>
-		<string>Поместить адрес в Белый Список        </string>
+		<string>加入白名單                              </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -356,7 +356,7 @@
 		<key>Key</key>
 		<string>useLAcontext</string>
 		<key>Title</key>
-		<string>Подгрузить все Дополнения                </string>
+		<string>載入所有的外掛模組                 </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -365,6 +365,10 @@
 		<false/>
 		<key>Key</key>
 		<string>useLIcontext</string>
+		<key>Title</key>
+		<string>載入不可見的外掛模組              </string>
+		<key>Type</key>
+		<string>CheckBox</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
@@ -372,7 +376,7 @@
 		<key>Key</key>
 		<string>useDVcontext</string>
 		<key>Title</key>
-		<string>Скачать Видео                                       </string>
+		<string>下載影片                                 </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -382,7 +386,7 @@
 		<key>Key</key>
 		<string>useVScontext</string>
 		<key>Title</key>
-		<string>Показать на сайте оригинала              </string>
+		<string>於網站上檢視                           </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -392,7 +396,7 @@
 		<key>Key</key>
 		<string>useQTcontext</string>
 		<key>Title</key>
-		<string>Смотреть в проигрывателе QuickTime</string>
+		<string>於 QuickTime Player 中檢視    </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -406,12 +410,12 @@
 		<key>Key</key>
 		<string>sifrReplacement</string>
 		<key>Title</key>
-		<string>Заголовки sIFR</string>
+		<string>sIFR 文字</string>
 		<key>Titles</key>
 		<array>
-			<string>Только текст</string>
-			<string>Обходиться как с Flash</string>
-			<string>Автоматически показать</string>
+			<string>只顯示文字</string>
+			<string>當作一般 Flash</string>
+			<string>自動載入</string>
 		</array>
 		<key>Type</key>
 		<string>PopUpButton</string>
@@ -434,7 +438,7 @@
 		<key>StepValue</key>
 		<real>0.01</real>
 		<key>Title</key>
-		<string>Видимость</string>
+		<string>透明度</string>
 		<key>Type</key>
 		<string>Slider</string>
 	</dict>
@@ -444,9 +448,15 @@
 		<key>Key</key>
 		<string>debug</string>
 		<key>Title</key>
-		<string>Подтверждать действия вручную        </string>
+		<string>手動阻擋內容                           </string>
 		<key>Type</key>
 		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>mustUpdateWhitelists</string>
 	</dict>
 </array>
 </plist>

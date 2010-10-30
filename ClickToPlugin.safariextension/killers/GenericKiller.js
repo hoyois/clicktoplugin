@@ -5,7 +5,7 @@ function GenericKiller() {
 GenericKiller.prototype.canKill = function(data) {
     if(data.plugin != "Flash" || !safari.extension.settings["replaceFlash"]) return false;
     // streams are not supported
-    return (!hasFlashVariable(data.params, "streamer") && (hasFlashVariable(data.params, "file") || hasFlashVariable(data.params, "load") || hasFlashVariable(data.params, "playlistfile") || hasFlashVariable(data.params, "src")));
+    return (!hasFlashVariable(data.params, "streamer") && (hasFlashVariable(data.params, "file") || hasFlashVariable(data.params, "load") || hasFlashVariable(data.params, "playlistfile") || hasFlashVariable(data.params, "src") || hasFlashVariable(data.params, "mp3")));
 };
 
 GenericKiller.prototype.processElement = function(data, callback) {
@@ -13,6 +13,7 @@ GenericKiller.prototype.processElement = function(data, callback) {
     var sourceURL = decodeURIComponent(getFlashVariable(data.params, "file")); // JW player
     if(!sourceURL) sourceURL = decodeURIComponent(getFlashVariable(data.params, "load")); // TS player
     if(!sourceURL) sourceURL = decodeURIComponent(getFlashVariable(data.params, "src")); // generic player
+    if(!sourceURL) sourceURL = decodeURIComponent(getFlashVariable(data.params, "mp3"));
     
     // Playlist support
     if(safari.extension.settings["usePlaylists"]) {
