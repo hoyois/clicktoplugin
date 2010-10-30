@@ -218,7 +218,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string>1x1</string>
+		<string>8x8</string>
 		<key>Key</key>
 		<string>maxinvdim</string>
 		<key>Title</key>
@@ -249,6 +249,16 @@
 		<string>useLAcontext</string>
 		<key>Title</key>
 		<string>載入所有的 Flash                 </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useLIcontext</string>
+		<key>Title</key>
+		<string>載入不可見的 Flash              </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -310,7 +320,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<real>1</real>
+		<real>0.5</real>
 		<key>Key</key>
 		<string>opacity</string>
 		<key>MaximumValue</key>

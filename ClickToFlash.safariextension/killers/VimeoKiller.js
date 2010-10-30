@@ -44,8 +44,12 @@ VimeoKiller.prototype.processElement = function(data, callback) {
         }
         var siteInfo = null;
         if(data.location.indexOf("vimeo.com/") == -1 || data.location == "http://vimeo.com/" || data.location.indexOf("player.vimeo.com/") != -1) siteInfo = {"name": "Vimeo", "url": "http://vimeo.com/" + videoID};
+        var title;
+        if(xhr.responseXML.getElementsByTagName("caption").length > 0) {
+            title = xhr.responseXML.getElementsByTagName("caption")[0].childNodes[0].nodeValue;
+        }
         var videoData = {
-            "playlist": [{"siteInfo": siteInfo, "mediaType": "video", "posterURL": posterURL, "mediaURL": videoURL}],
+            "playlist": [{"siteInfo": siteInfo, "mediaType": "video", "title": title, "posterURL": posterURL, "mediaURL": videoURL}],
             "badgeLabel": badgeLabel
         };
 
