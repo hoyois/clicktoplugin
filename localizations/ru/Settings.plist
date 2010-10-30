@@ -158,7 +158,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string>www.example.com, www.example2.com</string>
+		<string>www.example.com www.example2.com</string>
 		<key>Key</key>
 		<string>locwhitelist</string>
 		<key>Title</key>
@@ -218,7 +218,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string>1x1</string>
+		<string>8x8</string>
 		<key>Key</key>
 		<string>maxinvdim</string>
 		<key>Title</key>
@@ -251,6 +251,12 @@
 		<string>Подгрузить все Дополнения                </string>
 		<key>Type</key>
 		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useLIcontext</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
@@ -310,7 +316,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<real>1</real>
+		<real>0.5</real>
 		<key>Key</key>
 		<string>opacity</string>
 		<key>MaximumValue</key>

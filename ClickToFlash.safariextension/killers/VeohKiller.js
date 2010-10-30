@@ -15,8 +15,7 @@ VeohKiller.prototype.processElement = function(data, callback) {
         var matches = data.src.match(/permalinkId=([^&]+)(?:&|$)/);
         if(matches) videoID = matches[1];
     }
-    var posterURL = null;
-    var videoURL = null;
+    var title, posterURL, videoURL;
     
     var xhr = new XMLHttpRequest();
     xhr.open('GET', "http://www.veoh.com/rest/video/" + videoID + "/details", true);
@@ -25,10 +24,11 @@ VeohKiller.prototype.processElement = function(data, callback) {
         if(element) {
             videoURL = element.getAttribute("fullPreviewHashPath"); //"fullPreviewHashLowPath"
             posterURL = element.getAttribute("fullHighResImagePath");
+            title = element.getAttribute("title");
         }
     
         var videoData = {
-            "playlist": [{"mediaType": "video",  "posterURL": posterURL, "mediaURL": videoURL}],
+            "playlist": [{"mediaType": "video", "title": title, "posterURL": posterURL, "mediaURL": videoURL}],
             "badgeLabel": "Video" // There's no HD on Veoh, as far as I see, despite what they say. It's < 360p! Am I doing something wrong??
         }
         if(isEmbed) videoData.playlist[0].siteInfo = {"name": "Veoh", "url": "http://www.veoh.com/browse/videos#watch%3D" + videoID};

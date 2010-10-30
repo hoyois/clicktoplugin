@@ -30,28 +30,6 @@ function ClickToFlash() {
     
     safari.self.addEventListener("message", this.respondToMessageTrampoline, false);
     document.addEventListener("beforeload", this.handleBeforeLoadEventTrampoline, true);
-    /* NOTE ALPHA (READ IF YOU WANT TO PLAY WITH THE CODE!)
-    It sometimes happen, though the reason is still mysterious to me,(*) that several 'beforeload' events
-    are fired with the SAME target. It's just a fact of life (or a webkit bug?) we have to live with.
-    Thus, if you modify manually properties of the HTML Element event.target
-    while handling the beforeload event, YOU CANNOT ASSUME THAT THESE PROPERTIES ARE CONSTANT.
-    Eg, suppose you do
-    
-    element1 = event.target; 
-    element1.elementID = 1;
-    
-    and later for a second event
-    
-    element2 = event.target; 
-    element2.elementID = 2;
-    
-    If the two events have the same target, then element1.elementID will be changed to 2,
-    which can yield undesirable results if element1 is still being processed.
-    
-    Of course, when such a redundant event happens, we should ignore it as early as possible.
-    
-    (*) It might have something to do with fallback content
-    */
     
     document.oncontextmenu = function(event) {
         safari.self.tab.setContextMenuEventUserInfo(event, {"location": window.location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length, "invisible": this.getElementsByClassName("CTFinvisible").length});
@@ -145,7 +123,7 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
         return;
     }
     
-    if(element.source) { // fired beforeload twice
+    if(element.parentNode && element.parentNode.className === "CTFnodisplay") { // fired beforeload twice
         event.preventDefault();
         return;
     }
@@ -279,8 +257,9 @@ ClickToFlash.prototype.prepMedia = function(mediaData) {
             this.placeholderElements[mediaData.elementID].style.opacity = "1";
             this.placeholderElements[mediaData.elementID].style.backgroundImage = "url('" + mediaData.playlist[0].posterURL + "') !important";
             this.placeholderElements[mediaData.elementID].className = "CTFplaceholder"; // remove 'noimage' class
-            this.placeholderElements[mediaData.elementID].removeAttribute("title"); // remove tooltip
         }
+        if(mediaData.playlist[0].title) this.placeholderElements[mediaData.elementID].title = mediaData.playlist[0].title; // set tooltip
+        else this.placeholderElements[mediaData.elementID].removeAttribute("title");
     }
     
     var badgeLabel = mediaData.badgeLabel;
@@ -424,8 +403,8 @@ ClickToFlash.prototype.unhideLogo = function(elementID, i) {
     }
 };
 
-ClickToFlash.prototype.clickPlaceholder = function(elementID) {
-    if (this.mediaPlayers[elementID] && this.mediaPlayers[elementID].startTrack != null) {
+ClickToFlash.prototype.clickPlaceholder = function(elementID, usePlugin) {
+    if (!usePlugin && this.mediaPlayers[elementID] && this.mediaPlayers[elementID].startTrack !== null) {
         this.loadMediaForElement(elementID);
     } else {
         this.loadPluginForElement(elementID);
@@ -475,7 +454,10 @@ ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
     
     var _this = this;
     
-    placeholderElement.onclick = function(event){_this.clickPlaceholder(elementID); event.stopPropagation();};
+    placeholderElement.onclick = function(event) {
+        _this.clickPlaceholder(elementID, event.altKey || event.button);
+        event.stopPropagation();
+    };
     placeholderElement.oncontextmenu = function(event) {
         var contextInfo = {
             "instance": _this.instance,

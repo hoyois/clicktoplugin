@@ -38,8 +38,12 @@ DailymotionKiller.prototype.processElementFromSequence = function(sequence, call
     matches = sequence.match(/\"backgroundImageURL\":\"([^"]*)\"/);
     if(matches) posterURL = matches[1].replace(/\\\//g,"/");
     
+    var title;
+    matches = sequence.match(/\"videoTitle\":\"((?:\\"|[^"])*)\"/);
+    if(matches) title = unescape(matches[1].replace(/\+/g, " ").replace(/\\u/g, "%u").replace(/\\["'\/\\]/g, function(s){return s.charAt(1);}));
+    
     var videoData = {
-        "playlist": [{"mediaType": "video", "posterURL": posterURL, "mediaURL": videoURL}],
+        "playlist": [{"mediaType": "video", "title": title, "posterURL": posterURL, "mediaURL": videoURL}],
         "badgeLabel": badgeLabel
     };
     callback(videoData);
