@@ -131,7 +131,7 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
         return;
     }
     
-    if(element.attr) { // fired beforeload twice
+    if(element.parentNode && element.parentNode.className === "CTFnodisplay") { // fired beforeload twice
         event.preventDefault();
         return;
     }
@@ -243,8 +243,9 @@ ClickToPlugin.prototype.prepMedia = function(mediaData) {
             this.placeholderElements[mediaData.elementID].style.opacity = "1";
             this.placeholderElements[mediaData.elementID].style.backgroundImage = "url('" + mediaData.playlist[0].posterURL + "') !important";
             this.placeholderElements[mediaData.elementID].className = "CTFplaceholder"; // remove 'noimage' class
-            this.placeholderElements[mediaData.elementID].removeAttribute("title"); // remove tooltip
         }
+        if(mediaData.playlist[0].title) this.placeholderElements[mediaData.elementID].title = mediaData.playlist[0].title; // set tooltip
+        else this.placeholderElements[mediaData.elementID].removeAttribute("title");
     }
     
     var badgeLabel = mediaData.badgeLabel;
@@ -389,8 +390,8 @@ ClickToPlugin.prototype.unhideLogo = function(elementID, i) {
     }
 };
 
-ClickToPlugin.prototype.clickPlaceholder = function(elementID) {
-    if (this.mediaPlayers[elementID] && this.mediaPlayers[elementID].startTrack != null) {
+ClickToPlugin.prototype.clickPlaceholder = function(elementID, usePlugin) {
+    if (!usePlugin && this.mediaPlayers[elementID] && this.mediaPlayers[elementID].startTrack !== null) {
         this.loadMediaForElement(elementID);
     } else {
         this.loadPluginForElement(elementID);
@@ -440,7 +441,10 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
     
     var _this = this;
     
-    placeholderElement.onclick = function(event){_this.clickPlaceholder(elementID); event.stopPropagation();};
+    placeholderElement.onclick = function(event) {
+        _this.clickPlaceholder(elementID, event.altKey || event.button);
+        event.stopPropagation();
+    };
     placeholderElement.oncontextmenu = function(event) {
         var contextInfo = {
             "instance": _this.instance,
