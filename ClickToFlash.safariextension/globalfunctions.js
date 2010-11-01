@@ -72,7 +72,7 @@ function willPlaySrcWithHTML5(url) {
 }
 
 function getMIMEType(resourceURL, handleMIMEType) {
-    xhr = new XMLHttpRequest();
+    var xhr = new XMLHttpRequest();
     xhr.open('HEAD', resourceURL, true);
     var gotContentType = false;
     xhr.onreadystatechange = function () {
