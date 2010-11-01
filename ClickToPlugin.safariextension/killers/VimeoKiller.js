@@ -64,7 +64,7 @@ VimeoKiller.prototype.processElement = function(data, callback) {
                 if(MIMEType.split(";")[0] != "video/x-flv") {
                     callback(videoData);
                 } 
-            };
+            }
             getMIMEType(videoURL, handleMIMEType);
         }
     };
