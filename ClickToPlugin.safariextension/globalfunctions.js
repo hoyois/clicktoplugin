@@ -112,7 +112,7 @@ function isNativeExt(ext) {
 
 function getMIMEType(resourceURL, handleMIMEType) {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', resourceURL, true);
+    xhr.open('HEAD', resourceURL, true);
     var gotContentType = false;
     xhr.onreadystatechange = function () {
         if(!gotContentType && xhr.getResponseHeader('Content-Type')) {
