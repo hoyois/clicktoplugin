@@ -60,11 +60,11 @@ mediaPlayer.prototype.initialize = function(buffer, width, height, volume, conte
     this.mediaElement.addEventListener("contextmenu", function(event) {_this.setContextInfo(event, contextInfo);}, false);
     this.mediaElement.addEventListener("loadedmetadata", function() {_this.fixAspectRatio();}, false);
     this.mediaElement.addEventListener("ended", function() {_this.nextTrack();}, false);
-    this.mediaElement.ondblclick = function(event) {
+    this.mediaElement.addEventListener("dblclick", function(event) {
         if(event.target == this && event.offsetY + 24 < this.offsetHeight) {
             _this.switchLoop();
         }
-    };
+    }, false);
     
     // Playlist constrols
     if(this.usePlaylistControls) this.initializePlaylistControls();
@@ -104,15 +104,15 @@ mediaPlayer.prototype.initializePlaylistControls = function() {
     trackSelect.innerHTML = "<input type=\"text\" style=\"width: " + (7 * (this.playlistLength.toString().length - 1) + 8) + "px\"><span>/" + normalize(this.playlist.length, this.playlistLength) + "</span>";
     
     var _this = this;
-    this.mediaElement.onmouseover = function(event) {
+    this.mediaElement.addEventListener("mouseover", function(event) {
         this.focus = true;
         if(!this.paused && this.readyState > 1) _this.fadeIn(.05);
-    };
-    this.playlistControls.onmouseover = function(event) {
+    }, false);
+    this.playlistControls.addEventListener("mouseover", function(event) {
         _this.mediaElement.focus = true;
         if(!_this.mediaElement.paused && _this.mediaElement.readyState > 1) _this.fadeIn(0);
-    };
-    this.mediaElement.onmouseout = function(event) {
+    }, false);
+    this.mediaElement.addEventListener("mouseout", function(event) {
         // prevents the default controls from disappearing
         if(event.relatedTarget && (event.relatedTarget == prevButton || event.relatedTarget == nextButton || event.relatedTarget == trackSelect.firstChild || event.relatedTarget.hasAttribute("precision"))) {
             event.preventDefault();
@@ -120,16 +120,16 @@ mediaPlayer.prototype.initializePlaylistControls = function() {
             this.focus = false;
             if(!this.paused && this.readyState > 1) _this.fadeOut(0);
         }
-    };
-    this.playlistControls.onmouseout = function(event) {
+    }, false);
+    this.playlistControls.addEventListener("mouseout", function(event) {
         _this.mediaElement.focus = false;
         if(!_this.mediaElement.paused && _this.mediaElement.readyState > 1) _this.fadeOut(.1);
-    };
+    }, false);
     this.mediaElement.focus = false;
     this.mediaElement.addEventListener("pause", function(){_this.fadeIn(0);}, false);
     this.mediaElement.addEventListener("play", function(){if(!_this.mediaElement.focus) _this.fadeOut(0);}, false);
     
-    trackSelect.onsubmit = function(event) {
+    trackSelect.addEventListener("submit", function(event) {
         event.preventDefault();
         var track = this.getElementsByTagName("input")[0].value;
         if(!(/^\d+$/.test(track))) return;
@@ -140,15 +140,15 @@ mediaPlayer.prototype.initializePlaylistControls = function() {
         if(track < _this.playlist.length) {
             _this.loadTrack(track, true);
         }
-    };
-    prevButton.onclick = function() {
+    }, false);
+    prevButton.addEventListener("click", function() {
         if(_this.playlist.length == 1) return;
         _this.loadTrack(_this.currentTrack - 1, true);
-    };
-    nextButton.onclick = function() {
+    }, false);
+    nextButton.addEventListener("click", function() {
         if(_this.playlist.length == 1) return;
         _this.loadTrack(_this.currentTrack + 1, true);
-    };
+    }, false);
     
     this.containerElement.appendChild(this.playlistControls);
 };
