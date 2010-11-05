@@ -39,9 +39,9 @@ function ClickToPlugin() {
     safari.self.addEventListener("message", this.respondToMessageTrampoline, false);
     document.addEventListener("beforeload", this.handleBeforeLoadEventTrampoline, true);
     
-    document.oncontextmenu = function(event) {
+    document.addEventListener("contextmenu", function(event) {
         safari.self.tab.setContextMenuEventUserInfo(event, {"location": window.location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length, "invisible": this.getElementsByClassName("CTFinvisible").length});
-    };
+    }, false);
 }
 
 ClickToPlugin.prototype.clearAll = function(elementID) {
@@ -441,11 +441,11 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
     
     var _this = this;
     
-    placeholderElement.onclick = function(event) {
+    placeholderElement.addEventListener("click", function(event) {
         _this.clickPlaceholder(elementID, event.altKey || event.button);
         event.stopPropagation();
-    };
-    placeholderElement.oncontextmenu = function(event) {
+    }, false);
+    placeholderElement.addEventListener("contextmenu", function(event) {
         var contextInfo = {
             "instance": _this.instance,
             "elementID": elementID,
@@ -460,7 +460,7 @@ ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
             safari.self.tab.setContextMenuEventUserInfo(event, contextInfo);
             event.stopPropagation();
         }
-    };
+    }, false);
     
     // Building the placeholder
     placeholderElement.innerHTML = "<div class=\"CTFplaceholderContainer\"><div class=\"CTFlogoVerticalPosition\"><div class=\"CTFlogoHorizontalPosition\"><div class=\"CTFlogoContainer CTFnodisplay\"><div class=\"CTFlogo\"></div><div class=\"CTFlogo CTFinset\"></div></div></div></div></div>";
