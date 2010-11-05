@@ -16,39 +16,41 @@ VimeoKiller.prototype.processElement = function(data, callback) {
     }
     if(!videoID) return;
     
-    var posterURL = null;
-    var videoURL = null;
+    var title, posterURL, videoURL;
     var badgeLabel = "H.264";
+    var noSniff = false;
     
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', "http://www.vimeo.com/moogaloop/load/clip:" + videoID + "/", true);
+    xhr.open('GET', "http://www.vimeo.com/moogaloop/load/clip:" + videoID + "/local/", true);
     xhr.onload = function() {
-        if(xhr.responseXML.getElementsByTagName("error").length > 0) { // Vimeo Plus non-embeddable video
-            // In this case videoURLs of the form
-            // "http://www.vimeo.com/play_redirect?clip_id=" + videoID + "&quality=mobile&codecs=H264"
-            // will work but I don't know how to find out if the quality/codec combination exists,
-            // because AJAX returns 403 (as will the download link).
-            // Given that 99% of videos have sd,hd/H264, could blindly go with that
-            // (and I think mobile/H264 always exists). Leave as Flash for now...
+        var xml = xhr.responseXML;
+        /*if(xml.getElementsByTagName("error").length > 0) { // never happened
+            // Try this as a last resort (will not work if H264 version doesn't exist)
+            videoURL = "http://www.vimeo.com/play_redirect?clip_id=" + videoID + "&quality=" + (safari.extension.settings["maxresolution"] > 1 ? "hd" : "sd") + "&codecs=H264";
+            if (safari.extension.settings["maxresolution"] > 1) badgeLabel = "HD H.264";
+            noSniff = true; // must remove the 'Download Video' option
             return;
-        }
+        }*/
+        
+        if(xml.getElementsByTagName("request_signature").length > 0 && xml.getElementsByTagName("request_signature_expires").length > 0) {
+            videoURL = "http://www.vimeo.com/moogaloop/play/clip:" + videoID + "/" + xml.getElementsByTagName("request_signature")[0].textContent + "/" + xml.getElementsByTagName("request_signature_expires")[0].textContent + "/?q=" + ((badgeLabel === "H.264") ? "sd" : "hd");
+        } else return;
+        
         if (safari.extension.settings["maxresolution"] > 1) {
-            if(xhr.responseXML.getElementsByTagName("isHD").length > 0) {
-                if(xhr.responseXML.getElementsByTagName("isHD")[0].childNodes[0].nodeValue == "1") badgeLabel = "HD&nbsp;H.264";
+            if(xml.getElementsByTagName("isHD").length > 0) {
+                if(xml.getElementsByTagName("isHD")[0].textContent === "1") badgeLabel = "HD&nbsp;H.264";
             }
         }
-        if(xhr.responseXML.getElementsByTagName("request_signature").length > 0 && xhr.responseXML.getElementsByTagName("request_signature_expires").length > 0) {
-            videoURL = "http://www.vimeo.com/moogaloop/play/clip:" + videoID + "/" + xhr.responseXML.getElementsByTagName("request_signature")[0].childNodes[0].nodeValue+ "/" + xhr.responseXML.getElementsByTagName("request_signature_expires")[0].childNodes[0].nodeValue+"/?q=" + ((badgeLabel == "H.264") ? "sd" : "hd");
+        if(xml.getElementsByTagName("thumbnail").length > 0) {
+            posterURL = xml.getElementsByTagName("thumbnail")[0].textContent;
         }
-        if(xhr.responseXML.getElementsByTagName("thumbnail").length > 0) {
-            posterURL = xhr.responseXML.getElementsByTagName("thumbnail")[0].childNodes[0].nodeValue;
+        if(xml.getElementsByTagName("caption").length > 0) {
+            title = xml.getElementsByTagName("caption")[0].textContent;
         }
-        var siteInfo = null;
-        if(data.location.indexOf("vimeo.com/") == -1 || data.location == "http://vimeo.com/" || data.location.indexOf("player.vimeo.com/") != -1) siteInfo = {"name": "Vimeo", "url": "http://vimeo.com/" + videoID};
-        var title;
-        if(xhr.responseXML.getElementsByTagName("caption").length > 0) {
-            title = xhr.responseXML.getElementsByTagName("caption")[0].childNodes[0].nodeValue;
-        }
+        
+        var siteInfo;
+        if(data.location.indexOf("vimeo.com/") === -1 || data.location == "http://vimeo.com/" || data.location.indexOf("player.vimeo.com/") !== -1) siteInfo = {"name": "Vimeo", "url": "http://vimeo.com/" + videoID};
+        
         var videoData = {
             "playlist": [{"siteInfo": siteInfo, "mediaType": "video", "title": title, "posterURL": posterURL, "mediaURL": videoURL}],
             "badgeLabel": badgeLabel
