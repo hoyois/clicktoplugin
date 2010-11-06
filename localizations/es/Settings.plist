@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>Title</key>
+		<string>Ajustes de vídeo</string>
+		<key>Type</key>
+		<string>Group</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>useH264</string>
+		<key>Title</key>
+		<string>Buscar alternativas al contenido en Flash             </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>usePlaylists</string>
+		<key>Title</key>
+		<string>Usar listas de reproducción                                  </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>showPoster</string>
+		<key>Title</key>
+		<string>Mostrar la imagen de previsualización                  </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>H264autoload</string>
+		<key>Title</key>
+		<string>Cargar el reproductor de vídeo automáticamente</string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string></string>
+		<key>Key</key>
+		<string>H264whitelist</string>
+		<key>Title</key>
+		<string>en las direcciones</string>
+		<key>Type</key>
+		<string>TextField</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string>autoplay</string>
+		<key>Key</key>
+		<string>H264behavior</string>
+		<key>Title</key>
+		<string>Acción inicial</string>
+		<key>Titles</key>
+		<array>
+			<string>No cargar el vídeo</string>
+			<string>Empezar a cargar el vídeo</string>
+			<string>Empezar a cargar y reproducir el vídeo</string>
+		</array>
+		<key>Type</key>
+		<string>PopUpButton</string>
+		<key>Values</key>
+		<array>
+			<string>none</string>
+			<string>buffer</string>
+			<string>autoplay</string>
+		</array>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<real>2</real>
+		<key>Key</key>
+		<string>QTbehavior</string>
+		<key>Title</key>
+		<string>Códecs no nativos</string>
+		<key>Titles</key>
+		<array>
+			<string>No usar</string>
+			<string>Usar como última opción</string>
+			<string>Usar indistintamente</string>
+		</array>
+		<key>Type</key>
+		<string>PopUpButton</string>
+		<key>Values</key>
+		<array>
+			<real>1</real>
+			<real>2</real>
+			<real>3</real>
+		</array>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<real>3</real>
+		<key>Key</key>
+		<string>maxresolution</string>
+		<key>Title</key>
+		<string>Resolución máxima</string>
+		<key>Titles</key>
+		<array>
+			<string>480p</string>
+			<string>720p</string>
+			<string>1080p</string>
+			<string>4K</string>
+		</array>
+		<key>Type</key>
+		<string>PopUpButton</string>
+		<key>Values</key>
+		<array>
+			<real>1</real>
+			<real>2</real>
+			<real>3</real>
+			<real>4</real>
+		</array>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<real>0.5</real>
+		<key>Key</key>
+		<string>volume</string>
+		<key>MaximumValue</key>
+		<real>1</real>
+		<key>StepValue</key>
+		<real>0.01</real>
+		<key>Title</key>
+		<string>Volumen</string>
+		<key>Type</key>
+		<string>Slider</string>
+	</dict>
+	<dict>
+		<key>Title</key>
+		<string>Lista blanca</string>
+		<key>Type</key>
+		<string>Group</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>uselocWhitelist</string>
+		<key>Title</key>
+		<string>Permitir el contenido Flahs en direcciones     </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string>www.ejemplo.com www.ejemplo2.com</string>
+		<key>Key</key>
+		<string>locwhitelist</string>
+		<key>Title</key>
+		<string>que contengan</string>
+		<key>Type</key>
+		<string>TextField</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string></string>
+		<key>Key</key>
+		<string>locblacklist</string>
+		<key>Title</key>
+		<string>que no contengan</string>
+		<key>Type</key>
+		<string>TextField</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>usesrcWhitelist</string>
+		<key>Title</key>
+		<string>Permitir el contenido Flash cuya procedencia</string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string></string>
+		<key>Key</key>
+		<string>srcwhitelist</string>
+		<key>Title</key>
+		<string>contenga</string>
+		<key>Type</key>
+		<string>TextField</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string></string>
+		<key>Key</key>
+		<string>srcblacklist</string>
+		<key>Title</key>
+		<string>no contengan</string>
+		<key>Type</key>
+		<string>TextField</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>loadInvisible</string>
+		<key>Title</key>
+		<string>Permitir el contenido Flash si                         </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string>8x8</string>
+		<key>Key</key>
+		<string>maxinvdim</string>
+		<key>Title</key>
+		<string>el tamaño máximo es</string>
+		<key>Type</key>
+		<string>TextField</string>
+	</dict>
+	<dict>
+		<key>Title</key>
+		<string>Elementos del menú contextual</string>
+		<key>Type</key>
+		<string>Group</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useWLcontext</string>
+		<key>Title</key>
+		<string>Añadir a la lista blanca                  </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useLAcontext</string>
+		<key>Title</key>
+		<string>Cargar todo el contenido Flash      </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useLIcontext</string>
+		<key>Title</key>
+		<string>Cargar el contenido Flash invisible</string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>useDVcontext</string>
+		<key>Title</key>
+		<string>Descargar el vídeo                         </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useVScontext</string>
+		<key>Title</key>
+		<string>Ver en el sitio                                 </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useQTcontext</string>
+		<key>Title</key>
+		<string>Ver en QuickTime Player                </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<string>Separator</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string>textonly</string>
+		<key>Key</key>
+		<string>sifrReplacement</string>
+		<key>Title</key>
+		<string>Texto sIFR</string>
+		<key>Titles</key>
+		<array>
+			<string>Sólo mostrar texto</string>
+			<string>Tratar como Flash</string>
+			<string>Cargar automáticamente</string>
+		</array>
+		<key>Type</key>
+		<string>PopUpButton</string>
+		<key>Values</key>
+		<array>
+			<string>textonly</string>
+			<string>normal</string>
+			<string>autoload</string>
+		</array>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<real>0.5</real>
+		<key>Key</key>
+		<string>opacity</string>
+		<key>MaximumValue</key>
+		<real>1</real>
+		<key>StepValue</key>
+		<real>0.01</real>
+		<key>Title</key>
+		<string>Opacidad</string>
+		<key>Type</key>
+		<string>Slider</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>debug</string>
+		<key>Title</key>
+		<string>Bloquear el contenido manualmente</string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+</array>
+</plist>
