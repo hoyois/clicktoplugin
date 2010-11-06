@@ -32,15 +32,16 @@ VimeoKiller.prototype.processElement = function(data, callback) {
             return;
         }*/
         
-        if(xml.getElementsByTagName("request_signature").length > 0 && xml.getElementsByTagName("request_signature_expires").length > 0) {
-            videoURL = "http://www.vimeo.com/moogaloop/play/clip:" + videoID + "/" + xml.getElementsByTagName("request_signature")[0].textContent + "/" + xml.getElementsByTagName("request_signature_expires")[0].textContent + "/?q=" + ((badgeLabel === "H.264") ? "sd" : "hd");
-        } else return;
-        
         if (safari.extension.settings["maxresolution"] > 1) {
             if(xml.getElementsByTagName("isHD").length > 0) {
                 if(xml.getElementsByTagName("isHD")[0].textContent === "1") badgeLabel = "HD&nbsp;H.264";
             }
         }
+        
+        if(xml.getElementsByTagName("request_signature").length > 0 && xml.getElementsByTagName("request_signature_expires").length > 0) {
+            videoURL = "http://www.vimeo.com/moogaloop/play/clip:" + videoID + "/" + xml.getElementsByTagName("request_signature")[0].textContent + "/" + xml.getElementsByTagName("request_signature_expires")[0].textContent + "/?q=" + ((badgeLabel === "H.264") ? "sd" : "hd");
+        } else return;
+        
         if(xml.getElementsByTagName("thumbnail").length > 0) {
             posterURL = xml.getElementsByTagName("thumbnail")[0].textContent;
         }
