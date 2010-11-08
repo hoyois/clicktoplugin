@@ -133,18 +133,18 @@ YouTubeKiller.prototype.getMediaDataFromURLMap = function(videoID, videoHash, ur
     Other containers are FLV (0, 5, 6, 34, 35, the latter two are H.264 360p and 480p),
     3GP (13,17), or WebM (43,45)
     */
-    if (availableFormats[38] && safari.extension.settings["maxresolution"] > 3) {// 4K @_@
+    if(availableFormats[38] && safari.extension.settings["maxresolution"] > 3) {// 4K @_@
         badgeLabel = "4K&nbsp;H.264";
         videoURL = availableFormats[38];
-    } else if (availableFormats[37] && safari.extension.settings["maxresolution"] > 2) {// 1080p
+    } else if(availableFormats[37] && safari.extension.settings["maxresolution"] > 2) {// 1080p
         badgeLabel = "HD&nbsp;H.264";
         videoURL = availableFormats[37];
-    } else if (availableFormats[22] && safari.extension.settings["maxresolution"] > 1) {// 720p
+    } else if(availableFormats[22] && safari.extension.settings["maxresolution"] > 1) {// 720p
         badgeLabel = "HD&nbsp;H.264";
         videoURL = availableFormats[22];
-    } else if (availableFormats[35] && safari.extension.settings["QTbehavior"] > 2 && canPlayFLV) {// 480p FLV
+    } else if(availableFormats[35] && safari.extension.settings["QTbehavior"] > 2 && canPlayFLV) {// 480p FLV
         videoURL = availableFormats[35];
-    } else if (availableFormats[18]) {// <=360p
+    } else if(availableFormats[18]) {// <=360p
         videoURL = availableFormats[18];
     }
     return {"posterURL": posterURL, "videoURL": videoURL, "badgeLabel": badgeLabel};
