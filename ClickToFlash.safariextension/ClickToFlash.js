@@ -425,13 +425,17 @@ ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
     // Note: 'display' is set to 'inline-block', which is always the effective value for 'replaced elements'
     var style = getComputedStyle(element, null);
     placeholderElement.style.setProperty("position", style.getPropertyValue("position"), "important");
+    placeholderElement.style.setProperty("top", style.getPropertyValue("top"), "important");
+    placeholderElement.style.setProperty("right", style.getPropertyValue("right"), "important");
+    placeholderElement.style.setProperty("bottom", style.getPropertyValue("bottom"), "important");
+    placeholderElement.style.setProperty("left", style.getPropertyValue("left"), "important");
+    placeholderElement.style.setProperty("z-index", style.getPropertyValue("z-index"), "important");
     placeholderElement.style.setProperty("clear", style.getPropertyValue("clear"), "important");
     placeholderElement.style.setProperty("float", style.getPropertyValue("float"), "important");
     placeholderElement.style.setProperty("margin-top", style.getPropertyValue("margin-top"), "important");
     placeholderElement.style.setProperty("margin-right", style.getPropertyValue("margin-right"), "important");
     placeholderElement.style.setProperty("margin-bottom", style.getPropertyValue("margin-bottom"), "important");
     placeholderElement.style.setProperty("margin-left", style.getPropertyValue("margin-left"), "important");
-    placeholderElement.style.setProperty("z-index", style.getPropertyValue("z-index"), "important");
     
     // Replace the element by the placeholder
     element.parentNode.replaceChild(placeholderElement, element);
