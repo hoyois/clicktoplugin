@@ -9,11 +9,11 @@ function downloadURL(url) {
 }
 
 function getTypeOf(element) {
-    switch (element.tag) {
-        case "embed":
+    switch (element.nodeName) {
+        case "EMBED":
             return element.type;
             break;
-        case "object":
+        case "OBJECT":
             var embedChild = element.getElementsByTagName("embed")[0];
             if(embedChild && embedChild.type) return embedChild.type;
             if(element.type) return element.type;
@@ -31,11 +31,11 @@ function getTypeOf(element) {
 }
 
 function getParams(element) {
-    switch (element.tag) {
-        case "embed":
+    switch (element.nodeName) {
+        case "EMBED":
             return (element.hasAttribute("flashvars") ? element.getAttribute("flashvars") : ""); // fixing Safari's buggy JS
             break
-        case "object":
+        case "OBJECT":
             var paramElements = element.getElementsByTagName("param");
             for (var i = paramElements.length - 1; i >= 0; i--) {
                 try {
