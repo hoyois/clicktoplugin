@@ -5,6 +5,7 @@ ClickToFlash class definition
 function ClickToFlash() {
     
     this.blockedElements = new Array(); // array containing the blocked HTML elements
+    this.blockedData = new Array(); // array containing info on the blocked element (plugin, dimension, source, ...)
     this.placeholderElements = new Array(); // array containing the corresponding placeholder elements
     this.mediaPlayers = new Array(); // array containing the HTML5 media players
     
@@ -38,6 +39,7 @@ function ClickToFlash() {
 
 ClickToFlash.prototype.clearAll = function(elementID) {
     this.blockedElements[elementID] = null;
+    this.blockedData[elementID] = null;
     this.placeholderElements[elementID] = null;
     this.mediaPlayers[elementID] = null;
 };
@@ -115,18 +117,7 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
     // flash element must not be blocked
     if (element.allowedToLoad) return;
     
-    if (element instanceof HTMLObjectElement) {
-        element.tag = "object";
-    } else if (element instanceof HTMLEmbedElement) {
-        element.tag = "embed";
-    } else {
-        return;
-    }
-    
-    if(element.parentNode && element.parentNode.className === "CTFnodisplay") { // fired beforeload twice
-        event.preventDefault();
-        return;
-    }
+    if (!(element instanceof HTMLObjectElement || element instanceof HTMLEmbedElement)) return;
     
     // Check if it is Flash (lousy, CTP is better)
     switch(isFlash(element, event.url)) {
@@ -141,19 +132,18 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
     }
     
     // At this point we know we're dealing with Evil itself
+    var data = {"width": element.offsetWidth, "height": element.offsetHeight};
     
     // Need to store the absolute source of the element
-    if(!event.url) element.source = "";
+    if(!event.url) data.src = "";
     else {
         var tmpAnchor = document.createElement("a");
         tmpAnchor.href = event.url;
-        element.source = tmpAnchor.href;
+        data.src = tmpAnchor.href;
     }
     
-    element.dim = {"width": element.offsetWidth, "height": element.offsetHeight};
-    
     // Check whitelists and invisible elements settings
-    if(safari.self.tab.canLoad(event, {"src": element.source, "location": window.location.href, "dim": element.dim})) return;
+    if(safari.self.tab.canLoad(event, {"data": data, "location": window.location.href})) return;
     
     // Load the user settings
     if(this.settings === null) {
@@ -179,14 +169,112 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
         do {
             positionX += e.offsetLeft; positionY += e.offsetTop;
         } while(e = e.offsetParent);
-        if(!confirm("ClickToFlash is about to block element " + this.instance + "." + elementID + ":\n" + "\nLocation: " + window.location.href + "\nSource: " + element.source + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + element.offsetWidth + "x" + element.offsetHeight)) return;
+        if(!confirm("ClickToFlash is about to block element " + this.instance + "." + elementID + ":\n" + "\nLocation: " + window.location.href + "\nSource: " + data.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + data.width + "x" + data.height)) return;
     }
     // END DEBUG
     
     event.preventDefault(); // prevents 'element' from loading
     
-    if(event.url || element.id) {
-        this.processBlockedElement(element, elementID);
+    if(!event.url && !element.id) return;
+    
+    // Create the placeholder element
+    var placeholderElement = document.createElement("div");
+    placeholderElement.title = data.src; // tooltip
+    placeholderElement.className = "CTFplaceholder CTFnoimage";
+    placeholderElement.style.width = data.width + "px !important";
+    placeholderElement.style.height = data.height + "px !important";
+    placeholderElement.style.opacity = this.settings["opacity"];
+    
+    // Copy CSS box & positioning properties that have an effect on page layout
+    // Note: 'display' is set to 'inline-block', which is always the effective value for 'replaced elements'
+    var style = getComputedStyle(element, null);
+    placeholderElement.style.setProperty("position", style.getPropertyValue("position"), "important");
+    placeholderElement.style.setProperty("top", style.getPropertyValue("top"), "important");
+    placeholderElement.style.setProperty("right", style.getPropertyValue("right"), "important");
+    placeholderElement.style.setProperty("bottom", style.getPropertyValue("bottom"), "important");
+    placeholderElement.style.setProperty("left", style.getPropertyValue("left"), "important");
+    placeholderElement.style.setProperty("z-index", style.getPropertyValue("z-index"), "important");
+    placeholderElement.style.setProperty("clear", style.getPropertyValue("clear"), "important");
+    placeholderElement.style.setProperty("float", style.getPropertyValue("float"), "important");
+    placeholderElement.style.setProperty("margin-top", style.getPropertyValue("margin-top"), "important");
+    placeholderElement.style.setProperty("margin-right", style.getPropertyValue("margin-right"), "important");
+    placeholderElement.style.setProperty("margin-bottom", style.getPropertyValue("margin-bottom"), "important");
+    placeholderElement.style.setProperty("margin-left", style.getPropertyValue("margin-left"), "important");
+    
+    // Replace the element by the placeholder
+    if(element.parentNode && element.parentNode.className !== "CTFnodisplay") {
+        element.parentNode.replaceChild(placeholderElement, element);
+    } else { // fired beforeload twice (NOTE: as of Safari 5.0.3, this test does not work too early in the handler!)
+        return;
+    }    
+    // Place the blocked element in the stack
+    if(this.stack ===  null) {
+        this.stack = document.createElement("div");
+        this.stack.id = "CTFstack";
+        this.stack.className = "CTFnodisplay";
+        this.stack.style.display = "none !important";
+        this.stack.innerHTML = "<div class=\"CTFnodisplay\"><div class=\"CTFnodisplay\"></div></div>";
+        document.body.appendChild(this.stack);
+    }
+    try {
+        this.stack.firstChild.firstChild.appendChild(element);
+    } catch(err) { // some script has modified the stack structure. No big deal, we just reset it
+        this.stack.innerHTML = "<div class=\"CTFnodisplay\"><div class=\"CTFnodisplay\"></div></div>";
+        this.stack.firstChild.firstChild.appendChild(element);
+    }
+    
+    var _this = this;
+    
+    placeholderElement.addEventListener("click", function(event) {
+        _this.clickPlaceholder(elementID, event.altKey || event.button);
+        event.stopPropagation();
+    }, false);
+    placeholderElement.addEventListener("contextmenu", function(event) {
+        var contextInfo = {
+            "instance": _this.instance,
+            "elementID": elementID,
+            "src": data.src
+        };
+        if (_this.mediaPlayers[elementID] && _this.mediaPlayers[elementID].startTrack != null) {
+            contextInfo.hasH264 = true;
+            _this.mediaPlayers[elementID].setContextInfo(event, contextInfo);
+        } else {
+            contextInfo.hasH264 = false;
+            safari.self.tab.setContextMenuEventUserInfo(event, contextInfo);
+            event.stopPropagation();
+        }
+    }, false);
+    
+    // Building the placeholder
+    placeholderElement.innerHTML = "<div class=\"CTFplaceholderContainer\"><div class=\"CTFlogoVerticalPosition\"><div class=\"CTFlogoHorizontalPosition\"><div class=\"CTFlogoContainer CTFnodisplay\"><div class=\"CTFlogo\"></div><div class=\"CTFlogo CTFinset\"></div></div></div></div></div>";
+    if(data.width > 0 && data.height > 0 && data.width <= this.settings.maxinvdim.width && data.height <= this.settings.maxinvdim.height) placeholderElement.firstChild.className += " CTFinvisible";
+    
+    // Fill the main arrays
+    this.blockedElements[elementID] = element;
+    this.blockedData[elementID] = data;
+    this.placeholderElements[elementID] = placeholderElement;
+    // Display the badge
+    this.displayBadge(element.label, elementID);
+    // Look for video replacements
+    if(this.settings["useH264"]) {
+        if(!this.directKill(elementID)) {
+            // Need to pass the base URL to the killers so that they can resolve URLs, eg. for AJAX requests.
+            // According to RFC1808, the base URL is given by the <base> tag if present,
+            // else by the 'Content-Base' HTTP header if present, else by the current URL.
+            // Fortunately the magical anchor trick takes care of all this for us!!
+            var tmpAnchor = document.createElement("a");
+            tmpAnchor.href = "./";
+            var elementData = {
+                "instance": this.instance,
+                "elementID": elementID,
+                "src": data.src,
+                "location": window.location.href,
+                "title": document.title,
+                "baseURL": tmpAnchor.href,
+                "params": getParams(element)
+            };
+            safari.self.tab.dispatchMessage("killFlash", elementData);
+        }
     }
 };
 
@@ -214,7 +302,7 @@ ClickToFlash.prototype.loadAll = function() {
 
 ClickToFlash.prototype.loadSrc = function(string) {
     for(var i = 0; i < this.numberOfBlockedElements; i++) {
-        if(this.placeholderElements[i] && this.blockedElements[i].source.indexOf(string) != -1) {
+        if(this.placeholderElements[i] && this.blockedData[i].src.indexOf(string) != -1) {
             this.loadPluginForElement(i);
         }
     }
@@ -275,7 +363,7 @@ ClickToFlash.prototype.loadMediaForElement = function(elementID) {
     };
 
     // Initialize player
-    this.mediaPlayers[elementID].initialize(this.settings["H264behavior"], this.blockedElements[elementID].dim.width, this.blockedElements[elementID].dim.height, this.settings["volume"], contextInfo);
+    this.mediaPlayers[elementID].initialize(this.settings["H264behavior"], this.blockedData[elementID].width, this.blockedData[elementID].height, this.settings["volume"], contextInfo);
     // mediaElement.allowedToLoad = true; // not used
 
     // Replace placeholder and load first track
@@ -346,7 +434,7 @@ ClickToFlash.prototype.removeElement = function(elementID) {
 };
 
 ClickToFlash.prototype.showElement = function(elementID) {
-    alert("Location: " + window.location.href + "\nSource: " + this.blockedElements[elementID].source + "\n\n" + document.HTMLToString(this.blockedElements[elementID]));
+    alert("Location: " + window.location.href + "\nSource: " + this.blockedData[elementID].src + "\n\n" + document.HTMLToString(this.blockedElements[elementID]));
 };
 
 // I really don't like the next two methods, but can't come up with something better
@@ -408,105 +496,6 @@ ClickToFlash.prototype.clickPlaceholder = function(elementID, usePlugin) {
         this.loadMediaForElement(elementID);
     } else {
         this.loadPluginForElement(elementID);
-    }
-};
-
-ClickToFlash.prototype.processBlockedElement = function(element, elementID) {
-    
-    // Create the placeholder element
-    var placeholderElement = document.createElement("div");
-    placeholderElement.title = element.source; // tooltip
-    placeholderElement.className = "CTFplaceholder CTFnoimage";
-    placeholderElement.style.width = element.dim.width + "px !important";
-    placeholderElement.style.height = element.dim.height + "px !important";
-    placeholderElement.style.opacity = this.settings["opacity"];
-    
-    // Copy CSS box & positioning properties that have an effect on page layout
-    // Note: 'display' is set to 'inline-block', which is always the effective value for 'replaced elements'
-    var style = getComputedStyle(element, null);
-    placeholderElement.style.setProperty("position", style.getPropertyValue("position"), "important");
-    placeholderElement.style.setProperty("top", style.getPropertyValue("top"), "important");
-    placeholderElement.style.setProperty("right", style.getPropertyValue("right"), "important");
-    placeholderElement.style.setProperty("bottom", style.getPropertyValue("bottom"), "important");
-    placeholderElement.style.setProperty("left", style.getPropertyValue("left"), "important");
-    placeholderElement.style.setProperty("z-index", style.getPropertyValue("z-index"), "important");
-    placeholderElement.style.setProperty("clear", style.getPropertyValue("clear"), "important");
-    placeholderElement.style.setProperty("float", style.getPropertyValue("float"), "important");
-    placeholderElement.style.setProperty("margin-top", style.getPropertyValue("margin-top"), "important");
-    placeholderElement.style.setProperty("margin-right", style.getPropertyValue("margin-right"), "important");
-    placeholderElement.style.setProperty("margin-bottom", style.getPropertyValue("margin-bottom"), "important");
-    placeholderElement.style.setProperty("margin-left", style.getPropertyValue("margin-left"), "important");
-    
-    // Replace the element by the placeholder
-    element.parentNode.replaceChild(placeholderElement, element);
-    
-    // Place the blocked element in the stack
-    if(this.stack ===  null) {
-        this.stack = document.createElement("div");
-        this.stack.id = "CTFstack";
-        this.stack.className = "CTFnodisplay";
-        this.stack.style.display = "none !important";
-        this.stack.innerHTML = "<div class=\"CTFnodisplay\"><div class=\"CTFnodisplay\"></div></div>";
-        document.body.appendChild(this.stack);
-    }
-    try {
-        this.stack.firstChild.firstChild.appendChild(element);
-    } catch(err) { // some script has modified the stack structure. No big deal, we just reset it
-        this.stack.innerHTML = "<div class=\"CTFnodisplay\"><div class=\"CTFnodisplay\"></div></div>";
-        this.stack.firstChild.firstChild.appendChild(element);
-    }
-    
-    var _this = this;
-    
-    placeholderElement.addEventListener("click", function(event) {
-        _this.clickPlaceholder(elementID, event.altKey || event.button);
-        event.stopPropagation();
-    }, false);
-    placeholderElement.addEventListener("contextmenu", function(event) {
-        var contextInfo = {
-            "instance": _this.instance,
-            "elementID": elementID,
-            "src": element.source
-        };
-        if (_this.mediaPlayers[elementID] && _this.mediaPlayers[elementID].startTrack != null) {
-            contextInfo.hasH264 = true;
-            _this.mediaPlayers[elementID].setContextInfo(event, contextInfo);
-        } else {
-            contextInfo.hasH264 = false;
-            safari.self.tab.setContextMenuEventUserInfo(event, contextInfo);
-            event.stopPropagation();
-        }
-    }, false);
-    
-    // Building the placeholder
-    placeholderElement.innerHTML = "<div class=\"CTFplaceholderContainer\"><div class=\"CTFlogoVerticalPosition\"><div class=\"CTFlogoHorizontalPosition\"><div class=\"CTFlogoContainer CTFnodisplay\"><div class=\"CTFlogo\"></div><div class=\"CTFlogo CTFinset\"></div></div></div></div></div>";
-    if(element.dim.width > 0 && element.dim.height > 0 && element.dim.width <= this.settings.maxinvdim.width && element.dim.height <= this.settings.maxinvdim.height) placeholderElement.firstChild.className += " CTFinvisible";
-    
-    // Fill the main arrays
-    this.blockedElements[elementID] = element;
-    this.placeholderElements[elementID] = placeholderElement;
-    // Display the badge
-    this.displayBadge(element.label, elementID);
-    // Look for video replacements
-    if(this.settings["useH264"]) {
-        if(!this.directKill(elementID)) {
-            // Need to pass the base URL to the killers so that they can resolve URLs, eg. for AJAX requests.
-            // According to RFC1808, the base URL is given by the <base> tag if present,
-            // else by the 'Content-Base' HTTP header if present, else by the current URL.
-            // Fortunately the magical anchor trick takes care of all this for us!!
-            var tmpAnchor = document.createElement("a");
-            tmpAnchor.href = "./";
-            var elementData = {
-                "instance": this.instance,
-                "elementID": elementID,
-                "src": element.source,
-                "location": window.location.href,
-                "title": document.title,
-                "baseURL": tmpAnchor.href,
-                "params": getParams(element)
-            };
-            safari.self.tab.dispatchMessage("killFlash", elementData);
-        }
     }
 };
 
