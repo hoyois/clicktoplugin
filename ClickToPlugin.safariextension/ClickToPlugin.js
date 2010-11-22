@@ -5,16 +5,9 @@ ClickToPlugin class definition
 function ClickToPlugin() {
     
     this.blockedElements = new Array(); // array containing the blocked HTML elements
+    this.blockedData = new Array(); // array containing info on the blocked element (plugin, dimension, source, ...)
     this.placeholderElements = new Array(); // array containing the corresponding placeholder elements
     this.mediaPlayers = new Array(); // array containing the HTML5 media players
-    
-    /*
-    Each item in blockedElements will acquire 4 additional properties:
-    -> tag: 'embed' or 'object'
-    -> plugin: the name of the plugin that would handle the element
-    -> attr: an object gathering relevent attributes of the element
-    -> dim: the offset width and height of the element
-    */
     
     this.settings = null;
     this.instance = null;
@@ -46,6 +39,7 @@ function ClickToPlugin() {
 
 ClickToPlugin.prototype.clearAll = function(elementID) {
     this.blockedElements[elementID] = null;
+    this.blockedData[elementID] = null;
     this.placeholderElements[elementID] = null;
     this.mediaPlayers[elementID] = null;
 };
@@ -123,23 +117,19 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
     // flash element must not be blocked
     if (element.allowedToLoad) return;
     
-    if (element instanceof HTMLObjectElement) {
-        element.tag = "object";
-    } else if (element instanceof HTMLEmbedElement) {
-        element.tag = "embed";
-    } else {
-        return;
-    }
+    if (!(element instanceof HTMLObjectElement || element instanceof HTMLEmbedElement)) return;
     
-    if(element.parentNode && element.parentNode.className === "CTFnodisplay") { // fired beforeload twice
-        event.preventDefault();
-        return;
-    }
-    element.attr = getAttributes(element, event.url);
-    element.dim = {"width": element.offsetWidth, "height": element.offsetHeight};
+    var data = getAttributes(element, event.url);
+    /* PROBLEM: elements within display:none iframes fire beforeload events, and the following is incorrect
+    To solve this we'd need the CSS 2.1 'computed value' of height and width (and modify the arithmetic in mediaPlayer
+    to handle px and %), which might be possible using getMatchedCSSRules (returns matching rules in cascading order)
+    The 'auto' value will be a problem... */
+    data.width = element.offsetWidth;
+    data.height = element.offsetHeight;
     
-    element.plugin = safari.self.tab.canLoad(event, {"attr": element.attr, "location": window.location.href, "dim": element.dim, "className": element.className});
-    if(true === element.plugin) return; // whitelisted
+    
+    data.plugin = safari.self.tab.canLoad(event, {"data": data, "location": window.location.href, "className": element.className});
+    if(true === data.plugin) return; // whitelisted
     
     // Load the user settings
     if(this.settings === null) {
@@ -165,14 +155,116 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
         do {
             positionX += e.offsetLeft; positionY += e.offsetTop;
         } while(e = e.offsetParent);
-        if(!confirm("ClickToPlugin is about to block element " + this.instance + "." + elementID + ":\n" + "\nType: " + element.plugin + "\nLocation: " + window.location.href + "\nSource: " + element.attr.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + element.dim.width + "x" + element.dim.height)) return;
+        if(!confirm("ClickToPlugin is about to block element " + this.instance + "." + elementID + ":\n" + "\nType: " + data.plugin + "\nLocation: " + window.location.href + "\nSource: " + data.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + data.width + "x" + data.height)) return;
     }
     // END DEBUG
     
     event.preventDefault(); // prevents 'element' from loading
     
-    if(event.url || element.id) {
-        this.processBlockedElement(element, elementID);
+    if(!event.url && !element.id) return;
+    
+    // Create the placeholder element
+    var placeholderElement = document.createElement("div");
+    placeholderElement.title = data.src; // tooltip
+    placeholderElement.className = "CTFplaceholder CTFnoimage";
+    placeholderElement.style.width = data.width + "px !important";
+    placeholderElement.style.height = data.height + "px !important";
+    placeholderElement.style.opacity = this.settings["opacity"];
+    
+    // Copy CSS box & positioning properties that have an effect on page layout
+    // Note: 'display' is set to 'inline-block', which is always the effective value for 'replaced elements'
+    var style = getComputedStyle(element, null);
+    placeholderElement.style.setProperty("position", style.getPropertyValue("position"), "important");
+    placeholderElement.style.setProperty("top", style.getPropertyValue("top"), "important");
+    placeholderElement.style.setProperty("right", style.getPropertyValue("right"), "important");
+    placeholderElement.style.setProperty("bottom", style.getPropertyValue("bottom"), "important");
+    placeholderElement.style.setProperty("left", style.getPropertyValue("left"), "important");
+    placeholderElement.style.setProperty("z-index", style.getPropertyValue("z-index"), "important");
+    placeholderElement.style.setProperty("clear", style.getPropertyValue("clear"), "important");
+    placeholderElement.style.setProperty("float", style.getPropertyValue("float"), "important");
+    placeholderElement.style.setProperty("margin-top", style.getPropertyValue("margin-top"), "important");
+    placeholderElement.style.setProperty("margin-right", style.getPropertyValue("margin-right"), "important");
+    placeholderElement.style.setProperty("margin-bottom", style.getPropertyValue("margin-bottom"), "important");
+    placeholderElement.style.setProperty("margin-left", style.getPropertyValue("margin-left"), "important");
+    
+    // Replace the element by the placeholder
+    if(element.parentNode && element.parentNode.className !== "CTFnodisplay") {
+        element.parentNode.replaceChild(placeholderElement, element);
+    } else { // fired beforeload twice (NOTE: as of Safari 5.0.3, this test does not work too early in the handler!)
+        return;
+    }
+    
+    // Place the blocked element in the stack
+    if(this.stack ===  null) {
+        this.stack = document.createElement("div");
+        this.stack.id = "CTFstack";
+        this.stack.className = "CTFnodisplay";
+        this.stack.style.display = "none !important";
+        this.stack.innerHTML = "<div class=\"CTFnodisplay\"><div class=\"CTFnodisplay\"></div></div>";
+        document.body.appendChild(this.stack);
+    }
+    try {
+        this.stack.firstChild.firstChild.appendChild(element);
+    } catch(err) { // some script has modified the stack structure. No big deal, we just reset it
+        this.stack.innerHTML = "<div class=\"CTFnodisplay\"><div class=\"CTFnodisplay\"></div></div>";
+        this.stack.firstChild.firstChild.appendChild(element);
+    }
+    
+    var _this = this;
+    
+    placeholderElement.addEventListener("click", function(event) {
+        _this.clickPlaceholder(elementID, event.altKey || event.button);
+        event.stopPropagation();
+    }, false);
+    placeholderElement.addEventListener("contextmenu", function(event) {
+        var contextInfo = {
+            "instance": _this.instance,
+            "elementID": elementID,
+            "src": data.src,
+            "plugin": data.plugin
+        };
+        if (_this.mediaPlayers[elementID] && _this.mediaPlayers[elementID].startTrack != null) {
+            contextInfo.hasH264 = true;
+            _this.mediaPlayers[elementID].setContextInfo(event, contextInfo);
+        } else {
+            contextInfo.hasH264 = false;
+            safari.self.tab.setContextMenuEventUserInfo(event, contextInfo);
+            event.stopPropagation();
+        }
+    }, false);
+    
+    // Building the placeholder
+    placeholderElement.innerHTML = "<div class=\"CTFplaceholderContainer\"><div class=\"CTFlogoVerticalPosition\"><div class=\"CTFlogoHorizontalPosition\"><div class=\"CTFlogoContainer CTFnodisplay\"><div class=\"CTFlogo\"></div><div class=\"CTFlogo CTFinset\"></div></div></div></div></div>";
+    if(data.width > 0 && data.height > 0 && data.width <= this.settings.maxinvdim.width && data.height <= this.settings.maxinvdim.height) placeholderElement.firstChild.className += " CTFinvisible";
+    
+    // Fill the main arrays
+    this.blockedElements[elementID] = element;
+    this.blockedData[elementID] = data;
+    this.placeholderElements[elementID] = placeholderElement;
+    // Display the badge
+    this.displayBadge(data.plugin, elementID);
+    // Look for video replacements
+    if(this.settings["useH264"]) {
+        if(!this.directKill(elementID)) {
+            // Need to pass the base URL to the killers so that they can resolve URLs, eg. for AJAX requests.
+            // According to RFC1808, the base URL is given by the <base> tag if present,
+            // else by the 'Content-Base' HTTP header if present, else by the current URL.
+            // Fortunately the magical anchor trick takes care of all this for us!!
+            var tmpAnchor = document.createElement("a");
+            tmpAnchor.href = "./";
+            var elementData = {
+                "instance": this.instance,
+                "elementID": elementID,
+                "plugin": data.plugin,
+                "src": data.src,
+                "location": window.location.href,
+                "title": document.title,
+                "baseURL": tmpAnchor.href,
+                "href": data.href,
+                "params": getParams(element, data.plugin)
+            };
+            safari.self.tab.dispatchMessage("killPlugin", elementData);
+        }
     }
 };
 
@@ -200,7 +292,7 @@ ClickToPlugin.prototype.loadAll = function() {
 
 ClickToPlugin.prototype.loadSrc = function(string) {
     for(var i = 0; i < this.numberOfBlockedElements; i++) {
-        if(this.placeholderElements[i] && this.blockedElements[i].attr.src.indexOf(string) != -1) {
+        if(this.placeholderElements[i] && this.blockedData[i].src.indexOf(string) != -1) {
             this.loadPluginForElement(i);
         }
     }
@@ -258,11 +350,11 @@ ClickToPlugin.prototype.loadMediaForElement = function(elementID) {
     var contextInfo = {
         "instance": this.instance,
         "elementID": elementID,
-        "plugin": this.blockedElements[elementID].plugin
+        "plugin": this.blockedData[elementID].plugin
     };
 
     // Initialize player
-    this.mediaPlayers[elementID].initialize(this.settings["H264behavior"], this.blockedElements[elementID].dim.width, this.blockedElements[elementID].dim.height, this.settings["volume"], contextInfo);
+    this.mediaPlayers[elementID].initialize(this.settings["H264behavior"], this.blockedData[elementID].width, this.blockedData[elementID].height, this.settings["volume"], contextInfo);
     // mediaElement.allowedToLoad = true; // not used
 
     // Replace placeholder and load first track
@@ -333,7 +425,7 @@ ClickToPlugin.prototype.removeElement = function(elementID) {
 };
 
 ClickToPlugin.prototype.showElement = function(elementID) {
-    alert("Location: " + window.location.href + "\nSource: " + this.blockedElements[elementID].attr.src + "\n\n" + document.HTMLToString(this.blockedElements[elementID]));
+    alert("Location: " + window.location.href + "\nSource: " + this.blockedData[elementID].src + "\n\n" + document.HTMLToString(this.blockedElements[elementID]));
 };
 
 // I really don't like the next two methods, but can't come up with something better
@@ -395,108 +487,6 @@ ClickToPlugin.prototype.clickPlaceholder = function(elementID, usePlugin) {
         this.loadMediaForElement(elementID);
     } else {
         this.loadPluginForElement(elementID);
-    }
-};
-
-ClickToPlugin.prototype.processBlockedElement = function(element, elementID) {
-    
-    // Create the placeholder element
-    var placeholderElement = document.createElement("div");
-    placeholderElement.title = element.attr.src; // tooltip
-    placeholderElement.className = "CTFplaceholder CTFnoimage";
-    placeholderElement.style.width = element.dim.width + "px !important";
-    placeholderElement.style.height = element.dim.height + "px !important";
-    placeholderElement.style.opacity = this.settings["opacity"];
-    
-    // Copy CSS box & positioning properties that have an effect on page layout
-    // Note: 'display' is set to 'inline-block', which is always the effective value for 'replaced elements'
-    var style = getComputedStyle(element, null);
-    placeholderElement.style.setProperty("position", style.getPropertyValue("position"), "important");
-    placeholderElement.style.setProperty("top", style.getPropertyValue("top"), "important");
-    placeholderElement.style.setProperty("right", style.getPropertyValue("right"), "important");
-    placeholderElement.style.setProperty("bottom", style.getPropertyValue("bottom"), "important");
-    placeholderElement.style.setProperty("left", style.getPropertyValue("left"), "important");
-    placeholderElement.style.setProperty("z-index", style.getPropertyValue("z-index"), "important");
-    placeholderElement.style.setProperty("clear", style.getPropertyValue("clear"), "important");
-    placeholderElement.style.setProperty("float", style.getPropertyValue("float"), "important");
-    placeholderElement.style.setProperty("margin-top", style.getPropertyValue("margin-top"), "important");
-    placeholderElement.style.setProperty("margin-right", style.getPropertyValue("margin-right"), "important");
-    placeholderElement.style.setProperty("margin-bottom", style.getPropertyValue("margin-bottom"), "important");
-    placeholderElement.style.setProperty("margin-left", style.getPropertyValue("margin-left"), "important");
-    
-    // Replace the element by the placeholder
-    element.parentNode.replaceChild(placeholderElement, element);
-    
-    // Place the blocked element in the stack
-    if(this.stack ===  null) {
-        this.stack = document.createElement("div");
-        this.stack.id = "CTFstack";
-        this.stack.className = "CTFnodisplay";
-        this.stack.style.display = "none !important";
-        this.stack.innerHTML = "<div class=\"CTFnodisplay\"><div class=\"CTFnodisplay\"></div></div>";
-        document.body.appendChild(this.stack);
-    }
-    try {
-        this.stack.firstChild.firstChild.appendChild(element);
-    } catch(err) { // some script has modified the stack structure. No big deal, we just reset it
-        this.stack.innerHTML = "<div class=\"CTFnodisplay\"><div class=\"CTFnodisplay\"></div></div>";
-        this.stack.firstChild.firstChild.appendChild(element);
-    }
-    
-    var _this = this;
-    
-    placeholderElement.addEventListener("click", function(event) {
-        _this.clickPlaceholder(elementID, event.altKey || event.button);
-        event.stopPropagation();
-    }, false);
-    placeholderElement.addEventListener("contextmenu", function(event) {
-        var contextInfo = {
-            "instance": _this.instance,
-            "elementID": elementID,
-            "src": element.attr.src,
-            "plugin": element.plugin
-        };
-        if (_this.mediaPlayers[elementID] && _this.mediaPlayers[elementID].startTrack != null) {
-            contextInfo.hasH264 = true;
-            _this.mediaPlayers[elementID].setContextInfo(event, contextInfo);
-        } else {
-            contextInfo.hasH264 = false;
-            safari.self.tab.setContextMenuEventUserInfo(event, contextInfo);
-            event.stopPropagation();
-        }
-    }, false);
-    
-    // Building the placeholder
-    placeholderElement.innerHTML = "<div class=\"CTFplaceholderContainer\"><div class=\"CTFlogoVerticalPosition\"><div class=\"CTFlogoHorizontalPosition\"><div class=\"CTFlogoContainer CTFnodisplay\"><div class=\"CTFlogo\"></div><div class=\"CTFlogo CTFinset\"></div></div></div></div></div>";
-    if(element.dim.width > 0 && element.dim.height > 0 && element.dim.width <= this.settings.maxinvdim.width && element.dim.height <= this.settings.maxinvdim.height) placeholderElement.firstChild.className += " CTFinvisible";
-    
-    // Fill the main arrays
-    this.blockedElements[elementID] = element;
-    this.placeholderElements[elementID] = placeholderElement;
-    // Display the badge
-    this.displayBadge(element.plugin, elementID);
-    // Look for video replacements
-    if(this.settings["useH264"]) {
-        if(!this.directKill(elementID)) {
-            // Need to pass the base URL to the killers so that they can resolve URLs, eg. for AJAX requests.
-            // According to RFC1808, the base URL is given by the <base> tag if present,
-            // else by the 'Content-Base' HTTP header if present, else by the current URL.
-            // Fortunately the magical anchor trick takes care of all this for us!!
-            var tmpAnchor = document.createElement("a");
-            tmpAnchor.href = "./";
-            var elementData = {
-                "instance": this.instance,
-                "elementID": elementID,
-                "plugin": element.plugin,
-                "src": element.attr.src,
-                "location": window.location.href,
-                "title": document.title,
-                "baseURL": tmpAnchor.href,
-                "href": element.attr.href,
-                "params": getParams(element)
-            };
-            safari.self.tab.dispatchMessage("killPlugin", elementData);
-        }
     }
 };
 

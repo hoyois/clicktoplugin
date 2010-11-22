@@ -71,7 +71,7 @@ function respondToMessage(event) {
 
 function respondToCanLoad(message) {
     // Make checks in correct order for optimal performance
-    if(message.location !== undefined) return blockOrAllow(message);
+    if(message.location !== undefined) return blockOrAllow(message.data, message.location, message.className);
     switch(message) {
         case "getSettings":
             return getSettings();
@@ -84,16 +84,16 @@ function respondToCanLoad(message) {
     }
 }
 
-function blockOrAllow(data) { // returns true if element can be loaded, the name of the plugin otherwise
+function blockOrAllow(data, location, className) { // returns true if element can be loaded, the name of the plugin otherwise
     
     // no source and no type -> must allow, it's probably going to pass through here again after being modified by a script
-    if(!data.attr.src && !data.attr.type && !data.attr.classid) return true;
+    if(!data.src && !data.type && !data.classid) return true;
     
     // native Safari support
     // NOTE: 3rd-party plugins can override this... Anyone still using Adobe Reader? LOL
-    var ext = extractExt(data.attr.src); // used later as well
-    if(data.attr.type) {
-        if(isNativeType(data.attr.type)) return true;
+    var ext = extractExt(data.src); // used later as well
+    if(data.type) {
+        if(isNativeType(data.type)) return true;
     } else {
         // This is a vulnerability: e.g. a .png file can be served as Flash and won't be blocked...
         // This only works with native extensions, though. See below
@@ -101,25 +101,25 @@ function blockOrAllow(data) { // returns true if element can be loaded, the name
     }
     
     // Deal with invisible plugins
-    if(safari.extension.settings["loadInvisible"] && data.dim.width > 0 && data.dim.height > 0) {
-        if(data.dim.width <= maxinvdim.width && data.dim.height <= maxinvdim.height) return true;
+    if(safari.extension.settings["loadInvisible"] && data.width > 0 && data.height > 0) {
+        if(data.width <= maxinvdim.width && data.height <= maxinvdim.height) return true;
     }
     
     // Deal with whitelisted content
     if(safari.extension.settings["uselocWhitelist"]) {
-        if(locwhitelist && matchList(locwhitelist, data.location)) return true;
-        if(locblacklist && !matchList(locblacklist, data.location)) return true;
+        if(locwhitelist && matchList(locwhitelist, location)) return true;
+        if(locblacklist && !matchList(locblacklist, location)) return true;
     }
     if(safari.extension.settings["usesrcWhitelist"]) {
-        if(srcwhitelist && matchList(srcwhitelist, data.attr.src)) return true;
-        if(srcblacklist && !matchList(srcblacklist, data.attr.src)) return true;
+        if(srcwhitelist && matchList(srcwhitelist, data.src)) return true;
+        if(srcblacklist && !matchList(srcblacklist, data.src)) return true;
     }
     
     // The following determination of type is based on WebKit's internal mechanism
-    var type = data.attr.type;
+    var type = data.type;
     var plugin = null;
     if(!type) {
-        if(data.attr.classid) type = getTypeForClassid(data.attr.classid);
+        if(data.classid) type = getTypeForClassid(data.classid);
         if(!type) {
             // For extensions in Info.plist (except css, pdf, xml, xbl), WebKit checks Content-type header at this point
             // and only does the following if it matches no plugin.
@@ -153,9 +153,9 @@ function blockOrAllow(data) { // returns true if element can be loaded, the name
     // At this point we know we should block the element
     
     // Exception: ask the user what to do if a QT object would launch QTP
-    if(data.attr.autohref && data.attr.target === "quicktimeplayer" && data.attr.href) {
-        if(data.className === "CTFallowedToLoad") return true;
-        if(confirm(QT_CONFIRM_LAUNCH_DIALOG(data.attr.href))) return true;
+    if(data.autohref && data.target === "quicktimeplayer" && data.href) {
+        if(className === "CTFallowedToLoad") return true; // for other extensions with open-in-QTP functionality
+        if(confirm(QT_CONFIRM_LAUNCH_DIALOG(data.href))) return true;
     }
     
     // Exception 2: JS-Silverlight interaction?

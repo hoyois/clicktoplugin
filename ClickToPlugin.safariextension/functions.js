@@ -16,8 +16,8 @@ function getAttributes(element, url) {
     var info = new Object();
     info.type = element.type;
     var tmpAnchor = document.createElement("a");
-    switch (element.tag) {
-        case "embed":
+    switch (element.nodeName) {
+        case "EMBED":
             if(element.hasAttribute("qtsrc")) {
                 tmpAnchor.href = element.getAttribute("qtsrc");
                 info.src = tmpAnchor.href;
@@ -33,7 +33,7 @@ function getAttributes(element, url) {
                 info.target = element.getAttribute("target");
             }
             break;
-        case "object":
+        case "OBJECT":
             info.classid = element.getAttribute("classid");
             var paramElements = element.getElementsByTagName("param");
             for (var i = 0; i < paramElements.length; i++) {
@@ -87,14 +87,14 @@ function getAttributes(element, url) {
     return info;
 }
 
-function getParams(element) {
-    switch(element.plugin) {
+function getParams(element, plugin) {
+    switch(plugin) {
         case "Flash": // need flashvars
-            switch (element.tag) {
-                case "embed":
+            switch (element.nodeName) {
+                case "EMBED":
                     return (element.hasAttribute("flashvars") ? element.getAttribute("flashvars") : ""); // fixing Safari's buggy JS
                     break
-                case "object":
+                case "OBJECT":
                     var paramElements = element.getElementsByTagName("param");
                     for (var i = paramElements.length - 1; i >= 0; i--) {
                         try{ // see NOTE 1
@@ -108,7 +108,7 @@ function getParams(element) {
             }
             break;
         case "Silverlight": // need initparams
-            if(element.tag != "object") return "";
+            if(element.nodeName !== "OBJECT") return "";
             var paramElements = element.getElementsByTagName("param");
             for (var i = 0; i < paramElements.length; i++) {
                 try { // see NOTE 1
@@ -120,11 +120,11 @@ function getParams(element) {
             return "";
             break;
         case "DivX": // need previewimage
-            switch(element.tag) {
-                case "embed":
+            switch(element.nodeName) {
+                case "EMBED":
                     return element.getAttribute("previewimage");
                     break
-                case "object":
+                case "OBJECT":
                     var paramElements = element.getElementsByTagName("param");
                     for (var i = 0; i < paramElements.length; i++) {
                         try{ // see NOTE 1
