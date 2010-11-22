@@ -146,7 +146,7 @@ YouTubeKiller.prototype.getMediaDataFromURLMap = function(videoID, videoHash, ur
         videoURL = availableFormats[35];
     } else if(availableFormats[18]) {// <=360p
         videoURL = availableFormats[18];
-    }
+    } 
     return {"posterURL": posterURL, "videoURL": videoURL, "badgeLabel": badgeLabel};
 };
 
