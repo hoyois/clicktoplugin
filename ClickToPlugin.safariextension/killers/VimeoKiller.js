@@ -16,9 +16,8 @@ VimeoKiller.prototype.processElement = function(data, callback) {
     }
     if(!videoID) return;
     
-    var title, posterURL, videoURL;
+    var title, posterURL, videoURL, siteInfo;
     var badgeLabel = "H.264";
-    var noSniff = false;
     
     var xhr = new XMLHttpRequest();
     xhr.open('GET', "http://www.vimeo.com/moogaloop/load/clip:" + videoID + "/local/", true);
@@ -49,7 +48,6 @@ VimeoKiller.prototype.processElement = function(data, callback) {
             title = xml.getElementsByTagName("caption")[0].textContent;
         }
         
-        var siteInfo;
         if(data.location.indexOf("vimeo.com/") === -1 || data.location == "http://vimeo.com/" || data.location.indexOf("player.vimeo.com/") !== -1) siteInfo = {"name": "Vimeo", "url": "http://vimeo.com/" + videoID};
         
         var videoData = {

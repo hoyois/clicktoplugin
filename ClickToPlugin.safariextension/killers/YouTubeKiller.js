@@ -142,11 +142,11 @@ YouTubeKiller.prototype.getMediaDataFromURLMap = function(videoID, videoHash, ur
     } else if(availableFormats[22] && safari.extension.settings["maxresolution"] > 1) {// 720p
         badgeLabel = "HD&nbsp;H.264";
         videoURL = availableFormats[22];
-    } else if(availableFormats[35] && safari.extension.settings["QTbehavior"] > 2 && canPlayFLV) {// 480p FLV
+    } else if(availableFormats[35] && safari.extension.settings["maxresolution"] > 0 && safari.extension.settings["QTbehavior"] > 2 && canPlayFLV) {// 480p FLV
         videoURL = availableFormats[35];
     } else if(availableFormats[18]) {// <=360p
         videoURL = availableFormats[18];
-    } 
+    }
     return {"posterURL": posterURL, "videoURL": videoURL, "badgeLabel": badgeLabel};
 };
 
