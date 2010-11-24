@@ -219,6 +219,7 @@
 		<string>Max resolution</string>
 		<key>Titles</key>
 		<array>
+		    <string>360p</string>
 			<string>480p</string>
 			<string>720p</string>
 			<string>1080p</string>
@@ -228,6 +229,7 @@
 		<string>PopUpButton</string>
 		<key>Values</key>
 		<array>
+		    <real>0</real>
 			<real>1</real>
 			<real>2</real>
 			<real>3</real>

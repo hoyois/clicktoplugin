@@ -237,7 +237,7 @@ function handleWhitelisting(type, url) {
 }
 
 // KILLERS
-const killers = [new YouTubeKiller(), new VimeoKiller(), new DailymotionKiller(), new VeohKiller(), new GenericKiller(), new SLKiller(), new QTKiller(), new WMKiller(), new DivXKiller()];
+const killers = [new YouTubeKiller(), new VimeoKiller(), new DailymotionKiller(), new VeohKiller(), new BreakKiller(), new TumblrKiller(), new BlipKiller(), new GenericKiller(), new SLKiller(), new QTKiller(), new WMKiller(), new DivXKiller()];
 
 function findKillerFor(data) {
     for (var i = 0; i < killers.length; i++) {
