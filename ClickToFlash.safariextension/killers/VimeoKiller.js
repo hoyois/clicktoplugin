@@ -15,14 +15,20 @@ VimeoKiller.prototype.processElement = function(data, callback) {
     }
     if(!videoID) return;
     
-    var title, posterURL, videoURL;
+    var title, posterURL, videoURL, siteInfo;
     var badgeLabel = "H.264";
-    var noSniff = false;
     
     var xhr = new XMLHttpRequest();
     xhr.open('GET', "http://www.vimeo.com/moogaloop/load/clip:" + videoID + "/local/", true);
     xhr.onload = function() {
         var xml = xhr.responseXML;
+        /*if(xml.getElementsByTagName("error").length > 0) { // never happened
+            // Try this as a last resort (will not work if H264 version doesn't exist)
+            videoURL = "http://www.vimeo.com/play_redirect?clip_id=" + videoID + "&quality=" + (safari.extension.settings["maxresolution"] > 1 ? "hd" : "sd") + "&codecs=H264";
+            if (safari.extension.settings["maxresolution"] > 1) badgeLabel = "HD H.264";
+            noSniff = true; // must remove the 'Download Video' option
+            return;
+        }*/
         
         if (safari.extension.settings["maxresolution"] > 1) {
             if(xml.getElementsByTagName("isHD").length > 0) {
@@ -41,7 +47,6 @@ VimeoKiller.prototype.processElement = function(data, callback) {
             title = xml.getElementsByTagName("caption")[0].textContent;
         }
         
-        var siteInfo;
         if(data.location.indexOf("vimeo.com/") === -1 || data.location == "http://vimeo.com/" || data.location.indexOf("player.vimeo.com/") !== -1) siteInfo = {"name": "Vimeo", "url": "http://vimeo.com/" + videoID};
         
         var videoData = {

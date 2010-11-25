@@ -60,14 +60,17 @@ function canPlayTypeWithHTML5(MIMEType) {
     return document.createElement("video").canPlayType(MIMEType);
 }
 const canPlayFLV = canPlayTypeWithHTML5("video/x-flv");
+const canPlayWM = canPlayTypeWithHTML5("video/x-ms-wmv");
 
 // and certainly not this this one! but it does the job reasonably well
 function willPlaySrcWithHTML5(url) {
     url = extractExt(url);
     if (/^(?:mp4|mpe?g|mov|m4v)$/i.test(url)) return "video";
     if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && /^flv$/i.test(url)) return "video";
+    if(safari.extension.settings["QTbehavior"] > 1 && canPlayWM && /^(?:wm[vp]?|asf)$/i.test(url)) return "video";
     if(/^(?:mp3|wav|midi?|aif[fc]?|aac|m4a)$/i.test(url)) return "audio";
     if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && /^fla$/i.test(url)) return "video";
+    if(safari.extension.settings["QTbehavior"] > 1 && canPlayWM && /^wma$/i.test(url)) return "audio";
     return "";
 }
 

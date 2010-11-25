@@ -17,6 +17,7 @@ DailymotionKiller.prototype.processElement = function(data, callback) {
 };
 
 DailymotionKiller.prototype.processElementFromSequence = function(sequence, callback) {
+    // NOTE: sequence.replace(/\\'/g, "'") is JSON but it's so messy that regexp search is easier
     var posterURL, videoURL, matches;
     var badgeLabel = "H.264";
     // sdURL (FLV only)
@@ -27,6 +28,7 @@ DailymotionKiller.prototype.processElementFromSequence = function(sequence, call
     // hqURL (<=480p)
     matches = sequence.match(/\"hqURL\":\"([^"]*)\"/);
     if(matches) videoURL = matches[1].replace(/\\\//g,"/");
+    // hdURL (720p)
     if(safari.extension.settings["maxresolution"] > 1) {
         matches = sequence.match(/\"hdURL\":\"([^"]*)\"/);
         if(matches) {
@@ -34,7 +36,7 @@ DailymotionKiller.prototype.processElementFromSequence = function(sequence, call
             badgeLabel = "HD&nbsp;H.264";
         }
     }
-    // hdURL (720p)
+    
     matches = sequence.match(/\"backgroundImageURL\":\"([^"]*)\"/);
     if(matches) posterURL = matches[1].replace(/\\\//g,"/");
     

@@ -31,7 +31,7 @@ VeohKiller.prototype.processElement = function(data, callback) {
             "playlist": [{"mediaType": "video", "title": title, "posterURL": posterURL, "mediaURL": videoURL}],
             "badgeLabel": "Video" // There's no HD on Veoh, as far as I see, despite what they say. It's < 360p! Am I doing something wrong??
         }
-        if(isEmbed) videoData.playlist[0].siteInfo = {"name": "Veoh", "url": "http://www.veoh.com/browse/videos#watch%3D" + videoID};
+        if(isEmbed || data.location === "http://www.veoh.com/") videoData.playlist[0].siteInfo = {"name": "Veoh", "url": "http://www.veoh.com/browse/videos#watch%3D" + videoID};
         callback(videoData);
     };
     xhr.send(null);
