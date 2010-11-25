@@ -18,6 +18,7 @@ DailymotionKiller.prototype.processElement = function(data, callback) {
 };
 
 DailymotionKiller.prototype.processElementFromSequence = function(sequence, callback) {
+    // NOTE: sequence.replace(/\\'/g, "'") is JSON but it's so messy that regexp search is easier
     var posterURL, videoURL, matches;
     var badgeLabel = "H.264";
     // sdURL (FLV only)

@@ -22,33 +22,52 @@ BlipKiller.prototype.processElement = function(data, callback) {
         else return;
     }
     
-    var videoURL, siteInfo;
+    var videoURL, sourceURL, siteInfo;
     var badgeLabel = "H.264";
     
-    // USE JSON INSTEAD (has thumbnail info!)
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.onload = function() {
-        var json = JSON.parse(xhr.responseText);
+        var json = JSON.parse(xhr.responseText.replace(/\\'/g, "'")); // correct Blip.tv's invalid JSON
         
-        var ext;
         var availableFormats = new Array();
+        var hasH264Format = false;
+        var ext, height, source;
         for(var i = 0; i < json.additionalMedia.length; i++) {
-            ext = json.additionalMedia[i].url.substr(-3);alert(ext);
-            if(ext === "mp4" || ext === "m4v" || ext == "mov") {
-                availableFormats[parseInt(json.additionalMedia[i].height)] = json.additionalMedia[i].url;
+            ext = json.additionalMedia[i].url.substr(-3).toLowerCase();
+            if(ext === "mp4" || ext === "m4v" || ext === "mov" || ext === "mpg") {
+                hasH264Format = true;
+                ext = true;
+            } else {
+                if((ext === "flv" && canPlayFLV) || (ext === "wmv" && canPlayWM)) ext = false;
+                else continue;
             }
+            height = parseInt(json.additionalMedia[i].height);
+            if(json.additionalMedia[i].role === "Source") {
+                source = {"height": height, "isH264": ext, "url": json.additionalMedia[i].url};
+                continue;
+            }
+            if(availableFormats[height] && availableFormats[height].isH264) continue;
+            availableFormats[height] = {"isSource": json.additionalMedia[i].role === "Source", "isH264": ext, "url": json.additionalMedia[i].url};
         }
         
-        for(var height in availableFormats) {
-            if(height <= 360) videoURL = availableFormats[height];
-            else if(safari.extension.settings["maxresolution"] > 0 && height <= 480) {
-                videoURL = availableFormats[height];
-            } else if((safari.extension.settings["maxresolution"] > 1 && height <= 720) || (safari.extension.settings["maxresolution"] > 2 && height <= 1080)) {
-                videoURL = availableFormats[height];
-                badgeLabel = "HD&nbsp;H.264";
+        var assignVideoURL = function(height, isH264, url) {
+            if(safari.extension.settings["QTbehavior"] === 0 && !isH264) return;
+            if(safari.extension.settings["QTbehavior"] === 1 && !isH264 && hasH264Format) return;
+            if(height <= 360 || (safari.extension.settings["maxresolution"] > 0 && height <= 480)) {
+                videoURL = url;
+                badgeLabel = isH264 ? "H.264" : "Video";
             }
+            else if((safari.extension.settings["maxresolution"] > 1 && height <= 720) || (safari.extension.settings["maxresolution"] > 2 && height <= 1080)) {
+                videoURL = url;
+                badgeLabel = isH264 ? "HD&nbsp;H.264" : "Video";
+            }
+        };
+        
+        for(var h in availableFormats) {
+            assignVideoURL(h, availableFormats[h].isH264, availableFormats[h].url);
         }
+        if(source) assignVideoURL(source.height, source.isH264, source.url);
         
         if(!videoURL) return;
         

@@ -27,7 +27,7 @@ BreakKiller.prototype.processElement = function(data, callback) {
     
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
-    xhr.onload = function() {alert(xhr.responseText)
+    xhr.onload = function() {
         var videoURL;
         var badgeLabel = "H.264";
         var matches = xhr.responseText.match(/sGlobalFileNameHDD='([^']*)'/);
