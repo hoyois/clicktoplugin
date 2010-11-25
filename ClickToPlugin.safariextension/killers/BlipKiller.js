@@ -22,7 +22,7 @@ BlipKiller.prototype.processElement = function(data, callback) {
         else return;
     }
     
-    var videoURL, sourceURL, siteInfo;
+    var videoURL, siteInfo;
     var badgeLabel = "H.264";
     
     var xhr = new XMLHttpRequest();
