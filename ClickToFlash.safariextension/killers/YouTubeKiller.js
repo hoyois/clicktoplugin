@@ -3,11 +3,13 @@ function YouTubeKiller() {
 }
 
 YouTubeKiller.prototype.canKill = function(data) {
-    return (data.src.indexOf("ytimg.com") != -1 || data.src.indexOf("youtube.com") != -1 || data.src.indexOf("youtube-nocookie.com") != -1);
+    if(data.src.indexOf("ytimg.com/") != -1) {data.onsite = true; return true;}
+    if(data.src.indexOf("youtube.com/") != -1) {data.onsite = false; return true;}
+    return false;
 };
 
 YouTubeKiller.prototype.processElement = function(data, callback) {
-    if(data.params) { // on-site video
+    if(data.onsite) {
         if(safari.extension.settings["usePlaylists"]) {
             var URLvars = data.location.split(/#!|\?/)[1];
             var playlistID = null;
@@ -15,8 +17,11 @@ YouTubeKiller.prototype.processElement = function(data, callback) {
                 URLvars = URLvars.split("&");
                 for (var i = 0; i < URLvars.length; i++) {
                     var keyValuePair = URLvars[i].split("="); 
-                    if (keyValuePair[0] == "p") {
+                    if (keyValuePair[0] === "p") {
                         playlistID = keyValuePair[1];
+                        break;
+                    } else if (keyValuePair[0] === "list" && /^PL/.test(keyValuePair[1])) {
+                        playlistID = keyValuePair[1].substring(2);
                         break;
                     }
                 }
