@@ -59,7 +59,7 @@ BlipKiller.prototype.processElement = function(data, callback) {
             }
             else if((safari.extension.settings["maxresolution"] > 1 && height <= 720) || (safari.extension.settings["maxresolution"] > 2 && height <= 1080)) {
                 videoURL = url;
-                badgeLabel = isH264 ? "HD&nbsp;H.264" : "Video";
+                badgeLabel = isH264 ? "HD&nbsp;H.264" : "HD&nbsp;Video";
             }
         };
         
