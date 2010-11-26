@@ -45,7 +45,7 @@ BreakKiller.prototype.processElement = function(data, callback) {
         }
         if(!videoURL) return;
         videoURL = videoURL.replace(/\.flv$/, ".mp4");
-        if(!/.mp4$/.test(videoURL)) videoURL += ".mp4";
+        if(!/\.mp4$/.test(videoURL)) videoURL += ".mp4";
         
         if(!videoHash) {
             matches = xhr.responseText.match(/sGlobalToken=['"]([^'"]*)['"]/);
