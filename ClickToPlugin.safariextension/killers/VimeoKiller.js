@@ -4,7 +4,7 @@ function VimeoKiller() {
 
 VimeoKiller.prototype.canKill = function(data) {
     if(data.plugin != "Flash" || !safari.extension.settings["replaceFlash"]) return false;
-    return (data.src.indexOf("moogaloop") != -1 || data.src.indexOf("moogalover") != -1);
+    return (data.src.indexOf("vimeo.com/moogaloop") != -1 || data.src.indexOf("moogalover") != -1);
 };
 
 VimeoKiller.prototype.processElement = function(data, callback) {
@@ -23,13 +23,6 @@ VimeoKiller.prototype.processElement = function(data, callback) {
     xhr.open('GET', "http://www.vimeo.com/moogaloop/load/clip:" + videoID + "/local/", true);
     xhr.onload = function() {
         var xml = xhr.responseXML;
-        /*if(xml.getElementsByTagName("error").length > 0) { // never happened
-            // Try this as a last resort (will not work if H264 version doesn't exist)
-            videoURL = "http://www.vimeo.com/play_redirect?clip_id=" + videoID + "&quality=" + (safari.extension.settings["maxresolution"] > 1 ? "hd" : "sd") + "&codecs=H264";
-            if (safari.extension.settings["maxresolution"] > 1) badgeLabel = "HD H.264";
-            noSniff = true; // must remove the 'Download Video' option
-            return;
-        }*/
         
         if (safari.extension.settings["maxresolution"] > 1) {
             if(xml.getElementsByTagName("isHD").length > 0) {
