@@ -26,7 +26,7 @@ MetacafeKiller.prototype.processElementFromFlashvars = function(flashvars, siteI
     if(safari.extension.settings["maxresolution"] > 1) videoURL = mediaList.highDefinitionMP4;
     if(!videoURL) videoURL = mediaList.MP4;
     else badgeLabel = "HD&nbsp;H.264";
-    if(!videoURL && safari.extension.settings["QTbehavior"] > 1) {
+    if(!videoURL && safari.extension.settings["QTbehavior"] > 1 && canPlayFLV) {
         videoURL = mediaList.flv;
         badgeLabel = "Video";
     }
