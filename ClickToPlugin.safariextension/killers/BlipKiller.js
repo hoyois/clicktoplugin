@@ -52,6 +52,7 @@ BlipKiller.prototype.processElement = function(data, callback) {
         }
         
         var assignVideoURL = function(height, isH264, url) {
+            if(!isH264 && !canPlayFLV) return;
             if(safari.extension.settings["QTbehavior"] === 0 && !isH264) return;
             if(safari.extension.settings["QTbehavior"] === 1 && !isH264 && hasH264Format) return;
             if(height <= 360 || (safari.extension.settings["maxresolution"] > 0 && height <= 480)) {
