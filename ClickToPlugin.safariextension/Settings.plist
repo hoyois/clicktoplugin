@@ -72,7 +72,7 @@
 		<key>Key</key>
 		<string>useH264</string>
 		<key>Title</key>
-		<string>Look for video replacements to                     </string>
+		<string>Look for video replacements to                      </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -229,7 +229,7 @@
 		<string>PopUpButton</string>
 		<key>Values</key>
 		<array>
-			<real>0</real>
+			<real>0.0</real>
 			<real>1</real>
 			<real>2</real>
 			<real>3</real>
