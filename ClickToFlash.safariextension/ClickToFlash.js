@@ -63,10 +63,13 @@ ClickToFlash.prototype.respondToMessage = function(event) {
                     this.reloadInPlugin(event.message.elementID);
                     break;
                 case "download":
-                    this.downloadMedia(event.message.elementID);
+                    this.downloadMedia(event.message.elementID, event.message.source);
+                    break;
+                case "showurl":
+                    this.showURL(event.message.elementID, event.message.source);
                     break;
                 case "qtp":
-                    this.viewInQuickTimePlayer(event.message.elementID);
+                    this.viewInQuickTimePlayer(event.message.elementID, event.message.source);
                     break;
                 case "show":
                     this.showElement(event.message.elementID);
@@ -206,7 +209,8 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
         element.parentNode.replaceChild(placeholderElement, element);
     } else { // fired beforeload twice (NOTE: as of Safari 5.0.3, this test does not work too early in the handler!)
         return;
-    }    
+    }
+    
     // Place the blocked element in the stack
     if(this.stack ===  null) {
         this.stack = document.createElement("div");
@@ -235,9 +239,10 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
             "elementID": elementID,
             "src": data.src
         };
-        if (_this.mediaPlayers[elementID] && _this.mediaPlayers[elementID].startTrack != null) {
+        if (_this.mediaPlayers[elementID] && _this.mediaPlayers[elementID].startTrack !== null && _this.mediaPlayers[elementID].playlist[0].defaultSource !== undefined) {
             contextInfo.hasH264 = true;
-            _this.mediaPlayers[elementID].setContextInfo(event, contextInfo);
+            _this.mediaPlayers[elementID].setContextInfo(event, contextInfo, null);
+            event.stopPropagation();
         } else {
             contextInfo.hasH264 = false;
             safari.self.tab.setContextMenuEventUserInfo(event, contextInfo);
@@ -245,7 +250,7 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
         }
     }, false);
     
-    // Building the placeholder
+    // Build the placeholder
     placeholderElement.innerHTML = "<div class=\"CTFplaceholderContainer\"><div class=\"CTFlogoVerticalPosition\"><div class=\"CTFlogoHorizontalPosition\"><div class=\"CTFlogoContainer CTFnodisplay\"><div class=\"CTFlogo\"></div><div class=\"CTFlogo CTFinset\"></div></div></div></div></div>";
     if(data.width > 0 && data.height > 0 && data.width <= this.settings.maxinvdim.width && data.height <= this.settings.maxinvdim.height) placeholderElement.firstChild.className += " CTFinvisible";
     
@@ -317,27 +322,19 @@ ClickToFlash.prototype.loadInvisible = function() {
 };
 
 ClickToFlash.prototype.prepMedia = function(mediaData) {
-    if(mediaData.playlist.length == 0 || !mediaData.playlist[0].mediaURL) return;
+    if(mediaData.playlist.length === 0 || mediaData.playlist[0].sources.length === 0 || !mediaData.playlist[0].sources[0].url) return;
     if(!this.blockedElements[mediaData.elementID]) return; // User has loaded Flash already
-    
+
     if(!this.mediaPlayers[mediaData.elementID]) {
-        this.mediaPlayers[mediaData.elementID] = new mediaPlayer(mediaData.isAudio ? "audio" : "video");
-    }
-    if(mediaData.loadAfter) { // just adding stuff to the playlist
-        this.mediaPlayers[mediaData.elementID].playlistLength -= mediaData.missed;
-        this.mediaPlayers[mediaData.elementID].addToPlaylist(mediaData.playlist);
-        return;
+        this.mediaPlayers[mediaData.elementID] = new mediaPlayer();
     }
     
-    this.mediaPlayers[mediaData.elementID].addToPlaylist(mediaData.playlist, true);
-    this.mediaPlayers[mediaData.elementID].playlistLength = mediaData.playlistLength ? mediaData.playlistLength : mediaData.playlist.length;
-    this.mediaPlayers[mediaData.elementID].startTrack = mediaData.startTrack ? mediaData.startTrack : 0;
-    
-    this.mediaPlayers[mediaData.elementID].usePlaylistControls = this.settings["usePlaylists"] && !mediaData.noPlaylistControls && this.mediaPlayers[mediaData.elementID].playlistLength > 1;
+    this.mediaPlayers[mediaData.elementID].handleMediaData(mediaData, this.settings["usePlaylists"], this.settings["useSwitcher"]);
+    if(mediaData.loadAfter) return;
 
     // Check if we should load video at once
-    if(mediaData.autoload) {
-        this.loadMediaForElement(mediaData.elementID);
+    if(mediaData.autoload && mediaData.playlist[0].defaultSource !== undefined) {
+        this.loadMediaForElement(mediaData.elementID, null);
         return;
     } else {
         if(this.settings["showPoster"] && mediaData.playlist[0].posterURL) {
@@ -348,38 +345,86 @@ ClickToFlash.prototype.prepMedia = function(mediaData) {
         }
         if(mediaData.playlist[0].title) this.placeholderElements[mediaData.elementID].title = mediaData.playlist[0].title; // set tooltip
         else this.placeholderElements[mediaData.elementID].removeAttribute("title");
+        
+        if(this.settings["useSwitcher"] && !mediaData.isAudio) {
+            this.initializeSourceSwitcher(mediaData.elementID, mediaData.playlist[0].sources, mediaData.playlist[0].defaultSource);
+        }
     }
     
     var badgeLabel = mediaData.badgeLabel;
-    if(!badgeLabel) badgeLabel = "Video";
+    if(badgeLabel === undefined) badgeLabel = mediaData.isAudio ? "Audio" : "Video";
     
-    this.displayBadge(badgeLabel, mediaData.elementID);
+    if(mediaData.playlist[0].defaultSource !== undefined) this.displayBadge(badgeLabel, mediaData.elementID);
+    else if(this.settings["useSwitcher"] && !mediaData.isAudio) this.displayBadge("Flash*", mediaData.elementID);
 };
 
-ClickToFlash.prototype.loadMediaForElement = function(elementID) {
+ClickToFlash.prototype.initializeSourceSwitcher = function(elementID, sources, defaultSource) {
+    var _this = this;
+    var loadPlugin = function(event) {
+        _this.loadPluginForElement(elementID);
+        event.stopPropagation();
+    };
+    var handleClickEvent = function(event, source) {
+        _this.loadMediaForElement(elementID, source);
+        event.stopPropagation();
+    };
+    var handleContextMenuEvent = function(event, source) {
+        var contextInfo = {
+            "instance": _this.instance,
+            "elementID": elementID,
+            "src": _this.blockedData[elementID].src,
+            "hasH264": true
+        };
+        _this.mediaPlayers[elementID].setContextInfo(event, contextInfo, source);
+        event.stopPropagation();
+    };
+    
+    var sourceSelector = new sourceSwitcher("Flash", loadPlugin, handleClickEvent, handleContextMenuEvent);
+    
+    sourceSelector.setPosition(0,0);
+    sourceSelector.buildSourceList(sources);
+    sourceSelector.setCurrentSource(defaultSource);
+    
+    this.placeholderElements[elementID].firstChild.appendChild(sourceSelector.element);
+};
+
+ClickToFlash.prototype.loadMediaForElement = function(elementID, source) {
+    if(source === null) source = this.mediaPlayers[elementID].playlist[0].defaultSource;
+    if(source === undefined) {
+        this.loadPluginForElement(elementID);
+        return;
+    }
     var contextInfo = {
         "instance": this.instance,
         "elementID": elementID
     };
 
     // Initialize player
-    this.mediaPlayers[elementID].initialize(this.settings["H264behavior"], this.blockedData[elementID].width, this.blockedData[elementID].height, this.settings["volume"], contextInfo);
-    // mediaElement.allowedToLoad = true; // not used
+    var _this = this;
+    this.mediaPlayers[elementID].createMediaElement("Flash", function(event) {_this.reloadInPlugin(elementID); event.stopPropagation();}, this.blockedData[elementID].width, this.blockedData[elementID].height, this.settings["buffer"], this.settings["volume"], contextInfo);
 
     // Replace placeholder and load first track
     this.placeholderElements[elementID].parentNode.replaceChild(this.mediaPlayers[elementID].containerElement, this.placeholderElements[elementID]);
-    this.mediaPlayers[elementID].loadTrack(0);
+    this.mediaPlayers[elementID].loadTrack(0, source);
     this.placeholderElements[elementID] = null;
     
 };
 
-ClickToFlash.prototype.downloadMedia = function(elementID) {
+ClickToFlash.prototype.downloadMedia = function(elementID, source) {
     var track = this.mediaPlayers[elementID].currentTrack;
     if(track === null) track = 0;
-    downloadURL(this.mediaPlayers[elementID].playlist[track].mediaURL);
+    if(source === null) source = this.mediaPlayers[elementID].currentSource;
+    downloadURL(this.mediaPlayers[elementID].playlist[track].sources[source].url);
 };
 
-ClickToFlash.prototype.viewInQuickTimePlayer = function(elementID) {
+ClickToFlash.prototype.showURL = function(elementID, source) {
+    var track = this.mediaPlayers[elementID].currentTrack;
+    if(track === null) track = 0;
+    if(source === null) source = this.mediaPlayers[elementID].currentSource;
+    prompt("", this.mediaPlayers[elementID].playlist[track].sources[source].url);
+};
+
+ClickToFlash.prototype.viewInQuickTimePlayer = function(elementID, source) {
     var track = this.mediaPlayers[elementID].currentTrack;
     var element;
     if(track === null) {
@@ -388,7 +433,8 @@ ClickToFlash.prototype.viewInQuickTimePlayer = function(elementID) {
     } else {
         element = this.mediaPlayers[elementID].containerElement;
     }
-    var mediaURL = this.mediaPlayers[elementID].playlist[track].mediaURL;
+    if(source === null) source = this.mediaPlayers[elementID].currentSource;
+    var mediaURL = this.mediaPlayers[elementID].playlist[track].sources[source].url;
     // Relative URLs need to be resolved for QTP
     var tmpAnchor = document.createElement("a");
     tmpAnchor.href = mediaURL;
@@ -406,10 +452,8 @@ ClickToFlash.prototype.viewInQuickTimePlayer = function(elementID) {
     QTObject.setAttribute("target", "quicktimeplayer");
     QTObject.setAttribute("autohref", "true");
     QTObject.setAttribute("controller", "false");
-    // QTObject.setAttribute("postdomevents", "true");
     element.appendChild(QTObject);
-    // There doesn't seem to exist an appropriate event, so we just wait a bit...
-    setTimeout(function() {element.removeChild(QTObject);}, 100);
+    setTimeout(function() {element.removeChild(QTObject);}, 1000);
 };
 
 ClickToFlash.prototype.setVolumeTo = function(volume) {
@@ -493,7 +537,7 @@ ClickToFlash.prototype.unhideLogo = function(elementID, i) {
 
 ClickToFlash.prototype.clickPlaceholder = function(elementID, usePlugin) {
     if (!usePlugin && this.mediaPlayers[elementID] && this.mediaPlayers[elementID].startTrack !== null) {
-        this.loadMediaForElement(elementID);
+        this.loadMediaForElement(elementID, null);
     } else {
         this.loadPluginForElement(elementID);
     }
@@ -509,23 +553,23 @@ ClickToFlash.prototype.directKill = function(elementID) {
         else mediaType = "audio";
     } else mediaType = "video";
     if(mediaType == "audio") mediaElements = audioElements;
-    mediaURL = mediaElements[0].getAttribute("src");
+
+    var sources = new Array();
     
-    if(!mediaURL) { // look for <source> tags
+    if(!mediaElements[0].hasAttribute("src")) { // look for <source> tags
         var sourceElements = mediaElements[0].getElementsByTagName("source");
         for(var i = 0; i < sourceElements.length; i++) {
             if(mediaElements[0].canPlayType(sourceElements[i].getAttribute("type"))) {
-                mediaURL = sourceElements[i].getAttribute("src"); 
-                break;
+                sources.push({"url": sourceElements[i].getAttribute("src"), "format": sourceElements[i].getAttribute("type").split(";")[0].split("/")[1].toUpperCase()});
             }
         }
-    }
-    if(!mediaURL) return false;
+    } else sources.push({"url": mediaElements[0].getAttribute("src")})
+    if(sources.length === 0) return false;
     
     var mediaData = {
         "elementID": elementID,
-        "playlist": [{"mediaType": mediaType, "posterURL": mediaElements[0].getAttribute("poster"), "mediaURL": mediaURL}],
-        "badgeLabel": mediaType == "audio" ? "Audio" : "Video"
+        "playlist": [{"mediaType": mediaType, "posterURL": mediaElements[0].getAttribute("poster"), "sources": sources, "defaultSource": 0}],
+        "badgeLabel": mediaType === "audio" ? "Audio" : "Video"
     };
     this.prepMedia(mediaData);
     return true;

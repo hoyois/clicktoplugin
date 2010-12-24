@@ -1,10 +1,8 @@
-function YouTubeKiller() {
-    this.name = "YouTubeKiller";
-}
+function YouTubeKiller() {}
 
 YouTubeKiller.prototype.canKill = function(data) {
-    if(data.src.indexOf("ytimg.com/") != -1) {data.onsite = true; return true;}
-    if(data.src.indexOf("youtube.com/") != -1) {data.onsite = false; return true;}
+    if(data.src.indexOf("ytimg.com/") !== -1) {data.onsite = true; return true;}
+    if(data.src.indexOf("youtube.com/") !== -1) {data.onsite = false; return true;}
     return false;
 };
 
@@ -35,7 +33,7 @@ YouTubeKiller.prototype.processElement = function(data, callback) {
     // Embedded YT video
     var matches = data.src.match(/\.com\/([vp])\/([^&?]+)(?:[&?]|$)/);
     if(matches) {
-        if(matches[1] == "v") { // video
+        if(matches[1] === "v") { // video
             this.processElementFromVideoID(matches[2], callback);
         } else { // playlist
             this.buildVideoIDList(false, data.title, data.location, matches[2], 0, new Array(), callback);
@@ -102,7 +100,7 @@ YouTubeKiller.prototype.buildPlaylist = function(videoIDList, playlistID, isFirs
     var mediaData = {"loadAfter": true, "missed": 0, "playlist": []};
     var _this = this;
     var next = function(videoData) {
-        // this actually works!!
+        // this actually works!! feels like TeXing...
         if(videoData.playlist.length > 0) {
             videoData.playlist[0].siteInfo.url += "&p=" + playlistID;
             mediaData.playlist.push(videoData.playlist[0]);
@@ -119,41 +117,6 @@ YouTubeKiller.prototype.buildPlaylist = function(videoIDList, playlistID, isFirs
     return;
 };
 
-YouTubeKiller.prototype.getMediaDataFromURLMap = function(videoID, videoHash, urlMap) {
-    var availableFormats = [];
-    var formatInfo = urlMap.split(",");
-    for (var i = 0; i < formatInfo.length; i++) {
-        var format = formatInfo[i].split("|"); 
-        availableFormats[format[0]] = format[1];
-    }
-    
-    var posterURL = "http://i.ytimg.com/vi/" + videoID + "/hqdefault.jpg";
-    // this is the 360p MP4 video URL, (almost) always available
-    var videoURL = "http://www.youtube.com/get_video?fmt=18&asv=&video_id=" + videoID + "&t=" + videoHash;
-    var badgeLabel = "H.264";
-    
-    /*
-    Only 18, 22, 37, and 38 are MP4 playable nativey by QuickTime.
-    Other containers are FLV (0, 5, 6, 34, 35, the latter two are H.264 360p and 480p),
-    3GP (13,17), or WebM (43,45)
-    */
-    if(availableFormats[38] && safari.extension.settings["maxresolution"] > 3) {// 4K @_@
-        badgeLabel = "4K&nbsp;H.264";
-        videoURL = availableFormats[38];
-    } else if(availableFormats[37] && safari.extension.settings["maxresolution"] > 2) {// 1080p
-        badgeLabel = "HD&nbsp;H.264";
-        videoURL = availableFormats[37];
-    } else if(availableFormats[22] && safari.extension.settings["maxresolution"] > 1) {// 720p
-        badgeLabel = "HD&nbsp;H.264";
-        videoURL = availableFormats[22];
-    } else if(availableFormats[35] && safari.extension.settings["maxresolution"] > 0 && safari.extension.settings["QTbehavior"] > 2 && canPlayFLV) {// 480p FLV
-        videoURL = availableFormats[35];
-    } else if(availableFormats[18]) {// <=360p
-        videoURL = availableFormats[18];
-    }
-    return {"posterURL": posterURL, "videoURL": videoURL, "badgeLabel": badgeLabel};
-};
-
 YouTubeKiller.prototype.processElementFromFlashVars = function(flashvars, documentTitle, location, callback) {
     var videoID = getFlashVariable(flashvars, "video_id");
     // see http://apiblog.youtube.com/2010/03/upcoming-change-to-youtube-video-page.html:
@@ -164,8 +127,8 @@ YouTubeKiller.prototype.processElementFromFlashVars = function(flashvars, docume
         this.processElementFromVideoID(videoID, callback);
         return;
     }
-    var videoHash = getFlashVariable(flashvars, "t");
-    if(!videoHash) { // channel page
+    
+    if(!hasFlashVariable(flashvars, "t")) { // channel page
         this.processElementFromVideoID(videoID, callback);
         return;
     }
@@ -175,29 +138,25 @@ YouTubeKiller.prototype.processElementFromFlashVars = function(flashvars, docume
     if(title) title = title.substring(4).replace(/\+/g, " ");
     else if(/^YouTube\s-\s/.test(documentTitle)) title = documentTitle.substring(10);
     
-    this.finalizeProcessing(videoID, videoHash, urlMap, title, false, callback);
+    this.finalizeProcessing(videoID, urlMap, title, false, callback);
 };
 
 YouTubeKiller.prototype.processElementFromVideoID = function(videoID, callback) {
     if(!videoID) return; // needed!?
     var urlMapMatch = /\"fmt_url_map\":\s\"([^"]*)\"/; // works for both Flash and HTML5 Beta player pages
-    var hashMatch = /\"t\":\s\"([^"]*)\"/;
-    //var titleMatch = /\"rec_title\":\s\"Re:\s((?:\\\"|[^"])*)\"/; // not always available
     var titleMatch = /document\.title\s=\s'YouTube\s-\s((?:\\'|[^'])*)'/;
     var _this = this;
     var xhr = new XMLHttpRequest ();
     xhr.open("GET", "http://www.youtube.com/watch?v=" + videoID, true);
     xhr.onload = function() {
-        var matches, title, urlMap, videoHash;
+        var matches, title, urlMap;
         matches = xhr.responseText.match(titleMatch);
         if(matches) title = matches[1].replace(/\\["'\/\\]/g, function(s){return s.charAt(1);});
         matches = xhr.responseText.match(urlMapMatch);
         if(matches) urlMap = matches[1].replace(/\\\//g,"/");
-        matches = xhr.responseText.match(hashMatch);
-        if(matches) videoHash = encodeURIComponent(matches[1]);
         
-        if(urlMap && videoHash) {
-            _this.finalizeProcessing(videoID, videoHash, urlMap, title, true, callback);
+        if(urlMap) {
+            _this.finalizeProcessing(videoID, urlMap, title, true, callback);
         } else { // happens if YT just removed content and didn't update its playlists yet
             callback({"playlist": []});
         }
@@ -205,13 +164,46 @@ YouTubeKiller.prototype.processElementFromVideoID = function(videoID, callback) 
     xhr.send(null);
 };
 
-YouTubeKiller.prototype.finalizeProcessing = function(videoID, videoHash, urlMap, title, isEmbed, callback) {
-    var x = this.getMediaDataFromURLMap(videoID, videoHash, urlMap);
+YouTubeKiller.prototype.finalizeProcessing = function(videoID, urlMap, title, isEmbed, callback) {
     var downloadTitle = escape(title); // using escape here because YT needs latin1, and it cannot handle other Unicode chars anyway
-    if(/%u/.test(downloadTitle)) downloadTitle = ""; // revert to 'videoplayback' if the title will be garbled
+    if(/%u/.test(downloadTitle)) downloadTitle = ""; // revert to 'videoplayback' if the title will be garbled (WTF youtube?)
+    
+    var sources = new Array(); // all playable video sources
+        
+    /*
+    Only 18, 22, 37, and 38 are MP4 playable natively by QuickTime.
+    Other containers are FLV (5, 34, 35, the latter two are H.264 360p and 480p),
+    3GP (17), or WebM (43,45)
+    */
+    var formatList = urlMap.split(",");
+    for(var i = 0; i < formatList.length; i++) {
+        var x = formatList[i].split("|");
+        if(x[0] === "38") {
+            sources.push({"url": x[1] + "&title=" + downloadTitle, "format": "4K MP4", "resolution": 2304, "isNative": true});
+        } else if(x[0] === "37") {
+            sources.push({"url": x[1] + "&title=" + downloadTitle, "format": "1080p MP4", "resolution": 1080, "isNative": true});
+        } else if(x[0] === "22") {
+            sources.push({"url": x[1] + "&title=" + downloadTitle, "format": "720p MP4", "resolution": 720, "isNative": true});
+        } else if(x[0] === "18") {
+            sources.push({"url": x[1] + "&title=" + downloadTitle, "format": "360p MP4", "resolution": 360, "isNative": true});
+        } else if(x[0] === "35" && canPlayFLV) {
+            sources.push({"url": x[1] + "&title=" + downloadTitle, "format": "480p FLV", "resolution": 480, "isNative": false});
+        } else if(x[0] === "34" && canPlayFLV) {
+            sources.push({"url": x[1] + "&title=" + downloadTitle, "format": "360p FLV", "resolution": 360, "isNative": false});
+        } else if(x[0] === "5" && canPlayFLV) {
+            sources.push({"url": x[1] + "&title=" + downloadTitle, "format": "240p FLV", "resolution": 240, "isNative": false});
+        }
+    }
+    
+    var defaultSource = chooseDefaultSource(sources);
+    var badgeLabel = makeLabel(sources[defaultSource]);
+    
+    // var videoURL = "http://www.youtube.com/get_video?fmt=18&asv=&video_id=" + videoID + "&t=" + videoHash; 
+    
+    var posterURL = "http://i.ytimg.com/vi/" + videoID + "/hqdefault.jpg";
     var videoData = {
-        "playlist": [{"title": title, "mediaType": "video", "posterURL": x.posterURL, "mediaURL": x.videoURL + "&title=" + downloadTitle}],
-        "badgeLabel": x.badgeLabel
+        "playlist": [{"title": title, "mediaType": "video", "posterURL": posterURL, "sources": sources, "defaultSource": defaultSource}],
+        "badgeLabel": badgeLabel
     };
     if(isEmbed) videoData.playlist[0].siteInfo = {"name": "YouTube", "url": "http://www.youtube.com/watch?v=" + videoID};
     callback(videoData);
