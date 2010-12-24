@@ -3,8 +3,8 @@ function BIMKiller() { // Broadcast Interactive Media
 }
 
 BIMKiller.prototype.canKill = function(data) {
-    if(data.plugin != "Flash" || !safari.extension.settings["replaceFlash"]) return false;
-    return (/bimVideoPlayer[0-9]*\.swf$/.test(data.src) && hasFlashVariable(data.params, "mediaXML"));
+    if(data.plugin != "Flash") return false;
+    return (/bimVideoPlayer[^\/.]*\.swf$/.test(data.src) && hasFlashVariable(data.params, "mediaXML"));
 };
 
 BIMKiller.prototype.processElement = function(data, callback) {
@@ -29,7 +29,7 @@ BIMKiller.prototype.processElement = function(data, callback) {
         }
         
         var videoData = {
-            "playlist": [{"mediaType": "video", "title": title, "posterURL": posterURL, "mediaURL": videoURL}],
+            "playlist": [{"mediaType": "video", "title": title, "posterURL": posterURL, "sources": [{"url": videoURL}], "defaultSource": 0}],
             "badgeLabel": "H.264"
         };
         callback(videoData);

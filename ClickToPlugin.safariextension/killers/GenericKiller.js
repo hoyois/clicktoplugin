@@ -3,9 +3,8 @@ function GenericKiller() {
 }
 
 GenericKiller.prototype.canKill = function(data) {
-    if(data.plugin != "Flash" || !safari.extension.settings["replaceFlash"]) return false;
-    // streams are not supported
-    if(hasFlashVariable(data.params, "streamer")) return false;
+    if(data.plugin != "Flash") return false;
+    if(hasFlashVariable(data.params, "streamer")) data.streamer = true;
     if(hasFlashVariable(data.params, "file")) {data.file = "file"; return true;}
     if(hasFlashVariable(data.params, "load")) {data.file = "load"; return true;}
     if(hasFlashVariable(data.params, "playlistfile")) {data.playlist = "playlistfile"; return true;}
@@ -18,12 +17,19 @@ GenericKiller.prototype.canKill = function(data) {
 };
 
 GenericKiller.prototype.processElement = function(data, callback) {
+    if(data.streamer) {// streams are not supported
+        if(getFlashVariable(data.params, "streamer").substring(0,4) === "rtmp") return;
+    }
+    var sources = new Array();
     var playlistURL = decodeURIComponent(getFlashVariable(data.params, data.playlist)); // JW player & TS player
     var sourceURL = decodeURIComponent(getFlashVariable(data.params, data.file));
     if(!sourceURL) {
         sourceURL = data.src.match(/[?&]file=([^&]*)(?:&|$)/);
         if(sourceURL) sourceURL = decodeURIComponent(sourceURL[1]);
     }
+    // Site-specific decoding
+    if(/player_mp3_maxi\.swf$/.test(data.src)) sourceURL = sourceURL.replace(/\+/g, "%20");
+    
     var posterURL = decodeURIComponent(getFlashVariable(data.params, "image"));
     //if(!posterURL) posterURL = decodeURIComponent(getFlashVariable(data.params, "thumbnail"));
     if(!posterURL) {
@@ -46,13 +52,23 @@ GenericKiller.prototype.processElement = function(data, callback) {
     var sourceURL2 = getFlashVariable(data.params, "real_file");
     if(sourceURL2) sourceURL = decodeURIComponent(sourceURL2);
     
-    var mediaType = willPlaySrcWithHTML5(sourceURL);
+    var mediaType = canPlaySrcWithHTML5(sourceURL);
     if(!mediaType) return;
-    var isAudio = mediaType == "audio";
-
+    var isAudio = mediaType.type === "audio";
+    
+    sourceURL2 = getFlashVariable(data.params, "hd.file");
+    if(sourceURL2) {
+        var m = canPlaySrcWithHTML5(sourceURL2);
+        if(m) sources.push({"url": sourceURL2, "format": "HD", "isNative": m.isNative, "resolution": 720});
+    }
+    
+    sources.push({"url": sourceURL, "format": sources[0] ? "SD" : "", "isNative": mediaType.isNative});
+    
+    var defaultSource = chooseDefaultSource(sources);
+    
     var mediaData = {
-        "playlist": [{"mediaType": mediaType, "posterURL": posterURL, "mediaURL": sourceURL}],
-        "badgeLabel": isAudio ? "Audio" : "Video",
+        "playlist": [{"mediaType": mediaType.type, "posterURL": posterURL, "sources": sources, "defaultSource": defaultSource}],
+        "badgeLabel": isAudio ? "Audio" : makeLabel(sources[defaultSource]),
         "isAudio": isAudio
     };
     callback(mediaData);
@@ -60,7 +76,7 @@ GenericKiller.prototype.processElement = function(data, callback) {
 
 GenericKiller.prototype.processElementFromPlaylist = function(playlistURL, baseURL, posterURL, track, callback) {
     var handlePlaylistData = function(playlistData) {
-        playlistData.badgeLabel = playlistData.playlist[0].mediaType == "audio" ? "Audio" : "Video";
+        playlistData.badgeLabel = playlistData.playlist[0].mediaType === "audio" ? "Audio" : makeLabel(playlistData.playlist[0].sources[0]);
         callback(playlistData);
     };
     
