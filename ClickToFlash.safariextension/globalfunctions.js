@@ -25,6 +25,12 @@ function makeAbsoluteURL(url, base) {
     return base + url;
 }
 
+function unescapeHTML(text){
+  var e = document.createElement("div");
+  e.innerHTML = text;
+  return e.firstChild.nodeValue;
+}
+
 function hasFlashVariable(flashvars, key) {
     var s = "(?:^|&)" + key + "=";
     s = new RegExp(s);
@@ -63,15 +69,59 @@ const canPlayFLV = canPlayTypeWithHTML5("video/x-flv");
 const canPlayWM = canPlayTypeWithHTML5("video/x-ms-wmv");
 
 // and certainly not this this one! but it does the job reasonably well
-function willPlaySrcWithHTML5(url) {
+function canPlaySrcWithHTML5(url) {
     url = extractExt(url);
-    if (/^(?:mp4|mpe?g|mov|m4v)$/i.test(url)) return "video";
-    if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && /^flv$/i.test(url)) return "video";
-    if(safari.extension.settings["QTbehavior"] > 1 && canPlayWM && /^(?:wm[vp]?|asf)$/i.test(url)) return "video";
-    if(/^(?:mp3|wav|midi?|aif[fc]?|aac|m4a)$/i.test(url)) return "audio";
-    if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && /^fla$/i.test(url)) return "audio";
-    if(safari.extension.settings["QTbehavior"] > 1 && canPlayWM && /^wma$/i.test(url)) return "audio";
-    return "";
+    if (/^(?:mp4|mpe?g|mov|m4v)$/i.test(url)) return {"type": "video", "isNative": true};
+    if(canPlayFLV && /^flv$/i.test(url)) return {"type": "video", "isNative": false};
+    if(canPlayWM && /^(?:wm[vp]?|asf)$/i.test(url)) return {"type": "video", "isNative": false};
+    if(/^(?:mp3|wav|midi?|aif[fc]?|aac|m4a)$/i.test(url)) return {"type": "audio", "isNative": true};
+    if(canPlayFLV && /^fla$/i.test(url)) return {"type": "audio", "isNative": false};
+    if(canPlayWM && /^wma$/i.test(url)) return {"type": "audio", "isNative": false};
+    return false;
+}
+
+function chooseDefaultSource(sourceArray, bestSource) {
+    var defaultSource;
+    var hasNativeSource = false;
+    var resolutionMap = new Array();
+    for(var i = 0; i < sourceArray.length; i++) {
+        var h = sourceArray[i].resolution;
+        if(!h) h = 0;
+        if(sourceArray[i].isNative) {
+            resolutionMap[h] = i;
+            hasNativeSource = true;
+        } else if(resolutionMap[h] === undefined && safari.extension.settings["QTbehavior"] > 1) {
+            resolutionMap[h] = i;
+        }
+    }
+    
+    var setAsDefault = function(source) {
+        var h = sourceArray[source].resolution;
+        if(!h) h = 0;
+        if(safari.extension.settings["QTbehavior"] === 2 && hasNativeSource && !sourceArray[source].isNative) return;
+        if((h <= 240 && safari.extension.settings["maxresolution"] > 0) ||
+           (h <= 360 && safari.extension.settings["maxresolution"] > 1) ||
+           (h <= 480 && safari.extension.settings["maxresolution"] > 2) ||
+           (h <= 720 && safari.extension.settings["maxresolution"] > 3) ||
+           (h <= 1080 && safari.extension.settings["maxresolution"] > 4) ||
+           (safari.extension.settings["maxresolution"] > 5)) {
+            defaultSource = source;
+        }
+    };
+    
+    for(var h in resolutionMap) {
+        setAsDefault(resolutionMap[h]);
+    }
+    if(bestSource !== undefined) setAsDefault(bestSource);
+    return defaultSource;
+}
+
+function makeLabel(source) {
+    if(!source) return null;
+    var prefix = "";
+    if(source.resolution >= 720) prefix = "HD&nbsp;";
+    if(source.resolution >= 2304) prefix = "4K&nbsp;";
+    return prefix + (source.isNative ? "H.264" : "Video"); // right...
 }
 
 function getMIMEType(resourceURL, handleMIMEType) {
@@ -89,7 +139,7 @@ function getMIMEType(resourceURL, handleMIMEType) {
 }
 
 function parseXSPFPlaylist(playlistURL, altPosterURL, track, handlePlaylistData) {
-    xhr = new XMLHttpRequest();
+    var xhr = new XMLHttpRequest();
     xhr.open('GET', playlistURL, true);
     xhr.onload = function() {
         var x = xhr.responseXML.getElementsByTagName("track");
@@ -100,24 +150,25 @@ function parseXSPFPlaylist(playlistURL, altPosterURL, track, handlePlaylistData)
         var list, I, mediaType, mediaURL, posterURL, title;
         
         for(var i = 0; i < x.length; i++) {
+            // what about <jwplayer:streamer> rtmp??
             I = (i + track) % x.length;
             list = x[I].getElementsByTagName("location");
             if(list.length > 0) mediaURL = list[0].firstChild.nodeValue;
             else if(i == 0) return;
             else continue;
-            mediaType = willPlaySrcWithHTML5(mediaURL);
+            mediaType = canPlaySrcWithHTML5(mediaURL);
             if(!mediaType) {
                 if(i == 0) return;
                 if(i >= x.length - track) --startTrack;
                 continue;
-            } else if(mediaType == "video") isAudio = false;
+            } else if(mediaType.type === "video") isAudio = false;
             
             list = x[I].getElementsByTagName("image");
             if(list.length > 0) posterURL = list[0].firstChild.nodeValue;
             if(i == 0 && !posterURL) posterURL = altPosterURL;
             list = x[I].getElementsByTagName("title");
             if(list.length > 0) title = list[0].firstChild.nodeValue;
-            playlist.push({"mediaType": mediaType, "mediaURL": mediaURL, "posterURL": posterURL, "title": title});
+            playlist.push({"mediaType": mediaType.type, "sources": [{"url": mediaURL, "isNative": mediaType.isNative}], "defaultSource": 0, "posterURL": posterURL, "title": title});
         }
         var playlistData = {
             "playlist": playlist,

@@ -4,7 +4,7 @@
 <array>
 	<dict>
 		<key>Title</key>
-		<string>Video Settings</string>
+		<string>HTML5 Settings</string>
 		<key>Type</key>
 		<string>Group</string>
 	</dict>
@@ -14,7 +14,27 @@
 		<key>Key</key>
 		<string>useH264</string>
 		<key>Title</key>
-		<string>Look for video replacements to Flash            </string>
+		<string>Look for media replacements to Flash           </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useSwitcher</string>
+		<key>Title</key>
+		<string>Show list of available sources                        </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>showPoster</string>
+		<key>Title</key>
+		<string>Show preview image                                      </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -25,16 +45,6 @@
 		<string>usePlaylists</string>
 		<key>Title</key>
 		<string>Use playlists                                                   </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
-		<string>showPoster</string>
-		<key>Title</key>
-		<string>Show preview image on placeholder              </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -52,7 +62,7 @@
 		<key>DefaultValue</key>
 		<string></string>
 		<key>Key</key>
-		<string>H264whitelist</string>
+		<string>videowhitelist</string>
 		<key>Title</key>
 		<string>on these sites</string>
 		<key>Type</key>
@@ -82,6 +92,34 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
+		<real>5</real>
+		<key>Key</key>
+		<string>maxresolution</string>
+		<key>Title</key>
+		<string>Preferred source</string>
+		<key>Titles</key>
+		<array>
+			<string>Flash</string>
+			<string>360p</string>
+			<string>480p</string>
+			<string>720p</string>
+			<string>1080p</string>
+			<string>4K</string>
+		</array>
+		<key>Type</key>
+		<string>PopUpButton</string>
+		<key>Values</key>
+		<array>
+			<real>0.0</real>
+			<real>2</real>
+			<real>3</real>
+			<real>4</real>
+			<real>5</real>
+			<real>6</real>
+		</array>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
 		<real>2</real>
 		<key>Key</key>
 		<string>QTbehavior</string>
@@ -100,32 +138,6 @@
 			<real>1</real>
 			<real>2</real>
 			<real>3</real>
-		</array>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<real>3</real>
-		<key>Key</key>
-		<string>maxresolution</string>
-		<key>Title</key>
-		<string>Max resolution</string>
-		<key>Titles</key>
-		<array>
-			<string>360p</string>
-			<string>480p</string>
-			<string>720p</string>
-			<string>1080p</string>
-			<string>4K</string>
-		</array>
-		<key>Type</key>
-		<string>PopUpButton</string>
-		<key>Values</key>
-		<array>
-			<real>0</real>
-			<real>1</real>
-			<real>2</real>
-			<real>3</real>
-			<real>4</real>
 		</array>
 	</dict>
 	<dict>
@@ -238,6 +250,16 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
+		<string>useOOcontext</string>
+		<key>Title</key>
+		<string>Disable/Enable ClickToFlash                          </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
 		<string>useWLcontext</string>
 		<key>Title</key>
 		<string>Add to Whitelist                                             </string>
@@ -271,6 +293,16 @@
 		<string>useDVcontext</string>
 		<key>Title</key>
 		<string>Download Video                                             </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useSUcontext</string>
+		<key>Title</key>
+		<string>Show Video URL                                             </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>

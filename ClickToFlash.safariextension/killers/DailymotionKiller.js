@@ -18,24 +18,29 @@ DailymotionKiller.prototype.processElement = function(data, callback) {
 
 DailymotionKiller.prototype.processElementFromSequence = function(sequence, callback) {
     // NOTE: sequence.replace(/\\'/g, "'") is JSON but it's so messy that regexp search is easier
-    var posterURL, videoURL, matches;
-    var badgeLabel = "H.264";
-    // sdURL (FLV only)
-    if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV) {
-        matches = sequence.match(/\"sdURL\":\"([^"]*)\"/);
-        if(matches) videoURL = matches[1].replace(/\\\//g,"/");
+    var posterURL, matches;
+    var sources = new Array();
+    
+    // hdURL (720p)
+    matches = sequence.match(/\"hdURL\":\"([^"]*)\"/);
+    if(matches) {
+        sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "HD MP4", "resolution": 720, "isNative": true});
     }
     // hqURL (<=480p)
     matches = sequence.match(/\"hqURL\":\"([^"]*)\"/);
-    if(matches) videoURL = matches[1].replace(/\\\//g,"/");
-    // hdURL (720p)
-    if(safari.extension.settings["maxresolution"] > 1) {
-        matches = sequence.match(/\"hdURL\":\"([^"]*)\"/);
+    if(matches) {
+        sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "HQ MP4", "resolution": 360, "isNative": true});
+    }
+    // sdURL (FLV only)
+    if(canPlayFLV) {
+        matches = sequence.match(/\"sdURL\":\"([^"]*)\"/);
         if(matches) {
-            videoURL = matches[1].replace(/\\\//g,"/");
-            badgeLabel = "HD&nbsp;H.264";
+            sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "SD FLV", "resolution": 240, "isNative": false});
         }
     }
+    
+    var defaultSource = chooseDefaultSource(sources);
+    var badgeLabel = makeLabel(sources[defaultSource]);
     
     matches = sequence.match(/\"backgroundImageURL\":\"([^"]*)\"/);
     if(matches) posterURL = matches[1].replace(/\\\//g,"/");
@@ -45,7 +50,7 @@ DailymotionKiller.prototype.processElementFromSequence = function(sequence, call
     if(matches) title = unescape(matches[1].replace(/\+/g, " ").replace(/\\u/g, "%u").replace(/\\["'\/\\]/g, function(s){return s.charAt(1);}));
     
     var videoData = {
-        "playlist": [{"mediaType": "video", "title": title, "posterURL": posterURL, "mediaURL": videoURL}],
+        "playlist": [{"mediaType": "video", "title": title, "posterURL": posterURL, "sources": sources, "defaultSource": defaultSource}],
         "badgeLabel": badgeLabel
     };
     callback(videoData);

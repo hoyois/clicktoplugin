@@ -40,20 +40,20 @@ MegavideoKiller.prototype.processElement = function(data, callback) {
 };
 
 MegavideoKiller.prototype.finalizeProcessing = function(getVariable, siteInfo, callback) {
-    var badgeLabel = "Video";
-    var hd = "";
-    
-    if(safari.extension.settings["maxresolution"] > 1 && getVariable("hd") === "1") {
-        hd = "hd_";
-        badgeLabel = "HD&nbsp;Video";
-    }
+    var sources = new Array();
     
     var title = decodeURIComponent(getVariable("title")).replace(/\+/g, " ").toUpperCase();
-    var videoURL = "http://www" + getVariable(hd + "s") + ".megavideo.com/files/" + this.decrypt(getVariable(hd + "un"), getVariable(hd + "k1"), getVariable(hd + "k2")) + "/" + title + ".flv";
+    
+    if(getVariable("hd") === "1") {
+        sources.push({"url": "http://www" + getVariable("hd_s") + ".megavideo.com/files/" + this.decrypt(getVariable("hd_un"), getVariable("hd_k1"), getVariable("hd_k2")) + "/" + title + ".flv", "format": "HD FLV", "resolution": 720, "isNative": false});
+    }
+    sources.push({"url": "http://www" + getVariable("s") + ".megavideo.com/files/" + this.decrypt(getVariable("un"), getVariable("k1"), getVariable("k2")) + "/" + title + ".flv", "format": "SD FLV", "resolution": 360, "isNative": false});
+    
+    var defaultSource = chooseDefaultSource(sources);
     
     var videoData = {
-        "playlist": [{"siteInfo": siteInfo, "mediaType": "video", "title": title, "mediaURL": videoURL}],
-        "badgeLabel": badgeLabel
+        "playlist": [{"siteInfo": siteInfo, "mediaType": "video", "title": title, "sources": sources, "defaultSource": defaultSource}],
+        "badgeLabel": makeLabel(sources[defaultSource])
     };
     callback(videoData);
 };

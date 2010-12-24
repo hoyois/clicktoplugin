@@ -21,62 +21,38 @@ BlipKiller.prototype.processElement = function(data, callback) {
         else return;
     }
     
-    var videoURL, siteInfo;
-    var badgeLabel = "H.264";
+    var sources = new Array();
     
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.onload = function() {
         var json = JSON.parse(xhr.responseText.replace(/\\'/g, "'")); // correct Blip.tv's invalid JSON
         
-        var availableFormats = new Array();
+        var sourcesByHeight = new Array();
         var hasH264Format = false;
-        var ext, height, source;
+        var ext, resolution, format, bestSource, isNative;
         for(var i = 0; i < json.additionalMedia.length; i++) {
-            ext = json.additionalMedia[i].url.substr(-3).toLowerCase();
-            if(ext === "mp4" || ext === "m4v" || ext === "mov" || ext === "mpg") {
-                hasH264Format = true;
-                ext = true;
-            } else {
-                if((ext === "flv" && canPlayFLV) || (ext === "wmv" && canPlayWM)) ext = false;
-                else continue;
-            }
-            height = parseInt(json.additionalMedia[i].height);
+            ext = json.additionalMedia[i].url.substr(json.additionalMedia[i].url.lastIndexOf(".") + 1).toUpperCase();
+            if(ext === "MP4" || ext === "M4V" || ext === "MOV" || ext === "MPG" || ext === "MPEG") isNative = true;
+            else if((ext === "FLV" && canPlayFLV) || (ext === "WMV" && canPlayWM)) isNative = false;
+            else continue;
+            
+            resolution = parseInt(json.additionalMedia[i].height);
+            format = json.additionalMedia[i].role + " (" + json.additionalMedia[i].width + "x" + json.additionalMedia[i].height + ") " + ext;
             if(json.additionalMedia[i].role === "Source") {
-                source = {"height": height, "isH264": ext, "url": json.additionalMedia[i].url};
-                continue;
+                bestSource = sources.length;
             }
-            if(availableFormats[height] && availableFormats[height].isH264) continue;
-            availableFormats[height] = {"isSource": json.additionalMedia[i].role === "Source", "isH264": ext, "url": json.additionalMedia[i].url};
+            sources.push({"url": json.additionalMedia[i].url, "format": format, "isNative": isNative, "resolution": resolution});
         }
         
-        var assignVideoURL = function(height, isH264, url) {
-            if(!isH264 && !canPlayFLV) return;
-            if(safari.extension.settings["QTbehavior"] === 0 && !isH264) return;
-            if(safari.extension.settings["QTbehavior"] === 1 && !isH264 && hasH264Format) return;
-            if(height <= 360 || (safari.extension.settings["maxresolution"] > 0 && height <= 480)) {
-                videoURL = url;
-                badgeLabel = isH264 ? "H.264" : "Video";
-            }
-            else if((safari.extension.settings["maxresolution"] > 1 && height <= 720) || (safari.extension.settings["maxresolution"] > 2 && height <= 1080)) {
-                videoURL = url;
-                badgeLabel = isH264 ? "HD&nbsp;H.264" : "HD&nbsp;Video";
-            }
-        };
-        
-        for(var h in availableFormats) {
-            assignVideoURL(h, availableFormats[h].isH264, availableFormats[h].url);
-        }
-        if(source) assignVideoURL(source.height, source.isH264, source.url);
-        
-        if(!videoURL) return;
-        
-        if(isEmbed) siteInfo = {"name": "Blip.tv", "url": "http://www.blip.tv/file/" + json.itemId};
+        var defaultSource = chooseDefaultSource(sources, bestSource);
+        var badgeLabel = makeLabel(sources[defaultSource]);
         
         var videoData = {
-            "playlist": [{"siteInfo": siteInfo, "mediaType": "video", "title": json.title, "posterURL": json.thumbnailUrl, "mediaURL": videoURL}],
+            "playlist": [{"mediaType": "video", "title": unescapeHTML(json.title), "posterURL": json.thumbnailUrl, "sources": sources, "defaultSource": defaultSource}],
             "badgeLabel": badgeLabel
         };
+        if(isEmbed) videoData.playlist[0].siteInfo = {"name": "Blip.tv", "url": "http://www.blip.tv/file/" + json.itemId};
         callback(videoData);
     };
     xhr.send(null);
