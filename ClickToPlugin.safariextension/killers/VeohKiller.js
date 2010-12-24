@@ -3,7 +3,7 @@ function VeohKiller() {
 }
 
 VeohKiller.prototype.canKill = function(data) {
-    if(data.plugin != "Flash" || !safari.extension.settings["replaceFlash"]) return false;
+    if(data.plugin != "Flash") return false;
     return (data.src.indexOf("veoh.com/static/swf/webplayer") != -1 || data.src.indexOf("veohplayer.swf") != -1);
 };
 
@@ -16,7 +16,7 @@ VeohKiller.prototype.processElement = function(data, callback) {
         if(matches) videoID = matches[1];
         else return;
     }
-    var title, posterURL, videoURL, badgeLabel;
+    var title, posterURL, sources;
     
     var xhr = new XMLHttpRequest();
     xhr.open('GET', "http://www.veoh.com/rest/video/" + videoID + "/details", true);
@@ -25,18 +25,21 @@ VeohKiller.prototype.processElement = function(data, callback) {
         if(!element) return;
         
         videoURL = element.getAttribute("fullPreviewHashPath"); //"fullPreviewHashLowPath"
+        
+        var sources = [{"url": videoURL, "isNative": false}];
+        
         if(/\.mp4\?/.test(videoURL)) {
-            badgeLabel = "H.264";
-        } else if(safari.extension.settings["QTbehavior"] > 0 && canPlayFLV) {
-            badgeLabel = "Video";
-        } else return;
+            sources[0].isNative = true;
+        } else if(!canPlayFLV) return;
+        
+        var defaultSource = chooseDefaultSource(sources);
         
         posterURL = element.getAttribute("fullHighResImagePath");
         title = element.getAttribute("title");
     
         var videoData = {
-            "playlist": [{"mediaType": "video", "title": title, "posterURL": posterURL, "mediaURL": videoURL}],
-            "badgeLabel": badgeLabel // There's no HD on Veoh, as far as I see, despite what they say. It's < 360p! Am I doing something wrong??
+            "playlist": [{"mediaType": "video", "title": title, "posterURL": posterURL, "sources": sources, "defaultSource": defaultSource}],
+            "badgeLabel": makeLabel(sources[defaultSource])
         }
         if(isEmbed || data.location === "http://www.veoh.com/") videoData.playlist[0].siteInfo = {"name": "Veoh", "url": "http://www.veoh.com/browse/videos#watch%3D" + videoID};
         callback(videoData);

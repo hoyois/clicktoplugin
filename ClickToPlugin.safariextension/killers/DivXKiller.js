@@ -4,15 +4,16 @@ function DivXKiller() {
 
 
 DivXKiller.prototype.canKill = function(data) {
-    if(!safari.extension.settings["replaceDivX"]) return false;
-    return ((data.plugin == "DivX" || hasExt("divx", data.src)) && safari.extension.settings["QTbehavior"] > 1 && canPlayDivX);
+    return ((data.plugin == "DivX" || hasExt("divx", data.src)) && canPlayDivX);
 };
 
 
 DivXKiller.prototype.processElement = function(data, callback) {
+    var sources = [{"url": data.src, "isNative": false}];
+    var defaultSource = chooseDefaultSource(sources);
     var videoData = {
-        "playlist": [{"mediaType": "video", "posterURL": data.params, "mediaURL": data.src}],
-        "badgeLabel": "Video"
+        "playlist": [{"mediaType": "video", "posterURL": data.params, "sources": sources, "defaultSource": defaultSource}],
+        "badgeLabel": makeLabel(sources[defaultSource])
     };
     callback(videoData);
 };

@@ -3,7 +3,7 @@ function MetacafeKiller() {
 }
 
 MetacafeKiller.prototype.canKill = function(data) {
-    if(data.plugin != "Flash" || !safari.extension.settings["replaceFlash"]) return false;
+    if(data.plugin != "Flash") return false;
     return (data.src.indexOf(".mcstatic.com/Flash/vp/") != -1 || data.src.indexOf("metacafe.com/fplayer/") != -1);
 };
 
@@ -22,21 +22,25 @@ MetacafeKiller.prototype.processElementFromFlashvars = function(flashvars, siteI
     for(var type in mediaList) {
         mediaList[type] = mediaList[type].mediaURL + "?__gda__=" + mediaList[type].key;
     }
-    var videoURL;
-    var badgeLabel = "H.264";
-    if(safari.extension.settings["maxresolution"] > 1) videoURL = mediaList.highDefinitionMP4;
-    if(!videoURL) videoURL = mediaList.MP4;
-    else badgeLabel = "HD&nbsp;H.264";
-    if(!videoURL && safari.extension.settings["QTbehavior"] > 1 && canPlayFLV) {
-        videoURL = mediaList.flv;
-        badgeLabel = "Video";
+    var sources = new Array();
+    
+    if(mediaList.highDefinitionMP4) {
+        sources.push({"url": mediaList.highDefinitionMP4, "format": "HD MP4", "resolution": 720, "isNative": true});
     }
+    if(mediaList.MP4) {
+        sources.push({"url": mediaList.MP4, "format": "SD MP4", "resolution": 360, "isNative": true});
+    }
+    if(canPlayFLV && mediaList.flv) {
+        sources.push({"url": mediaList.flv, "format": "SD FLV", "resolution": 360, "isNative": false});
+    }
+    
+    var defaultSource = chooseDefaultSource(sources);
     
     var title = decodeURIComponent(getFlashVariable(flashvars, "title"));
     
     var videoData = {
-        "playlist": [{"mediaType": "video", "title": title, "mediaURL": videoURL, "siteInfo": siteInfo}],
-        "badgeLabel": badgeLabel
+        "playlist": [{"mediaType": "video", "title": title, "sources": sources, "defaultSource": defaultSource, "siteInfo": siteInfo}],
+        "badgeLabel": makeLabel(sources[defaultSource])
     };
     callback(videoData);
 };

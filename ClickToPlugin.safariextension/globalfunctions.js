@@ -25,6 +25,12 @@ function makeAbsoluteURL(url, base) {
     return base + url;
 }
 
+function unescapeHTML(text){
+  var e = document.createElement("div");
+  e.innerHTML = text;
+  return e.firstChild.nodeValue;
+}
+
 function hasFlashVariable(flashvars, key) {
     var s = "(?:^|&)" + key + "=";
     s = new RegExp(s);
@@ -80,18 +86,64 @@ function canPlayTypeWithHTML5(MIMEType) {
 const canPlayFLV = canPlayTypeWithHTML5("video/x-flv");
 const canPlayWM = canPlayTypeWithHTML5("video/x-ms-wmv");
 const canPlayDivX = canPlayFLV; // 'video/divx' always returns "", probably a Perian oversight
+//const canPlayWebM = canPlayTypeWithHTML5("video/webm"); // still can't with alpha version of QuickTime WebM component
+//const canPlayOGG = canPlayTypeWithHTML5("video/ogg"); // OK with Xiph component
 
 // and certainly not this this one! but it does the job reasonably well
-function willPlaySrcWithHTML5(url) {
+function canPlaySrcWithHTML5(url) {
     url = extractExt(url);
-    if (/^(?:mp4|mpe?g|mov|m4v)$/i.test(url)) return "video";
-    if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && /^flv$/i.test(url)) return "video";
-    if(safari.extension.settings["QTbehavior"] > 1 && canPlayWM && /^(?:wm[vp]?|asf)$/i.test(url)) return "video";
-    if(safari.extension.settings["QTbehavior"] > 1 && canPlayDivX && /^divx$/i.test(url)) return "video";
-    if(/^(?:mp3|wav|midi?|aif[fc]?|aac|m4a)$/i.test(url)) return "audio";
-    if(safari.extension.settings["QTbehavior"] > 1 && canPlayFLV && /^fla$/i.test(url)) return "audio";
-    if(safari.extension.settings["QTbehavior"] > 1 && canPlayWM && /^wma$/i.test(url)) return "audio";
-    return "";
+    if (/^(?:mp4|mpe?g|mov|m4v)$/i.test(url)) return {"type": "video", "isNative": true};
+    if(canPlayFLV && /^flv$/i.test(url)) return {"type": "video", "isNative": false};
+    if(canPlayWM && /^(?:wm[vp]?|asf)$/i.test(url)) return {"type": "video", "isNative": false};
+    if(canPlayDivX && /^divx$/i.test(url)) return {"type": "video", "isNative": false};
+    if(/^(?:mp3|wav|midi?|aif[fc]?|aac|m4a)$/i.test(url)) return {"type": "audio", "isNative": true};
+    if(canPlayFLV && /^fla$/i.test(url)) return {"type": "audio", "isNative": false};
+    if(canPlayWM && /^wma$/i.test(url)) return {"type": "audio", "isNative": false};
+    return false;
+}
+
+function chooseDefaultSource(sourceArray, bestSource) {
+    var defaultSource;
+    var hasNativeSource = false;
+    var resolutionMap = new Array();
+    for(var i = 0; i < sourceArray.length; i++) {
+        var h = sourceArray[i].resolution;
+        if(!h) h = 0;
+        if(sourceArray[i].isNative) {
+            resolutionMap[h] = i;
+            hasNativeSource = true;
+        } else if(resolutionMap[h] === undefined && safari.extension.settings["QTbehavior"] > 1) {
+            resolutionMap[h] = i;
+        }
+    }
+    
+    var setAsDefault = function(source) {
+        var h = sourceArray[source].resolution;
+        if(!h) h = 0;
+        if(safari.extension.settings["QTbehavior"] === 2 && hasNativeSource && !sourceArray[source].isNative) return;
+        if((h <= 240 && safari.extension.settings["maxresolution"] > 0) ||
+           (h <= 360 && safari.extension.settings["maxresolution"] > 1) ||
+           (h <= 480 && safari.extension.settings["maxresolution"] > 2) ||
+           (h <= 720 && safari.extension.settings["maxresolution"] > 3) ||
+           (h <= 1080 && safari.extension.settings["maxresolution"] > 4) ||
+           (safari.extension.settings["maxresolution"] > 5)) {
+            defaultSource = source;
+        }
+    };
+    
+    for(var h in resolutionMap) {
+        setAsDefault(resolutionMap[h]);
+    }
+    if(bestSource !== undefined) setAsDefault(bestSource);
+    return defaultSource;
+}
+
+function makeLabel(source) {
+    if(!source) return null;
+    var prefix = "";
+    if(source.resolution >= 720) prefix = "HD&nbsp;";
+    if(source.resolution >= 2304) prefix = "4K&nbsp;";
+    return prefix + (source.isNative ? "H.264" : "Video"); // right...
 }
 
 // native MIME types that might realistically appear in <object> tags
@@ -125,7 +177,7 @@ function getMIMEType(resourceURL, handleMIMEType) {
 }
 
 function parseXSPFPlaylist(playlistURL, altPosterURL, track, handlePlaylistData) {
-    xhr = new XMLHttpRequest();
+    var xhr = new XMLHttpRequest();
     xhr.open('GET', playlistURL, true);
     xhr.onload = function() {
         var x = xhr.responseXML.getElementsByTagName("track");
@@ -136,24 +188,25 @@ function parseXSPFPlaylist(playlistURL, altPosterURL, track, handlePlaylistData)
         var list, I, mediaType, mediaURL, posterURL, title;
         
         for(var i = 0; i < x.length; i++) {
+            // what about <jwplayer:streamer> rtmp??
             I = (i + track) % x.length;
             list = x[I].getElementsByTagName("location");
             if(list.length > 0) mediaURL = list[0].firstChild.nodeValue;
             else if(i == 0) return;
             else continue;
-            mediaType = willPlaySrcWithHTML5(mediaURL);
+            mediaType = canPlaySrcWithHTML5(mediaURL);
             if(!mediaType) {
                 if(i == 0) return;
                 if(i >= x.length - track) --startTrack;
                 continue;
-            } else if(mediaType == "video") isAudio = false;
+            } else if(mediaType.type === "video") isAudio = false;
             
             list = x[I].getElementsByTagName("image");
             if(list.length > 0) posterURL = list[0].firstChild.nodeValue;
             if(i == 0 && !posterURL) posterURL = altPosterURL;
             list = x[I].getElementsByTagName("title");
             if(list.length > 0) title = list[0].firstChild.nodeValue;
-            playlist.push({"mediaType": mediaType, "mediaURL": mediaURL, "posterURL": posterURL, "title": title});
+            playlist.push({"mediaType": mediaType.type, "sources": [{"url": mediaURL, "isNative": mediaType.isNative}], "defaultSource": 0, "posterURL": posterURL, "title": title});
         }
         var playlistData = {
             "playlist": playlist,
@@ -188,14 +241,14 @@ function matchList(list, string) {
 Plugin detection methods
 ***********************/
 
-function getTypeForClassid(classid) {
+function getTypeForClassid(classid) { // from WebKit's source code (except divx)
     switch(classid.toLowerCase()) {
         case "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000": return "application/x-shockwave-flash";
         case "clsid:22d6f312-b0f6-11d0-94ab-0080c74c7e95": return "application/x-mplayer2";
         case "clsid:6bf52a52-394a-11d3-b153-00c04f79faa6": return "application/x-mplayer2";
         case "clsid:02bf25d5-8c17-4b23-bc80-d3488abddc6b": return "video/quicktime";
         case "clsid:cfcdaa03-8be4-11cf-b84b-0020afbbccfa": return "audio/x-pn-realaudio-plugin";
-        case "clsid:67dabfbf-d0ab-41fa-9c46-cc0f21721616": return "video/divx"; // not in WebKit
+        case "clsid:67dabfbf-d0ab-41fa-9c46-cc0f21721616": return "video/divx";
         case "clsid:166b1bca-3f9c-11cf-8075-444553540000": return "application/x-director";
         default: return false;
     }
@@ -228,7 +281,7 @@ function getPluginNameFromPlugin(plugin) {
     if(plugin.name === "Silverlight Plug-In") return "Silverlight";
     if(plugin.name.indexOf("Java") != -1) return "Java";
     if(plugin.name.indexOf("QuickTime") != -1) return "QuickTime";
-    if(plugin.name.indexOf("Flip4Mac") != -1) return "WM";
+    if(plugin.name.indexOf("Flip4Mac") != -1) return "Flip4Mac";
     if(plugin.name === "iPhotoPhotocast") return "iPhoto";
     if(plugin.name === "Quartz Composer Plug-In") return "Quartz";
     if(plugin.name === "VideoLAN VLC Plug-in") return "VLC";
@@ -243,7 +296,7 @@ function getPluginNameFromType(type) { // only used if no installed plugin is fo
     if(type === "application/x-silverlight-2") return "Silverlight";
     if(type === "application/x-silverlight") return "Silverlight";
     if(/x-java/.test(type)) return "Java";
-    if(/x-ms/.test(type)) return "WM";
+    if(/x-ms/.test(type)) return "Flip4Mac";
     if(/x-pn/.test(type)) return "Real";
     type = type.split(";")[0];
     if(type === "video/divx") return "DivX";
