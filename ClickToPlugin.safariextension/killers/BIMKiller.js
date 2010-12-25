@@ -1,6 +1,4 @@
-function BIMKiller() { // Broadcast Interactive Media
-    this.name = "BIMKiller";
-}
+function BIMKiller() {}
 
 BIMKiller.prototype.canKill = function(data) {
     if(data.plugin != "Flash") return false;

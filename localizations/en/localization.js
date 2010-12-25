@@ -25,6 +25,6 @@ const VIEW_ON_SITE = function(site) {return "View on " + site;};
 
 // Dialogs
 const QT_CONFIRM_LAUNCH_DIALOG = function(url) {return "A QuickTime object would like to play\n\n" + url + "\n\nin QuickTime Player. Do you want to allow it?";};
-const ADD_TO_LOC_WHITELIST_DIALOG = "Allow embedded content on locations matching:";
-const ADD_TO_SRC_WHITELIST_DIALOG = "Allow embedded content from sources matching:";
+const ADD_TO_LOC_WHITELIST_DIALOG = "Allow plugins on locations matching:";
+const ADD_TO_SRC_WHITELIST_DIALOG = "Allow plugins from sources matching:";
 

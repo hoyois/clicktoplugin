@@ -1,6 +1,4 @@
-function GenericKiller() {
-    this.name = "GenericKiller";
-}
+function GenericKiller() {}
 
 GenericKiller.prototype.canKill = function(data) {
     if(data.plugin != "Flash") return false;

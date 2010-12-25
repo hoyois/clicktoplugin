@@ -87,14 +87,6 @@ Placeholder element
     background: -webkit-gradient(linear, left bottom, left top, from(rgba(235, 235, 235, 1)), to(rgba(220, 220, 220, 1))) !important;
 }
 
-.CTFplaceholder.CTFnoposter {
-    background: -webkit-gradient(radial, 50% 50%, 0, 50% 50%, 100, from(rgba(80, 80, 80, 1)), to(rgba(20, 20, 20, 0.3))), -webkit-gradient(linear, 50% 0%, 50% 100%, from(rgba(0, 0, 0, 1)), to(rgba(30, 30, 30, 1)), color-stop(0.5, rgba(50, 50, 50, 1)), color-stop(0.65, rgba(0, 0, 0, 1))) !important;
-}
-
-.CTFplaceholder.CTFnoposter:active {
-    background: -webkit-gradient(linear, 50% 0%, 50% 100%, from(rgba(20, 20, 20, 1)), to(rgba(30, 30, 30, 1)), color-stop(0.5, rgba(50, 50, 50, 1)), color-stop(0.6, rgba(0, 0, 0, 1))) !important;
-}
-
 .CTFplaceholder .CTFplaceholderContainer {
     position: relative !important;
     width: inherit !important;

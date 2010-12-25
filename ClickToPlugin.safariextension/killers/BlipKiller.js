@@ -1,6 +1,4 @@
-function BlipKiller() {
-    this.name = "BlipKiller";
-}
+function BlipKiller() {}
 
 BlipKiller.prototype.canKill = function(data) {
     if(data.plugin != "Flash") return false;
@@ -29,8 +27,6 @@ BlipKiller.prototype.processElement = function(data, callback) {
     xhr.onload = function() {
         var json = JSON.parse(xhr.responseText.replace(/\\'/g, "'")); // correct Blip.tv's invalid JSON
         
-        var sourcesByHeight = new Array();
-        var hasH264Format = false;
         var ext, resolution, format, bestSource, isNative;
         for(var i = 0; i < json.additionalMedia.length; i++) {
             ext = json.additionalMedia[i].url.substr(json.additionalMedia[i].url.lastIndexOf(".") + 1).toUpperCase();

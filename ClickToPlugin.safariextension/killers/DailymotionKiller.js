@@ -1,6 +1,4 @@
-function DailymotionKiller() {
-    this.name = "DailymotionKiller";
-}
+function DailymotionKiller() {}
 
 DailymotionKiller.prototype.canKill = function(data) {
     if(data.plugin != "Flash") return false;

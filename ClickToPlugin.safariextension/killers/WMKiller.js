@@ -1,6 +1,4 @@
-function WMKiller() {
-    this.name = "WMKiller";
-}
+function WMKiller() {}
 
 WMKiller.prototype.canKill = function(data) {
     return (data.plugin == "Flip4Mac" && canPlayWM);

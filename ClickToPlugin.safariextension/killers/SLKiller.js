@@ -1,6 +1,4 @@
-function SLKiller() {
-    this.name = "SLKiller";
-}
+function SLKiller() {}
 
 SLKiller.prototype.canKill = function(data) {
     if(!data.plugin == "Silverlight") return false;
