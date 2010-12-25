@@ -1,6 +1,4 @@
-function QTKiller() {
-    this.name = "QTKiller";
-}
+function QTKiller() {}
 
 
 QTKiller.prototype.canKill = function(data) {

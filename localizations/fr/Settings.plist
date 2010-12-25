@@ -4,7 +4,7 @@
 <array>
 	<dict>
 		<key>Title</key>
-		<string>Options MIME</string>
+		<string>Options plugins</string>
 		<key>Type</key>
 		<string>Group</string>
 	</dict>
@@ -17,7 +17,7 @@
 		<string>Bloquer</string>
 		<key>Titles</key>
 		<array>
-			<string>tous les types MIME</string>
+			<string>tous plugins</string>
 			<string>tous sauf ceux de la liste verte</string>
 			<string>seulement ceux de la liste rouge</string>
 		</array>
@@ -42,7 +42,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string>flash futuresplash silverlight</string>
+		<string>flash silverlight</string>
 		<key>Key</key>
 		<string>redlist</string>
 		<key>Title</key>
@@ -51,18 +51,8 @@
 		<string>TextField</string>
 	</dict>
 	<dict>
-		<key>DefaultValue</key>
-		<false/>
-		<key>Key</key>
-		<string>allowQT</string>
 		<key>Title</key>
-		<string>Autoriser le plugin QuickTime                          </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>Title</key>
-		<string>Options vidéo</string>
+		<string>Options HTML5</string>
 		<key>Type</key>
 		<string>Group</string>
 	</dict>
@@ -72,7 +62,17 @@
 		<key>Key</key>
 		<string>useH264</string>
 		<key>Title</key>
-		<string>Rechercher des vidéos pour remplacer             </string>
+		<string>Rechercher des vidéos pour remplacer les plugins</string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useSwitcher</string>
+		<key>Title</key>
+		<string>Afficher la liste des formats disponibles                 </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -80,49 +80,9 @@
 		<key>DefaultValue</key>
 		<true/>
 		<key>Key</key>
-		<string>replaceFlash</string>
+		<string>showPoster</string>
 		<key>Title</key>
-		<string>Flash                                             </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
-		<string>replaceSL</string>
-		<key>Title</key>
-		<string>Silverlight                                      </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
-		<string>replaceQT</string>
-		<key>Title</key>
-		<string>QuickTime                                    </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
-		<string>replaceWM</string>
-		<key>Title</key>
-		<string>Windows Media                             </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
-		<string>replaceDivX</string>
-		<key>Title</key>
-		<string>DivX                                              </string>
+		<string>Afficher un aperçu de la vidéo                                </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -132,29 +92,7 @@
 		<key>Key</key>
 		<string>usePlaylists</string>
 		<key>Title</key>
-		<string>Utiliser les listes de lecture                               </string>
-		<key>Titles</key>
-		<array>
-			<string>Ne pas utiliser</string>
-			<string>N'utiliser qu'en dernier recours</string>
-			<string>Utiliser sans restrictions</string>
-		</array>
-		<key>Type</key>
-		<string>CheckBox</string>
-		<key>Values</key>
-		<array>
-			<real>1</real>
-			<real>2</real>
-			<real>3</real>
-		</array>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
-		<string>showPoster</string>
-		<key>Title</key>
-		<string>Afficher un aperçu de la vidéo                          </string>
+		<string>Utiliser les listes de lecture                                     </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -164,7 +102,7 @@
 		<key>Key</key>
 		<string>H264autoload</string>
 		<key>Title</key>
-		<string>Effectuer les remplacements automatiquement</string>
+		<string>Effectuer les remplacements automatiquement      </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -172,7 +110,7 @@
 		<key>DefaultValue</key>
 		<string></string>
 		<key>Key</key>
-		<string>H264whitelist</string>
+		<string>videowhitelist</string>
 		<key>Title</key>
 		<string>sur ces sites</string>
 		<key>Type</key>
@@ -202,6 +140,34 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
+		<real>5</real>
+		<key>Key</key>
+		<string>maxresolution</string>
+		<key>Title</key>
+		<string>Format préféré</string>
+		<key>Titles</key>
+		<array>
+			<string>Plugin</string>
+			<string>360p</string>
+			<string>480p</string>
+			<string>720p</string>
+			<string>1080p</string>
+			<string>4K</string>
+		</array>
+		<key>Type</key>
+		<string>PopUpButton</string>
+		<key>Values</key>
+		<array>
+			<real>0.0</real>
+			<real>2</real>
+			<real>3</real>
+			<real>4</real>
+			<real>5</real>
+			<real>6</real>
+		</array>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
 		<real>2</real>
 		<key>Key</key>
 		<string>QTbehavior</string>
@@ -220,30 +186,6 @@
 			<real>1</real>
 			<real>2</real>
 			<real>3</real>
-		</array>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<real>3</real>
-		<key>Key</key>
-		<string>maxresolution</string>
-		<key>Title</key>
-		<string>Résolution max</string>
-		<key>Titles</key>
-		<array>
-			<string>480p</string>
-			<string>720p</string>
-			<string>1080p</string>
-			<string>4K</string>
-		</array>
-		<key>Type</key>
-		<string>PopUpButton</string>
-		<key>Values</key>
-		<array>
-			<real>1</real>
-			<real>2</real>
-			<real>3</real>
-			<real>4</real>
 		</array>
 	</dict>
 	<dict>
@@ -272,7 +214,7 @@
 		<key>Key</key>
 		<string>uselocWhitelist</string>
 		<key>Title</key>
-		<string>Autoriser les plugins si l'adresse de la page     </string>
+		<string>Autoriser les plugins si l'adresse de la page           </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -302,7 +244,7 @@
 		<key>Key</key>
 		<string>usesrcWhitelist</string>
 		<key>Title</key>
-		<string>Autoriser les plugins si l'adresse de l'objet       </string>
+		<string>Autoriser les plugins si l'adresse de l'objet             </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -332,7 +274,7 @@
 		<key>Key</key>
 		<string>loadInvisible</string>
 		<key>Title</key>
-		<string>Autoriser les éléments aux dimensions            </string>
+		<string>Autoriser les plugins aux dimensions                     </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -356,9 +298,19 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
+		<string>useOOcontext</string>
+		<key>Title</key>
+		<string>Désactiver/Activer ClickToPlugin                            </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
 		<string>useWLcontext</string>
 		<key>Title</key>
-		<string>Ajouter à la liste blanche                                  </string>
+		<string>Ajouter à la liste blanche                                        </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -368,7 +320,7 @@
 		<key>Key</key>
 		<string>useLAcontext</string>
 		<key>Title</key>
-		<string>Débloquer tous les plugins                               </string>
+		<string>Débloquer tous les plugins                                     </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -378,7 +330,7 @@
 		<key>Key</key>
 		<string>useLIcontext</string>
 		<key>Title</key>
-		<string>Débloquer les plugins invisibles                        </string>
+		<string>Débloquer les plugins invisibles                              </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -388,7 +340,17 @@
 		<key>Key</key>
 		<string>useDVcontext</string>
 		<key>Title</key>
-		<string>Télécharger la vidéo                                          </string>
+		<string>Télécharger la vidéo                                                </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useSUcontext</string>
+		<key>Title</key>
+		<string>Voir l'URL de la vidéo                                              </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -398,7 +360,7 @@
 		<key>Key</key>
 		<string>useVScontext</string>
 		<key>Title</key>
-		<string>Voir la vidéo sur le site                                     </string>
+		<string>Voir la vidéo sur le site                                           </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -408,7 +370,7 @@
 		<key>Key</key>
 		<string>useQTcontext</string>
 		<key>Title</key>
-		<string>Ouvrir dans QuickTime Player                           </string>
+		<string>Ouvrir dans QuickTime Player                                 </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -460,9 +422,21 @@
 		<key>Key</key>
 		<string>debug</string>
 		<key>Title</key>
-		<string>Bloquer manuellement                                      </string>
+		<string>Bloquer les plugins manuellement                          </string>
 		<key>Type</key>
 		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>allowQT</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>mustUpdateSettings</string>
 	</dict>
 </array>
 </plist>

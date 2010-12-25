@@ -1,6 +1,4 @@
-function BreakKiller() {
-    this.name = "BreakKiller";
-}
+function BreakKiller() {}
 
 BreakKiller.prototype.canKill = function(data) {
     if(data.plugin != "Flash") return false;

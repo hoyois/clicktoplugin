@@ -173,8 +173,8 @@ function blockOrAllow(data, location, className) { // returns true if element ca
     
     // Use greenlist/redlist
     if(safari.extension.settings["block"] === "useRedlist") {
-            if(mimeredlist && type && !matchList(mimeredlist, type)) return true;
-            if(redlist && plugin && !matchList(redlist, plugin.name.replace(/\s/g, "").toLowerCase())) return true;
+            if((!mimeredlist || !type || !matchList(mimeredlist, type)) &&
+            (!redlist || !plugin || !matchList(redlist, plugin.name.replace(/\s/g, "").toLowerCase()))) return true;
     } else if(safari.extension.settings["block"] === "useGreenlist") {
             if(mimegreenlist && type && matchList(mimegreenlist, type)) return true;
             if(greenlist && plugin && matchList(greenlist, plugin.name.replace(/\s/g, "").toLowerCase())) return true;

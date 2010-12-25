@@ -1,6 +1,4 @@
-function TumblrKiller() {
-    this.name = "TumblrKiller";
-}
+function TumblrKiller() {}
 
 TumblrKiller.prototype.canKill = function(data) {
     if(data.plugin != "Flash") return false;

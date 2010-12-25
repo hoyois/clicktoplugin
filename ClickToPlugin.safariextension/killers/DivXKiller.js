@@ -1,6 +1,4 @@
-function DivXKiller() {
-    this.name = "DivXKiller";
-}
+function DivXKiller() {}
 
 
 DivXKiller.prototype.canKill = function(data) {

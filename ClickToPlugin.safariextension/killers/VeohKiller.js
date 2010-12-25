@@ -1,6 +1,4 @@
-function VeohKiller() {
-    this.name = "VeohKiller";
-}
+function VeohKiller() {}
 
 VeohKiller.prototype.canKill = function(data) {
     if(data.plugin != "Flash") return false;
