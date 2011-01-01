@@ -42,12 +42,8 @@ BlipKiller.prototype.processElement = function(data, callback) {
             sources.push({"url": json.additionalMedia[i].url, "format": format, "isNative": isNative, "resolution": resolution});
         }
         
-        var defaultSource = chooseDefaultSource(sources, bestSource);
-        var badgeLabel = makeLabel(sources[defaultSource]);
-        
         var videoData = {
-            "playlist": [{"mediaType": "video", "title": unescapeHTML(json.title), "posterURL": json.thumbnailUrl, "sources": sources, "defaultSource": defaultSource}],
-            "badgeLabel": badgeLabel
+            "playlist": [{"mediaType": "video", "title": unescapeHTML(json.title), "posterURL": json.thumbnailUrl, "sources": sources, "bestSource": bestSource}]
         };
         if(isEmbed) videoData.playlist[0].siteInfo = {"name": "Blip.tv", "url": "http://www.blip.tv/file/" + json.itemId};
         callback(videoData);

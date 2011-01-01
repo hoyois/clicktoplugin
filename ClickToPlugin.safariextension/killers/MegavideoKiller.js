@@ -2,7 +2,7 @@ function MegavideoKiller() {}
 
 MegavideoKiller.prototype.canKill = function(data) {
     if(data.plugin != "Flash") return false;
-    if(safari.extension.settings["QTbehavior"] === 1 || !canPlayFLV) return false;
+    if(safari.extension.settings.codecsPolicy === 1 || !canPlayFLV) return false;
     if(data.src === "http://wwwstatic.megavideo.com/mv_player.swf") {data.onsite = true; return true;};
     if(data.src.indexOf("megavideo.com/v/") !== -1) {data.onsite = false; return true;}
     return false;
@@ -48,11 +48,8 @@ MegavideoKiller.prototype.finalizeProcessing = function(getVariable, siteInfo, c
     }
     sources.push({"url": "http://www" + getVariable("s") + ".megavideo.com/files/" + this.decrypt(getVariable("un"), getVariable("k1"), getVariable("k2")) + "/" + title + ".flv", "format": "SD FLV", "resolution": 360, "isNative": false});
     
-    var defaultSource = chooseDefaultSource(sources);
-    
     var videoData = {
-        "playlist": [{"siteInfo": siteInfo, "mediaType": "video", "title": title, "sources": sources, "defaultSource": defaultSource}],
-        "badgeLabel": makeLabel(sources[defaultSource])
+        "playlist": [{"siteInfo": siteInfo, "mediaType": "video", "title": title, "sources": sources}]
     };
     callback(videoData);
 };

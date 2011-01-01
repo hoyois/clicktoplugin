@@ -8,9 +8,10 @@ BreakKiller.prototype.canKill = function(data) {
 };
 
 BreakKiller.prototype.processElement = function(data, callback) {
-    var videoURL, videoHash, url;
+    var videoURL, posterURL, videoHash, url;
     if(data.onsite) {
         videoURL = getFlashVariable(data.params, "videoPath");//??
+        posterURL = getFlashVariable(data.params, "thumbnailURL");
         videoHash = getFlashVariable(data.params, "icon");
         url = getFlashVariable(data.params, "sLink");
         if(!url) {
@@ -51,19 +52,17 @@ BreakKiller.prototype.processElement = function(data, callback) {
             else return;
         }
         
-        var defaultSource = chooseDefaultSource(sources);
-        var badgeLabel = makeLabel(sources[defaultSource]);
-        
-        var posterURL, title, siteInfo;
-        matches = xhr.responseText.match(/sGlobalThumbnailURL=['"]([^'"]*)['"]/);
-        if(matches) posterURL = matches[1];
+        var title, siteInfo;
+        if(!posterURL) {
+            matches = xhr.responseText.match(/sGlobalThumbnailURL=['"]([^'"]*)['"]/);
+            if(matches) posterURL = matches[1];
+        }
         matches = xhr.responseText.match(/!!!&amp;body=(.*?)%0d/);
         if(matches) title = decodeURIComponent(matches[1]);
         if(!data.onsite || data.location === "http://www.break.com/") siteInfo = {"name": "Break.com", "url": url};
         
         var videoData = {
-            "playlist": [{"mediaType": "video", "title": title, "posterURL": posterURL, "sources": sources, "defaultSource": defaultSource, "siteInfo": siteInfo}],
-            "badgeLabel": badgeLabel
+            "playlist": [{"mediaType": "video", "title": title, "posterURL": posterURL, "sources": sources, "siteInfo": siteInfo}]
         };
         callback(videoData);
     };

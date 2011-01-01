@@ -38,22 +38,18 @@ VimeoKiller.prototype.processElement = function(data, callback) {
             if(isNative || canPlayFLV) sources.push({"url": url + "sd", "format": "360p " + (isNative ? "MP4" : "FLV"), "resolution": 360, "isNative": isNative});
             var handleMIMEType2 = function(MIMEType) {
                 if(MIMEType === "video/mp4") sources.push({"url": url + "mobile", "format": "Mobile MP4", "resolution": 240, "isNative": true});
-
-                var defaultSource = chooseDefaultSource(sources);
-                var badgeLabel = makeLabel(sources[defaultSource]);
-
+                
                 if(xml.getElementsByTagName("thumbnail").length > 0) {
                     posterURL = xml.getElementsByTagName("thumbnail")[0].textContent;
                 }
                 if(xml.getElementsByTagName("caption").length > 0) {
                     title = xml.getElementsByTagName("caption")[0].textContent;
                 }
-
+                
                 if(data.location.indexOf("vimeo.com/") === -1 || data.location == "http://vimeo.com/" || data.location.indexOf("player.vimeo.com/") !== -1) siteInfo = {"name": "Vimeo", "url": "http://vimeo.com/" + videoID};
 
                 var videoData = {
-                    "playlist": [{"siteInfo": siteInfo, "mediaType": "video", "title": title, "posterURL": posterURL, "sources": sources, "defaultSource": defaultSource}],
-                    "badgeLabel": badgeLabel
+                    "playlist": [{"siteInfo": siteInfo, "mediaType": "video", "title": title, "posterURL": posterURL, "sources": sources}]
                 };
                 callback(videoData);
             };

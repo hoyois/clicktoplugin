@@ -27,8 +27,7 @@ BIMKiller.prototype.processElement = function(data, callback) {
         }
         
         var videoData = {
-            "playlist": [{"mediaType": "video", "title": title, "posterURL": posterURL, "sources": [{"url": videoURL}], "defaultSource": 0}],
-            "badgeLabel": "H.264"
+            "playlist": [{"posterURL": posterURL, "title": title, "sources": [{"url": videoURL, "isNative": true}]}]
         };
         callback(videoData);
     };

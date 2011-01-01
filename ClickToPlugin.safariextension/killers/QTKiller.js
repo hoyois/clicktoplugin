@@ -8,13 +8,11 @@ QTKiller.prototype.canKill = function(data) {
 
 
 QTKiller.prototype.processElement = function(data, callback) {
-    var playlist = [{"mediaType": "video", "sources": [{"url": data.src}], "defaultSource": 0}];
-    if(data.href) playlist.push({"mediaType": "video", "sources": [{"url": data.href}], "defaultSource": 0});
+    var playlist = [{"mediaType": "video", "sources": [{"url": data.src, "isNative": true}]}];
+    if(data.href) playlist.push({"mediaType": "video", "sources": [{"url": data.href, "isNative": true}]});
     var videoData = {
         "noPlaylistControls": true,
-        "playlist": playlist,
-        "badgeLabel": "H.264"
+        "playlist": playlist
     };
-
     callback(videoData);
 };
