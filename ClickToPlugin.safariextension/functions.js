@@ -141,7 +141,7 @@ function getParams(element, plugin) {
 }
 
 // Debugging functions
-document.HTMLToString = function(element){
+function HTMLToString(element) {
     return (new XMLSerializer()).serializeToString(element);
 };
 

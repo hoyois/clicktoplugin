@@ -4,51 +4,63 @@
 <array>
 	<dict>
 		<key>Title</key>
-		<string>Options plugins</string>
+		<string>Listes blanches</string>
 		<key>Type</key>
 		<string>Group</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string>blockAll</string>
+		<string></string>
 		<key>Key</key>
-		<string>block</string>
+		<string>pluginsWhitelist</string>
 		<key>Title</key>
-		<string>Bloquer</string>
-		<key>Titles</key>
-		<array>
-			<string>tous plugins</string>
-			<string>tous sauf ceux de la liste verte</string>
-			<string>seulement ceux de la liste rouge</string>
-		</array>
+		<string>Plugins</string>
 		<key>Type</key>
-		<string>RadioButtons</string>
-		<key>Values</key>
-		<array>
-			<string>blockAll</string>
-			<string>useGreenlist</string>
-			<string>useRedlist</string>
-		</array>
+		<string>TextField</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>invertPluginsWhitelist</string>
+		<key>Title</key>
+		<string>Utiliser comme liste noire   </string>
+		<key>Type</key>
+		<string>CheckBox</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<string></string>
 		<key>Key</key>
-		<string>greenlist</string>
+		<string>locationsWhitelist</string>
 		<key>Title</key>
-		<string>Liste verte</string>
+		<string>Sites</string>
+		<key>Titles</key>
+		<array/>
+		<key>Type</key>
+		<string>TextField</string>
+		<key>Values</key>
+		<array/>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string></string>
+		<key>Key</key>
+		<string>sourcesWhitelist</string>
+		<key>Title</key>
+		<string>Sources</string>
 		<key>Type</key>
 		<string>TextField</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string>flash silverlight</string>
+		<false/>
 		<key>Key</key>
-		<string>redlist</string>
+		<string>invertWhitelists</string>
 		<key>Title</key>
-		<string>Liste rouge</string>
+		<string>Utiliser comme listes noires</string>
 		<key>Type</key>
-		<string>TextField</string>
+		<string>CheckBox</string>
 	</dict>
 	<dict>
 		<key>Title</key>
@@ -60,7 +72,7 @@
 		<key>DefaultValue</key>
 		<true/>
 		<key>Key</key>
-		<string>useH264</string>
+		<string>replacePlugins</string>
 		<key>Title</key>
 		<string>Rechercher des vidéos pour remplacer les plugins</string>
 		<key>Type</key>
@@ -70,7 +82,7 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>useSwitcher</string>
+		<string>useSourceSelector</string>
 		<key>Title</key>
 		<string>Afficher la liste des formats disponibles                 </string>
 		<key>Type</key>
@@ -100,7 +112,7 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>H264autoload</string>
+		<string>mediaAutoload</string>
 		<key>Title</key>
 		<string>Effectuer les remplacements automatiquement      </string>
 		<key>Type</key>
@@ -110,7 +122,7 @@
 		<key>DefaultValue</key>
 		<string></string>
 		<key>Key</key>
-		<string>videowhitelist</string>
+		<string>mediaWhitelist</string>
 		<key>Title</key>
 		<string>sur ces sites</string>
 		<key>Type</key>
@@ -120,7 +132,7 @@
 		<key>DefaultValue</key>
 		<string>autoplay</string>
 		<key>Key</key>
-		<string>H264behavior</string>
+		<string>initialBehavior</string>
 		<key>Title</key>
 		<string>Action initiale</string>
 		<key>Titles</key>
@@ -140,9 +152,9 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<real>5</real>
+		<real>1080</real>
 		<key>Key</key>
-		<string>maxresolution</string>
+		<string>maxResolution</string>
 		<key>Title</key>
 		<string>Format préféré</string>
 		<key>Titles</key>
@@ -158,19 +170,19 @@
 		<string>PopUpButton</string>
 		<key>Values</key>
 		<array>
-			<real>0.0</real>
-			<real>2</real>
-			<real>3</real>
-			<real>4</real>
-			<real>5</real>
-			<real>6</real>
+			<string>plugin</string>
+			<real>360</real>
+			<real>480</real>
+			<real>720</real>
+			<real>1080</real>
+			<string>infinity</string>
 		</array>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<real>2</real>
 		<key>Key</key>
-		<string>QTbehavior</string>
+		<string>codecPolicy</string>
 		<key>Title</key>
 		<string>Codecs non natifs</string>
 		<key>Titles</key>
@@ -204,92 +216,6 @@
 	</dict>
 	<dict>
 		<key>Title</key>
-		<string>Liste blanche</string>
-		<key>Type</key>
-		<string>Group</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<false/>
-		<key>Key</key>
-		<string>uselocWhitelist</string>
-		<key>Title</key>
-		<string>Autoriser les plugins si l'adresse de la page           </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<string>www.example.com www.example2.com</string>
-		<key>Key</key>
-		<string>locwhitelist</string>
-		<key>Title</key>
-		<string>contient</string>
-		<key>Type</key>
-		<string>TextField</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<string></string>
-		<key>Key</key>
-		<string>locblacklist</string>
-		<key>Title</key>
-		<string>ne contient pas</string>
-		<key>Type</key>
-		<string>TextField</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<false/>
-		<key>Key</key>
-		<string>usesrcWhitelist</string>
-		<key>Title</key>
-		<string>Autoriser les plugins si l'adresse de l'objet             </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<string></string>
-		<key>Key</key>
-		<string>srcwhitelist</string>
-		<key>Title</key>
-		<string>contient</string>
-		<key>Type</key>
-		<string>TextField</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<string></string>
-		<key>Key</key>
-		<string>srcblacklist</string>
-		<key>Title</key>
-		<string>ne contient pas</string>
-		<key>Type</key>
-		<string>TextField</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<false/>
-		<key>Key</key>
-		<string>loadInvisible</string>
-		<key>Title</key>
-		<string>Autoriser les plugins aux dimensions                     </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<string>8x8</string>
-		<key>Key</key>
-		<string>maxinvdim</string>
-		<key>Title</key>
-		<string>n'excédant pas</string>
-		<key>Type</key>
-		<string>TextField</string>
-	</dict>
-	<dict>
-		<key>Title</key>
 		<string>Menu contextuel</string>
 		<key>Type</key>
 		<string>Group</string>
@@ -298,9 +224,9 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>useOOcontext</string>
+		<string>disableEnableContext</string>
 		<key>Title</key>
-		<string>Désactiver/Activer ClickToPlugin                            </string>
+		<string>Désactiver/Activer ClickToPlugin        </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -308,9 +234,9 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>useWLcontext</string>
+		<string>addToWhitelistContext</string>
 		<key>Title</key>
-		<string>Ajouter à la liste blanche                                        </string>
+		<string>Ajouter à la liste blanche                    </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -318,9 +244,9 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>useLAcontext</string>
+		<string>loadAllContext</string>
 		<key>Title</key>
-		<string>Débloquer tous les plugins                                     </string>
+		<string>Débloquer tous les plugins                 </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -328,9 +254,9 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>useLIcontext</string>
+		<string>loadInvisibleContext</string>
 		<key>Title</key>
-		<string>Débloquer les plugins invisibles                              </string>
+		<string>Débloquer les plugins invisibles          </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -338,9 +264,9 @@
 		<key>DefaultValue</key>
 		<true/>
 		<key>Key</key>
-		<string>useDVcontext</string>
+		<string>downloadContext</string>
 		<key>Title</key>
-		<string>Télécharger la vidéo                                                </string>
+		<string>Télécharger la vidéo                            </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -348,9 +274,9 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>useSUcontext</string>
+		<string>viewOnSiteContext</string>
 		<key>Title</key>
-		<string>Voir l'URL de la vidéo                                              </string>
+		<string>Voir la vidéo sur le site                       </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -358,19 +284,9 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>useVScontext</string>
+		<string>viewInQTPContext</string>
 		<key>Title</key>
-		<string>Voir la vidéo sur le site                                           </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<false/>
-		<key>Key</key>
-		<string>useQTcontext</string>
-		<key>Title</key>
-		<string>Ouvrir dans QuickTime Player                                 </string>
+		<string>Ouvrir dans QuickTime Player             </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -380,9 +296,29 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>loadInvisible</string>
+		<key>Title</key>
+		<string>Autoriser les plugins invisibles           </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>debug</string>
+		<key>Title</key>
+		<string>Bloquer les plugins manuellement      </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
 		<string>textonly</string>
 		<key>Key</key>
-		<string>sifrReplacement</string>
+		<string>sIFRPolicy</string>
 		<key>Title</key>
 		<string>Texte sIFR</string>
 		<key>Titles</key>
@@ -418,25 +354,9 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<false/>
+		<real>8</real>
 		<key>Key</key>
-		<string>debug</string>
-		<key>Title</key>
-		<string>Bloquer les plugins manuellement                          </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<false/>
-		<key>Key</key>
-		<string>allowQT</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
-		<string>mustUpdateSettings</string>
+		<string>maxInvisibleSize</string>
 	</dict>
 </array>
 </plist>

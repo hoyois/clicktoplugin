@@ -7,14 +7,11 @@ WMKiller.prototype.canKill = function(data) {
 WMKiller.prototype.processElement = function(data, callback) {
     var mediaType = canPlaySrcWithHTML5(data.src);
     if(!mediaType) return;
-    var isAudio = mediaType.type === "audio";
     var sources = [{"url": data.src, "isNative": false}];
-    var defaultSource = chooseDefaultSource(sources);
     
     var mediaData = {
-        "playlist": [{"mediaType": "video", "sources": sources, "defaultSource": defaultSource}],
-        "badgeLabel": isAudio ? "Audio" : "Video",
-        "isAudio": isAudio
+        "playlist": [{"mediaType": mediaType.type, "sources": sources}],
+        "isAudio": mediaType.type === "audio"
     };
     callback(mediaData);
 };

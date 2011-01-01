@@ -5,7 +5,7 @@ mediaPlayer class definition
 function mediaPlayer() {
     
     this.playerType; // audio or video
-    this.playlist = new Array(); // array of mediaData objects
+    this.playlist = new Array();
     this.playlistLength = 0; // not necessarily synced with playlist.length!
     
     this.startTrack = null; // internal start track is always 0
@@ -23,14 +23,12 @@ function mediaPlayer() {
     
     this.contextInfo = null;
     
-    this.usePlaylistControls = false;
-    this.useSourceSwitcher = false;
     this.playlistControls = null;
-    this.sourceSwitcher = null;
+    this.sourceSelector = null;
     
 }
 
-mediaPlayer.prototype.handleMediaData = function(mediaData, usePlaylists, useSwitcher) {
+mediaPlayer.prototype.handleMediaData = function(mediaData) {
     if(mediaData.loadAfter) { // just adding stuff to the playlist
         this.playlistLength -= mediaData.missed;
         this.addToPlaylist(mediaData.playlist);
@@ -39,13 +37,11 @@ mediaPlayer.prototype.handleMediaData = function(mediaData, usePlaylists, useSwi
         this.addToPlaylist(mediaData.playlist, true);
         this.playlistLength = mediaData.playlistLength ? mediaData.playlistLength : mediaData.playlist.length;
         this.startTrack = mediaData.startTrack ? mediaData.startTrack : 0;
-
-        this.usePlaylistControls = usePlaylists && !mediaData.noPlaylistControls && this.playlistLength > 1;
-        this.useSourceSwitcher = useSwitcher && !mediaData.isAudio;
+        this.playlistControls = !mediaData.noPlaylistControls && this.playlistLength > 1;
     }
 };
 
-mediaPlayer.prototype.createMediaElement = function(plugin, loadPlugin, width, height, buffer, volume, contextInfo) {
+mediaPlayer.prototype.createMediaElement = function(plugin, loadPlugin, width, height, initialBehavior, volume, contextInfo, useSourceSelector) {
     this.containerElement = document.createElement("div");
     this.containerElement.className = "CTFmediaPlayer";
     this.mediaElement = document.createElement(this.playerType);
@@ -53,7 +49,7 @@ mediaPlayer.prototype.createMediaElement = function(plugin, loadPlugin, width, h
     this.containerElement.appendChild(this.mediaElement);
     
     this.mediaElement.setAttribute("controls", "controls");
-    switch (buffer) {
+    switch(initialBehavior) {
         case "autoplay": 
             this.mediaElement.setAttribute("autoplay", "autoplay");
             break;
@@ -92,8 +88,8 @@ mediaPlayer.prototype.createMediaElement = function(plugin, loadPlugin, width, h
     }, false);
     
     // Playlist constrols
-    if(this.usePlaylistControls) this.initializePlaylistControls();
-    if(this.useSourceSwitcher) this.initializeSourceSwitcher(plugin, loadPlugin);
+    if(this.playlistControls) this.initializePlaylistControls();
+    if(useSourceSelector) this.initializeSourceSelector(plugin, loadPlugin);
 };
 
 mediaPlayer.prototype.initializePlaylistControls = function() {
@@ -142,7 +138,7 @@ mediaPlayer.prototype.initializePlaylistControls = function() {
         // prevents the default controls from disappearing
         if(event.relatedTarget && (event.relatedTarget == prevButton || event.relatedTarget == nextButton || event.relatedTarget == trackSelect.firstChild || event.relatedTarget.hasAttribute("precision"))) {
             event.preventDefault();
-        } else {
+        } else if(!event.relatedTarget || (event.relatedTarget.className !== "CTFsourceList" && event.relatedTarget.parentNode.className !== "CTFsourceList" && event.relatedTarget.parentNode.parentNode.className !== "CTFsourceList")) {
             this.focus = false;
             if(!this.paused && this.readyState > 1) fade(_this.playlistControls, .4, 0, 0);
         }
@@ -179,7 +175,7 @@ mediaPlayer.prototype.initializePlaylistControls = function() {
     this.containerElement.appendChild(this.playlistControls);
 };
 
-mediaPlayer.prototype.initializeSourceSwitcher = function(plugin, loadPlugin) {
+mediaPlayer.prototype.initializeSourceSelector = function(plugin, loadPlugin) {
     var _this = this;
     var handleClickEvent = function(event, source) {
         _this.switchSource(source);
@@ -189,13 +185,13 @@ mediaPlayer.prototype.initializeSourceSwitcher = function(plugin, loadPlugin) {
         _this.setContextInfo(event, _this.contextInfo, source);
         event.stopPropagation();
     };
-    this.sourceSwitcher = new sourceSwitcher(plugin, loadPlugin, handleClickEvent, handleContextMenuEvent);
+    this.sourceSelector = new sourceSelector(plugin, loadPlugin, handleClickEvent, handleContextMenuEvent);
     
     this.mediaElement.addEventListener("mouseout", function(event) {
-        if(event.relatedTarget && (event.relatedTarget.className === "CTFsourceList" || event.relatedTarget.parentNode.className === "CTFsourceList")) event.preventDefault();
+        if(event.relatedTarget && (event.relatedTarget.className === "CTFsourceList" || event.relatedTarget.parentNode.className === "CTFsourceList" || event.relatedTarget.parentNode.parentNode.className === "CTFsourceList")) event.preventDefault();
     }, false);
     
-    this.containerElement.appendChild(this.sourceSwitcher.element);
+    this.containerElement.appendChild(this.sourceSelector.element);
 };
 
 mediaPlayer.prototype.fixAspectRatio = function() {
@@ -207,21 +203,21 @@ mediaPlayer.prototype.fixAspectRatio = function() {
         // No rounding to avoid stretching in fullscreen
         var height = h/w*this.width;
         this.mediaElement.style.width = this.width + "px"; this.mediaElement.style.height = height + "px";
-        if(this.useSourceSwitcher) {
-            this.sourceSwitcher.setPosition(0, this.height - height);
+        if(this.sourceSelector) {
+            this.sourceSelector.setPosition(0, this.height - height);
         }
     } else {
         var width = w/h*this.height;
         this.mediaElement.style.height = this.height + "px"; this.mediaElement.style.width = width + "px";
         if(this.playlistControls) {
             this.playlistControls.style.width = width + "px";
-            if(this.usePlaylistControls) this.playlistControls.getElementsByTagName("p")[0].style.width = (width - this.playlistControls.getElementsByClassName("CTFplaylistControlsRight")[0].offsetWidth - 12) + "px";
+            this.playlistControls.getElementsByTagName("p")[0].style.width = (width - this.playlistControls.getElementsByClassName("CTFplaylistControlsRight")[0].offsetWidth - 12) + "px";
         }
-        if(this.useSourceSwitcher) {
-            this.sourceSwitcher.setPosition((this.width - width)/2, 0);
+        if(this.sourceSelector) {
+            this.sourceSelector.setPosition((this.width - width)/2, 0);
         }
     }
-    if(this.usePlaylistControls) {
+    if(this.playlistControls) {
         // need this otherwise webkit messes up font smoothing with hardware acceleration
         fade(this.playlistControls, .05, 0, .9);
     }
@@ -233,10 +229,10 @@ mediaPlayer.prototype.resetAspectRatio = function() {
     this.mediaElement.style.height = this.height + "px";
     if(this.playlistControls) {
         this.playlistControls.style.width = this.width + "px";
-        if(this.usePlaylistControls) this.playlistControls.getElementsByTagName("p")[0].style.width = (this.width - this.playlistControls.getElementsByClassName("CTFplaylistControlsRight")[0].offsetWidth - 12) + "px";
+        this.playlistControls.getElementsByTagName("p")[0].style.width = (this.width - this.playlistControls.getElementsByClassName("CTFplaylistControlsRight")[0].offsetWidth - 12) + "px";
     }
-    if(this.useSourceSwitcher) {
-        this.sourceSwitcher.setPosition(0,0);
+    if(this.sourceSelector) {
+        this.sourceSelector.setPosition(0,0);
     }
 };
 
@@ -256,7 +252,7 @@ mediaPlayer.prototype.loadTrack = function(track, source, autoplay) { // source 
     track = track % this.playlist.length;
     if(track < 0) track += this.playlist.length; // weird JS behavior
     if(source === null) source = this.playlist[track].defaultSource;
-    if(source === undefined) source = 0; // only happens for JW player playlists and no-MP4 YT playlists
+    if(source === undefined) source = 0; // should NOT happen
     
     this.resetAspectRatio();
     this.mediaElement.src = this.playlist[track].sources[source].url;
@@ -280,11 +276,14 @@ mediaPlayer.prototype.loadTrack = function(track, source, autoplay) { // source 
         this.mediaElement.setAttribute("autoplay", "autoplay");
     }
     
-    if(this.useSourceSwitcher) {
-        this.sourceSwitcher.buildSourceList(this.playlist[track].sources);
-        this.sourceSwitcher.setCurrentSource(source);
+    if(this.sourceSelector) {
+        this.sourceSelector.hide();
+        this.sourceSelector.buildSourceList(this.playlist[track].sources);
+        this.sourceSelector.setCurrentSource(source);
+        this.sourceSelector.setTitle(this.playlist[track].title);
+        this.sourceSelector.unhide(this.width, this.height);
     }
-    if(this.usePlaylistControls) {
+    if(this.playlistControls) {
         var title = this.playlist[track].title;
         if(!title) title = "(no title)";
         track = this.printTrack(track);
@@ -307,9 +306,11 @@ mediaPlayer.prototype.loadTrack = function(track, source, autoplay) { // source 
 mediaPlayer.prototype.switchSource = function(source) {
     if(source === this.currentSource) return;
         
-    this.sourceSwitcher.setCurrentSource(source);
+    this.sourceSelector.setCurrentSource(source);
     
     var currentTime = this.mediaElement.currentTime;
+    this.mediaElement.setAttribute("preload", "auto");
+    this.mediaElement.setAttribute("autoplay", "autoplay");
     this.mediaElement.src = this.playlist[this.currentTrack].sources[source].url;
     this.currentSource = source;    
     
@@ -329,18 +330,22 @@ mediaPlayer.prototype.setContextInfo = function(event, contextInfo, source) {
     if(track === null) track = 0;
     contextInfo.mediaType = this.playlist[track].mediaType;
     contextInfo.siteInfo = this.playlist[track].siteInfo;
+    contextInfo.hasVideo = true;
     contextInfo.isVideo = this.currentTrack !== null;
     if(source === null) {
         if(this.currentSource !== null) contextInfo.source = this.currentSource;
         else contextInfo.source = this.playlist[track].defaultSource;
-    } else contextInfo.source = source;
+    } else {
+        //contextInfo.isSelector = true;
+        contextInfo.source = source;
+    }
     safari.self.tab.setContextMenuEventUserInfo(event, contextInfo);
 };
 
 mediaPlayer.prototype.addToPlaylist = function(playlist, init) {
     if(init) this.playlist = playlist.concat(this.playlist);
     else this.playlist = this.playlist.concat(playlist);
-    if(this.usePlaylistControls && this.playlistControls) {
+    if(this.playlistControls) {
         this.playlistControls.getElementsByTagName("span")[0].innerHTML = "/" + normalize(this.playlist.length + this.startTrack, this.playlistLength);
     }
 };

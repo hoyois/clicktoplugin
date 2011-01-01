@@ -38,9 +38,6 @@ DailymotionKiller.prototype.processElementFromSequence = function(sequence, call
         }
     }
     
-    var defaultSource = chooseDefaultSource(sources);
-    var badgeLabel = makeLabel(sources[defaultSource]);
-    
     matches = sequence.match(/\"backgroundImageURL\":\"([^"]*)\"/);
     if(matches) posterURL = matches[1].replace(/\\\//g,"/");
     
@@ -49,8 +46,7 @@ DailymotionKiller.prototype.processElementFromSequence = function(sequence, call
     if(matches) title = unescape(matches[1].replace(/\+/g, " ").replace(/\\u/g, "%u").replace(/\\["'\/\\]/g, function(s){return s.charAt(1);}));
     
     var videoData = {
-        "playlist": [{"mediaType": "video", "title": title, "posterURL": posterURL, "sources": sources, "defaultSource": defaultSource}],
-        "badgeLabel": badgeLabel
+        "playlist": [{"mediaType": "video", "title": title, "posterURL": posterURL, "sources": sources}]
     };
     callback(videoData);
 };

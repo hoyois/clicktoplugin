@@ -1,55 +1,67 @@
-// UPDATES FOR v2.0
-if(safari.extension.settings["mustUpdateSettings"]) {
-    safari.extension.settings["mustUpdateSettings"] = false;
-    if(safari.extension.settings["block"] !== "blockAll") {
-        alert("Welcome to ClickToPlugin 2.0!\n\nAs you are using the greenlist/redlist, please take a moment to review their new behavior and update them if necessary:\n\nhttp://hoyois.github.com/safariextensions/clicktoplugin/#plugin_settings\n\n(This message will not be shown again.)");
+// UPDATE
+if(!safari.extension.settings.version) {
+    safari.extension.settings.version = 2;
+    
+    if(safari.extension.settings.block === "useRedlist") safari.extension.settings.invertPluginsWhitelist = true;
+    if(safari.extension.settings.usesrcWhitelist && safari.extension.settings.srcblacklist) {
+        safari.extension.settings.invertWhitelists = true;
+        safari.extension.settings.sourcesWhitelist = safari.extension.settings.srcblacklist;
+        safari.extension.settings.removeItem("srcblacklist");
+        if(safari.extension.settings.uselocWhitelist) {
+            safari.extension.settings.locationsWhitelist = safari.extension.settings.locblacklist;
+            safari.extension.settings.removeItem("locblacklist");
+        }
+    } else {
+        if(safari.extension.settings.usesrcWhitelist) {
+            safari.extension.settings.sourcesWhitelist = safari.extension.settings.srcwhitelist;
+            safari.extension.settings.removeItem("srcwhitelist");
+        }
+        if(safari.extension.settings.uselocWhitelist) {
+            safari.extension.settings.locationsWhitelist = safari.extension.settings.locwhitelist;
+            safari.extension.settings.removeItem("locwhitelist");
+        }
     }
-    if(safari.extension.settings["allowQT"]) {
-        var space = "";
-        if(safari.extension.settings["greenlist"]) space = " ";
-        safari.extension.settings["greenlist"] += space + "quicktime";
-        if(safari.extension.settings["block"] === "blockAll") safari.extension.settings["block"] = "useGreenlist";
+    if(safari.extension.settings.H264whitelist) {
+        safari.extension.settings.mediaWhitelist = safari.extension.settings.H264whitelist;
+        safari.extension.settings.removeItem("H264whitelist");
     }
+    
+    var removeSettings = function() {
+        for(var i = 0; i < arguments.length; i++) {
+            safari.extension.settings.removeItem(arguments[i]);
+        }
+    };
+    removeSettings("allowQT", "useH264", "useSwitcher", "H264autoload", "videowhitelist", "H264behavior", "maxresolution", "QTbehavior", "uselocWhitelist", "usesrcWhitelist", "maxinvdim", "useOOcontext", "useWLcontect", "useLAcontext", "useLIcontext", "useDVcontext", "useSUcontext", "useVScontext", "useQTcontext", "sifrReplacement");
+    
+    alert("Welcome to ClickToPlugin 2.0!\n\nNote that some of your settings may have been reset by this update. For a detailed explanation of each setting, visit\n\nhttp://hoyois.github.com/safariextensions/clicktoplugin/#settings");
 }
 
 // SETTINGS
-var maxinvdim, locwhitelist, locblacklist, srcwhitelist, srcblacklist, greenlist, redlist, mimegreenlist, mimeredlist;
+var pluginsWhitelist, typesWhitelist, locationsWhitelist, sourcesWhitelist;
 
-function updateList(name) {
-    if(safari.extension.settings[name]) this[name] = safari.extension.settings[name].split(/\s+/);
-    else this[name] = false;
-}
-
-function updateInvisibleDimensions() {
-    var dim = safari.extension.settings["maxinvdim"].split("x");
-    maxinvdim = {"width": parseInt(dim[0]), "height": parseInt(dim[1])};
-}
-
-function updatePluginList(name) {
-    if(!safari.extension.settings[name]) {
-        this[name] = false;
-        this["mime" + name] = false;
+function updateWhitelists() {
+    if(safari.extension.settings.locationsWhitelist) locationsWhitelist = safari.extension.settings.locationsWhitelist.split(/\s+/);
+    else locationsWhitelist = false;
+    if(safari.extension.settings.sourcesWhitelist) sourcesWhitelist = safari.extension.settings.sourcesWhitelist.split(/\s+/);
+    else sourcesWhitelist = false;
+    if(!safari.extension.settings.pluginsWhitelist) {
+        pluginsWhitelist = false;
+        typesWhitelist = false;
         return;
     }
-    var list = safari.extension.settings[name].split(/\s+/);
-    this[name] = new Array();
-    this["mime" + name] = new Array();
+    var list = safari.extension.settings.pluginsWhitelist.split(/\s+/);
+    pluginsWhitelist = new Array();
+    typesWhitelist = new Array();
     for(var i = 0; i < list.length; i++) {
         var match = list[i].match(/^MIME:(.*)/i);
-        if(match) this["mime" + name].push(match[1]);
-        else this[name].push(list[i]);
+        if(match) typesWhitelist.push(match[1].toLowerCase());
+        else pluginsWhitelist.push(list[i].toLowerCase());
     }
-    if(this[name].length === 0) this[name] = false;
-    if(this["mime" + name].length === 0) this["mime" + name] = false;
+    if(pluginsWhitelist.length === 0) pluginsWhitelist = false;
+    if(typesWhitelist.length === 0) typesWhitelist = false;
 }
 
-updateList("locwhitelist");
-updateList("locblacklist");
-updateList("srcwhitelist");
-updateList("srcblacklist");
-updatePluginList("greenlist");
-updatePluginList("redlist");
-updateInvisibleDimensions();
+updateWhitelists();
 
 function handleChangeOfSettings(event) {
     switch(event.key) {
@@ -59,36 +71,25 @@ function handleChangeOfSettings(event) {
         case "opacity":
             dispatchMessageToAllPages("updateOpacity", event.newValue);
             break;
-        case "maxinvdim":
-            updateInvisibleDimensions();
-            break;
-        case "locwhitelist":
-        case "locblacklist":
-        case "srcwhitelist":
-        case "srcblacklist":
-            updateList(event.key);
-            break;
-        case "greenlist":
-        case "redlist":
-            updatePluginList(event.key);
+        case "pluginsWhitelist":
+        case "locationsWhitelist":
+        case "sourcesWhitelist":
+            updateWhitelists();
             break;
     }
 }
 
-function getSettings() { // return the settings injected scripts need
-    var settings = new Object();
-    settings.maxinvdim = maxinvdim;
-    settings.useH264 = safari.extension.settings["useH264"];
-    settings.sifrReplacement = safari.extension.settings["sifrReplacement"];
-    settings.opacity = safari.extension.settings["opacity"];
-    settings.debug = safari.extension.settings["debug"];
-    
-    settings.usePlaylists = safari.extension.settings["usePlaylists"] && safari.extension.settings["maxresolution"] > 0;
-    settings.useSwitcher = safari.extension.settings["useSwitcher"];
-    settings.showPoster = safari.extension.settings["showPoster"];
-    settings.buffer = safari.extension.settings["H264behavior"];
-    settings.volume = safari.extension.settings["volume"];
-    return settings;
+function getSettings() { // for injected scripts
+    return {
+        "replacePlugins": safari.extension.settings.replacePlugins,
+        "sIFRAutoload": safari.extension.settings.sIFRPolicy === "autoload",
+        "opacity": safari.extension.settings.opacity,
+        "debug": safari.extension.settings.debug,
+        "useSourceSelector": safari.extension.settings.useSourceSelector,
+        "showPoster": safari.extension.settings.showPoster,
+        "initialBehavior": safari.extension.settings.initialBehavior,
+        "volume": safari.extension.settings.volume
+    };
 }
 
 // CORE
@@ -107,20 +108,20 @@ function respondToMessage(event) {
 
 function respondToCanLoad(message) {
     // Make checks in correct order for optimal performance
-    if(message.location !== undefined) return blockOrAllow(message.data, message.location, message.className);
+    if(message.location !== undefined) return blockOrAllow(message);
     switch(message) {
         case "getSettings":
             return getSettings();
         case "getInstance":
             return ++CTP_instance;
         case "sIFR":
-            if (safari.extension.settings["sifrReplacement"] == "textonly") {
-                return {"canLoad": false, "debug": safari.extension.settings["debug"]};
+            if (safari.extension.settings.sIFRPolicy === "textonly") {
+                return {"canLoad": false, "debug": safari.extension.settings.debug};
             } else return {"canLoad": true};
     }
 }
 
-function blockOrAllow(data, location, className) { // returns true if element can be loaded, the name of the plugin otherwise
+function blockOrAllow(data) { // returns true if element can be loaded, data on the plugin object otherwise
     
     // no source and no type -> must allow, it's probably going to pass through here again after being modified by a script
     if(!data.src && !data.type && !data.classid) return true;
@@ -136,20 +137,14 @@ function blockOrAllow(data, location, className) { // returns true if element ca
         if(isNativeExt(ext)) return true;
     }
     
-    // Deal with invisible plugins
-    if(safari.extension.settings["loadInvisible"] && data.width > 0 && data.height > 0) {
-        if(data.width <= maxinvdim.width && data.height <= maxinvdim.height) return true;
+    // Check if invisible
+    if(data.width <= safari.extension.settings.maxInvisibleSize && data.height <= safari.extension.settings.maxInvisibleSize && (data.width > 0 && data.height > 0) || safari.extension.settings.zeroIsInvisible) {
+        if(safari.extension.settings.loadInvisible) return true;
+        var isInvisible = true;
     }
     
-    // Deal with whitelisted content
-    if(safari.extension.settings["uselocWhitelist"]) {
-        if(locwhitelist && matchList(locwhitelist, location)) return true;
-        if(locblacklist && !matchList(locblacklist, location)) return true;
-    }
-    if(safari.extension.settings["usesrcWhitelist"]) {
-        if(srcwhitelist && matchList(srcwhitelist, data.src)) return true;
-        if(srcblacklist && !matchList(srcblacklist, data.src)) return true;
-    }
+    // Check whitelists
+    if(safari.extension.settings.invertWhitelists !== ((locationsWhitelist && matchList(locationsWhitelist, data.location)) || (sourcesWhitelist && matchList(sourcesWhitelist, data.src)))) return true;
     
     // The following determination of type is based on WebKit's internal mechanism
     var type = data.type;
@@ -157,7 +152,7 @@ function blockOrAllow(data, location, className) { // returns true if element ca
     if(!type) {
         if(data.classid) type = getTypeForClassid(data.classid);
         if(!type) {
-            // For extensions in Info.plist (except css, pdf, xml, xbl), WebKit checks Content-type header at this point
+            // For extensions in Info.plist (except css, pdf, xml, xbl), WebKit checks Content-Type header at this point
             // and only does the following if it matches no plugin.
             // Thus, these extensions can be used to circumvent blocking...
             var x = getPluginAndTypeForExt(ext);
@@ -171,26 +166,18 @@ function blockOrAllow(data, location, className) { // returns true if element ca
     // We could check the HTTP header, but only asynchronously, which means we should later clone this element
     // upon restore otherwise WebKit would use fallback content (bug 44827)
     
-    // Use greenlist/redlist
-    if(safari.extension.settings["block"] === "useRedlist") {
-            if((!mimeredlist || !type || !matchList(mimeredlist, type)) &&
-            (!redlist || !plugin || !matchList(redlist, plugin.name.replace(/\s/g, "").toLowerCase()))) return true;
-    } else if(safari.extension.settings["block"] === "useGreenlist") {
-            if(mimegreenlist && type && matchList(mimegreenlist, type)) return true;
-            if(greenlist && plugin && matchList(greenlist, plugin.name.replace(/\s/g, "").toLowerCase())) return true;
-    }
+    // Check plugins whitelist
+    if(safari.extension.settings.invertPluginsWhitelist !== ((pluginsWhitelist && plugin && matchList(pluginsWhitelist, plugin.name.replace(/\s/g, "").toLowerCase())) || (typesWhitelist && type && matchList(typesWhitelist, type)))) return true;
     
     var pluginName = "?";
     if(plugin) pluginName = getPluginNameFromPlugin(plugin);
     else if(type) pluginName = getPluginNameFromType(type);
     
-    if(safari.extension.settings["allowQT"] && pluginName === "QuickTime") return true;
-    
     // At this point we know we should block the element
     
     // Exception: ask the user what to do if a QT object would launch QTP
     if(data.autohref && data.target === "quicktimeplayer" && data.href) {
-        if(className === "CTFallowedToLoad") return true; // for other extensions with open-in-QTP functionality
+        if(data.className === "CTFallowedToLoad") return true; // for other extensions with open-in-QTP functionality
         if(confirm(QT_CONFIRM_LAUNCH_DIALOG(data.href))) return true;
     }
     
@@ -199,7 +186,7 @@ function blockOrAllow(data, location, className) { // returns true if element ca
         if(!confirm(SL_CONFIRM_BLOCK_DIALOG(data.width + "x" + data.height))) return null;
     }*/
     
-    return pluginName;
+    return {"plugin": pluginName, "isInvisible": isInvisible};
 }
 
 // CONTEXT MENU
@@ -209,32 +196,31 @@ function handleContextMenu(event) {
     try {
         var u = event.userInfo; // throws exception if there are no content scripts
     } catch(err) {
-        if(s.useOOcontext) event.contextMenu.appendContextMenuItem("switchon", TURN_CTP_ON);
+        if(s.disableEnableContext) event.contextMenu.appendContextMenuItem("switchOn", TURN_CTP_ON);
         return;
     }
     
     if(!u.instance) { // Generic menu
-        if(s.useOOcontext) event.contextMenu.appendContextMenuItem("switchoff", TURN_CTP_OFF);
-        if(s.useLAcontext && u.blocked > 0 && (u.blocked > u.invisible || !s.useLIcontext)) event.contextMenu.appendContextMenuItem("loadall", LOAD_ALL_PLUGINS + " (" + u.blocked + ")");
-        if(s.useLIcontext && u.invisible > 0) event.contextMenu.appendContextMenuItem("loadinvisible", LOAD_INVISIBLE_PLUGINS + " (" + u.invisible + ")");
-        if(s.useWLcontext) event.contextMenu.appendContextMenuItem("locwhitelist", ADD_TO_LOC_WHITELIST + "\u2026");
+        if(s.disableEnableContext) event.contextMenu.appendContextMenuItem("switchOff", TURN_CTP_OFF);
+        if(s.loadAllContext && u.blocked > 0 && (u.blocked > u.invisible || !s.loadInvisibleContext)) event.contextMenu.appendContextMenuItem("loadAll", LOAD_ALL_PLUGINS + " (" + u.blocked + ")");
+        if(s.loadInvisibleContext && u.invisible > 0) event.contextMenu.appendContextMenuItem("loadInvisible", LOAD_INVISIBLE_PLUGINS + " (" + u.invisible + ")");
+        if(s.addToWhitelistContext) event.contextMenu.appendContextMenuItem("locationsWhitelist", ADD_TO_LOC_WHITELIST + "\u2026");
         return;
     }
     
     var pluginName = /[A-Z]/.test(u.plugin) ? u.plugin : PLUGIN_GENERIC;
     if(u.isVideo) event.contextMenu.appendContextMenuItem("reload", RELOAD_IN_PLUGIN(pluginName));
     else {
-        if(u.hasH264) event.contextMenu.appendContextMenuItem("plugin", LOAD_PLUGIN(pluginName));
+        if(u.hasVideo) event.contextMenu.appendContextMenuItem("plugin", LOAD_PLUGIN(pluginName));
         event.contextMenu.appendContextMenuItem("remove", REMOVE_PLUGIN(pluginName));
     }
-    if((u.isVideo || u.hasH264) && u.source !== undefined) {
-        if(s.useDVcontext) event.contextMenu.appendContextMenuItem("download", u.mediaType === "audio" ? DOWNLOAD_AUDIO : DOWNLOAD_VIDEO);
-        if(s.useSUcontext) event.contextMenu.appendContextMenuItem("showurl", u.mediaType === "audio" ? SHOW_AUDIO_URL : SHOW_VIDEO_URL);
-        if(u.siteInfo && s.useVScontext) event.contextMenu.appendContextMenuItem("gotosite", VIEW_ON_SITE(u.siteInfo.name));
-        if(s.useQTcontext) event.contextMenu.appendContextMenuItem("qtp", VIEW_IN_QUICKTIME_PLAYER);
+    if(u.hasVideo && u.source !== undefined) {
+        if(s.downloadContext) event.contextMenu.appendContextMenuItem("download", u.mediaType === "audio" ? DOWNLOAD_AUDIO : DOWNLOAD_VIDEO);
+        if(u.siteInfo && s.viewOnSiteContext) event.contextMenu.appendContextMenuItem("viewOnSite", VIEW_ON_SITE(u.siteInfo.name));
+        if(s.viewInQTPContext) event.contextMenu.appendContextMenuItem("viewInQTP", VIEW_IN_QUICKTIME_PLAYER);
     }
     if(!u.isVideo) {
-        if(s.useWLcontext) event.contextMenu.appendContextMenuItem("srcwhitelist", ADD_TO_SRC_WHITELIST + "\u2026");
+        if(s.addToWhitelistContext && !s.invertWhitelists) event.contextMenu.appendContextMenuItem("sourcesWhitelist", ADD_TO_SRC_WHITELIST + "\u2026");
         // BEGIN DEBUG
         if(s.debug) event.contextMenu.appendContextMenuItem("show", SHOW_ELEMENT + " " + u.instance + "." + u.elementID);
         //END DEBUG
@@ -243,26 +229,26 @@ function handleContextMenu(event) {
 
 function doCommand(event) {
     switch(event.command) {
-        case "gotosite":
+        case "viewOnSite":
             var newTab = safari.application.activeBrowserWindow.openTab("foreground");
             newTab.url = event.userInfo.siteInfo.url;
             break;
-        case "locwhitelist":
+        case "locationsWhitelist":
             handleWhitelisting(true, event.userInfo.location);
             break;
-        case "srcwhitelist":
+        case "sourcesWhitelist":
             handleWhitelisting(false, event.userInfo.src);
             break;
-        case "loadall":
+        case "loadAll":
             safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("loadAll", "");
             break;
-        case "loadinvisible":
+        case "loadInvisible":
             safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("loadInvisible", "");
             break;
-        case "switchoff":
+        case "switchOff":
             switchOff();
             break;
-        case "switchon":
+        case "switchOn":
             switchOn();
             break;
         default:
@@ -278,29 +264,32 @@ function switchOff() {
 
 function switchOn() {
     safari.extension.addContentScriptFromURL(safari.extension.baseURI + "functions.js");
-    safari.extension.addContentScriptFromURL(safari.extension.baseURI + "sourceSwitcher.js");
+    safari.extension.addContentScriptFromURL(safari.extension.baseURI + "sourceSelector.js");
     safari.extension.addContentScriptFromURL(safari.extension.baseURI + "mediaPlayer.js");
     safari.extension.addContentScriptFromURL(safari.extension.baseURI + "ClickToPlugin.js");
     safari.application.activeBrowserWindow.activeTab.url = safari.application.activeBrowserWindow.activeTab.url;
 }
 
 function handleWhitelisting(type, url) {
-    var newWLstring = prompt(type ? ADD_TO_LOC_WHITELIST_DIALOG : ADD_TO_SRC_WHITELIST_DIALOG, url);
+    var newWLstring = prompt(type ? (safari.extension.settings.invertWhitelists ? ADD_TO_LOC_BLACKLIST_DIALOG : ADD_TO_LOC_WHITELIST_DIALOG) : ADD_TO_SRC_WHITELIST_DIALOG, url);
     if(newWLstring) {
-        safari.extension.settings["use" + (type ? "loc" : "src") + "Whitelist"] = true;
-        if(type && safari.extension.settings["locwhitelist"] == "www.example.com www.example2.com") { // get rid of the example
-            safari.extension.settings["locwhitelist"] = newWLstring;
-        } else {
-            var space = safari.extension.settings[(type ? "loc" : "src") + "whitelist"] ? " " : "";
-            safari.extension.settings[(type ? "loc" : "src") + "whitelist"] += space + newWLstring;
-        }
+        var space = safari.extension.settings[(type ? "locations" : "sources") + "Whitelist"] ? " " : "";
+        safari.extension.settings[(type ? "locations" : "sources") + "Whitelist"] += space + newWLstring;
         // load targeted content at once
-        dispatchMessageToAllPages(type ? "locwhitelist" : "srcwhitelist", newWLstring);
+        if(!type) dispatchMessageToAllPages("loadSource", newWLstring);
+        else if(!safari.extension.settings.invertWhitelists) dispatchMessageToAllPages("loadLocation", newWLstring);
     }
 }
 
 // KILLERS
-const killers = [new YouTubeKiller(), new VimeoKiller(), new DailymotionKiller(), new VeohKiller(), new BreakKiller(), new BlipKiller(), new MetacafeKiller(), new TumblrKiller(), new MegavideoKiller(), new BIMKiller(), new GenericKiller(), new SLKiller(), new QTKiller(), new WMKiller(), new DivXKiller()];
+var killers = [new YouTubeKiller(), new VimeoKiller(), new DailymotionKiller(), new BreakKiller(), new BlipKiller(), new MetacafeKiller(), new TumblrKiller(), new VeohKiller(), new MegavideoKiller(), new BIMKiller(), new GenericKiller(), new SLKiller(), new QTKiller(), new WMKiller(), new DivXKiller()];
+
+if(safari.extension.settings.disabledKillers) {
+    var disabledKillers = safari.extension.settings.disabledKillers.sort(function(a,b) {return a - b;});
+    for(var i = disabledKillers.length - 1; i >= 0; i--) {
+        killers.splice(disabledKillers[i], 1);
+    }
+}
 
 function findKillerFor(data) {
     for (var i = 0; i < killers.length; i++) {
@@ -310,24 +299,36 @@ function findKillerFor(data) {
 }
 
 function killPlugin(data) {
-    var killerID = findKillerFor(data);
-    if(killerID === null) return;
+    if(data.baseURL) {
+        var killerID = findKillerFor(data);
+        if(killerID === null) return;
+    }
     
     var callback = function(mediaData) {
+        if(mediaData.playlist.length === 0 || mediaData.playlist[0].sources.length === 0) return;
         mediaData.elementID = data.elementID;
         mediaData.instance = data.instance;
-        if(safari.extension.settings["H264autoload"]) {
-            if(!safari.extension.settings["videowhitelist"]) mediaData.autoload = true;
-            else {
-                mediaData.autoload = matchList(safari.extension.settings["videowhitelist"].split(/\s+/), data.location);
-            }
+        
+        var defaultSource = chooseDefaultSource(mediaData.playlist[0].sources, mediaData.playlist[0].bestSource);
+        mediaData.playlist[0].defaultSource = defaultSource;
+        if(!mediaData.loadAfter) mediaData.badgeLabel = makeLabel(mediaData.playlist[0].sources[defaultSource], mediaData.playlist[0].mediaType);
+        for(var i = 1; i < mediaData.playlist.length; i++) {
+            mediaData.playlist[i].defaultSource = chooseDefaultSource(mediaData.playlist[i].sources, mediaData.playlist[i].bestSource);
+            if(mediaData.playlist[i].defaultSource === undefined) mediaData.playlist.splice(i--, 1);
+        }
+        
+        if(safari.extension.settings.mediaAutoload && !mediaData.loadAfter && defaultSource !== undefined) {
+            if(!safari.extension.settings.mediaWhitelist) mediaData.autoload = true;
+            else mediaData.autoload = matchList(safari.extension.settings.mediaWhitelist.split(/\s+/), data.location);
         }
         
         // the following messsage must be dispatched to all pages to make sure that
         // pages or tabs loading in the background get their mediaData
         dispatchMessageToAllPages("mediaData", mediaData);
     };
-    killers[killerID].processElement(data, callback);
+    
+    if(data.baseURL) killers[killerID].processElement(data, callback);
+    else callback(data);
 }
 
 // EVENT LISTENERS
