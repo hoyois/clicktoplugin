@@ -1,6 +1,4 @@
-function VeohKiller() {
-    this.name = "VeohKiller";
-}
+function VeohKiller() {}
 
 VeohKiller.prototype.canKill = function(data) {
     return (data.src.indexOf("veoh.com/static/swf/webplayer") != -1 || data.src.indexOf("veohplayer.swf") != -1);
@@ -31,14 +29,11 @@ VeohKiller.prototype.processElement = function(data, callback) {
             sources[0].isNative = true;
         } else if(!canPlayFLV) return;
         
-        var defaultSource = chooseDefaultSource(sources);
-        
         posterURL = element.getAttribute("fullHighResImagePath");
         title = element.getAttribute("title");
-    
+        
         var videoData = {
-            "playlist": [{"mediaType": "video", "title": title, "posterURL": posterURL, "sources": sources, "defaultSource": defaultSource}],
-            "badgeLabel": makeLabel(sources[defaultSource])
+            "playlist": [{"mediaType": "video", "title": title, "posterURL": posterURL, "sources": sources}]
         }
         if(isEmbed || data.location === "http://www.veoh.com/") videoData.playlist[0].siteInfo = {"name": "Veoh", "url": "http://www.veoh.com/browse/videos#watch%3D" + videoID};
         callback(videoData);

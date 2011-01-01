@@ -1,6 +1,9 @@
-function sourceSwitcher(plugin, loadPlugin, handleClickEvent, handleContextMenuEvent) {
+const OFFSET_LEFT = 10;
+const OFFSET_TOP = 10;
+
+function sourceSelector(plugin, loadPlugin, handleClickEvent, handleContextMenuEvent) {
     this.element = document.createElement("div");
-    this.element.className = "CTFsourceSwitcher";
+    this.element.className = "CTFsourceSelector CTFhidden";
     this.element.innerHTML = "<ul class=\"CTFsourceList\"></ul>";
     
     this.sources = null;
@@ -14,12 +17,12 @@ function sourceSwitcher(plugin, loadPlugin, handleClickEvent, handleContextMenuE
     this.loadPlugin = loadPlugin;
 }
 
-sourceSwitcher.prototype.setPosition = function(left, top) {
-    this.element.style.left = (20 + left) + "px !important";
-    this.element.style.top = (20 + top) + "px !important";
+sourceSelector.prototype.setPosition = function(left, top) {
+    this.element.style.left = (OFFSET_LEFT + left) + "px !important";
+    this.element.style.top = (OFFSET_TOP + top) + "px !important";
 };
 
-sourceSwitcher.prototype.setCurrentSource = function(source) {
+sourceSelector.prototype.setCurrentSource = function(source) {
     if(this.currentSource !== null) {
         if(this.currentSource === undefined) this.pluginSourceItem.removeAttribute("class");
         else this.element.firstChild.childNodes[this.currentSource].removeAttribute("class");
@@ -29,7 +32,7 @@ sourceSwitcher.prototype.setCurrentSource = function(source) {
     this.currentSource = source;
 };
 
-sourceSwitcher.prototype.buildSourceList = function(sources) {
+sourceSelector.prototype.buildSourceList = function(sources) {
     this.element.firstChild.innerHTML = "";
     this.sources = sources;
     for(var i = 0; i < sources.length; i++) {
@@ -48,9 +51,10 @@ sourceSwitcher.prototype.buildSourceList = function(sources) {
     this.element.firstChild.appendChild(this.pluginSourceItem);
 };
 
-sourceSwitcher.prototype.appendSource = function(source) {
+sourceSelector.prototype.appendSource = function(source) {
     var sourceItem = document.createElement("li");
-    sourceItem.innerHTML = this.sources[source].format ? this.sources[source].format : "HTML5";
+    sourceItem.innerHTML = "<a href=\"" + this.sources[source].url + "\">" + (this.sources[source].format ? this.sources[source].format : "HTML5") + "</a>";
+    sourceItem.firstChild.addEventListener("click", function(event) {event.preventDefault();}, false);
     var _this = this;
     sourceItem.addEventListener("click", function(event) {
         _this.handleClickEvent(event, source);
@@ -60,4 +64,20 @@ sourceSwitcher.prototype.appendSource = function(source) {
     }, false);
     this.element.firstChild.appendChild(sourceItem);
 };
+
+sourceSelector.prototype.setTitle = function(title) {
+    this.pluginSourceItem.title = title;
+};
+
+sourceSelector.prototype.unhide = function(width, height) {
+    if(this.element.offsetWidth + OFFSET_LEFT < width && this.element.offsetHeight + OFFSET_TOP < height) {
+        this.element.className = "CTFsourceSelector";
+        return true;
+    }
+    return false;
+};
+
+sourceSelector.prototype.hide = function() {
+    this.element.className = "CTFsourceSelector CTFhidden";
+}
 
