@@ -1,6 +1,4 @@
-function MetacafeKiller() {
-    this.name = "MetacafeKiller";
-}
+function MetacafeKiller() {}
 
 MetacafeKiller.prototype.canKill = function(data) {
     return (data.src.indexOf(".mcstatic.com/Flash/vp/") != -1 || data.src.indexOf("metacafe.com/fplayer/") != -1);
@@ -33,13 +31,10 @@ MetacafeKiller.prototype.processElementFromFlashvars = function(flashvars, siteI
         sources.push({"url": mediaList.flv, "format": "SD FLV", "resolution": 360, "isNative": false});
     }
     
-    var defaultSource = chooseDefaultSource(sources);
-    
     var title = decodeURIComponent(getFlashVariable(flashvars, "title"));
     
     var videoData = {
-        "playlist": [{"mediaType": "video", "title": title, "sources": sources, "defaultSource": defaultSource, "siteInfo": siteInfo}],
-        "badgeLabel": makeLabel(sources[defaultSource])
+        "playlist": [{"mediaType": "video", "title": title, "sources": sources, "siteInfo": siteInfo}]
     };
     callback(videoData);
 };

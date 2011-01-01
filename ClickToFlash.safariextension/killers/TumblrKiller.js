@@ -1,6 +1,4 @@
-function TumblrKiller() {
-    this.name = "TumblrKiller";
-}
+function TumblrKiller() {}
 
 TumblrKiller.prototype.canKill = function(data) {
     return /\?audio_file=/.test(data.src);
@@ -11,8 +9,7 @@ TumblrKiller.prototype.processElement = function(data, callback) {
     if(audioURL) audioURL =  audioURL[1] + "?plead=please-dont-download-this-or-our-lawyers-wont-let-us-host-audio";
 
     var mediaData = {
-        "playlist": [{"mediaType": "audio", "sources": [{"url": audioURL}], "defaultSource": 0}],
-        "badgeLabel": "Audio",
+        "playlist": [{"mediaType": "audio", "sources": [{"url": audioURL, "isNative": true}]}],
         "isAudio": true
     };
     callback(mediaData);

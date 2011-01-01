@@ -1,6 +1,4 @@
-function BlipKiller() {
-    this.name = "BlipKiller";
-}
+function BlipKiller() {}
 
 BlipKiller.prototype.canKill = function(data) {
     return data.src.indexOf("blip.tv/") != -1;
@@ -28,8 +26,6 @@ BlipKiller.prototype.processElement = function(data, callback) {
     xhr.onload = function() {
         var json = JSON.parse(xhr.responseText.replace(/\\'/g, "'")); // correct Blip.tv's invalid JSON
         
-        var sourcesByHeight = new Array();
-        var hasH264Format = false;
         var ext, resolution, format, bestSource, isNative;
         for(var i = 0; i < json.additionalMedia.length; i++) {
             ext = json.additionalMedia[i].url.substr(json.additionalMedia[i].url.lastIndexOf(".") + 1).toUpperCase();
@@ -45,12 +41,8 @@ BlipKiller.prototype.processElement = function(data, callback) {
             sources.push({"url": json.additionalMedia[i].url, "format": format, "isNative": isNative, "resolution": resolution});
         }
         
-        var defaultSource = chooseDefaultSource(sources, bestSource);
-        var badgeLabel = makeLabel(sources[defaultSource]);
-        
         var videoData = {
-            "playlist": [{"mediaType": "video", "title": unescapeHTML(json.title), "posterURL": json.thumbnailUrl, "sources": sources, "defaultSource": defaultSource}],
-            "badgeLabel": badgeLabel
+            "playlist": [{"mediaType": "video", "title": unescapeHTML(json.title), "posterURL": json.thumbnailUrl, "sources": sources, "bestSource": bestSource}]
         };
         if(isEmbed) videoData.playlist[0].siteInfo = {"name": "Blip.tv", "url": "http://www.blip.tv/file/" + json.itemId};
         callback(videoData);

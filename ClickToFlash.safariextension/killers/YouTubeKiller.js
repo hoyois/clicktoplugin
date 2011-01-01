@@ -2,13 +2,13 @@ function YouTubeKiller() {}
 
 YouTubeKiller.prototype.canKill = function(data) {
     if(data.src.indexOf("ytimg.com/") !== -1) {data.onsite = true; return true;}
-    if(data.src.indexOf("youtube.com/") !== -1) {data.onsite = false; return true;}
+    if(data.src.search(/youtube(-nocookie)?\.com\//) !== -1) {data.onsite = false; return true;}
     return false;
 };
 
 YouTubeKiller.prototype.processElement = function(data, callback) {
     if(data.onsite) {
-        if(safari.extension.settings["usePlaylists"]) {
+        if(safari.extension.settings.usePlaylists) {
             var URLvars = data.location.split(/#!|\?/)[1];
             var playlistID = null;
             if(URLvars) {
@@ -173,7 +173,7 @@ YouTubeKiller.prototype.finalizeProcessing = function(videoID, urlMap, title, is
     /*
     Only 18, 22, 37, and 38 are MP4 playable natively by QuickTime.
     Other containers are FLV (5, 34, 35, the latter two are H.264 360p and 480p),
-    3GP (17), or WebM (43,45)
+    3GP (17), or WebM (43,45) [17,43,45 do not appear in the flashvars!]
     */
     var formatList = urlMap.split(",");
     for(var i = 0; i < formatList.length; i++) {
@@ -195,15 +195,11 @@ YouTubeKiller.prototype.finalizeProcessing = function(videoID, urlMap, title, is
         }
     }
     
-    var defaultSource = chooseDefaultSource(sources);
-    var badgeLabel = makeLabel(sources[defaultSource]);
-    
     // var videoURL = "http://www.youtube.com/get_video?fmt=18&asv=&video_id=" + videoID + "&t=" + videoHash; 
     
     var posterURL = "http://i.ytimg.com/vi/" + videoID + "/hqdefault.jpg";
     var videoData = {
-        "playlist": [{"title": title, "mediaType": "video", "posterURL": posterURL, "sources": sources, "defaultSource": defaultSource}],
-        "badgeLabel": badgeLabel
+        "playlist": [{"title": title, "mediaType": "video", "posterURL": posterURL, "sources": sources}]
     };
     if(isEmbed) videoData.playlist[0].siteInfo = {"name": "YouTube", "url": "http://www.youtube.com/watch?v=" + videoID};
     callback(videoData);

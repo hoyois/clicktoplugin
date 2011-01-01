@@ -52,7 +52,7 @@ function getParams(element) {
 function isFlash(element, url) {
     url = url.split(/[?#]/)[0];
     url = url.substring(url.lastIndexOf(".") + 1);
-    if(url == "swf" || url == "spl") return "probably";
+    if(url === "swf" || url === "spl") return "probably";
     if(element.hasAttribute("classid")) {
         if(element.getAttribute("classid").toLowerCase() === "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000") return "probably";
         else return "";
@@ -72,7 +72,7 @@ function isFlash(element, url) {
 }
 
 // Debugging functions
-document.HTMLToString = function(element){
+function HTMLToString(element) {
     return (new XMLSerializer()).serializeToString(element);
 };
 

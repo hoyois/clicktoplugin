@@ -16,7 +16,7 @@
     float: none !important;
 }
 
-.CTFplaceholder *:not(.CTFsourceSwitcher), .CTFmediaPlayer *:not(.CTFsourceSwitcher) {
+.CTFplaceholder *:not(.CTFsourceSelector), .CTFmediaPlayer *:not(.CTFsourceSelector) {
     top: auto !important;
     right: auto !important;
     bottom: auto !important;
@@ -85,14 +85,6 @@ Placeholder element
 
 .CTFplaceholder.CTFnoimage:active {
     background: -webkit-gradient(linear, left bottom, left top, from(rgba(235, 235, 235, 1)), to(rgba(220, 220, 220, 1))) !important;
-}
-
-.CTFplaceholder.CTFnoposter {
-    background: -webkit-gradient(radial, 50% 50%, 0, 50% 50%, 100, from(rgba(80, 80, 80, 1)), to(rgba(20, 20, 20, 0.3))), -webkit-gradient(linear, 50% 0%, 50% 100%, from(rgba(0, 0, 0, 1)), to(rgba(30, 30, 30, 1)), color-stop(0.5, rgba(50, 50, 50, 1)), color-stop(0.65, rgba(0, 0, 0, 1))) !important;
-}
-
-.CTFplaceholder.CTFnoposter:active {
-    background: -webkit-gradient(linear, 50% 0%, 50% 100%, from(rgba(20, 20, 20, 1)), to(rgba(30, 30, 30, 1)), color-stop(0.5, rgba(50, 50, 50, 1)), color-stop(0.6, rgba(0, 0, 0, 1))) !important;
 }
 
 .CTFplaceholder .CTFplaceholderContainer {
@@ -336,7 +328,7 @@ Media player
 Source switcher
 **************/
 
-.CTFsourceSwitcher * {
+.CTFsourceSelector * {
     width: auto !important;
     height: auto !important;
     color: white !important;
@@ -349,7 +341,7 @@ Source switcher
     list-style: none !important;
 }
 
-.CTFsourceSwitcher {
+.CTFsourceSelector {
     display: block !important;
     position: absolute !important;
     z-index: 2 !important;
@@ -360,18 +352,22 @@ Source switcher
     opacity: 0 !important;
 }
 
-.CTFsourceSwitcher:hover {
+.CTFsourceSelector.CTFhidden {
+    visibility: hidden !important;
+}
+
+.CTFsourceSelector:hover {
     opacity: 1 !important;
 }
 
-.CTFsourceList {
+.CTFsourceSelector .CTFsourceList {
     display: block !important;
     pointer-events: auto !important;
     margin: 0 !important;
     padding: 5px !important;
 }
 
-.CTFsourceList li {
+.CTFsourceSelector li {
     display: list-item !important;
     position: static !important;
     cursor: pointer !important;
@@ -381,17 +377,18 @@ Source switcher
     line-height: normal !important;
 }
 
-.CTFsourceList li:hover {
+.CTFsourceSelector li a {
+    color: inherit !important;
+    cursor: inherit !important;
+}
+
+.CTFsourceSelector li:hover {
     color: white !important;
     
 }
 
-.CTFsourceList li.CTFcurrentSource {
+.CTFsourceSelector li.CTFcurrentSource {
     cursor: default !important;
-    color: white !important;
-}
-
-.CTFsourceList li.CTFdefaultSource {
     color: white !important;
 }
 
