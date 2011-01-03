@@ -6,6 +6,10 @@ function sourceSelector(plugin, loadPlugin, handleClickEvent, handleContextMenuE
     this.element.className = "CTFsourceSelector CTFhidden";
     this.element.innerHTML = "<ul class=\"CTFsourceList\"></ul>";
     
+    this.element.style.WebkitTransitionProperty = "none !important";
+    var _this = this;
+    setTimeout(function() {_this.element.style.WebkitTransitionProperty = "opacity !important";}, 0);
+    
     this.sources = null;
     this.plugin = plugin;
     this.pluginSourceItem = null;
@@ -66,6 +70,7 @@ sourceSelector.prototype.appendSource = function(source) {
 };
 
 sourceSelector.prototype.setTitle = function(title) {
+    if(!title) title = "";
     this.pluginSourceItem.title = title;
 };
 
