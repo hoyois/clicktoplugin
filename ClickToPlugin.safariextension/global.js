@@ -1,8 +1,5 @@
 // UPDATE
 if(!safari.extension.settings.version) {
-    safari.extension.settings.version = 2;
-    
-    if(safari.extension.settings.block === "useRedlist") safari.extension.settings.invertPluginsWhitelist = true;
     if(safari.extension.settings.usesrcWhitelist && safari.extension.settings.srcblacklist) {
         safari.extension.settings.invertWhitelists = true;
         safari.extension.settings.sourcesWhitelist = safari.extension.settings.srcblacklist;
@@ -32,9 +29,9 @@ if(!safari.extension.settings.version) {
         }
     };
     removeSettings("allowQT", "useH264", "useSwitcher", "H264autoload", "videowhitelist", "H264behavior", "maxresolution", "QTbehavior", "uselocWhitelist", "usesrcWhitelist", "maxinvdim", "useOOcontext", "useWLcontect", "useLAcontext", "useLIcontext", "useDVcontext", "useSUcontext", "useVScontext", "useQTcontext", "sifrReplacement");
-    
-    alert("Welcome to ClickToPlugin 2.0!\n\nNote that some of your settings may have been reset by this update. For a detailed explanation of each setting, visit\n\nhttp://hoyois.github.com/safariextensions/clicktoplugin/#settings");
 }
+
+safari.extension.settings.version = 3;
 
 // SETTINGS
 var pluginsWhitelist, typesWhitelist, locationsWhitelist, sourcesWhitelist;
@@ -309,12 +306,17 @@ function killPlugin(data) {
         mediaData.elementID = data.elementID;
         mediaData.instance = data.instance;
         
-        var defaultSource = chooseDefaultSource(mediaData.playlist[0].sources, mediaData.playlist[0].bestSource);
-        mediaData.playlist[0].defaultSource = defaultSource;
-        if(!mediaData.loadAfter) mediaData.badgeLabel = makeLabel(mediaData.playlist[0].sources[defaultSource], mediaData.playlist[0].mediaType);
-        for(var i = 1; i < mediaData.playlist.length; i++) {
+        if(!mediaData.loadAfter) {
+            var defaultSource = chooseDefaultSource(mediaData.playlist[0].sources, mediaData.playlist[0].bestSource);
+            mediaData.playlist[0].defaultSource = defaultSource;
+            mediaData.badgeLabel = makeLabel(mediaData.playlist[0].sources[defaultSource], mediaData.playlist[0].mediaType);
+        }
+        for(var i = (mediaData.loadAfter ? 0 : 1); i < mediaData.playlist.length; i++) {
             mediaData.playlist[i].defaultSource = chooseDefaultSource(mediaData.playlist[i].sources, mediaData.playlist[i].bestSource);
-            if(mediaData.playlist[i].defaultSource === undefined) mediaData.playlist.splice(i--, 1);
+            if(mediaData.playlist[i].defaultSource === undefined) {
+                if(mediaData.missed !== undefined) ++mediaData.missed;
+                mediaData.playlist.splice(i--, 1);
+            }
         }
         
         if(safari.extension.settings.mediaAutoload && !mediaData.loadAfter && defaultSource !== undefined) {

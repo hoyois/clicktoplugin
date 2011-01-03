@@ -9,6 +9,7 @@ GenericKiller.prototype.canKill = function(data) {
     if(hasFlashVariable(data.params, "mp3")) {data.file = "mp3"; return true;}
     if(hasFlashVariable(data.params, "soundFile")) {data.file = "soundFile"; return true;}
     if(hasFlashVariable(data.params, "url")) {data.file = "url"; return true;}
+    if(hasFlashVariable(data.params, "file_url")) {data.file = "file_url"; return true;}
     // other video flashvars: wmvUrl/flvUrl (gvideoplayer.swf)
     if(/[?&]file=/.test(data.src)) return true;
     return false;
@@ -30,7 +31,14 @@ GenericKiller.prototype.processElement = function(data, callback) {
     // Site-specific decoding
     if(/player_mp3_maxi\.swf$/.test(data.src)) sourceURL = sourceURL.replace(/\+/g, "%20");
     
-    var posterURL = decodeURIComponent(getFlashVariable(data.params, "image"));
+    var posterURL;
+    switch(data.file) {
+        case "file_url":
+            posterURL = decodeURIComponent(getFlashVariable(data.params, "poster_url"));
+            break;
+        default:
+            posterURL = decodeURIComponent(getFlashVariable(data.params, "image"));
+    }
     // other image flashvars: sScreenshotUrl (gvideoplayer.swf), thumbnail (?)
     if(!posterURL) {
         posterURL = data.src.match(/[?&]image=([^&]*)(?:&|$)/);
