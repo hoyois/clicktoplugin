@@ -304,7 +304,7 @@ ClickToFlash.prototype.loadAll = function() {
 
 ClickToFlash.prototype.loadSource = function(string) {
     for(var i = 0; i < this.numberOfBlockedElements; i++) {
-        if(this.placeholderElements[i] && this.blockedData[i].src.indexOf(string) != -1) {
+        if(this.placeholderElements[i] && this.blockedData[i].src.indexOf(string) !== -1) {
             this.loadPluginForElement(i);
         }
     }
