@@ -340,6 +340,7 @@ Source switcher
     font-weight: normal !important;
     list-style: none !important;
     text-shadow: black 0 1px 1px !important;
+    line-height: normal !important;
 }
 
 .CTFsourceSelector {
@@ -383,7 +384,6 @@ Source switcher
     margin: 5px !important;
     padding: 0 !important;
     color: #ADADAD !important;
-    line-height: normal !important;
 }
 
 .CTFsourceSelector li.CTFcurrentSource {
