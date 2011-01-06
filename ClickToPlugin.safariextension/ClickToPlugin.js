@@ -172,7 +172,7 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
     placeholderElement.className = "CTFplaceholder CTFnoimage";
     placeholderElement.style.width = data.width + "px !important";
     placeholderElement.style.height = data.height + "px !important";
-    placeholderElement.style.opacity = this.settings.opacity;
+    placeholderElement.style.opacity = this.settings.opacity + " !important";
     
     // Copy CSS box & positioning properties that have an effect on page layout
     // Note: 'display' is set to 'inline-block', which is always the effective value for 'replaced elements'
@@ -327,7 +327,7 @@ ClickToPlugin.prototype.prepMedia = function(mediaData) {
     }
     if(this.settings.showPoster && mediaData.playlist[0].posterURL) {
         // show poster as background image
-        this.placeholderElements[elementID].style.opacity = "1";
+        this.placeholderElements[elementID].style.opacity = "1 !important";
         this.placeholderElements[elementID].style.backgroundImage = "url('" + mediaData.playlist[0].posterURL + "') !important";
         this.placeholderElements[elementID].className = "CTFplaceholder"; // remove 'noimage' class
     }
@@ -442,7 +442,7 @@ ClickToPlugin.prototype.setVolumeTo = function(volume) {
 
 ClickToPlugin.prototype.setOpacityTo = function(opacity) {
     for(var i = 0; i < this.numberOfBlockedElements; i++) {
-        if(this.placeholderElements[i] && this.placeholderElements[i].className === "CTFplaceholder CTFnoimage") this.placeholderElements[i].style.opacity = opacity;
+        if(this.placeholderElements[i] && this.placeholderElements[i].className === "CTFplaceholder CTFnoimage") this.placeholderElements[i].style.opacity = opacity + " !important";
     }
 };
 
