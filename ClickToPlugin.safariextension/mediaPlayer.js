@@ -299,7 +299,7 @@ mediaPlayer.prototype.loadTrack = function(track, source, autoplay) { // source 
         
         // Show playlist controls
         this.playlistControls.style.WebkitTransition = "";
-        this.playlistControls.style.opacity = "1";
+        this.playlistControls.style.opacity = "1 !important";
     }
 };
 
@@ -355,7 +355,7 @@ mediaPlayer.prototype.addToPlaylist = function(playlist, init) {
 
 function fade(element, duration, delay, opacity) {
     element.style.WebkitTransition = "opacity " + duration + "s linear " + delay + "s";
-    element.style.opacity = opacity;
+    element.style.opacity = opacity + " !important";
 };
 
 function normalize(n,m) {
