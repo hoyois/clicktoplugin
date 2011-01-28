@@ -27,9 +27,9 @@ function makeAbsoluteURL(url, base) {
 }
 
 function unescapeHTML(text){
-  var e = document.createElement("div");
-  e.innerHTML = text;
-  return e.firstChild.nodeValue;
+    var e = document.createElement("div");
+    e.innerHTML = text;
+    return e.firstChild.nodeValue;
 }
 
 function hasFlashVariable(flashvars, key) {
