@@ -25,6 +25,7 @@ function mediaPlayer() {
     
     this.playlistControls = null;
     this.sourceSelector = null;
+    this.showTooltip = null;
     
 }
 
@@ -41,7 +42,7 @@ mediaPlayer.prototype.handleMediaData = function(mediaData) {
     }
 };
 
-mediaPlayer.prototype.createMediaElement = function(plugin, loadPlugin, width, height, initialBehavior, volume, contextInfo, useSourceSelector) {
+mediaPlayer.prototype.createMediaElement = function(plugin, loadPlugin, width, height, initialBehavior, volume, showTooltip, contextInfo, useSourceSelector) {
     this.containerElement = document.createElement("div");
     this.containerElement.className = "CTFmediaPlayer";
     this.mediaElement = document.createElement(this.playerType);
@@ -72,6 +73,7 @@ mediaPlayer.prototype.createMediaElement = function(plugin, loadPlugin, width, h
     
     // Set global contextInfo
     this.contextInfo = contextInfo;
+    this.showTooltip = showTooltip;
     
     // Set listeners
     var _this = this; // need anonymous function in listeners otherwise the 'this' will refer to the mediaElement!
@@ -280,7 +282,7 @@ mediaPlayer.prototype.loadTrack = function(track, source, autoplay) { // source 
         this.sourceSelector.hide();
         this.sourceSelector.buildSourceList(this.playlist[track].sources);
         this.sourceSelector.setCurrentSource(source);
-        this.sourceSelector.setTitle(this.playlist[track].title);
+        if(this.showTooltip) this.sourceSelector.setTitle(this.playlist[track].title);
         this.sourceSelector.unhide(this.width, this.height);
     }
     if(this.playlistControls) {

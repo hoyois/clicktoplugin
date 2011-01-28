@@ -27,23 +27,22 @@ BlipKiller.prototype.processElement = function(data, callback) {
     xhr.onload = function() {
         var json = JSON.parse(xhr.responseText.replace(/\\'/g, "'")); // correct Blip.tv's invalid JSON
         
-        var ext, resolution, format, bestSource, isNative;
+        var ext, format, isNative;
         for(var i = 0; i < json.additionalMedia.length; i++) {
             ext = json.additionalMedia[i].url.substr(json.additionalMedia[i].url.lastIndexOf(".") + 1).toUpperCase();
             if(ext === "MP4" || ext === "M4V" || ext === "MOV" || ext === "MPG" || ext === "MPEG") isNative = true;
             else if((ext === "FLV" && canPlayFLV) || (ext === "WMV" && canPlayWM)) isNative = false;
             else continue;
             
-            resolution = parseInt(json.additionalMedia[i].height);
             format = json.additionalMedia[i].role + " (" + json.additionalMedia[i].width + "x" + json.additionalMedia[i].height + ") " + ext;
-            if(json.additionalMedia[i].role === "Source") {
+            /*if(json.additionalMedia[i].role === "Source") {
                 bestSource = sources.length;
-            }
-            sources.push({"url": json.additionalMedia[i].url, "format": format, "isNative": isNative, "resolution": resolution});
+            }*/
+            sources.push({"url": json.additionalMedia[i].url, "format": format, "isNative": isNative, "resolution": parseInt(json.additionalMedia[i].height)});
         }
         
         var videoData = {
-            "playlist": [{"mediaType": "video", "title": unescapeHTML(json.title), "posterURL": json.thumbnailUrl, "sources": sources, "bestSource": bestSource}]
+            "playlist": [{"mediaType": "video", "title": unescapeHTML(json.title), "posterURL": json.thumbnailUrl, "sources": sources}]
         };
         if(isEmbed) videoData.playlist[0].siteInfo = {"name": "Blip.tv", "url": "http://www.blip.tv/file/" + json.itemId};
         callback(videoData);

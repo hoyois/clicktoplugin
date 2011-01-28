@@ -2,12 +2,14 @@ function SLKiller() {}
 
 SLKiller.prototype.canKill = function(data) {
     if(!data.plugin == "Silverlight") return false;
-    return hasSLVariable(data.params, "m") || hasSLVariable(data.params, "fileurl");
+    if(hasSLVariable(data.params, "m")) {data.file = "m"; return true;}
+    if(hasSLVariable(data.params, "fileurl")) {data.file = "fileurl"; return true;}
+    if(hasSLVariable(data.params, "mediaurl")) {data.file = "mediaurl"; return true;}
+    return false;
 };
 
 SLKiller.prototype.processElement = function(data, callback) {
-    var mediaURL = decodeURIComponent(getSLVariable(data.params, "m"));
-    if(!mediaURL) mediaURL = decodeURIComponent(getSLVariable(data.params, "fileurl"));
+    var mediaURL = decodeURIComponent(getSLVariable(data.params, data.file));
     var mediaType = canPlaySrcWithHTML5(mediaURL);
     if(!mediaType) return;
     if(!mediaType.isNative && !canPlayWM) return;

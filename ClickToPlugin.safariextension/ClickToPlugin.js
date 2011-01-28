@@ -33,7 +33,7 @@ function ClickToPlugin() {
     document.addEventListener("beforeload", this.handleBeforeLoadEventTrampoline, true);
     
     document.addEventListener("contextmenu", function(event) {
-        safari.self.tab.setContextMenuEventUserInfo(event, {"location": window.location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length, "invisible": this.getElementsByClassName("CTFinvisible").length});
+        safari.self.tab.setContextMenuEventUserInfo(event, {"location": window.location.href});
     }, false);
 }
 
@@ -168,7 +168,7 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
     
     // Create the placeholder element
     var placeholderElement = document.createElement("div");
-    placeholderElement.title = data.src; // tooltip
+    if(this.settings.showTooltip) placeholderElement.title = data.src; // tooltip
     placeholderElement.className = "CTFplaceholder CTFnoimage";
     placeholderElement.style.width = data.width + "px !important";
     placeholderElement.style.height = data.height + "px !important";
@@ -189,6 +189,10 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
     placeholderElement.style.setProperty("margin-right", style.getPropertyValue("margin-right"), "important");
     placeholderElement.style.setProperty("margin-bottom", style.getPropertyValue("margin-bottom"), "important");
     placeholderElement.style.setProperty("margin-left", style.getPropertyValue("margin-left"), "important");
+    
+    // Build the placeholder
+    placeholderElement.innerHTML = "<div class=\"CTFplaceholderContainer\"><div class=\"CTFlogoVerticalPosition\"><div class=\"CTFlogoHorizontalPosition\"><div class=\"CTFlogoContainer CTFnodisplay\"><div class=\"CTFlogo\"></div><div class=\"CTFlogo CTFinset\"></div></div></div></div></div>";
+    if(responseData.isInvisible) placeholderElement.firstChild.className += " CTFinvisible";
     
     // Replace the element by the placeholder
     if(element.parentNode && element.parentNode.className !== "CTFnodisplay") {
@@ -234,10 +238,6 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
             event.stopPropagation();
         }
     }, false);
-    
-    // Build the placeholder
-    placeholderElement.innerHTML = "<div class=\"CTFplaceholderContainer\"><div class=\"CTFlogoVerticalPosition\"><div class=\"CTFlogoHorizontalPosition\"><div class=\"CTFlogoContainer CTFnodisplay\"><div class=\"CTFlogo\"></div><div class=\"CTFlogo CTFinset\"></div></div></div></div></div>";
-    if(responseData.isInvisible) placeholderElement.firstChild.className += " CTFinvisible";
     
     // Fill the main arrays
     this.blockedElements[elementID] = element;
@@ -331,7 +331,7 @@ ClickToPlugin.prototype.prepMedia = function(mediaData) {
         this.placeholderElements[elementID].style.backgroundImage = "url('" + mediaData.playlist[0].posterURL + "') !important";
         this.placeholderElements[elementID].className = "CTFplaceholder"; // remove 'noimage' class
     }
-    if(mediaData.playlist[0].title) this.placeholderElements[elementID].title = mediaData.playlist[0].title; // set tooltip
+    if(mediaData.playlist[0].title && this.settings.showMediaTooltip) this.placeholderElements[elementID].title = mediaData.playlist[0].title; // set tooltip
     else this.placeholderElements[elementID].removeAttribute("title");
     
     if(this.settings.useSourceSelector) {
@@ -387,7 +387,7 @@ ClickToPlugin.prototype.loadMediaForElement = function(elementID, source) {
 
     // Initialize player
     var _this = this;
-    this.mediaPlayers[elementID].createMediaElement(this.blockedData[elementID].plugin, function(event) {_this.reloadInPlugin(elementID); event.stopPropagation();}, this.blockedData[elementID].width, this.blockedData[elementID].height, this.settings.initialBehavior, this.settings.volume, contextInfo, this.settings.useSourceSelector);
+    this.mediaPlayers[elementID].createMediaElement(this.blockedData[elementID].plugin, function(event) {_this.reloadInPlugin(elementID); event.stopPropagation();}, this.blockedData[elementID].width, this.blockedData[elementID].height, this.settings.initialBehavior, this.settings.volume, this.settings.showMediaTooltip, contextInfo, this.settings.useSourceSelector);
 
     // Replace placeholder and load first track
     this.placeholderElements[elementID].parentNode.replaceChild(this.mediaPlayers[elementID].containerElement, this.placeholderElements[elementID]);
