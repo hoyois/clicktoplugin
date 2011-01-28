@@ -84,6 +84,8 @@ function getSettings() { // for injected scripts
         "debug": safari.extension.settings.debug,
         "useSourceSelector": safari.extension.settings.useSourceSelector,
         "showPoster": safari.extension.settings.showPoster,
+        "showTooltip": safari.extension.settings.showTooltip,
+        "showMediaTooltip": safari.extension.settings.showMediaTooltip,
         "initialBehavior": safari.extension.settings.initialBehavior,
         "volume": safari.extension.settings.volume
     };
@@ -199,8 +201,8 @@ function handleContextMenu(event) {
     
     if(!u.instance) { // Generic menu
         if(s.disableEnableContext) event.contextMenu.appendContextMenuItem("switchOff", TURN_CTP_OFF);
-        if(s.loadAllContext && u.blocked > 0 && (u.blocked > u.invisible || !s.loadInvisibleContext)) event.contextMenu.appendContextMenuItem("loadAll", LOAD_ALL_PLUGINS + " (" + u.blocked + ")");
-        if(s.loadInvisibleContext && u.invisible > 0) event.contextMenu.appendContextMenuItem("loadInvisible", LOAD_INVISIBLE_PLUGINS + " (" + u.invisible + ")");
+        if(s.loadAllContext) event.contextMenu.appendContextMenuItem("loadAll", LOAD_ALL_PLUGINS);
+        if(s.loadInvisibleContext) event.contextMenu.appendContextMenuItem("loadInvisible", LOAD_INVISIBLE_PLUGINS);
         if(s.addToWhitelistContext) event.contextMenu.appendContextMenuItem("locationsWhitelist", ADD_TO_LOC_WHITELIST + "\u2026");
         return;
     }
@@ -307,12 +309,12 @@ function killPlugin(data) {
         mediaData.instance = data.instance;
         
         if(!mediaData.loadAfter) {
-            var defaultSource = chooseDefaultSource(mediaData.playlist[0].sources, mediaData.playlist[0].bestSource);
+            var defaultSource = chooseDefaultSource(mediaData.playlist[0].sources);
             mediaData.playlist[0].defaultSource = defaultSource;
             mediaData.badgeLabel = makeLabel(mediaData.playlist[0].sources[defaultSource], mediaData.playlist[0].mediaType);
         }
         for(var i = (mediaData.loadAfter ? 0 : 1); i < mediaData.playlist.length; i++) {
-            mediaData.playlist[i].defaultSource = chooseDefaultSource(mediaData.playlist[i].sources, mediaData.playlist[i].bestSource);
+            mediaData.playlist[i].defaultSource = chooseDefaultSource(mediaData.playlist[i].sources);
             if(mediaData.playlist[i].defaultSource === undefined) {
                 if(mediaData.missed !== undefined) ++mediaData.missed;
                 mediaData.playlist.splice(i--, 1);

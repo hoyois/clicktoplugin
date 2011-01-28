@@ -14,6 +14,7 @@
     margin: 0 !important;
     padding: 0 !important;
     float: none !important;
+    -webkit-font-smoothing: subpixel-antialiased;
 }
 
 .CTFplaceholder *:not(.CTFsourceSelector), .CTFmediaPlayer *:not(.CTFsourceSelector) {
@@ -341,6 +342,7 @@ Source switcher
     list-style: none !important;
     text-shadow: black 0 1px 1px !important;
     line-height: normal !important;
+    overflow: visible !important;
 }
 
 .CTFsourceSelector {
@@ -410,6 +412,10 @@ Source switcher
 
 .CTFmediaPlayer li.CTFcurrentSource:active a {
     text-shadow: none !important;  
+}
+
+.CTFsourceSelector li::before {
+    display: none !important;
 }
 
 .CTFmediaPlayer li.CTFcurrentSource a::before {
