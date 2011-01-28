@@ -22,18 +22,18 @@ DailymotionKiller.prototype.processElementFromSequence = function(sequence, call
     // hdURL (720p)
     matches = sequence.match(/\"hdURL\":\"([^"]*)\"/);
     if(matches) {
-        sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "HD MP4", "resolution": 720, "isNative": true});
+        sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "720p MP4", "resolution": 720, "isNative": true});
     }
     // hqURL (<=480p)
     matches = sequence.match(/\"hqURL\":\"([^"]*)\"/);
     if(matches) {
-        sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "HQ MP4", "resolution": 360, "isNative": true});
+        sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "SD MP4", "resolution": 360, "isNative": true});
     }
     // sdURL (FLV only)
     if(canPlayFLV) {
         matches = sequence.match(/\"sdURL\":\"([^"]*)\"/);
         if(matches) {
-            sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "SD FLV", "resolution": 240, "isNative": false});
+            sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "LD FLV", "resolution": 240, "isNative": false});
         }
     }
     
