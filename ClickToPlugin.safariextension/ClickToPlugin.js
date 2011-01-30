@@ -33,7 +33,11 @@ function ClickToPlugin() {
     document.addEventListener("beforeload", this.handleBeforeLoadEventTrampoline, true);
     
     document.addEventListener("contextmenu", function(event) {
-        safari.self.tab.setContextMenuEventUserInfo(event, {"location": window.location.href});
+        safari.self.tab.setContextMenuEventUserInfo(event, {"instance": _this.instance, "location": window.location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length, "invisible": this.getElementsByClassName("CTFinvisible").length});
+    }, false);
+    
+    document.addEventListener("keypress", function(event) {
+        if(event.keyCode === 1 && event.metaKey && event.ctrlKey) safari.self.tab.dispatchMessage("loadAll", "");
     }, false);
 }
 
@@ -68,6 +72,12 @@ ClickToPlugin.prototype.respondToMessage = function(event) {
                 case "viewInQTP":
                     this.viewInQuickTimePlayer(event.message.elementID, event.message.source);
                     break;
+                case "loadAll":
+                    this.loadAll();
+                    break;
+                case "loadInvisible":
+                    this.loadInvisible();
+                    break;
                 case "show":
                     this.showElement(event.message.elementID);
                     break;
@@ -75,9 +85,6 @@ ClickToPlugin.prototype.respondToMessage = function(event) {
             break;
         case "loadAll":
             this.loadAll();
-            break;
-        case "loadInvisible":
-            this.loadInvisible();
             break;
         case "loadSource":
             this.loadSource(event.message);
@@ -190,10 +197,6 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
     placeholderElement.style.setProperty("margin-bottom", style.getPropertyValue("margin-bottom"), "important");
     placeholderElement.style.setProperty("margin-left", style.getPropertyValue("margin-left"), "important");
     
-    // Build the placeholder
-    placeholderElement.innerHTML = "<div class=\"CTFplaceholderContainer\"><div class=\"CTFlogoVerticalPosition\"><div class=\"CTFlogoHorizontalPosition\"><div class=\"CTFlogoContainer CTFnodisplay\"><div class=\"CTFlogo\"></div><div class=\"CTFlogo CTFinset\"></div></div></div></div></div>";
-    if(responseData.isInvisible) placeholderElement.firstChild.className += " CTFinvisible";
-    
     // Replace the element by the placeholder
     if(element.parentNode && element.parentNode.className !== "CTFnodisplay") {
         element.parentNode.replaceChild(placeholderElement, element);
@@ -238,6 +241,10 @@ ClickToPlugin.prototype.handleBeforeLoadEvent = function(event) {
             event.stopPropagation();
         }
     }, false);
+    
+    // Build the placeholder
+    placeholderElement.innerHTML = "<div class=\"CTFplaceholderContainer\"><div class=\"CTFlogoVerticalPosition\"><div class=\"CTFlogoHorizontalPosition\"><div class=\"CTFlogoContainer CTFnodisplay\"><div class=\"CTFlogo\"></div><div class=\"CTFlogo CTFinset\"></div></div></div></div></div>";
+    if(responseData.isInvisible) placeholderElement.firstChild.className += " CTFinvisible";
     
     // Fill the main arrays
     this.blockedElements[elementID] = element;
