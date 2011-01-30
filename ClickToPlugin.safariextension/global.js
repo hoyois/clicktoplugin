@@ -102,6 +102,9 @@ function respondToMessage(event) {
         case "killPlugin":
             killPlugin(event.message);
             break;
+        case "loadAll":
+            event.target.page.dispatchMessage("loadAll", "");
+            break;
     }
 }
 
@@ -199,10 +202,10 @@ function handleContextMenu(event) {
         return;
     }
     
-    if(!u.instance) { // Generic menu
+    if(u.elementID === undefined) { // Generic menu
         if(s.disableEnableContext) event.contextMenu.appendContextMenuItem("switchOff", TURN_CTP_OFF);
-        if(s.loadAllContext) event.contextMenu.appendContextMenuItem("loadAll", LOAD_ALL_PLUGINS);
-        if(s.loadInvisibleContext) event.contextMenu.appendContextMenuItem("loadInvisible", LOAD_INVISIBLE_PLUGINS);
+        if(s.loadAllContext && u.blocked > 0 && (u.blocked > u.invisible || !s.loadInvisibleContext)) event.contextMenu.appendContextMenuItem("loadAll", LOAD_ALL_PLUGINS + " (" + u.blocked + ")");
+        if(s.loadInvisibleContext && u.invisible > 0) event.contextMenu.appendContextMenuItem("loadInvisible", LOAD_INVISIBLE_PLUGINS + " (" + u.invisible + ")");
         if(s.addToWhitelistContext) event.contextMenu.appendContextMenuItem("locationsWhitelist", ADD_TO_LOC_WHITELIST + "\u2026");
         return;
     }
@@ -237,12 +240,6 @@ function doCommand(event) {
             break;
         case "sourcesWhitelist":
             handleWhitelisting(false, event.userInfo.src);
-            break;
-        case "loadAll":
-            safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("loadAll", "");
-            break;
-        case "loadInvisible":
-            safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("loadInvisible", "");
             break;
         case "switchOff":
             switchOff();
