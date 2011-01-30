@@ -33,7 +33,11 @@ function ClickToFlash() {
     document.addEventListener("beforeload", this.handleBeforeLoadEventTrampoline, true);
     
     document.addEventListener("contextmenu", function(event) {
-        safari.self.tab.setContextMenuEventUserInfo(event, {"location": window.location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length, "invisible": this.getElementsByClassName("CTFinvisible").length});
+        safari.self.tab.setContextMenuEventUserInfo(event, {"instance": _this.instance, "location": window.location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length, "invisible": this.getElementsByClassName("CTFinvisible").length});
+    }, false);
+    
+    document.addEventListener("keypress", function(event) {
+        if(event.keyCode === 1 && event.metaKey && event.ctrlKey) safari.self.tab.dispatchMessage("loadAll", "");
     }, false);
 }
 
@@ -68,6 +72,12 @@ ClickToFlash.prototype.respondToMessage = function(event) {
                 case "viewInQTP":
                     this.viewInQuickTimePlayer(event.message.elementID, event.message.source);
                     break;
+                case "loadAll":
+                    this.loadAll();
+                    break;
+                case "loadInvisible":
+                    this.loadInvisible();
+                    break;
                 case "show":
                     this.showElement(event.message.elementID);
                     break;
@@ -75,9 +85,6 @@ ClickToFlash.prototype.respondToMessage = function(event) {
             break;
         case "loadAll":
             this.loadAll();
-            break;
-        case "loadInvisible":
-            this.loadInvisible();
             break;
         case "loadSource":
             this.loadSource(event.message);
