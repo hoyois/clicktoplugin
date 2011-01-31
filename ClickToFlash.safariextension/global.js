@@ -31,7 +31,7 @@ if(!safari.extension.settings.version) {
     removeSettings("useH264", "useSwitcher", "H264autoload", "videowhitelist", "H264behavior", "maxresolution", "QTbehavior", "uselocWhitelist", "usesrcWhitelist", "maxinvdim", "useOOcontext", "useWLcontect", "useLAcontext", "useLIcontext", "useDVcontext", "useSUcontext", "useVScontext", "useQTcontext", "sifrReplacement");
 }
 
-safari.extension.settings.version = 3;
+safari.extension.settings.version = 4;
 
 // SETTINGS
 var locationsWhitelist, sourcesWhitelist;
@@ -68,6 +68,8 @@ function getSettings() { // for injected scripts
         "debug": safari.extension.settings.debug,
         "useSourceSelector": safari.extension.settings.useSourceSelector,
         "showPoster": safari.extension.settings.showPoster,
+        "showTooltip": safari.extension.settings.showTooltip,
+        "showMediaTooltip": safari.extension.settings.showMediaTooltip,
         "initialBehavior": safari.extension.settings.initialBehavior,
         "volume": safari.extension.settings.volume
     };
@@ -233,12 +235,12 @@ function killPlugin(data) {
         mediaData.instance = data.instance;
         
         if(!mediaData.loadAfter) {
-            var defaultSource = chooseDefaultSource(mediaData.playlist[0].sources, mediaData.playlist[0].bestSource);
+            var defaultSource = chooseDefaultSource(mediaData.playlist[0].sources);
             mediaData.playlist[0].defaultSource = defaultSource;
             mediaData.badgeLabel = makeLabel(mediaData.playlist[0].sources[defaultSource], mediaData.playlist[0].mediaType);
         }
         for(var i = (mediaData.loadAfter ? 0 : 1); i < mediaData.playlist.length; i++) {
-            mediaData.playlist[i].defaultSource = chooseDefaultSource(mediaData.playlist[i].sources, mediaData.playlist[i].bestSource);
+            mediaData.playlist[i].defaultSource = chooseDefaultSource(mediaData.playlist[i].sources);
             if(mediaData.playlist[i].defaultSource === undefined) {
                 if(mediaData.missed !== undefined) ++mediaData.missed;
                 mediaData.playlist.splice(i--, 1);

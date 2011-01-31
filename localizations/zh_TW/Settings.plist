@@ -4,7 +4,47 @@
 <array>
 	<dict>
 		<key>Title</key>
-		<string>影片設定</string>
+		<string>白名單</string>
+		<key>Type</key>
+		<string>Group</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string></string>
+		<key>Key</key>
+		<string>locationsWhitelist</string>
+		<key>Title</key>
+		<string>網址</string>
+		<key>Titles</key>
+		<array/>
+		<key>Type</key>
+		<string>TextField</string>
+		<key>Values</key>
+		<array/>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string></string>
+		<key>Key</key>
+		<string>sourcesWhitelist</string>
+		<key>Title</key>
+		<string>來源</string>
+		<key>Type</key>
+		<string>TextField</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>invertWhitelists</string>
+		<key>Title</key>
+		<string>反轉清單                       </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>Title</key>
+		<string>HTML5 設定</string>
 		<key>Type</key>
 		<string>Group</string>
 	</dict>
@@ -12,9 +52,19 @@
 		<key>DefaultValue</key>
 		<true/>
 		<key>Key</key>
-		<string>useH264</string>
+		<string>replacePlugins</string>
 		<key>Title</key>
-		<string>尋找 Flash 的替代影片         </string>
+		<string>尋找 Flash 的替代影片   </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>useSourceSelector</string>
+		<key>Title</key>
+		<string>顯示可用的來源清單       </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -24,17 +74,7 @@
 		<key>Key</key>
 		<string>usePlaylists</string>
 		<key>Title</key>
-		<string>使用播放列表                       </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
-		<string>showPoster</string>
-		<key>Title</key>
-		<string>在暫存區中顯示預覽影像       </string>
+		<string>使用播放列表                 </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -42,9 +82,9 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>H264autoload</string>
+		<string>mediaAutoload</string>
 		<key>Title</key>
-		<string>自動載入影片播放器             </string>
+		<string>自動載入影片播放器       </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -52,7 +92,7 @@
 		<key>DefaultValue</key>
 		<string></string>
 		<key>Key</key>
-		<string>H264whitelist</string>
+		<string>mediaWhitelist</string>
 		<key>Title</key>
 		<string>在這些網站</string>
 		<key>Type</key>
@@ -62,7 +102,7 @@
 		<key>DefaultValue</key>
 		<string>autoplay</string>
 		<key>Key</key>
-		<string>H264behavior</string>
+		<string>initialBehavior</string>
 		<key>Title</key>
 		<string>初始動作</string>
 		<key>Titles</key>
@@ -82,9 +122,37 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
+		<real>1080</real>
+		<key>Key</key>
+		<string>maxResolution</string>
+		<key>Title</key>
+		<string>偏好的來源</string>
+		<key>Titles</key>
+		<array>
+			<string>Flash</string>
+			<string>360p</string>
+			<string>480p</string>
+			<string>720p</string>
+			<string>1080p</string>
+			<string>4K</string>
+		</array>
+		<key>Type</key>
+		<string>PopUpButton</string>
+		<key>Values</key>
+		<array>
+			<string>plugin</string>
+			<real>360</real>
+			<real>480</real>
+			<real>720</real>
+			<real>1080</real>
+			<string>infinity</string>
+		</array>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
 		<real>2</real>
 		<key>Key</key>
-		<string>QTbehavior</string>
+		<string>codecsPolicy</string>
 		<key>Title</key>
 		<string>非原生解碼器</string>
 		<key>Titles</key>
@@ -104,30 +172,6 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<real>3</real>
-		<key>Key</key>
-		<string>maxresolution</string>
-		<key>Title</key>
-		<string>最高解析度</string>
-		<key>Titles</key>
-		<array>
-			<string>480p</string>
-			<string>720p</string>
-			<string>1080p</string>
-			<string>4K</string>
-		</array>
-		<key>Type</key>
-		<string>PopUpButton</string>
-		<key>Values</key>
-		<array>
-			<real>1</real>
-			<real>2</real>
-			<real>3</real>
-			<real>4</real>
-		</array>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
 		<real>0.5</real>
 		<key>Key</key>
 		<string>volume</string>
@@ -142,92 +186,6 @@
 	</dict>
 	<dict>
 		<key>Title</key>
-		<string>白名單</string>
-		<key>Type</key>
-		<string>Group</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<false/>
-		<key>Key</key>
-		<string>uselocWhitelist</string>
-		<key>Title</key>
-		<string>允許 Flash，如果它的網址    </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<string>www.example.com www.example2.com</string>
-		<key>Key</key>
-		<string>locwhitelist</string>
-		<key>Title</key>
-		<string>符合</string>
-		<key>Type</key>
-		<string>TextField</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<string></string>
-		<key>Key</key>
-		<string>locblacklist</string>
-		<key>Title</key>
-		<string>不符合</string>
-		<key>Type</key>
-		<string>TextField</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<false/>
-		<key>Key</key>
-		<string>usesrcWhitelist</string>
-		<key>Title</key>
-		<string>允許 Flash，如果它的來源    </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<string></string>
-		<key>Key</key>
-		<string>srcwhitelist</string>
-		<key>Title</key>
-		<string>符合</string>
-		<key>Type</key>
-		<string>TextField</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<string></string>
-		<key>Key</key>
-		<string>srcblacklist</string>
-		<key>Title</key>
-		<string>不符合</string>
-		<key>Type</key>
-		<string>TextField</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<false/>
-		<key>Key</key>
-		<string>loadInvisible</string>
-		<key>Title</key>
-		<string>允許 Flash，如果                 </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<string>8x8</string>
-		<key>Key</key>
-		<string>maxinvdim</string>
-		<key>Title</key>
-		<string>尺寸不大於</string>
-		<key>Type</key>
-		<string>TextField</string>
-	</dict>
-	<dict>
-		<key>Title</key>
 		<string>特色選單項目</string>
 		<key>Type</key>
 		<string>Group</string>
@@ -236,7 +194,17 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>useWLcontext</string>
+		<string>disableEnableContext</string>
+		<key>Title</key>
+		<string>停用/啓用 ClickToFlash       </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>addToWhitelistContext</string>
 		<key>Title</key>
 		<string>加入白名單                          </string>
 		<key>Type</key>
@@ -246,7 +214,7 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>useLAcontext</string>
+		<string>loadAllContext</string>
 		<key>Title</key>
 		<string>載入所有的 Flash                 </string>
 		<key>Type</key>
@@ -256,7 +224,7 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>useLIcontext</string>
+		<string>loadInvisibleContext</string>
 		<key>Title</key>
 		<string>載入不可見的 Flash              </string>
 		<key>Type</key>
@@ -266,7 +234,7 @@
 		<key>DefaultValue</key>
 		<true/>
 		<key>Key</key>
-		<string>useDVcontext</string>
+		<string>downloadContext</string>
 		<key>Title</key>
 		<string>下載影片                             </string>
 		<key>Type</key>
@@ -276,7 +244,7 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>useVScontext</string>
+		<string>viewOnSiteContext</string>
 		<key>Title</key>
 		<string>於網站上檢視                       </string>
 		<key>Type</key>
@@ -286,7 +254,7 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>useQTcontext</string>
+		<string>viewInQTPContext</string>
 		<key>Title</key>
 		<string>於 QuickTime Player 中檢視</string>
 		<key>Type</key>
@@ -298,9 +266,29 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>loadInvisible</string>
+		<key>Title</key>
+		<string>允許不可見的外掛模組          </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>debug</string>
+		<key>Title</key>
+		<string>手動阻擋外掛模組                </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
 		<string>textonly</string>
 		<key>Key</key>
-		<string>sifrReplacement</string>
+		<string>sIFRPolicy</string>
 		<key>Title</key>
 		<string>sIFR 文字</string>
 		<key>Titles</key>
@@ -325,6 +313,8 @@
 		<string>opacity</string>
 		<key>MaximumValue</key>
 		<real>1</real>
+		<key>Secure</key>
+		<false/>
 		<key>StepValue</key>
 		<real>0.01</real>
 		<key>Title</key>
@@ -334,13 +324,27 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<false/>
+		<real>8</real>
 		<key>Key</key>
-		<string>debug</string>
-		<key>Title</key>
-		<string>手動阻擋內容                       </string>
-		<key>Type</key>
-		<string>CheckBox</string>
+		<string>maxInvisibleSize</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>showPoster</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>showTooltip</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>showMediaTooltip</string>
 	</dict>
 </array>
 </plist>

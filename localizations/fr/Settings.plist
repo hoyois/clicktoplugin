@@ -60,21 +60,11 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<false/>
+		<true/>
 		<key>Key</key>
 		<string>useSourceSelector</string>
 		<key>Title</key>
 		<string>Afficher la liste des formats disponibles           </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
-		<string>showPoster</string>
-		<key>Title</key>
-		<string>Afficher un aperçu de la vidéo                          </string>
 		<key>Type</key>
 		<string>CheckBox</string>
 	</dict>
@@ -337,6 +327,12 @@
 		<real>8</real>
 		<key>Key</key>
 		<string>maxInvisibleSize</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>showPoster</string>
 	</dict>
 </array>
 </plist>

@@ -86,12 +86,12 @@ function canPlaySrcWithHTML5(url) {
     return false;
 }
 
-function chooseDefaultSource(sourceArray, bestSource) {
+function chooseDefaultSource(sourceArray) {
     if(safari.extension.settings.maxResolution === "plugin") return undefined;
     var defaultSource;
     var hasNativeSource = false;
     var resolutionMap = new Array();
-    for(var i = 0; i < sourceArray.length; i++) {
+    for(var i = sourceArray.length - 1; i >= 0; i--) {
         var h = sourceArray[i].resolution;
         if(!h) h = 0;
         if(sourceArray[i].isNative) {
@@ -112,7 +112,6 @@ function chooseDefaultSource(sourceArray, bestSource) {
     for(var h in resolutionMap) {
         setAsDefault(resolutionMap[h]);
     }
-    if(bestSource !== undefined) setAsDefault(bestSource);
     return defaultSource;
 }
 
