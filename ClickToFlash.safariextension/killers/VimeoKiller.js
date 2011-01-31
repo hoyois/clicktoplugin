@@ -1,7 +1,7 @@
 function VimeoKiller() {}
 
 VimeoKiller.prototype.canKill = function(data) {
-    return (data.src.indexOf("vimeo.com/moogaloop") != -1 || data.src.indexOf("vimeocdn.com/p/flash/moogaloop") != -1 || data.src.indexOf("moogalover") != -1);
+    return (data.src.indexOf("vimeo.com/moogaloop") != -1 || data.src.indexOf("vimeocdn.com/p/flash/moogalo") != -1);
 };
 
 VimeoKiller.prototype.processElement = function(data, callback) {

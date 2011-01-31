@@ -187,11 +187,11 @@ ClickToFlash.prototype.handleBeforeLoadEvent = function(event) {
     
     // Create the placeholder element
     var placeholderElement = document.createElement("div");
-    placeholderElement.title = data.src; // tooltip
+    if(this.settings.showTooltip) placeholderElement.title = data.src; // tooltip
     placeholderElement.className = "CTFplaceholder CTFnoimage";
     placeholderElement.style.width = data.width + "px !important";
     placeholderElement.style.height = data.height + "px !important";
-    placeholderElement.style.opacity = this.settings.opacity + "! important";
+    placeholderElement.style.opacity = this.settings.opacity + " !important";
     
     // Copy CSS box & positioning properties that have an effect on page layout
     // Note: 'display' is set to 'inline-block', which is always the effective value for 'replaced elements'
@@ -347,7 +347,7 @@ ClickToFlash.prototype.prepMedia = function(mediaData) {
         this.placeholderElements[elementID].style.backgroundImage = "url('" + mediaData.playlist[0].posterURL + "') !important";
         this.placeholderElements[elementID].className = "CTFplaceholder"; // remove 'noimage' class
     }
-    if(mediaData.playlist[0].title) this.placeholderElements[elementID].title = mediaData.playlist[0].title; // set tooltip
+    if(mediaData.playlist[0].title && this.settings.showMediaTooltip) this.placeholderElements[elementID].title = mediaData.playlist[0].title; // set tooltip
     else this.placeholderElements[elementID].removeAttribute("title");
     
     if(this.settings.useSourceSelector) {
@@ -401,7 +401,7 @@ ClickToFlash.prototype.loadMediaForElement = function(elementID, source) {
 
     // Initialize player
     var _this = this;
-    this.mediaPlayers[elementID].createMediaElement("Flash", function(event) {_this.reloadInPlugin(elementID); event.stopPropagation();}, this.blockedData[elementID].width, this.blockedData[elementID].height, this.settings.initialBehavior, this.settings.volume, contextInfo, this.settings.useSourceSelector);
+    this.mediaPlayers[elementID].createMediaElement("Flash", function(event) {_this.reloadInPlugin(elementID); event.stopPropagation();}, this.blockedData[elementID].width, this.blockedData[elementID].height, this.settings.initialBehavior, this.settings.volume, this.settings.showMediaTooltip, contextInfo, this.settings.useSourceSelector);
 
     // Replace placeholder and load first track
     this.placeholderElements[elementID].parentNode.replaceChild(this.mediaPlayers[elementID].containerElement, this.placeholderElements[elementID]);
@@ -456,7 +456,7 @@ ClickToFlash.prototype.setVolumeTo = function(volume) {
 
 ClickToFlash.prototype.setOpacityTo = function(opacity) {
     for(var i = 0; i < this.numberOfBlockedElements; i++) {
-        if(this.placeholderElements[i] && this.placeholderElements[i].className === "CTFplaceholder CTFnoimage") this.placeholderElements[i].style.opacity = opacity + "! important";
+        if(this.placeholderElements[i] && this.placeholderElements[i].className === "CTFplaceholder CTFnoimage") this.placeholderElements[i].style.opacity = opacity + " !important";
     }
 };
 
