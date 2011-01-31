@@ -31,7 +31,7 @@ if(!safari.extension.settings.version) {
     removeSettings("allowQT", "useH264", "useSwitcher", "H264autoload", "videowhitelist", "H264behavior", "maxresolution", "QTbehavior", "uselocWhitelist", "usesrcWhitelist", "maxinvdim", "useOOcontext", "useWLcontect", "useLAcontext", "useLIcontext", "useDVcontext", "useSUcontext", "useVScontext", "useQTcontext", "sifrReplacement");
 }
 
-safari.extension.settings.version = 3;
+safari.extension.settings.version = 4;
 
 // SETTINGS
 var pluginsWhitelist, typesWhitelist, locationsWhitelist, sourcesWhitelist;

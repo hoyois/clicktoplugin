@@ -354,5 +354,17 @@
 		<key>Key</key>
 		<string>showPoster</string>
 	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>showTooltip</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>showMediaTooltip</string>
+	</dict>
 </array>
 </plist>

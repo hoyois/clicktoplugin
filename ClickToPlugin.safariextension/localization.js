@@ -1,4 +1,4 @@
-// ClickToFlash/ClickToPlugin localization file
+// ClickToPlugin localization file
 // Save with encoding: UTF-8
 
 // ENGLISH
