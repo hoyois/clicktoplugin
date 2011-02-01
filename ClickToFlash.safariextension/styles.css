@@ -129,8 +129,8 @@ Placeholder element
     text-shadow: 0 0 2px rgba(0, 0, 0, 1), 0 0 6px rgba(0, 0, 0, 0.6) !important;
     -webkit-box-shadow: 0 0 2px rgba(0, 0, 0, 1), inset 0 0 2px rgba(0, 0, 0, 1), 0 0 6px rgba(0, 0, 0, 0.6), inset 0 0 6px rgba(0, 0, 0, 0.6) !important;
     -webkit-user-select: none !important;
-    padding: 14px 5px 7px 5px !important;
-    line-height: 0 !important;
+    padding: 4px 5px 5px 5px !important;
+    line-height: 1 !important;
     font-family: "Helvetica Neue", Helvetica, sans-serif !important;
     font-size: 20px !important;
     font-style: normal !important;
@@ -164,7 +164,7 @@ Placeholder element
     border-width: 2px !important;
     border-radius: 4px !important;
     font-size: 10px !important;
-    padding: 7px 2px 4px 2px !important;
+    padding: 2px 2px 3px 2px !important;
 }
 
 .CTFplaceholder.CTFnoimage .CTFlogoContainer.CTFmini .CTFlogo {
