@@ -497,7 +497,7 @@ ClickToFlash.prototype.unhideLogo = function(elementID, i) {
     var w0 = this.placeholderElements[elementID].offsetWidth;
     var h0 = this.placeholderElements[elementID].offsetHeight;
     var w1 = logoContainer.childNodes[0].offsetWidth;
-    var h1 = logoContainer.childNodes[0].offsetHeight; 
+    var h1 = logoContainer.childNodes[0].offsetHeight;
     var w2 = logoContainer.childNodes[1].offsetWidth;
     var h2 = logoContainer.childNodes[1].offsetHeight;
     
@@ -516,7 +516,7 @@ ClickToFlash.prototype.unhideLogo = function(elementID, i) {
         logoContainer.childNodes[1].className = "CTFlogo CTFinset";
         logoContainer.className = "CTFlogoContainer";
         return;
-    } else if (w2 <= w0 - 6 && h2 <= h0 - 6) {
+    } else if (w2 <= w0 - 4 && h2 <= h0 - 5) {
         logoContainer.childNodes[1].className = "CTFlogo CTFinset";
         logoContainer.className = "CTFlogoContainer CTFmini";
         return;
