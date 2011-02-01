@@ -7,6 +7,7 @@ GenericKiller.prototype.canKill = function(data) {
     if(hasFlashVariable(data.params, "playlistfile")) {data.playlist = "playlistfile"; return true;}
     if(hasFlashVariable(data.params, "src")) {data.file = "src"; return true;}
     if(hasFlashVariable(data.params, "mp3")) {data.file = "mp3"; return true;}
+    if(hasFlashVariable(data.params, "mp3url")) {data.file = "mp3url"; return true;}
     if(hasFlashVariable(data.params, "soundFile")) {data.file = "soundFile"; return true;}
     if(hasFlashVariable(data.params, "url")) {data.file = "url"; return true;}
     if(hasFlashVariable(data.params, "file_url")) {data.file = "file_url"; return true;}
