@@ -32,9 +32,9 @@ YouTubeKiller.prototype.processElement = function(data, callback) {
         return;
     }
     // Embedded YT video
-    var matches = data.src.match(/\.com\/([vp])\/([^&?]+)(?:[&?]|$)/);
+    var matches = data.src.match(/\.com\/([vpe])\/([^&?]+)(?:[&?]|$)/);
     if(matches) {
-        if(matches[1] === "v") { // video
+        if(matches[1] === "v" || matches[1] === "e") { // video
             this.processElementFromVideoID(matches[2], callback);
         } else { // playlist
             this.buildVideoIDList(false, data.title, data.location, matches[2], 0, new Array(), callback);
