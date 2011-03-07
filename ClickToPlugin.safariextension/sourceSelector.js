@@ -1,7 +1,7 @@
 const OFFSET_LEFT = 10;
 const OFFSET_TOP = 10;
 
-function sourceSelector(plugin, loadPlugin, handleClickEvent, handleContextMenuEvent) {
+function sourceSelector(plugin, loadPlugin, viewInQuickTimePlayer, handleClickEvent, handleContextMenuEvent) {
     this.element = document.createElement("div");
     this.element.className = "CTFsourceSelector CTFhidden";
     this.element.innerHTML = "<ul class=\"CTFsourceList\"></ul>";
@@ -19,6 +19,7 @@ function sourceSelector(plugin, loadPlugin, handleClickEvent, handleContextMenuE
     this.handleClickEvent = handleClickEvent;
     this.handleContextMenuEvent = handleContextMenuEvent;
     this.loadPlugin = loadPlugin;
+    this.viewInQuickTimePlayer = viewInQuickTimePlayer;
 }
 
 sourceSelector.prototype.setPosition = function(left, top) {
@@ -48,6 +49,17 @@ sourceSelector.prototype.buildSourceList = function(sources) {
     var _this = this;
     this.pluginSourceItem.addEventListener("click", function(event) {
         _this.loadPlugin(event);
+    }, false);
+    this.pluginSourceItem.addEventListener("contextmenu", function(event) {
+        _this.handleContextMenuEvent(event);
+    }, false);
+    this.element.firstChild.appendChild(this.pluginSourceItem);
+    // QuickTime Player source item
+    if(this.viewInQuickTimePlayer === undefined) return;
+    this.pluginSourceItem = document.createElement("li");
+    this.pluginSourceItem.innerHTML = "QuickTime&nbsp;Player";
+    this.pluginSourceItem.addEventListener("click", function(event) {
+        _this.viewInQuickTimePlayer(event);
     }, false);
     this.pluginSourceItem.addEventListener("contextmenu", function(event) {
         _this.handleContextMenuEvent(event);
