@@ -42,7 +42,7 @@ mediaPlayer.prototype.handleMediaData = function(mediaData) {
     }
 };
 
-mediaPlayer.prototype.createMediaElement = function(plugin, loadPlugin, width, height, initialBehavior, volume, showTooltip, contextInfo, useSourceSelector) {
+mediaPlayer.prototype.createMediaElement = function(plugin, loadPlugin, viewInQuickTimePlayer, width, height, initialBehavior, volume, showTooltip, contextInfo, useSourceSelector) {
     this.containerElement = document.createElement("div");
     this.containerElement.className = "CTFmediaPlayer";
     this.mediaElement = document.createElement(this.playerType);
@@ -91,7 +91,7 @@ mediaPlayer.prototype.createMediaElement = function(plugin, loadPlugin, width, h
     
     // Playlist constrols
     if(this.playlistControls) this.initializePlaylistControls();
-    if(useSourceSelector) this.initializeSourceSelector(plugin, loadPlugin);
+    if(useSourceSelector) this.initializeSourceSelector(plugin, loadPlugin, viewInQuickTimePlayer);
 };
 
 mediaPlayer.prototype.initializePlaylistControls = function() {
@@ -177,7 +177,7 @@ mediaPlayer.prototype.initializePlaylistControls = function() {
     if(this.playlist.length > 1) this.containerElement.appendChild(this.playlistControls);
 };
 
-mediaPlayer.prototype.initializeSourceSelector = function(plugin, loadPlugin) {
+mediaPlayer.prototype.initializeSourceSelector = function(plugin, loadPlugin, viewInQuickTimePlayer) {
     var _this = this;
     var handleClickEvent = function(event, source) {
         _this.switchSource(source);
@@ -187,7 +187,7 @@ mediaPlayer.prototype.initializeSourceSelector = function(plugin, loadPlugin) {
         _this.setContextInfo(event, _this.contextInfo, source);
         event.stopPropagation();
     };
-    this.sourceSelector = new sourceSelector(plugin, loadPlugin, handleClickEvent, handleContextMenuEvent);
+    this.sourceSelector = new sourceSelector(plugin, loadPlugin, viewInQuickTimePlayer, handleClickEvent, handleContextMenuEvent);
     
     this.mediaElement.addEventListener("mouseout", function(event) {
         if(event.relatedTarget && (event.relatedTarget.className === "CTFsourceList" || event.relatedTarget.parentNode.className === "CTFsourceList" || event.relatedTarget.parentNode.parentNode.className === "CTFsourceList")) event.preventDefault();

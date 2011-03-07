@@ -355,6 +355,10 @@ ClickToPlugin.prototype.initializeSourceSelector = function(elementID, sources, 
         _this.loadPluginForElement(elementID);
         event.stopPropagation();
     };
+    var viewInQuickTimePlayer = defaultSource === undefined ? undefined : function(event) {
+        _this.viewInQuickTimePlayer(elementID, defaultSource);
+        event.stopPropagation();
+    };
     var handleClickEvent = function(event, source) {
         _this.loadMediaForElement(elementID, source);
         event.stopPropagation();
@@ -370,7 +374,7 @@ ClickToPlugin.prototype.initializeSourceSelector = function(elementID, sources, 
         event.stopPropagation();
     };
     
-    var selector = new sourceSelector(this.blockedData[elementID].plugin, loadPlugin, handleClickEvent, handleContextMenuEvent);
+    var selector = new sourceSelector(this.blockedData[elementID].plugin, loadPlugin, viewInQuickTimePlayer, handleClickEvent, handleContextMenuEvent);
     
     selector.setPosition(0,0);
     selector.buildSourceList(sources);
@@ -394,7 +398,7 @@ ClickToPlugin.prototype.loadMediaForElement = function(elementID, source) {
 
     // Initialize player
     var _this = this;
-    this.mediaPlayers[elementID].createMediaElement(this.blockedData[elementID].plugin, function(event) {_this.reloadInPlugin(elementID); event.stopPropagation();}, this.blockedData[elementID].width, this.blockedData[elementID].height, this.settings.initialBehavior, this.settings.volume, this.settings.showMediaTooltip, contextInfo, this.settings.useSourceSelector);
+    this.mediaPlayers[elementID].createMediaElement(this.blockedData[elementID].plugin, function(event) {_this.reloadInPlugin(elementID); event.stopPropagation();}, function(event) {_this.viewInQuickTimePlayer(elementID, null); event.stopPropagation();}, this.blockedData[elementID].width, this.blockedData[elementID].height, this.settings.initialBehavior, this.settings.volume, this.settings.showMediaTooltip, contextInfo, this.settings.useSourceSelector);
 
     // Replace placeholder and load first track
     this.placeholderElements[elementID].parentNode.replaceChild(this.mediaPlayers[elementID].containerElement, this.placeholderElements[elementID]);
