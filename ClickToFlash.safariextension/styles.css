@@ -386,6 +386,7 @@ Source switcher
     margin: 5px !important;
     padding: 0 !important;
     color: #ADADAD !important;
+    white-space: nowrap !important;
 }
 
 .CTFsourceSelector li.CTFcurrentSource {
@@ -399,6 +400,7 @@ Source switcher
 .CTFsourceSelector li a {
     color: inherit !important;
     cursor: inherit !important;
+    white-space: inherit !important;
 }
 
 .CTFsourceSelector li:hover {
