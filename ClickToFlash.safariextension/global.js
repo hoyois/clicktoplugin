@@ -1,37 +1,5 @@
 // UPDATE
-if(!safari.extension.settings.version) {
-    if(safari.extension.settings.usesrcWhitelist && safari.extension.settings.srcblacklist) {
-        safari.extension.settings.invertWhitelists = true;
-        safari.extension.settings.sourcesWhitelist = safari.extension.settings.srcblacklist;
-        safari.extension.settings.removeItem("srcblacklist");
-        if(safari.extension.settings.uselocWhitelist) {
-            safari.extension.settings.locationsWhitelist = safari.extension.settings.locblacklist;
-            safari.extension.settings.removeItem("locblacklist");
-        }
-    } else {
-        if(safari.extension.settings.usesrcWhitelist) {
-            safari.extension.settings.sourcesWhitelist = safari.extension.settings.srcwhitelist;
-            safari.extension.settings.removeItem("srcwhitelist");
-        }
-        if(safari.extension.settings.uselocWhitelist) {
-            safari.extension.settings.locationsWhitelist = safari.extension.settings.locwhitelist;
-            safari.extension.settings.removeItem("locwhitelist");
-        }
-    }
-    if(safari.extension.settings.H264whitelist) {
-        safari.extension.settings.mediaWhitelist = safari.extension.settings.H264whitelist;
-        safari.extension.settings.removeItem("H264whitelist");
-    }
-    
-    var removeSettings = function() {
-        for(var i = 0; i < arguments.length; i++) {
-            safari.extension.settings.removeItem(arguments[i]);
-        }
-    };
-    removeSettings("useH264", "useSwitcher", "H264autoload", "videowhitelist", "H264behavior", "maxresolution", "QTbehavior", "uselocWhitelist", "usesrcWhitelist", "maxinvdim", "useOOcontext", "useWLcontect", "useLAcontext", "useLIcontext", "useDVcontext", "useSUcontext", "useVScontext", "useQTcontext", "sifrReplacement");
-}
-
-safari.extension.settings.version = 4;
+safari.extension.settings.version = 6;
 
 // SETTINGS
 var locationsWhitelist, sourcesWhitelist;

@@ -58,7 +58,10 @@ sourceSelector.prototype.buildSourceList = function(sources) {
 sourceSelector.prototype.appendSource = function(source) {
     var sourceItem = document.createElement("li");
     sourceItem.innerHTML = "<a href=\"" + this.sources[source].url + "\">" + (this.sources[source].format ? this.sources[source].format : "HTML5") + "</a>";
-    sourceItem.firstChild.addEventListener("click", function(event) {event.preventDefault();}, false);
+    sourceItem.firstChild.addEventListener("click", function(event) {
+        if(event.altKey) event.stopPropagation(); // to allow option-click download
+        else event.preventDefault();
+    }, false);
     var _this = this;
     sourceItem.addEventListener("click", function(event) {
         _this.handleClickEvent(event, source);

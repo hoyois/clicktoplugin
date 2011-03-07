@@ -31,9 +31,9 @@ YouTubeKiller.prototype.processElement = function(data, callback) {
         return;
     }
     // Embedded YT video
-    var matches = data.src.match(/\.com\/([vp])\/([^&?]+)(?:[&?]|$)/);
+    var matches = data.src.match(/\.com\/([vpe])\/([^&?]+)(?:[&?]|$)/);
     if(matches) {
-        if(matches[1] === "v") { // video
+        if(matches[1] === "v" || matches[1] === "e") { // video
             this.processElementFromVideoID(matches[2], callback);
         } else { // playlist
             this.buildVideoIDList(false, data.title, data.location, matches[2], 0, new Array(), callback);
@@ -144,14 +144,17 @@ YouTubeKiller.prototype.processElementFromFlashVars = function(flashvars, docume
 YouTubeKiller.prototype.processElementFromVideoID = function(videoID, callback) {
     if(!videoID) return; // needed!?
     var urlMapMatch = /\"fmt_url_map\":\s\"([^"]*)\"/; // works for both Flash and HTML5 Beta player pages
-    var titleMatch = /document\.title\s=\s'YouTube\s-\s((?:\\'|[^'])*)'/;
+    var titleMatch = /document\.title\s=\s'YouTube\s-\s('?)(.*)/;
     var _this = this;
     var xhr = new XMLHttpRequest ();
     xhr.open("GET", "http://www.youtube.com/watch?v=" + videoID, true);
     xhr.onload = function() {
         var matches, title, urlMap;
         matches = xhr.responseText.match(titleMatch);
-        if(matches) title = matches[1].replace(/\\["'\/\\]/g, function(s){return s.charAt(1);});
+        if(matches) {
+            title = matches[2].replace(/\\["'\/\\]/g, function(s){return s.charAt(1);});
+            title = title.substring(matches[1] ? 4 : 0, title.length - 2);
+        }
         matches = xhr.responseText.match(urlMapMatch);
         if(matches) urlMap = matches[1].replace(/\\\//g,"/");
         

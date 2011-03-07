@@ -168,6 +168,10 @@ function parseXSPFPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlay
             if(i === 0 && !posterURL) posterURL = altPosterURL;
             list = x[I].getElementsByTagName("title");
             if(list.length > 0) title = list[0].firstChild.nodeValue;
+            else {
+                list = x[I].getElementsByTagName("annotation");
+                if(list.length > 0) title = list[0].firstChild.nodeValue;
+            }
             playlist.push({"mediaType": mediaType.type, "sources": [{"url": mediaURL, "isNative": mediaType.isNative}], "posterURL": posterURL, "title": title});
         }
         var playlistData = {
