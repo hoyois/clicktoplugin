@@ -80,6 +80,10 @@ Placeholder element
     border-top-style: none !important;
 }
 
+.CTFplaceholder[style*="background-image: url(data:"] {
+    border-style: none !important;
+}
+
 .CTFplaceholder.CTFnoimage {
     background: -webkit-gradient(linear, left top, left bottom, from(rgba(245, 245, 245, 1)), to(rgba(210, 210, 210, 1))) !important;
 }

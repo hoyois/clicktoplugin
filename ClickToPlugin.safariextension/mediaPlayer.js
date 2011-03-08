@@ -12,7 +12,7 @@ function mediaPlayer() {
     // when startTrack is set, loadMedia can be called
     this.currentTrack = null; // for the user, current track is startTrack + currentTrack + 1
     // currentTrack is set iff loadMedia has been called
-    this.currentSource = null; // the source being used for the currentTrack (an integer)
+    this.currentSource; // the source being used for the currentTrack (an integer)
     
     this.containerElement = null;
     this.mediaElement = null; // the HTML video/audio element
@@ -25,7 +25,6 @@ function mediaPlayer() {
     
     this.playlistControls = null;
     this.sourceSelector = null;
-    this.showTooltip = null;
     
 }
 
@@ -39,10 +38,11 @@ mediaPlayer.prototype.handleMediaData = function(mediaData) {
         this.playlistLength = mediaData.playlistLength ? mediaData.playlistLength : mediaData.playlist.length;
         this.startTrack = mediaData.startTrack ? mediaData.startTrack : 0;
         this.playlistControls = !mediaData.noPlaylistControls && this.playlistLength > 1;
+        this.currentSource = mediaData.playlist[0].defaultSource;
     }
 };
 
-mediaPlayer.prototype.createMediaElement = function(plugin, loadPlugin, viewInQuickTimePlayer, width, height, initialBehavior, volume, showTooltip, contextInfo, useSourceSelector) {
+mediaPlayer.prototype.createMediaElement = function(width, height, contextInfo) {
     this.containerElement = document.createElement("div");
     this.containerElement.className = "CTFmediaPlayer";
     this.mediaElement = document.createElement(this.playerType);
@@ -50,7 +50,7 @@ mediaPlayer.prototype.createMediaElement = function(plugin, loadPlugin, viewInQu
     this.containerElement.appendChild(this.mediaElement);
     
     this.mediaElement.setAttribute("controls", "controls");
-    switch(initialBehavior) {
+    switch(settings.initialBehavior) {
         case "autoplay": 
             this.mediaElement.setAttribute("autoplay", "autoplay");
             break;
@@ -69,11 +69,10 @@ mediaPlayer.prototype.createMediaElement = function(plugin, loadPlugin, viewInQu
     this.containerElement.style.height = height + "px";
     
     // Set volume
-    this.mediaElement.volume = volume;
+    this.mediaElement.volume = settings.volume;
     
     // Set global contextInfo
     this.contextInfo = contextInfo;
-    this.showTooltip = showTooltip;
     
     // Set listeners
     var _this = this; // need anonymous function in listeners otherwise the 'this' will refer to the mediaElement!
@@ -91,7 +90,7 @@ mediaPlayer.prototype.createMediaElement = function(plugin, loadPlugin, viewInQu
     
     // Playlist constrols
     if(this.playlistControls) this.initializePlaylistControls();
-    if(useSourceSelector) this.initializeSourceSelector(plugin, loadPlugin, viewInQuickTimePlayer);
+    if(settings.useSourceSelector) this.initializeSourceSelector();
 };
 
 mediaPlayer.prototype.initializePlaylistControls = function() {
@@ -138,7 +137,7 @@ mediaPlayer.prototype.initializePlaylistControls = function() {
     }, false);
     this.mediaElement.addEventListener("mouseout", function(event) {
         // prevents the default controls from disappearing
-        if(event.relatedTarget && (event.relatedTarget == prevButton || event.relatedTarget == nextButton || event.relatedTarget == trackSelect.firstChild || event.relatedTarget.hasAttribute("precision"))) {
+        if(event.relatedTarget && (event.relatedTarget === prevButton || event.relatedTarget === nextButton || event.relatedTarget === trackSelect.firstChild || event.relatedTarget.hasAttribute("precision"))) {
             event.preventDefault();
         } else if(!event.relatedTarget || (event.relatedTarget.className !== "CTFsourceList" && event.relatedTarget.parentNode.className !== "CTFsourceList" && event.relatedTarget.parentNode.parentNode.className !== "CTFsourceList")) {
             this.focus = false;
@@ -177,17 +176,14 @@ mediaPlayer.prototype.initializePlaylistControls = function() {
     if(this.playlist.length > 1) this.containerElement.appendChild(this.playlistControls);
 };
 
-mediaPlayer.prototype.initializeSourceSelector = function(plugin, loadPlugin, viewInQuickTimePlayer) {
+mediaPlayer.prototype.initializeSourceSelector = function() {
     var _this = this;
-    var handleClickEvent = function(event, source) {
-        _this.switchSource(source);
-        event.stopPropagation();
-    };
-    var handleContextMenuEvent = function(event, source) {
-        _this.setContextInfo(event, _this.contextInfo, source);
-        event.stopPropagation();
-    };
-    this.sourceSelector = new sourceSelector(plugin, loadPlugin, viewInQuickTimePlayer, handleClickEvent, handleContextMenuEvent);
+    var loadPlugin = function(event) {reloadInPlugin(_this.contextInfo.elementID);};
+    var viewInQTP = function(event) {viewInQuickTimePlayer(_this.contextInfo.elementID);};
+    var handleClickEvent = function(event, source) {_this.switchSource(source);};
+    var handleContextMenuEvent = function(event, source) {_this.setContextInfo(event, _this.contextInfo, source);};
+    
+    this.sourceSelector = new sourceSelector(this.contextInfo.plugin, loadPlugin, viewInQTP, handleClickEvent, handleContextMenuEvent);
     
     this.mediaElement.addEventListener("mouseout", function(event) {
         if(event.relatedTarget && (event.relatedTarget.className === "CTFsourceList" || event.relatedTarget.parentNode.className === "CTFsourceList" || event.relatedTarget.parentNode.parentNode.className === "CTFsourceList")) event.preventDefault();
@@ -282,7 +278,7 @@ mediaPlayer.prototype.loadTrack = function(track, source, autoplay) { // source 
         this.sourceSelector.hide();
         this.sourceSelector.buildSourceList(this.playlist[track].sources);
         this.sourceSelector.setCurrentSource(source);
-        if(this.showTooltip) this.sourceSelector.setTitle(this.playlist[track].title);
+        if(settings.showMediaTooltip) this.sourceSelector.setTitle(this.playlist[track].title);
         this.sourceSelector.unhide(this.width, this.height);
     }
     if(this.playlistControls) {
@@ -335,7 +331,7 @@ mediaPlayer.prototype.setContextInfo = function(event, contextInfo, source) {
     contextInfo.hasVideo = true;
     contextInfo.isVideo = this.currentTrack !== null;
     if(source === null) {
-        if(this.currentSource !== null) contextInfo.source = this.currentSource;
+        if(this.currentSource !== undefined) contextInfo.source = this.currentSource;
         else contextInfo.source = this.playlist[track].defaultSource;
     } else {
         //contextInfo.isSelector = true;

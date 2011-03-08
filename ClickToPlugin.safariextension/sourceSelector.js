@@ -1,7 +1,7 @@
 const OFFSET_LEFT = 10;
 const OFFSET_TOP = 10;
 
-function sourceSelector(plugin, loadPlugin, viewInQuickTimePlayer, handleClickEvent, handleContextMenuEvent) {
+function sourceSelector(plugin, loadPlugin, viewInQTP, handleClickEvent, handleContextMenuEvent) {
     this.element = document.createElement("div");
     this.element.className = "CTFsourceSelector CTFhidden";
     this.element.innerHTML = "<ul class=\"CTFsourceList\"></ul>";
@@ -12,14 +12,13 @@ function sourceSelector(plugin, loadPlugin, viewInQuickTimePlayer, handleClickEv
     
     this.sources = null;
     this.plugin = plugin;
-    this.pluginSourceItem = null;
     
     this.currentSource = null;
     
     this.handleClickEvent = handleClickEvent;
     this.handleContextMenuEvent = handleContextMenuEvent;
     this.loadPlugin = loadPlugin;
-    this.viewInQuickTimePlayer = viewInQuickTimePlayer;
+    this.viewInQTP = viewInQTP;
 }
 
 sourceSelector.prototype.setPosition = function(left, top) {
@@ -32,8 +31,11 @@ sourceSelector.prototype.setCurrentSource = function(source) {
         if(this.currentSource === undefined) this.pluginSourceItem.removeAttribute("class");
         else this.element.firstChild.childNodes[this.currentSource].removeAttribute("class");
     }
-    if(source === undefined) this.pluginSourceItem.className = "CTFcurrentSource";
-    else this.element.firstChild.childNodes[source].className = "CTFcurrentSource";
+    if(source === undefined) {
+        if(this.pluginSourceItem) this.pluginSourceItem.className = "CTFcurrentSource";
+    } else if(settings.defaultPlayer === "qtp") {
+        if(this.QTPSourceItem) this.QTPSourceItem.className = "CTFcurrentSource";
+    } else this.element.firstChild.childNodes[source].className = "CTFcurrentSource";
     this.currentSource = source;
 };
 
@@ -43,28 +45,36 @@ sourceSelector.prototype.buildSourceList = function(sources) {
     for(var i = 0; i < sources.length; i++) {
         this.appendSource(i);
     }
-    // Plugin source item
-    this.pluginSourceItem = document.createElement("li");
-    this.pluginSourceItem.innerHTML = this.plugin;
     var _this = this;
-    this.pluginSourceItem.addEventListener("click", function(event) {
-        _this.loadPlugin(event);
-    }, false);
-    this.pluginSourceItem.addEventListener("contextmenu", function(event) {
-        _this.handleContextMenuEvent(event);
-    }, false);
-    this.element.firstChild.appendChild(this.pluginSourceItem);
+    // Plugin source item
+    if(settings.usePluginSourceItem) {
+        this.pluginSourceItem = document.createElement("li");
+        this.pluginSourceItem.innerHTML = this.plugin;
+        this.pluginSourceItem.addEventListener("click", function(event) {
+            _this.loadPlugin(event);
+            event.stopPropagation();
+        }, false);
+        this.pluginSourceItem.addEventListener("contextmenu", function(event) {
+            _this.handleContextMenuEvent(event);
+            event.stopPropagation();
+        }, false);
+        this.element.firstChild.appendChild(this.pluginSourceItem);
+    }
     // QuickTime Player source item
-    if(this.viewInQuickTimePlayer === undefined) return;
-    this.pluginSourceItem = document.createElement("li");
-    this.pluginSourceItem.innerHTML = "QuickTime&nbsp;Player";
-    this.pluginSourceItem.addEventListener("click", function(event) {
-        _this.viewInQuickTimePlayer(event);
-    }, false);
-    this.pluginSourceItem.addEventListener("contextmenu", function(event) {
-        _this.handleContextMenuEvent(event);
-    }, false);
-    this.element.firstChild.appendChild(this.pluginSourceItem);
+    if(settings.useQTPSourceItem) {
+        if(this.viewInQTP === undefined) return;
+        this.QTPSourceItem = document.createElement("li");
+        this.QTPSourceItem.innerHTML = "QuickTime&nbsp;Player";
+        this.QTPSourceItem.addEventListener("click", function(event) {
+            _this.viewInQTP(event);
+            event.stopPropagation();
+        }, false);
+        this.QTPSourceItem.addEventListener("contextmenu", function(event) {
+            _this.handleContextMenuEvent(event);
+            event.stopPropagation();
+        }, false);
+        this.element.firstChild.appendChild(this.QTPSourceItem);
+    }
 };
 
 sourceSelector.prototype.appendSource = function(source) {
@@ -77,16 +87,18 @@ sourceSelector.prototype.appendSource = function(source) {
     var _this = this;
     sourceItem.addEventListener("click", function(event) {
         _this.handleClickEvent(event, source);
+        event.stopPropagation();
     }, false);
     sourceItem.addEventListener("contextmenu", function(event) {
         _this.handleContextMenuEvent(event, source);
+        event.stopPropagation();
     }, false);
     this.element.firstChild.appendChild(sourceItem);
 };
 
 sourceSelector.prototype.setTitle = function(title) {
-    if(!title) title = "";
-    this.pluginSourceItem.title = title;
+    //if(!title) title = "";
+    //this.pluginSourceItem.title = title;
 };
 
 sourceSelector.prototype.unhide = function(width, height) {
