@@ -105,7 +105,7 @@ function canPlaySrcWithHTML5(url) {
 }
 
 function chooseDefaultSource(sourceArray) {
-    if(safari.extension.settings.maxResolution === "plugin") return undefined;
+    if(safari.extension.settings.defaultPlayer === "plugin") return undefined;
     var defaultSource;
     var hasNativeSource = false;
     var resolutionMap = new Array();
@@ -134,7 +134,8 @@ function chooseDefaultSource(sourceArray) {
 }
 
 function makeLabel(source, mediaType) {
-    if(!source) return false;
+    if(!source) return false; // the injected script will take care of the label
+    if(safari.extension.settings.defaultPlayer === "qtp") return "QTP";
     if(mediaType === "audio") return "Audio";
     var prefix = "";
     if(source.resolution >= 720) prefix = "HD&nbsp;";
@@ -153,7 +154,7 @@ function isNativeType(MIMEType) {
 }
 function isNativeExt(ext) {
     for(var i = 0; i < 12; i++) {
-        if(ext == nativeExts[i]) return true;
+        if(ext === nativeExts[i]) return true;
     }
     return false;
 }

@@ -55,6 +55,9 @@ function getSettings() { // for injected scripts
         "showTooltip": safari.extension.settings.showTooltip,
         "showMediaTooltip": safari.extension.settings.showMediaTooltip,
         "initialBehavior": safari.extension.settings.initialBehavior,
+        "defaultPlayer": safari.extension.settings.defaultPlayer,
+        "usePluginSourceItem": safari.extension.settings.usePluginSourceItem,
+        "useQTPSourceItem": safari.extension.settings.useQTPSourceItem,
         "volume": safari.extension.settings.volume
     };
 }
@@ -68,7 +71,7 @@ function respondToMessage(event) {
             event.message = respondToCanLoad(event.message);
             break;
         case "killPlugin":
-            killPlugin(event.message);
+            killPlugin(event.message, event.target);
             break;
         case "loadAll":
             event.target.page.dispatchMessage("loadAll", "");
@@ -100,12 +103,15 @@ function blockOrAllow(data) { // returns true if element can be loaded, data on 
     // NOTE: 3rd-party plugins can override this... Anyone still using Adobe Reader? LOL
     var ext = extractExt(data.src); // used later as well
     if(data.type) {
+        if(data.type === "image/gif" && safari.extension.settings.deanimateGIF) return {"plugin": "GIF", "isInvisible": false};
         if(isNativeType(data.type)) return true;
     } else {
+        if((ext === "gif" || ext === "GIF") && safari.extension.settings.deanimateGIF) return {"plugin": "GIF", "isInvisible": false};
         // This is a vulnerability: e.g. a .png file can be served as Flash and won't be blocked...
         // This only works with native extensions, though. See below
         if(isNativeExt(ext)) return true;
     }
+    if(data.nodeName === "IMG") return true;
     
     // Check if invisible
     if(data.width <= safari.extension.settings.maxInvisibleSize && data.height <= safari.extension.settings.maxInvisibleSize && (data.width > 0 && data.height > 0) || safari.extension.settings.zeroIsInvisible) {
@@ -246,7 +252,7 @@ function handleWhitelisting(type, url) {
 }
 
 // KILLERS
-var killers = [new YouTubeKiller(), new VimeoKiller(), new DailymotionKiller(), new BreakKiller(), new BlipKiller(), new MetacafeKiller(), new TumblrKiller(), new VeohKiller(), new MegavideoKiller(), new BIMKiller(), new GenericKiller(), new SLKiller(), new QTKiller(), new WMKiller(), new DivXKiller()];
+var killers = [new YouTubeKiller(), new VimeoKiller(), new DailymotionKiller(), new BreakKiller(), new BlipKiller(), new MetacafeKiller(), new TumblrKiller(), new VeohKiller(), new MegavideoKiller(), new BIMKiller(), new GenericKiller(), new SLKiller(), new QTKiller(), new WMKiller(), new DivXKiller(), new GIFKiller()];
 
 if(safari.extension.settings.disabledKillers) {
     var disabledKillers = safari.extension.settings.disabledKillers.sort(function(a,b) {return a - b;});
@@ -262,14 +268,14 @@ function findKillerFor(data) {
     return null;
 }
 
-function killPlugin(data) {
+function killPlugin(data, tab) {
     if(data.baseURL) {
         var killerID = findKillerFor(data);
         if(killerID === null) return;
     }
     
     var callback = function(mediaData) {
-        if(mediaData.playlist.length === 0 || mediaData.playlist[0].sources.length === 0) return;
+        if(mediaData.playlist.length === 0) return;
         mediaData.elementID = data.elementID;
         mediaData.instance = data.instance;
         
@@ -286,14 +292,12 @@ function killPlugin(data) {
             }
         }
         
-        if(safari.extension.settings.mediaAutoload && !mediaData.loadAfter && defaultSource !== undefined) {
+        if(safari.extension.settings.mediaAutoload && !mediaData.loadAfter && defaultSource !== undefined && safari.extension.settings.defaultPlayer === "html5") {
             if(!safari.extension.settings.mediaWhitelist) mediaData.autoload = true;
             else mediaData.autoload = matchList(safari.extension.settings.mediaWhitelist.split(/\s+/), data.location);
         }
         
-        // the following messsage must be dispatched to all pages to make sure that
-        // pages or tabs loading in the background get their mediaData
-        dispatchMessageToAllPages("mediaData", mediaData);
+        tab.page.dispatchMessage("mediaData", mediaData);
     };
     
     if(data.baseURL) killers[killerID].processElement(data, callback);

@@ -146,10 +146,9 @@
 		<key>Key</key>
 		<string>maxResolution</string>
 		<key>Title</key>
-		<string>Preferred source</string>
+		<string>Max resolution</string>
 		<key>Titles</key>
 		<array>
-			<string>Plugin</string>
 			<string>360p</string>
 			<string>480p</string>
 			<string>720p</string>
@@ -160,13 +159,64 @@
 		<string>PopUpButton</string>
 		<key>Values</key>
 		<array>
-			<string>plugin</string>
 			<real>360</real>
 			<real>480</real>
 			<real>720</real>
 			<real>1080</real>
 			<string>infinity</string>
 		</array>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string>html5</string>
+		<key>Key</key>
+		<string>defaultPlayer</string>
+		<key>Title</key>
+		<string>Default player</string>
+		<key>Titles</key>
+		<array>
+		    <string>HTML5</string>
+			<string>QuickTime Player</string>
+			<string>Plugin</string>
+		</array>
+		<key>Type</key>
+		<string>PopUpButton</string>
+		<key>Values</key>
+		<array>
+			<string>html5</string>
+			<string>qtp</string>
+			<string>plugin</string>
+		</array>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>usePluginSourceItem</string>
+		<key>Title</key>
+		<string>Plugin source item    </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useQTPSourceItem</string>
+		<key>Title</key>
+		<string>QTP source item     </string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>deanimateGIF</string>
+		<key>Title</key>
+		<string>deanimate GIF     </string>
+		<key>Type</key>
+		<string>CheckBox</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
