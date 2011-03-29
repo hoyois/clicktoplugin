@@ -1,7 +1,7 @@
 function BlipKiller() {}
 
 BlipKiller.prototype.canKill = function(data) {
-    if(data.plugin != "Flash") return false;
+    if(data.plugin !== "Flash") return false;
     return data.src.indexOf("blip.tv/") != -1;
 };
 

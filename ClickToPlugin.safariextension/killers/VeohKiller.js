@@ -1,7 +1,7 @@
 function VeohKiller() {}
 
 VeohKiller.prototype.canKill = function(data) {
-    if(data.plugin != "Flash") return false;
+    if(data.plugin !== "Flash") return false;
     return (data.src.indexOf("veoh.com/static/swf/webplayer") != -1 || data.src.indexOf("veohplayer.swf") != -1);
 };
 

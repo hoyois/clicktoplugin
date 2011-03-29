@@ -3,398 +3,425 @@
 <plist version="1.0">
 <array>
 	<dict>
-		<key>Title</key>
-		<string>Whitelists</string>
-		<key>Type</key>
-		<string>Group</string>
-	</dict>
-	<dict>
 		<key>DefaultValue</key>
-		<string></string>
+		<array></array>
 		<key>Key</key>
-		<string>pluginsWhitelist</string>
-		<key>Title</key>
-		<string>Plugins</string>
-		<key>Type</key>
-		<string>TextField</string>
+		<string>allowedPlugins</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<false/>
-		<key>Key</key>
-		<string>invertPluginsWhitelist</string>
-		<key>Title</key>
-		<string>Negate list                   </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<string></string>
+		<array></array>
 		<key>Key</key>
 		<string>locationsWhitelist</string>
-		<key>Title</key>
-		<string>Locations</string>
-		<key>Titles</key>
-		<array/>
-		<key>Type</key>
-		<string>TextField</string>
-		<key>Values</key>
-		<array/>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string></string>
+		<array></array>
 		<key>Key</key>
 		<string>sourcesWhitelist</string>
-		<key>Title</key>
-		<string>Sources</string>
-		<key>Type</key>
-		<string>TextField</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<array></array>
+		<key>Key</key>
+		<string>locationsBlacklist</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<array></array>
+		<key>Key</key>
+		<string>sourcesBlacklist</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
 		<string>invertWhitelists</string>
-		<key>Title</key>
-		<string>Negate lists                  </string>
-		<key>Type</key>
-		<string>CheckBox</string>
 	</dict>
 	<dict>
-		<key>Title</key>
-		<string>HTML5 Settings</string>
-		<key>Type</key>
-		<string>Group</string>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>invertBlacklists</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<array>
+		    <integer>0</integer>
+		    <integer>1</integer>
+		    <integer>2</integer>
+		    <integer>3</integer>
+		    <integer>4</integer>
+		    <integer>5</integer>
+		    <integer>6</integer>
+		    <integer>7</integer>
+		    <integer>8</integer>
+		    <integer>9</integer>
+		    <integer>10</integer>
+		    <integer>11</integer>
+		    <integer>12</integer>
+		    <integer>13</integer>
+		    <integer>14</integer>
+		</array>
+		<key>Key</key>
+		<string>enabledKillers</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<true/>
 		<key>Key</key>
-		<string>replacePlugins</string>
-		<key>Title</key>
-		<string>Look for media replacements to plugins       </string>
-		<key>Type</key>
-		<string>CheckBox</string>
+		<string>showSourceSelector</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<true/>
 		<key>Key</key>
-		<string>useSourceSelector</string>
-		<key>Title</key>
-		<string>Show list of available sources                        </string>
-		<key>Type</key>
-		<string>CheckBox</string>
+		<string>showPluginSourceItem</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>showQTPSourceItem</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<true/>
 		<key>Key</key>
 		<string>usePlaylists</string>
-		<key>Title</key>
-		<string>Use playlists                                                   </string>
-		<key>Type</key>
-		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>showVolumeSlider</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>hideRewindButton</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
 		<string>mediaAutoload</string>
-		<key>Title</key>
-		<string>Load the media player automatically             </string>
-		<key>Type</key>
-		<string>CheckBox</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string></string>
+		<array>
+		  <string>www.youtube.com</string>
+		</array>
 		<key>Key</key>
 		<string>mediaWhitelist</string>
-		<key>Title</key>
-		<string>on these sites</string>
-		<key>Type</key>
-		<string>TextField</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<string>autoplay</string>
 		<key>Key</key>
 		<string>initialBehavior</string>
-		<key>Title</key>
-		<string>Initial behavior</string>
-		<key>Titles</key>
-		<array>
-			<string>Do not buffer</string>
-			<string>Start buffering</string>
-			<string>Start buffering and play automatically</string>
-		</array>
-		<key>Type</key>
-		<string>PopUpButton</string>
-		<key>Values</key>
-		<array>
-			<string>none</string>
-			<string>buffer</string>
-			<string>autoplay</string>
-		</array>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<real>1080</real>
+		<integer>1080</integer>
 		<key>Key</key>
 		<string>maxResolution</string>
-		<key>Title</key>
-		<string>Max resolution</string>
-		<key>Titles</key>
-		<array>
-			<string>360p</string>
-			<string>480p</string>
-			<string>720p</string>
-			<string>1080p</string>
-			<string>4K</string>
-		</array>
-		<key>Type</key>
-		<string>PopUpButton</string>
-		<key>Values</key>
-		<array>
-			<real>360</real>
-			<real>480</real>
-			<real>720</real>
-			<real>1080</real>
-			<string>infinity</string>
-		</array>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<string>html5</string>
 		<key>Key</key>
 		<string>defaultPlayer</string>
-		<key>Title</key>
-		<string>Default player</string>
-		<key>Titles</key>
-		<array>
-		    <string>HTML5</string>
-			<string>QuickTime Player</string>
-			<string>Plugin</string>
-		</array>
-		<key>Type</key>
-		<string>PopUpButton</string>
-		<key>Values</key>
-		<array>
-			<string>html5</string>
-			<string>qtp</string>
-			<string>plugin</string>
-		</array>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<false/>
-		<key>Key</key>
-		<string>usePluginSourceItem</string>
-		<key>Title</key>
-		<string>Plugin source item    </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<false/>
-		<key>Key</key>
-		<string>useQTPSourceItem</string>
-		<key>Title</key>
-		<string>QTP source item     </string>
-		<key>Type</key>
-		<string>CheckBox</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
 		<key>Key</key>
 		<string>deanimateGIF</string>
-		<key>Title</key>
-		<string>deanimate GIF     </string>
-		<key>Type</key>
-		<string>CheckBox</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<real>2</real>
+		<integer>2</integer>
 		<key>Key</key>
 		<string>codecsPolicy</string>
-		<key>Title</key>
-		<string>Nonnative codecs</string>
-		<key>Titles</key>
-		<array>
-			<string>Do not use</string>
-			<string>Use only as a last resort</string>
-			<string>Use freely</string>
-		</array>
-		<key>Type</key>
-		<string>PopUpButton</string>
-		<key>Values</key>
-		<array>
-			<real>1</real>
-			<real>2</real>
-			<real>3</real>
-		</array>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<real>0.5</real>
 		<key>Key</key>
 		<string>volume</string>
-		<key>MaximumValue</key>
-		<real>1</real>
-		<key>StepValue</key>
-		<real>0.01</real>
-		<key>Title</key>
-		<string>Sound volume</string>
-		<key>Type</key>
-		<string>Slider</string>
-	</dict>
-	<dict>
-		<key>Title</key>
-		<string>Contextual Menu Items</string>
-		<key>Type</key>
-		<string>Group</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
 		<string>disableEnableContext</string>
-		<key>Title</key>
-		<string>Disable/Enable ClickToPlugin     </string>
-		<key>Type</key>
-		<string>CheckBox</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
 		<string>addToWhitelistContext</string>
-		<key>Title</key>
-		<string>Add to Whitelist                         </string>
-		<key>Type</key>
-		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>addToBlacklistContext</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
 		<string>loadAllContext</string>
-		<key>Title</key>
-		<string>Load All Plugins                         </string>
-		<key>Type</key>
-		<string>CheckBox</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
 		<string>loadInvisibleContext</string>
-		<key>Title</key>
-		<string>Load Invisible Plugins                 </string>
-		<key>Type</key>
-		<string>CheckBox</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<true/>
 		<key>Key</key>
 		<string>downloadContext</string>
-		<key>Title</key>
-		<string>Download Video                         </string>
-		<key>Type</key>
-		<string>CheckBox</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
 		<string>viewOnSiteContext</string>
-		<key>Title</key>
-		<string>View on Site                               </string>
-		<key>Type</key>
-		<string>CheckBox</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
 		<string>viewInQTPContext</string>
-		<key>Title</key>
-		<string>View in QuickTime Player           </string>
-		<key>Type</key>
-		<string>CheckBox</string>
 	</dict>
 	<dict>
-		<key>Type</key>
-		<string>Separator</string>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>enableKeyboardShortcuts</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>enableMediaKeyboardShortcuts</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<dict>
+		    <key>type</key>
+		    <string>keydown</string>
+		    <key>shiftKey</key>
+		    <false/>
+		    <key>ctrlKey</key>
+		    <true/>
+		    <key>altKey</key>
+		    <false/>
+		    <key>metaKey</key>
+		    <true/>
+		    <key>keyIdentifier</key>
+		    <string>U+0041</string>
+		</dict>
+		<key>Key</key>
+		<string>loadAllShortcut</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<dict>
+		    <key>type</key>
+		    <string>keydown</string>
+		    <key>shiftKey</key>
+		    <false/>
+		    <key>ctrlKey</key>
+		    <true/>
+		    <key>altKey</key>
+		    <false/>
+		    <key>metaKey</key>
+		    <true/>
+		    <key>keyIdentifier</key>
+		    <string>U+0048</string>
+		</dict>
+		<key>Key</key>
+		<string>hideAllShortcut</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<dict>
+		    <key>type</key>
+		    <string>click</string>
+		    <key>shiftKey</key>
+		    <false/>
+		    <key>ctrlKey</key>
+		    <false/>
+		    <key>altKey</key>
+		    <true/>
+		    <key>metaKey</key>
+		    <false/>
+		    <key>button</key>
+		    <integer>0</integer>
+		</dict>
+		<key>Key</key>
+		<string>hidePluginShortcut</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>playPauseShortcut</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+	    <false/>
+		<key>Key</key>
+		<string>enterFullscreenShortcut</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<dict>
+		    <key>type</key>
+		    <string>keydown</string>
+		    <key>shiftKey</key>
+		    <false/>
+		    <key>ctrlKey</key>
+		    <false/>
+		    <key>altKey</key>
+		    <false/>
+		    <key>metaKey</key>
+		    <false/>
+		    <key>keyIdentifier</key>
+		    <string>Up</string>
+		</dict>
+		<key>Key</key>
+		<string>volumeUpShortcut</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<dict>
+		    <key>type</key>
+		    <string>keydown</string>
+		    <key>shiftKey</key>
+		    <false/>
+		    <key>ctrlKey</key>
+		    <false/>
+		    <key>altKey</key>
+		    <false/>
+		    <key>metaKey</key>
+		    <false/>
+		    <key>keyIdentifier</key>
+		    <string>Down</string>
+		</dict>
+		<key>Key</key>
+		<string>volumeDownShortcut</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<dict>
+		    <key>type</key>
+		    <string>keydown</string>
+		    <key>shiftKey</key>
+		    <false/>
+		    <key>ctrlKey</key>
+		    <false/>
+		    <key>altKey</key>
+		    <false/>
+		    <key>metaKey</key>
+		    <false/>
+		    <key>keyIdentifier</key>
+		    <string>Left</string>
+		</dict>
+		<key>Key</key>
+		<string>prevTrackShortcut</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<dict>
+		    <key>type</key>
+		    <string>keydown</string>
+		    <key>shiftKey</key>
+		    <false/>
+		    <key>ctrlKey</key>
+		    <false/>
+		    <key>altKey</key>
+		    <false/>
+		    <key>metaKey</key>
+		    <false/>
+		    <key>keyIdentifier</key>
+		    <string>Right</string>
+		</dict>
+		<key>Key</key>
+		<string>nextTrackShortcut</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<dict>
+		    <key>type</key>
+		    <string>dblclick</string>
+		    <key>shiftKey</key>
+		    <false/>
+		    <key>ctrlKey</key>
+		    <false/>
+		    <key>altKey</key>
+		    <false/>
+		    <key>metaKey</key>
+		    <false/>
+		    <key>button</key>
+		    <integer>0</integer>
+		</dict>
+		<key>Key</key>
+		<string>toggleLoopingShortcut</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<dict>
+		    <key>type</key>
+		    <string>keydown</string>
+		    <key>shiftKey</key>
+		    <false/>
+		    <key>ctrlKey</key>
+		    <false/>
+		    <key>altKey</key>
+		    <false/>
+		    <key>metaKey</key>
+		    <false/>
+		    <key>keyIdentifier</key>
+		    <string>U+0049</string>
+		</dict>
+		<key>Key</key>
+		<string>showTitleShortcut</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
 		<string>loadInvisible</string>
-		<key>Title</key>
-		<string>Allow invisible plugins               </string>
-		<key>Type</key>
-		<string>CheckBox</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
 		<string>debug</string>
-		<key>Title</key>
-		<string>Block plugins manually              </string>
-		<key>Type</key>
-		<string>CheckBox</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<string>textonly</string>
 		<key>Key</key>
 		<string>sIFRPolicy</string>
-		<key>Title</key>
-		<string>sIFR text</string>
-		<key>Titles</key>
-		<array>
-			<string>Show text only</string>
-			<string>Treat as regular Flash</string>
-			<string>Load automatically</string>
-		</array>
-		<key>Type</key>
-		<string>PopUpButton</string>
-		<key>Values</key>
-		<array>
-			<string>textonly</string>
-			<string>normal</string>
-			<string>autoload</string>
-		</array>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<real>0.5</real>
 		<key>Key</key>
 		<string>opacity</string>
-		<key>MaximumValue</key>
-		<real>1</real>
-		<key>Secure</key>
-		<false/>
-		<key>StepValue</key>
-		<real>0.01</real>
-		<key>Title</key>
-		<string>Opacity</string>
-		<key>Type</key>
-		<string>Slider</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<real>8</real>
+		<integer>8</integer>
 		<key>Key</key>
 		<string>maxInvisibleSize</string>
 	</dict>

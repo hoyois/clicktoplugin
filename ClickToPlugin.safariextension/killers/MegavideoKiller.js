@@ -1,9 +1,9 @@
 function MegavideoKiller() {}
 
 MegavideoKiller.prototype.canKill = function(data) {
-    if(data.plugin != "Flash") return false;
+    if(data.plugin !== "Flash") return false;
     if(safari.extension.settings.codecsPolicy === 1 || !canPlayFLV) return false;
-    if(data.src === "http://wwwstatic.megavideo.com/mv_player.swf") {data.onsite = true; return true;};
+    if(data.src === "http://wwwstatic.megavideo.com/mv_player2.swf") {data.onsite = true; return true;};
     if(data.src.indexOf("megavideo.com/v/") !== -1) {data.onsite = false; return true;}
     return false;
 };

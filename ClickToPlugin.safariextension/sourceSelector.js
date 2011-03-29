@@ -47,7 +47,7 @@ sourceSelector.prototype.buildSourceList = function(sources) {
     }
     var _this = this;
     // Plugin source item
-    if(settings.usePluginSourceItem) {
+    if(settings.showPluginSourceItem) {
         this.pluginSourceItem = document.createElement("li");
         this.pluginSourceItem.innerHTML = this.plugin;
         this.pluginSourceItem.addEventListener("click", function(event) {
@@ -61,7 +61,7 @@ sourceSelector.prototype.buildSourceList = function(sources) {
         this.element.firstChild.appendChild(this.pluginSourceItem);
     }
     // QuickTime Player source item
-    if(settings.useQTPSourceItem) {
+    if(settings.showQTPSourceItem) {
         if(this.viewInQTP === undefined) return;
         this.QTPSourceItem = document.createElement("li");
         this.QTPSourceItem.innerHTML = "QuickTime&nbsp;Player";

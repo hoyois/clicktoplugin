@@ -157,7 +157,7 @@ YouTubeKiller.prototype.processElementFromVideoID = function(videoID, callback) 
             title = title.substring(matches[1] ? 4 : 0, title.length - 2);
         }
         matches = xhr.responseText.match(urlMapMatch);
-        if(matches) urlMap = matches[1].replace(/\\\//g,"/");
+        if(matches) urlMap = parseUnicode(matches[1].replace(/\\\//g,"/"));
         
         if(urlMap) {
             _this.finalizeProcessing(videoID, urlMap, title, true, callback);
