@@ -8,6 +8,22 @@ function downloadURL(url) {
     downloadLink.dispatchEvent(event);
 }
 
+function testShortcut(event, shortcut) {
+    for(var x in shortcut) {
+        if(event[x] !== shortcut[x]) return false;
+    }
+    event.preventDefault();
+    event.stopPropagation(); // immediate?
+    return true;
+}
+
+function removeHTMLNode(node) {
+    while(node.parentNode.childNodes.length === 1) {
+        node = node.parentNode;
+    }
+    node.parentNode.removeChild(node);
+}
+
 function getAttributes(element, url) {
     // Gathers essential attributes of the element that are needed to decide blocking.
     // Done by a single function so that we only loop once through the <param> children.

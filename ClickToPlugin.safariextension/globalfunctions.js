@@ -25,11 +25,18 @@ function makeAbsoluteURL(url, base) {
     }
     return base + url;
 }
+function extractDomain(url) {
+    return url.match(/\/\/([^\/]+)\//)[1];
+}
 
-function unescapeHTML(text){
+function unescapeHTML(text) {
     var e = document.createElement("div");
     e.innerHTML = text;
     return e.firstChild.nodeValue;
+}
+
+function parseUnicode(text) {
+    return text.replace(/\\u([0-9a-fA-F]{4})/g, function(s,c) {return String.fromCharCode(parseInt(c, 16));});
 }
 
 function hasFlashVariable(flashvars, key) {
@@ -43,8 +50,8 @@ function getFlashVariable(flashvars, key) {
     var flashVarsArray = flashvars.split("&");
     for (var i = 0; i < flashVarsArray.length; i++) {
         var keyValuePair = flashVarsArray[i].split("=");
-        if (keyValuePair[0] == key) {
-            return keyValuePair[1];
+        if (keyValuePair.shift() === key) {
+            return keyValuePair.join("=");
         }
     }
     return "";
@@ -61,8 +68,8 @@ function getSLVariable(initParams, key) {
     var initParamsArray = initParams.split(",");
     for (var i = 0; i < initParamsArray.length; i++) {
         var keyValuePair = initParamsArray[i].split("=");
-        if (keyValuePair[0].toLowerCase() == key) {
-            return keyValuePair[1];
+        if (keyValuePair.shift().toLowerCase() === key) {
+            return keyValuePair.join("=");
         }
     }
     return "";
@@ -223,16 +230,15 @@ function matchList(list, string) {
     var s;
     for(var i = 0; i < list.length; i++) {
         s = list[i];
-        if(!s) continue;
-        if(/^\(.*\)$/.test(s)) { // if s is enclosed in parenthesis, interpret as regexp
-            try{
-                s = new RegExp(s);
-            } catch (err) { // invalid regexp, just ignore
+        if(s.charAt(0) === "@") { // if s starts with '@', interpret as regexp
+            try {
+                s = new RegExp(s.substr(1));
+            } catch(err) { // invalid regexp, just ignore
                 continue;
             }
             if(s.test(string)) return true;
         } else { // otherwise, regular string match
-            if(string.indexOf(s) != -1) return true;
+            if(string.indexOf(s) !== -1) return true;
         }
     }
     return false;
@@ -242,7 +248,7 @@ function matchList(list, string) {
 Plugin detection methods
 ***********************/
 
-function getTypeForClassid(classid) { // from WebKit's source code (except divx)
+function getTypeFromClassid(classid) { // from WebKit's source code (except divx)
     switch(classid.toLowerCase()) {
         case "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000": return "application/x-shockwave-flash";
         case "clsid:22d6f312-b0f6-11d0-94ab-0080c74c7e95": return "application/x-mplayer2";
@@ -253,6 +259,16 @@ function getTypeForClassid(classid) { // from WebKit's source code (except divx)
         case "clsid:166b1bca-3f9c-11cf-8075-444553540000": return "application/x-director";
         default: return false;
     }
+}
+
+function isDataURI(url) {
+    return /^data:/.test(url);
+}
+
+function getTypeFromDataURI(url) {
+    var match = url.match(/^data:([^,;]+)[,;]/);
+    if(match) return match[1];
+    else return "text/plain";
 }
 
 function getPluginForType(type) { // type is a string
@@ -277,34 +293,33 @@ function getPluginAndTypeForExt(ext) {
     return false;
 }
 
-function getPluginNameFromPlugin(plugin) {
-    if(plugin.name === "Shockwave Flash") return "Flash";
-    if(plugin.name === "Silverlight Plug-In") return "Silverlight";
-    if(plugin.name.indexOf("Java") != -1) return "Java";
-    if(plugin.name.indexOf("QuickTime") != -1) return "QuickTime";
-    if(plugin.name.indexOf("Flip4Mac") != -1) return "Flip4Mac";
-    if(plugin.name === "iPhotoPhotocast") return "iPhoto";
-    if(plugin.name === "Quartz Composer Plug-In") return "Quartz";
-    if(plugin.name === "VideoLAN VLC Plug-in") return "VLC";
-    if(plugin.name === "DivX Web Player") return "DivX";
-    if(plugin.name === "RealPlayer Plugin.plugin") return "Real";
-    if(plugin.name === "Shockwave for Director") return "Shockwave";
-    if(plugin.name === "Unity Player") return "Unity";
-    return plugin.name;
+function getPluginName(plugin, type) {
+    if(plugin) {
+        if(plugin.name === "Shockwave Flash") return "Flash";
+        if(plugin.name === "Silverlight Plug-In") return "Silverlight";
+        if(plugin.name.indexOf("Java") != -1) return "Java";
+        if(plugin.name.indexOf("QuickTime") != -1) return "QuickTime";
+        if(plugin.name.indexOf("Flip4Mac") != -1) return "Flip4Mac";
+        if(plugin.name === "iPhotoPhotocast") return "iPhoto";
+        if(plugin.name === "Quartz Composer Plug-In") return "Quartz";
+        if(plugin.name === "VideoLAN VLC Plug-in") return "VLC";
+        if(plugin.name === "DivX Web Player") return "DivX";
+        if(plugin.name === "RealPlayer Plugin.plugin") return "Real";
+        if(plugin.name === "Shockwave for Director") return "Shockwave";
+        if(plugin.name === "Unity Player") return "Unity";
+        return plugin.name;
+    } else if(type) { // only so that killers can work with plugins not installed
+        if(type === "application/x-shockwave-flash") return "Flash";
+        if(type === "application/futuresplash") return "Flash";
+        if(type === "application/x-silverlight-2") return "Silverlight";
+        if(type === "application/x-silverlight") return "Silverlight";
+        //if(/x-java/.test(type)) return "Java";
+        if(/x-ms/.test(type) || type === "application/x-mplayer2" || type === "application/asx") return "Flip4Mac";
+        //if(/x-pn/.test(type)) return "Real";
+        //if(type === "application/x-director") return "Shockwave";
+        //if(type === "application/vnd.unity") return "Unity";
+        type = type.split(";")[0];
+        if(type === "video/divx") return "DivX";
+        return "";// type.split("/")[1];
+    } else return "";
 }
-
-function getPluginNameFromType(type) { // only used if no installed plugin is found
-    if(type === "application/x-shockwave-flash") return "Flash";
-    if(type === "application/futuresplash") return "Flash";
-    if(type === "application/x-silverlight-2") return "Silverlight";
-    if(type === "application/x-silverlight") return "Silverlight";
-    if(/x-java/.test(type)) return "Java";
-    if(/x-ms/.test(type) || type === "application/x-mplayer2" || type === "application/asx") return "Flip4Mac";
-    if(/x-pn/.test(type)) return "Real";
-    if(type === "application/x-director") return "Shockwave";
-    if(type === "application/vnd.unity") return "Unity";
-    type = type.split(";")[0];
-    if(type === "video/divx") return "DivX";
-    return type.split("/")[1];
-}
-

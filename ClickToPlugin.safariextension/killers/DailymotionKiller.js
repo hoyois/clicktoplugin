@@ -1,7 +1,7 @@
 function DailymotionKiller() {}
 
 DailymotionKiller.prototype.canKill = function(data) {
-    if(data.plugin != "Flash") return false;
+    if(data.plugin !== "Flash") return false;
     return (data.src.indexOf("/dmplayerv4/") != -1 || data.src.indexOf("www.dailymotion.com") != -1);
 };
 

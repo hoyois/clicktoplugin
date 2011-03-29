@@ -1,7 +1,7 @@
 function BreakKiller() {}
 
 BreakKiller.prototype.canKill = function(data) {
-    if(data.plugin != "Flash") return false;
+    if(data.plugin !== "Flash") return false;
     if(data.src.indexOf(".break.com/static/") != -1) {data.onsite = true; return true;}
     if(data.src.indexOf("embed.break.com/") != -1) {data.onsite = false; return true;}
     return false;
@@ -59,7 +59,7 @@ BreakKiller.prototype.processElement = function(data, callback) {
         }
         matches = xhr.responseText.match(/!!!&amp;body=(.*?)%0d/);
         if(matches) title = decodeURIComponent(matches[1]);
-        if(!data.onsite || data.location === "http://www.break.com/") siteInfo = {"name": "Break.com", "url": url};
+        if(!data.onsite || data.location === "http://www.break.com/") siteInfo = {"name": "Break", "url": url};
         
         var videoData = {
             "playlist": [{"mediaType": "video", "title": title, "posterURL": posterURL, "sources": sources, "siteInfo": siteInfo}]

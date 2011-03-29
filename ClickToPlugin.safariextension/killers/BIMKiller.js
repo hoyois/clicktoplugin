@@ -1,7 +1,7 @@
-function BIMKiller() {}
+function BIMKiller() {this.index = 2;}
 
 BIMKiller.prototype.canKill = function(data) {
-    if(data.plugin != "Flash") return false;
+    if(data.plugin !== "Flash") return false;
     return (/bimVideoPlayer[^\/.]*\.swf$/.test(data.src) && hasFlashVariable(data.params, "mediaXML"));
 };
 

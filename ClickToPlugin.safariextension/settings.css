@@ -1,0 +1,180 @@
+* {
+    font: -webkit-control;
+    -webkit-user-select: none;
+    cursor: default;
+}
+
+body {
+    margin: 20px;
+    /*display: none;*/
+}
+
+#main {
+    border: 1px solid #9B9B9B;
+    background-color: #EDEDED;
+    min-width: 800px;
+}
+
+#aux {
+    display: inline-block;
+    position: absolute;
+    top: -100px;
+    bottom: -100px;
+    visibility: hidden;
+}
+
+span.local {
+    display: none;
+}
+
+span.left {
+    display: inline-block;
+    width: 300px;
+    text-align: right;
+    margin-right: 7px;
+}
+
+span.right {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+span.right.sub {
+    margin-left: 18px;
+}
+
+.tip {
+    display: inline-block;
+    font: -webkit-small-control;
+    font-size: 10px;
+    line-height: 15px;
+    white-space: normal;
+}
+
+nav {
+    display: block;
+    background: -webkit-gradient(linear, left top, left bottom, from(#D0D0D0), to(#A7A7A7));
+    height: 22px;
+    border-bottom: 1px solid #515151;
+}
+
+nav ul {
+    margin: 0;
+}
+
+nav ul li {
+    display: inline-block;
+    float: left;
+    padding: 0;
+    margin: 0;
+    height: 22px;
+}
+
+nav ul li.selected {
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#9B9B9B), to(#515151));
+    padding: 0 1px;
+}
+
+nav ul li#plugins_tab.selected {
+    padding-left: 0;
+}
+
+li span.tab {
+    display: block;
+    padding: 3px 6px;
+    cursor: pointer;
+    border-bottom: 1px solid #515151;
+}
+
+li.selected span.tab {
+    padding: 3px 5px;
+    background-color: #EDEDED;
+    border-bottom-color: #EDEDED;
+}
+
+li#plugins_tab.selected span.tab {
+    padding: 3px 5px 3px 6px;
+    border-left-style: none;
+}
+
+li.glue {
+    height: 13px;
+}
+
+menu, ul {
+    -webkit-padding-start: 0px;
+    list-style-type: none;
+}
+
+section {
+    display: none;
+    clear: left;
+}
+
+section.selected {
+    display: block;
+}
+
+textarea, input[type="text"], input[type="number"] {
+    -webkit-appearance: textfield;
+    -webkit-user-select: text;
+    margin-left: 0;
+}
+
+input.keyboard {
+    text-align: center;
+    width: 135px;
+}
+
+input[type="number"]::-webkit-outer-spin-button {
+    
+}
+
+textarea {
+     margin: 2px 0;
+     vertical-align: top;
+}
+
+span.left.textarea {
+    margin-top: 5px;
+    vertical-align: top;
+}
+
+textarea, select, input[type="range"] {
+    width: 300px;
+}
+
+input[type="range"] {
+    vertical-align: middle;
+}
+
+input[type="checkbox"] {
+    font-size: 20px;
+    margin: 3px 4px 3px 0;
+}
+
+input[type="button"] {
+    height: 13px;
+}
+
+span.mouse {
+    display: inline-block;
+    vertical-align: -5px;
+    width: 20px;
+    height: 20px;
+    margin-left: 5px;
+    padding: 0;
+    background-color: #A7A7A7;
+}
+
+span.mouse.disabled {
+    visibility: hidden;
+}
+
+input.shortcut_clear {
+    margin-left: 6px;
+}
+
+select {
+    font-size: 20px;
+}

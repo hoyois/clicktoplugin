@@ -2,6 +2,8 @@
 ClickToPlugin global scope
 *************************/
 
+if(!safari) return; // WTF?
+
 var blockedElements = new Array(); // array containing the blocked HTML elements
 var blockedData = new Array(); // array containing info on the blocked element (plugin, dimension, source, ...)
 var placeholderElements = new Array(); // array containing the corresponding placeholder elements
@@ -25,21 +27,19 @@ document.addEventListener("contextmenu", function(event) {
     safari.self.tab.setContextMenuEventUserInfo(event, {"instance": instance, "location": window.location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length, "invisible": this.getElementsByClassName("CTFinvisible").length});
 }, false);
 
-document.addEventListener("keypress", function(event) {
-    if(event.keyCode === 1 && event.metaKey && event.ctrlKey) safari.self.tab.dispatchMessage("loadAll", "");
-}, false);
 
 function clearAll(elementID) {
-    blockedElements[elementID] = null;
-    blockedData[elementID] = null;
-    placeholderElements[elementID] = null;
-    mediaPlayers[elementID] = null;
+    delete blockedElements[elementID];
+    delete blockedData[elementID];
+    delete placeholderElements[elementID];
+    delete mediaPlayers[elementID];
 }
 
 function respondToMessage(event) {
     switch(event.name) {
         case "mediaData":
             if(event.message.instance !== instance) return; // ignore message from other instances
+            if(event.message.plugin) blockedData[event.message.elementID].plugin = event.message.plugin;
             prepMedia(event.message);
             break;
         case "loadContent":
@@ -48,8 +48,12 @@ function respondToMessage(event) {
                 case "plugin":
                     loadPluginForElement(event.message.elementID);
                     break;
+                case "changeLabel":
+                    blockedData[event.message.elementID].plugin = event.message.plugin;
+                    if(placeholderElements[event.message.elementID] && !mediaPlayers[event.message.elementID]) displayBadge(event.message.plugin, event.message.elementID);
+                    break;
                 case "remove":
-                    removeElement(event.message.elementID);
+                    hideElement(event.message.elementID);
                     break;
                 case "reload":
                     reloadInPlugin(event.message.elementID);
@@ -72,7 +76,8 @@ function respondToMessage(event) {
             }
             break;
         case "loadAll":
-            loadAll();
+            if(event.message) loadAll();
+            else hideAll();
             break;
         case "loadSource":
             loadSource(event.message);
@@ -80,11 +85,11 @@ function respondToMessage(event) {
         case "loadLocation":
             if(window.location.href.indexOf(event.message) !== -1) loadAll();
             break;
-        case "updateVolume":
-            setVolumeTo(event.message);
+        case "hideSource":
+            hideSource(event.message);
             break;
-        case "updateOpacity":
-            setOpacityTo(event.message);
+        case "hideLocation":
+            if(window.location.href.indexOf(event.message) !== -1) hideAll();
             break;
     }
 }
@@ -112,7 +117,7 @@ function handleBeforeLoadEvent(event) {
     // flash element must not be blocked
     if (element.allowedToLoad) return;
     
-    if (!(element instanceof HTMLObjectElement || element instanceof HTMLEmbedElement || element instanceof HTMLImageElement)) return;
+    if (!(element instanceof HTMLObjectElement || element instanceof HTMLEmbedElement)) return;
     
     var data = getAttributes(element, event.url);
     /* PROBLEM: elements within display:none iframes fire beforeload events, and the following is incorrect
@@ -120,7 +125,7 @@ function handleBeforeLoadEvent(event) {
     to handle px and %), which might be possible using getMatchedCSSRules (returns matching rules in cascading order)
     The 'auto' value will be a problem...
     status: still see no feasible solution to this problem...*/
-    data.nodeName = element.nodeName;
+    data.url = event.url;
     data.width = element.offsetWidth;
     data.height = element.offsetHeight;
     data.location = window.location.href;
@@ -128,6 +133,11 @@ function handleBeforeLoadEvent(event) {
     
     var responseData = safari.self.tab.canLoad(event, data);
     if(responseData === true) return; // whitelisted
+    if(responseData === false) { // hide plugin
+        event.preventDefault();
+        removeHTMLNode(element);
+        return;
+    }
     
     // Load the user settings
     if(settings === null) {
@@ -136,7 +146,7 @@ function handleBeforeLoadEvent(event) {
     
     // Deal with sIFR Flash
     if (element.className === "sIFR-flash" || element.hasAttribute("sifr")) {
-        if (settings.sIFRAutoload) return;
+        if (settings.sIFRPolicy === "autoload") return;
     }
     
     // At this point we know we have to block 'element' from loading
@@ -145,6 +155,7 @@ function handleBeforeLoadEvent(event) {
     // Give an address to this CTP instance to receive messages
     if(instance === null) {
         instance = safari.self.tab.canLoad(event, "getInstance");
+        registerGlobalShortcuts();
     }
     
     // BEGIN DEBUG
@@ -153,7 +164,7 @@ function handleBeforeLoadEvent(event) {
         do {
             positionX += e.offsetLeft; positionY += e.offsetTop;
         } while(e = e.offsetParent);
-        if(!confirm("ClickToPlugin is about to block element " + instance + "." + elementID + ":\n" + "\nType: " + responseData.plugin + "\nLocation: " + window.location.href + "\nSource: " + data.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + data.width + "x" + data.height)) return;
+        if(!confirm("ClickToPlugin is about to block element " + instance + "." + elementID + ":\n" + "\nType: " + (responseData.plugin ? responseData.plugin : "?") + "\nLocation: " + window.location.href + "\nSource: " + data.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + data.width + "x" + data.height)) return;
     }
     // END DEBUG
     
@@ -165,10 +176,11 @@ function handleBeforeLoadEvent(event) {
     // Create the placeholder element
     var placeholderElement = document.createElement("div");
     if(settings.showTooltip) placeholderElement.title = data.src; // tooltip
-    placeholderElement.className = "CTFplaceholder CTFnoimage";
+    placeholderElement.className = "CTFnoimage CTFplaceholder";
     placeholderElement.style.width = data.width + "px !important";
     placeholderElement.style.height = data.height + "px !important";
     placeholderElement.style.opacity = settings.opacity + " !important";
+    if(responseData.isInvisible) placeholderElement.className += " CTFinvisible"; // .classList supported in WK nightlies
     
     // Copy CSS box & positioning properties that have an effect on page layout
     // Note: 'display' is set to 'inline-block', which is always the effective value for 'replaced elements'
@@ -185,6 +197,34 @@ function handleBeforeLoadEvent(event) {
     placeholderElement.style.setProperty("margin-right", style.getPropertyValue("margin-right"), "important");
     placeholderElement.style.setProperty("margin-bottom", style.getPropertyValue("margin-bottom"), "important");
     placeholderElement.style.setProperty("margin-left", style.getPropertyValue("margin-left"), "important");
+    
+    // Fill the main arrays
+    blockedElements[elementID] = element;
+    blockedData[elementID] = data;
+    placeholderElements[elementID] = placeholderElement;
+    
+    // Register shortcuts
+    registerLocalShortcuts(elementID);
+    
+    placeholderElement.addEventListener("click", function(event) {
+        clickPlaceholder(elementID);
+        event.stopPropagation();
+    }, false);
+    placeholderElement.addEventListener("contextmenu", function(event) {
+        var contextInfo = {
+            "instance": instance,
+            "elementID": elementID,
+            "src": data.src,
+            "plugin": blockedData[elementID].plugin // it can change in time
+        };
+        if (mediaPlayers[elementID] && mediaPlayers[elementID].startTrack !== null && mediaPlayers[elementID].playlist[0].defaultSource !== undefined) {
+            mediaPlayers[elementID].setContextInfo(event, contextInfo, null);
+            event.stopPropagation();
+        } else {
+            safari.self.tab.setContextMenuEventUserInfo(event, contextInfo);
+            event.stopPropagation();
+        }
+    }, false);
     
     // Replace the element by the placeholder
     if(element.parentNode && element.parentNode.className !== "CTFnodisplay") {
@@ -209,38 +249,16 @@ function handleBeforeLoadEvent(event) {
         stack.firstChild.firstChild.appendChild(element);
     }
     
-    placeholderElement.addEventListener("click", function(event) {
-        clickPlaceholder(elementID, event.altKey || event.button);
-        event.stopPropagation();
-    }, false);
-    placeholderElement.addEventListener("contextmenu", function(event) {
-        var contextInfo = {
-            "instance": instance,
-            "elementID": elementID,
-            "src": data.src,
-            "plugin": data.plugin
-        };
-        if (mediaPlayers[elementID] && mediaPlayers[elementID].startTrack !== null && mediaPlayers[elementID].playlist[0].defaultSource !== undefined) {
-            mediaPlayers[elementID].setContextInfo(event, contextInfo, null);
-            event.stopPropagation();
-        } else {
-            safari.self.tab.setContextMenuEventUserInfo(event, contextInfo);
-            event.stopPropagation();
-        }
-    }, false);
-    
     // Build the placeholder
     placeholderElement.innerHTML = "<div class=\"CTFplaceholderContainer\"><div class=\"CTFlogoVerticalPosition\"><div class=\"CTFlogoHorizontalPosition\"><div class=\"CTFlogoContainer CTFnodisplay\"><div class=\"CTFlogo\"></div><div class=\"CTFlogo CTFinset\"></div></div></div></div></div>";
-    if(responseData.isInvisible) placeholderElement.firstChild.className += " CTFinvisible";
     
-    // Fill the main arrays
-    blockedElements[elementID] = element;
-    blockedData[elementID] = data;
-    placeholderElements[elementID] = placeholderElement;
     // Display the badge
-    displayBadge(data.plugin, elementID);
+    displayBadge(data.plugin ? data.plugin : "?", elementID);
+    
+    if(!data.plugin) safari.self.tab.dispatchMessage("checkMIMEType", {"instance": instance, "elementID": elementID, "url": event.url});
+    
     // Look for video replacements
-    if(settings.replacePlugins) {
+    if(settings.enabledKillers.length > 0) {
         var elementData = directKill(elementID);
         if(!elementData) { // send to the killers
             // Need to pass the base URL to the killers so that they can resolve URLs, eg. for AJAX requests.
@@ -252,13 +270,13 @@ function handleBeforeLoadEvent(event) {
             elementData = {
                 "instance": instance,
                 "elementID": elementID,
-                "plugin": data.plugin,
+                "plugin": data.plugin ? data.plugin : "Flash",
                 "src": data.src,
                 "location": window.location.href,
                 "title": document.title,
                 "baseURL": tmpAnchor.href,
                 "href": data.href,
-                "params": getParams(element, data.plugin)
+                "params": getParams(blockedElements[elementID], data.plugin)
             };
         }
         safari.self.tab.dispatchMessage("killPlugin", elementData);
@@ -287,6 +305,14 @@ function loadAll() {
     }
 }
 
+function hideAll() {
+    for(var i = 0; i < numberOfBlockedElements; i++) {
+        if(placeholderElements[i]) {
+            hideElement(i);
+        }
+    }
+}
+
 function loadSource(string) {
     for(var i = 0; i < numberOfBlockedElements; i++) {
         if(placeholderElements[i] && blockedData[i].src.indexOf(string) !== -1) {
@@ -295,9 +321,17 @@ function loadSource(string) {
     }
 }
 
+function hideSource(string) {
+    for(var i = 0; i < numberOfBlockedElements; i++) {
+        if(placeholderElements[i] && blockedData[i].src.indexOf(string) !== -1) {
+            hideElement(i);
+        }
+    }
+}
+
 function loadInvisible() {
     for(var i = 0; i < numberOfBlockedElements; i++) {
-        if(placeholderElements[i] && placeholderElements[i].firstChild.className === "CTFplaceholderContainer CTFinvisible") {
+        if(placeholderElements[i] && /CTFinvisible/.test(placeholderElements[i].className)) {
             loadPluginForElement(i);
         }
     }
@@ -316,19 +350,19 @@ function prepMedia(mediaData) {
 
     // Check if we should load video at once
     if(mediaData.autoload) {
-        loadMediaForElement(elementID, null);
+        loadMediaForElement(elementID, null, mediaData.autoplay);
         return;
     }
     if(settings.showPoster && mediaData.playlist[0].posterURL) {
         // show poster as background image
         placeholderElements[elementID].style.opacity = "1 !important";
         placeholderElements[elementID].style.backgroundImage = "url('" + mediaData.playlist[0].posterURL + "') !important";
-        placeholderElements[elementID].className = "CTFplaceholder"; // remove 'noimage' class
+        placeholderElements[elementID].className = placeholderElements[elementID].className.substr(11); // remove 'noimage' class
     }
     if(mediaData.playlist[0].title && settings.showMediaTooltip) placeholderElements[elementID].title = mediaData.playlist[0].title; // set tooltip
     else placeholderElements[elementID].removeAttribute("title");
     
-    if(settings.useSourceSelector) {
+    if(settings.showSourceSelector) {
         var hasSourceSelector = initializeSourceSelector(elementID, mediaData.playlist[0].sources, mediaData.playlist[0].defaultSource);
     }
     
@@ -340,7 +374,7 @@ function initializeSourceSelector(elementID, sources, defaultSource) {
     if(sources.length === 0) return false;
     var loadPlugin = function(event) {loadPluginForElement(elementID);};
     var viewInQTP = defaultSource === undefined ? undefined : function(event) {viewInQuickTimePlayer(elementID, defaultSource);};
-    var handleClickEvent = function(event, source) {loadMediaForElement(elementID, source);};
+    var handleClickEvent = function(event, source) {loadMediaForElement(elementID, source, true);};
     var handleContextMenuEvent = function(event, source) {
         var contextInfo = {
             "instance": instance,
@@ -361,13 +395,13 @@ function initializeSourceSelector(elementID, sources, defaultSource) {
     return selector.unhide(blockedData[elementID].width, blockedData[elementID].height);
 }
 
-function loadMediaForElement(elementID, source) {
+function loadMediaForElement(elementID, source, autoplay) {
     if(source === null) source = mediaPlayers[elementID].playlist[0].defaultSource;
     if(source === undefined) {
         loadPluginForElement(elementID);
         return;
     }
-    if(settings.defaultPlayer === "qtp") {
+    if(settings.defaultPlayer === "qtp") { // PROBLEM
         viewInQuickTimePlayer(elementID);
         return;
     }
@@ -383,8 +417,10 @@ function loadMediaForElement(elementID, source) {
     
     // Replace placeholder and load first track
     placeholderElements[elementID].parentNode.replaceChild(mediaPlayers[elementID].containerElement, placeholderElements[elementID]);
-    mediaPlayers[elementID].loadTrack(0, source);
-    placeholderElements[elementID] = null;
+    mediaPlayers[elementID].containerElement.focus(); // use a manual isInFocus property instead??
+    //setTimeout(function(){mediaPlayers[elementID].containerElement.blur();}, 10000);
+    mediaPlayers[elementID].loadTrack(0, source, autoplay);
+    delete placeholderElements[elementID];
 }
 
 function downloadMedia(elementID, source) {
@@ -426,24 +462,19 @@ function viewInQuickTimePlayer(elementID, source) {
     setTimeout(function() {element.removeChild(QTObject);}, 1000);
 }
 
-function setVolumeTo(volume) {
+function changeVolume(diff) {
     for(var i = 0; i < numberOfBlockedElements; i++) {
-        if(mediaPlayers[i] && mediaPlayers[i].mediaElement) mediaPlayers[i].mediaElement.volume = volume;
+        if(mediaPlayers[i] && mediaPlayers[i].mediaElement) {
+            var newVolume = mediaPlayers[i].mediaElement.volume + diff;
+            if(newVolume < 0) newVolume = 0;
+            else if(newVolume > 1) newVolume = 1;
+            mediaPlayers[i].mediaElement.volume = newVolume;
+        }
     }
 }
 
-function setOpacityTo(opacity) {
-    for(var i = 0; i < numberOfBlockedElements; i++) {
-        if(placeholderElements[i] && placeholderElements[i].className === "CTFplaceholder CTFnoimage") placeholderElements[i].style.opacity = opacity + " !important";
-    }
-}
-
-function removeElement(elementID) {
-    var element = placeholderElements[elementID];
-    while(element.parentNode.childNodes.length === 1) {
-        element = element.parentNode;
-    }
-    element.parentNode.removeChild(element);
+function hideElement(elementID) {
+    removeHTMLNode(placeholderElements[elementID]);
     clearAll(elementID);
 }
 
@@ -504,11 +535,35 @@ function unhideLogo(elementID, i) {
     }
 }
 
-function clickPlaceholder(elementID, usePlugin) {
-    if (!usePlugin && mediaPlayers[elementID] && mediaPlayers[elementID].startTrack !== null) {
-        loadMediaForElement(elementID, null);
+function clickPlaceholder(elementID) {
+    if (mediaPlayers[elementID] && mediaPlayers[elementID].startTrack !== null) {
+        loadMediaForElement(elementID, null, true);
     } else {
         loadPluginForElement(elementID);
+    }
+}
+
+function registerGlobalShortcuts() {
+    if(settings.loadAllShortcut) {
+        document.addEventListener(settings.loadAllShortcut.type, function(event) {
+            if(testShortcut(event, settings.loadAllShortcut)) safari.self.tab.dispatchMessage("loadAll", true);
+        }, false);
+    }
+    if(settings.hideAllShortcut) {
+        document.addEventListener(settings.hideAllShortcut.type, function(event) {
+            if(testShortcut(event, settings.hideAllShortcut)) safari.self.tab.dispatchMessage("loadAll", false);
+        }, false);
+    }
+}
+
+function registerLocalShortcuts(elementID) {
+    if(settings.hidePluginShortcut) {
+        placeholderElements[elementID].addEventListener(settings.hidePluginShortcut.type, function(event) {
+            if(testShortcut(event, settings.hidePluginShortcut)) {
+                hideElement(elementID);
+                event.stopImmediatePropagation();
+            }
+        }, false);
     }
 }
 
@@ -516,7 +571,7 @@ function clickPlaceholder(elementID, usePlugin) {
 function directKill(elementID) {
     var mediaElements = blockedElements[elementID].getElementsByTagName("video");
     var audioElements = blockedElements[elementID].getElementsByTagName("audio");
-    var mediaType = null;
+    var mediaType;
     if(mediaElements.length === 0) {
         if(audioElements.length === 0) return false;
         else mediaType = "audio";

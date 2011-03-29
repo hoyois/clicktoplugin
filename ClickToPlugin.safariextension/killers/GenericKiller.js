@@ -1,11 +1,11 @@
 function GenericKiller() {}
 
 GenericKiller.prototype.canKill = function(data) {
-    if(data.plugin != "Flash") return false;
+    if(data.plugin !== "Flash") return false;
     var matches = data.params.match(/(?:^|&)(file|load|playlistfile|src|mp3|mp3url|soundFile|url|file_url)=/);
     if(matches) {data.file = matches[1]; return true;}
     // other video flashvars: wmvUrl/flvUrl (gvideoplayer.swf)
-    matches = data.src.match(/[?&](file|playlist_url)=/);
+    matches = data.src.match(/[?&](file|mp3|playlist_url)=/);
     if(matches) {data.hash = matches[1]; return true;}
     return false;
 };

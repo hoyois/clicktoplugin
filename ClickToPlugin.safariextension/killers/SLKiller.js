@@ -1,4 +1,4 @@
-function SLKiller() {}
+function SLKiller() {this.index = 6;}
 
 SLKiller.prototype.canKill = function(data) {
     if(!data.plugin == "Silverlight") return false;
