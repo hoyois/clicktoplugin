@@ -2,7 +2,7 @@ function MetacafeKiller() {}
 
 MetacafeKiller.prototype.canKill = function(data) {
     if(data.plugin !== "Flash") return false;
-    return (data.src.indexOf(".mcstatic.com/Flash/vp/") != -1 || data.src.indexOf("metacafe.com/fplayer/") != -1);
+    return (data.src.indexOf(".mcstatic.com/Flash/vp/") !== -1 || data.src.indexOf("metacafe.com/fplayer/") !== -1);
 };
 
 MetacafeKiller.prototype.processElement = function(data, callback) {

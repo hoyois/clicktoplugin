@@ -55,7 +55,7 @@ YouTubeKiller.prototype.buildVideoIDList = function(flashvars, documentTitle, lo
         }
         var links = xhr.responseXML.getElementsByTagName("link");
         for(var j = 0; j < links.length; j++) {
-            if(links[j].getAttribute("rel") == "next") {
+            if(links[j].getAttribute("rel") === "next") {
                 _this.buildVideoIDList(flashvars, documentTitle, location, playlistID, ++i, videoIDList, callback);
                 return;
             }
@@ -72,7 +72,7 @@ YouTubeKiller.prototype.buildVideoIDList = function(flashvars, documentTitle, lo
                 flashvars = null;
             }
             for(var j = 0; j < videoIDList.length; j++) {
-                if(videoIDList[0] == videoID) {track = j; break;}
+                if(videoIDList[0] === videoID) {track = j; break;}
                 videoIDList.push(videoIDList.shift());
             }
         }
@@ -93,7 +93,7 @@ YouTubeKiller.prototype.buildVideoIDList = function(flashvars, documentTitle, lo
 };
 
 YouTubeKiller.prototype.buildPlaylist = function(videoIDList, playlistID, isFirst, n, callback) {
-    if(videoIDList.length == 0) return;
+    if(videoIDList.length === 0) return;
     var j = 0;
     var jmax = videoIDList.length;
     if(isFirst) {if(jmax > n-1) jmax = n-1;}
@@ -109,7 +109,7 @@ YouTubeKiller.prototype.buildPlaylist = function(videoIDList, playlistID, isFirs
             ++mediaData.missed;
         }
         ++j;
-        if(j == jmax) {
+        if(j === jmax) {
             callback(mediaData);
             _this.buildPlaylist(videoIDList, playlistID, false, n, callback);
         } else _this.processElementFromVideoID(videoIDList.shift(), next);

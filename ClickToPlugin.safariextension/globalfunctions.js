@@ -112,7 +112,6 @@ function canPlaySrcWithHTML5(url) {
 }
 
 function chooseDefaultSource(sourceArray) {
-    if(safari.extension.settings.defaultPlayer === "plugin") return undefined;
     var defaultSource;
     var hasNativeSource = false;
     var resolutionMap = new Array();
@@ -142,6 +141,7 @@ function chooseDefaultSource(sourceArray) {
 
 function makeLabel(source, mediaType) {
     if(!source) return false; // the injected script will take care of the label
+    if(safari.extension.settings.defaultPlayer === "plugin") return false;
     if(safari.extension.settings.defaultPlayer === "qtp") return "QTP";
     if(mediaType === "audio") return "Audio";
     var prefix = "";
@@ -155,7 +155,7 @@ const nativeTypes = ["image/svg+xml", "image/png", "image/tiff", "image/gif", "i
 const nativeExts = ["svg", "png", "tif", "tiff", "gif", "jpg", "jpeg", "jp2", "ico", "pdf", "html", "xml"];
 function isNativeType(MIMEType) {
     for(var i = 0; i < 10; i++) {
-        if(MIMEType == nativeTypes[i]) return true;
+        if(MIMEType === nativeTypes[i]) return true;
     }
     return false;
 }
@@ -274,7 +274,7 @@ function getTypeFromDataURI(url) {
 function getPluginForType(type) { // type is a string
     for(var i = 0; i < navigator.plugins.length; i++) {
         for(var j = 0; j < navigator.plugins[i].length; j++) {
-            if(navigator.plugins[i][j].type == type) return navigator.plugins[i];
+            if(navigator.plugins[i][j].type === type) return navigator.plugins[i];
         }
     }
     return false;
@@ -286,7 +286,7 @@ function getPluginAndTypeForExt(ext) {
         for(var j = 0; j < navigator.plugins[i].length; j++) {
             suffixes = navigator.plugins[i][j].suffixes.split(",");
             for(var k = 0; k < suffixes.length; k++) {
-                if(ext == suffixes[k]) return {"plugin": navigator.plugins[i], "type": navigator.plugins[i][j].type};
+                if(ext === suffixes[k]) return {"plugin": navigator.plugins[i], "type": navigator.plugins[i][j].type};
             }
         }
     }
@@ -297,9 +297,9 @@ function getPluginName(plugin, type) {
     if(plugin) {
         if(plugin.name === "Shockwave Flash") return "Flash";
         if(plugin.name === "Silverlight Plug-In") return "Silverlight";
-        if(plugin.name.indexOf("Java") != -1) return "Java";
-        if(plugin.name.indexOf("QuickTime") != -1) return "QuickTime";
-        if(plugin.name.indexOf("Flip4Mac") != -1) return "Flip4Mac";
+        if(plugin.name.indexOf("Java") !== -1) return "Java";
+        if(plugin.name.indexOf("QuickTime") !== -1) return "QuickTime";
+        if(plugin.name.indexOf("Flip4Mac") !== -1) return "Flip4Mac";
         if(plugin.name === "iPhotoPhotocast") return "iPhoto";
         if(plugin.name === "Quartz Composer Plug-In") return "Quartz";
         if(plugin.name === "VideoLAN VLC Plug-in") return "VLC";

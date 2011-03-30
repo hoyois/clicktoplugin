@@ -54,13 +54,13 @@ if(/\+/.test(navigator.appVersion)) {
 // Plugins list
 var pluginList = sections[0].getElementsByTagName("menu")[0];
 if(navigator.plugins.length === 0) {
-    pluginList.innerHTML = "<li><span class=\"left\">You currently have no enabled plugins!</span></li>";
+    pluginList.innerHTML = "<li><span>" + NO_PLUGINS_NOTICE + "</span></li>";
 } else {
     for(var i = 0; i < navigator.plugins.length || i < 2; i++) {
         var li = document.createElement("li");
         var title = "";
         if(navigator.plugins[i]) title = navigator.plugins[i].description.replace(/\"/g, "");
-        li.innerHTML = "<span class=\"left\">" + (i === 0 ? (ALLOW_THESE_PLUGINS + ":") : i === 1 ? "<input id=\"plugins_reset\" type=\"button\" value=\"" + CLEAR_BUTTON + "\"/><input id=\"plugins_toggle\" type=\"button\" value=\"" + TOGGLE_BUTTON + "\"/>" : "") + "</span><span class=\"right\" title=\"" + title + "\">" + (navigator.plugins[i] ? ("<input id=\"plugin" + i + "\" class=\"plugin\" type=\"checkbox\"/><label for=\"plugin" + i + "\">" + navigator.plugins[i].name + "</label>") : "") + "</span>";
+        li.innerHTML = "<span class=\"left\">" + (i === 0 ? (ALLOW_THESE_PLUGINS + ":") : i === 1 ? "<input id=\"plugins_reset\" type=\"button\" value=\"" + DESELECT_ALL_BUTTON + "\"/><input id=\"plugins_toggle\" type=\"button\" value=\"" + TOGGLE_BUTTON + "\"/>" : "") + "</span><span class=\"right\" title=\"" + title + "\">" + (navigator.plugins[i] ? ("<input id=\"plugin" + i + "\" class=\"plugin\" type=\"checkbox\"/><label for=\"plugin" + i + "\">" + navigator.plugins[i].name + "</label>") : "") + "</span>";
         pluginList.appendChild(li);
     }
     document.getElementById("plugins_toggle").addEventListener("click", function() {
@@ -273,6 +273,9 @@ function parseKeyID(keyID) {
             case 127: return "\u2326";
             default: return String.fromCharCode(code);
         }
+    }
+    if(keyID.charAt(0) === "F") {
+        return "[F" + keyID.substr(1) + "]";
     }
     switch(keyID) {
         case "Enter": return "\u2305";

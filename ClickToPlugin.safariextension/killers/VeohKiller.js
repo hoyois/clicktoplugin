@@ -2,7 +2,7 @@ function VeohKiller() {}
 
 VeohKiller.prototype.canKill = function(data) {
     if(data.plugin !== "Flash") return false;
-    return (data.src.indexOf("veoh.com/static/swf/webplayer") != -1 || data.src.indexOf("veohplayer.swf") != -1);
+    return (data.src.indexOf("veoh.com/static/swf/webplayer") !== -1 || data.src.indexOf("veohplayer.swf") !== -1);
 };
 
 VeohKiller.prototype.processElement = function(data, callback) {

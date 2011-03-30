@@ -18,7 +18,7 @@ const STRINGS = {
     },
     WHITELISTS_TAB: {
         "en-us": "Control lists",
-        "fr-fr": "Listes blanches"
+        "fr-fr": "Listes de contrôle"
     },
     KILLERS_TAB: {
         "en-us": "Killers",
@@ -40,11 +40,7 @@ const STRINGS = {
         "en-us": "Miscellaneous",
         "fr-fr": "Divers"
     },
-
-    CLEAR_BUTTON: {
-        "en-us": "Clear",
-        "fr-fr": "Aucun"
-    },
+    
     TOGGLE_BUTTON: {
         "en-us": "Toggle",
         "fr-fr": "Inverser"
@@ -53,10 +49,22 @@ const STRINGS = {
         "en-us": "Select All",
         "fr-fr": "Tout sélectionner"
     },
-
+    DESELECT_ALL_BUTTON: {
+        "en-us": "Clear",
+        "fr-fr": "Aucun"
+    },
+    CLEAR_BUTTON: {
+        "en-us": "Clear",
+        "fr-fr": "Effacer"
+    },
+    
     ALLOW_THESE_PLUGINS: {
         "en-us": "Allow these plugins",
         "fr-fr": "Autoriser ces plugins"
+    },
+    NO_PLUGINS_NOTICE: {
+        "en-us": "You currently have no enabled plugins!",
+        "fr-fr": "Aucun plugin actif!"
     },
     ALLOW_LOCATIONS: {
         "en-us": "Allow plugins on these sites",
@@ -85,6 +93,10 @@ const STRINGS = {
     ENABLE_THESE_KILLERS: {
         "en-us": "Enable these killers",
         "fr-fr": "Activer ces assassins"
+    },
+    USE_FALLBACK_MEDIA: {
+        "en-us": "Use media fallbacks",
+        "fr-fr": "Utiliser les replis HTML5"
     },
     SHOW_SOURCE_SELECTOR: {
         "en-us": "Show list of available sources",
@@ -115,7 +127,7 @@ const STRINGS = {
         "fr-fr": "Afficher le controlleur de volume"
     },
     HIDE_REWIND_BUTTON: {
-        "en-us": "Hide rewind button",
+        "en-us": "Hide ‘Rewind’ button",
         "fr-fr": "Supprimer le bouton « Rembobiner 30 secondes »"
     },
     AUTOLOAD_MEDIA_PLAYER: {
@@ -233,7 +245,7 @@ const STRINGS = {
     },
     HIDE_PLUGIN_SHORTCUT: {
         "en-us": "Hide targeted plugin",
-        "fr-fr": "Masquer plugin"
+        "fr-fr": "Masquer le plugin ciblé"
     },
     PLAY_PAUSE_SHORTCUT: {
         "en-us": "Play/pause",
@@ -267,33 +279,9 @@ const STRINGS = {
         "en-us": "Show/hide track title",
         "fr-fr": "Afficher/masquer le titre"
     },
-    MOUSE_GESTURE: {
-        "en-us": "Mouse activation",
-        "fr-fr": "???"
-    },
-    MOUSE_CLICK: {
-        "en-us": "Click",
-        "fr-fr": "Clique simple"
-    },
-    MOUSE_DOUBLE_CLICK: {
-        "en-us": "Double click",
-        "fr-fr": "Clique double"
-    },
-    MOUSE_MIDDLE_CLICK: {
-        "en-us": "Middle click",
-        "fr-fr": "Clique milieu??"
-    },
-    MOUSE_SCROLL_UP: {
-        "en-us": "Scroll up",
-        "fr-fr": "??"
-    },
-    MOUSE_SCROLL_DOWN: {
-        "en-us": "Scroll down",
-        "fr-fr": "??"
-    },
     PLACEHOLDER_OPACITY: {
         "en-us": "Placeholder opacity",
-        "fr-fr": "Transparence"
+        "fr-fr": "Transparence des boîtes de remplacement"
     },
     SIFR_POLICY: {
         "en-us": "sIFR text policy",
@@ -335,10 +323,6 @@ const STRINGS = {
         "en-us": "Use with the YouTube5 extension",
         "fr-fr": "Utiliser avec l'extension YouTube5"
     },
-    YT5_COMPATIBILITY_TIP: {
-        "en-us": "If using YouTube5 for YouTube or Vimeo videos, you must also disable the corresponding killers.",
-        "fr-fr": "Si vous utilisez YouTube5 pour YouTube ou Vimeo, vous devez aussi désactiver les assassins correspondants."
-    },
     
     // Context menu items
     PLUGIN_GENERIC: {
@@ -369,32 +353,24 @@ const STRINGS = {
         "en-us": "Hide All Plugins",
         "fr-fr": "Masquer tous les plugins"
     },
-    ADD_TO_LOC_WHITELIST: {
-        "en-us": "Add Location to Whitelist",
-        "fr-fr": "Ajouter à la liste blanche"
-    },
     ALWAYS_ALLOW_ON_DOMAIN: {
-        "en-us": "Allow plugins on this domain",
+        "en-us": "Allow Plugins on Domain",
         "fr-fr": "Autoriser les plugins sur ce domaine"
     },
     ALWAYS_BLOCK_ON_DOMAIN: {
-        "en-us": "Block plugins on this domain",
+        "en-us": "Block Plugins on Domain",
         "fr-fr": "Bloquer les plugins sur ce domaine"
     },
-    ADD_TO_SRC_WHITELIST: {
-        "en-us": "Add Source to Whitelist",
-        "fr-fr": "Ajouter à la liste blanche"
-    },
     ALWAYS_ALLOW_SOURCE: {
-        "en-us": "Always allow",
+        "en-us": "Always Allow",
         "fr-fr": "Toujours autoriser"
     },
     ALWAYS_HIDE_ON_DOMAIN: {
-        "en-us": "Hide plugins on this domain",
+        "en-us": "Hide Plugins on Domain",
         "fr-fr": "Masquer les plugins sur ce domaine"
     },
     ALWAYS_SHOW_ON_DOMAIN: {
-        "en-us": "Show plugins on this domain",
+        "en-us": "Show Plugins on Domain",
         "fr-fr": "Afficher les plugins sur ce domaine"
     },
     ALWAYS_HIDE_SOURCE: {

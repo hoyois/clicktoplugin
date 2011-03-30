@@ -1,7 +1,7 @@
 function SLKiller() {this.index = 6;}
 
 SLKiller.prototype.canKill = function(data) {
-    if(!data.plugin == "Silverlight") return false;
+    if(!data.plugin === "Silverlight") return false;
     if(hasSLVariable(data.params, "m")) {data.file = "m"; return true;}
     if(hasSLVariable(data.params, "fileurl")) {data.file = "fileurl"; return true;}
     if(hasSLVariable(data.params, "mediaurl")) {data.file = "mediaurl"; return true;}
