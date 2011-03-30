@@ -427,8 +427,9 @@ mediaPlayer.prototype.registerShortcuts = function() {
 
 mediaPlayer.prototype.addEventListener = function(type, handler) {
     if(type === "click" || type === "dblclick") { // ignore clicks on controls
+        var _this = this;
         this.containerElement.addEventListener(type, function(event) {
-            if(!(event.target === this || event.target.hasAttribute("controls")) || event.offsetY + 25 > this.offsetHeight) return;
+            if(!(event.target === this || event.target.hasAttribute("controls")) || event.offsetY + _this.mediaElement.offsetTop + 25 > _this.height) return;
             handler(event);
         }, false);
     } else {
