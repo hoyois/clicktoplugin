@@ -1,13 +1,13 @@
 // UPDATE
-if(false){//safari.extension.settings.version < 8) {
-    alert("ClickToPlugin 2.2b Release Notes\n\n--- New Features ---\n\n\u2022 The extension\u2019s settings are now on their own HTML page accessible through the context menu\n\u2022 Perfected plugin detection by using MIME type sniffing as a last resort, following WebKit's internal mechanism\n\u2022 New blacklists and context menu item to permanently hide plugins\n\u2022 Playlist controls are integrated to the main controls\n\u2022 Safari's incomplete volume slider for HTML5 media elements can be used (use the WebKit nightlies for the finalized volume slider)\n\u2022 Customizable keyboard and mouse shortcuts for media playback and other actions\n\u2022 All localizations will now be bundled within the same extension\n\n--- Fixed Bugs ---\n\n\u2022 Fixed HTML5 video aspect ratio issues using shadow DOM styling\n\u2022 Fixed Megavideo killer");
+if(!safari.extension.settings.version || safari.extension.settings.version < 8) {
+    alert("ClickToPlugin 2.2b Release Notes\n\n--- New Features ---\n\n\u2022 The extension\u2019s settings are now on their own HTML page accessible through the context menu\n\u2022 Perfected plugin detection by using MIME type sniffing as a last resort, following WebKit's internal mechanism\n\u2022 New blacklists and context menu item to permanently hide plugins\n\u2022 Customizable keyboard and mouse shortcuts for media playback and other actions\n\u2022 Playlist controls are integrated to the main controls\n\u2022 Safari's incomplete volume slider for HTML5 media elements can be used (use the WebKit nightlies for the finalized volume slider)\n\u2022 The title of the video appears in the controls while loading\n\u2022 All localizations will now be bundled within the same extension\n\n--- Fixed Bugs ---\n\n\u2022 Fixed HTML5 video aspect ratio issues using shadow DOM styling\n\u2022 Fixed Megavideo killer");
 }
 safari.extension.settings.version = 8;
 
 // SETTINGS
-const allSettings = ["allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "codecsPolicy", "volume", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+const allSettings = ["allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "useFallbackMedia", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "codecsPolicy", "volume", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
 
-const injectedSettings = ["enabledKillers", "showSourceSelector", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "volume", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+const injectedSettings = ["enabledKillers", "useFallbackMedia", "showSourceSelector", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "volume", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
 
 function getSettings(array) {
     var s = new Object();
@@ -117,25 +117,17 @@ function blockOrAllow(data) {
         // We can't do that now within the canLoad, but we'll do it later
     } catch(e) {}
     
-    if(plugin) {
-        if(isAllowed(plugin)) return true;
-        plugin = getPluginName(plugin, type);
-    }
+    if(plugin && isAllowed(plugin)) return true;
     
     // At this point we know we should block the element
-
+    
     // Exception: ask the user what to do if a QT object would launch QTP
     if(data.autohref && data.target === "quicktimeplayer" && data.href) {
         if(data.className === "CTFallowedToLoad") return true; // for other extensions with open-in-QTP functionality
         if(confirm(QT_CONFIRM_LAUNCH_DIALOG(data.href))) return true;
     }
     
-    // Exception 2: JS-Silverlight interaction?
-    /*if(pluginName == "Silverlight" && !data.src) {
-        if(!confirm(SL_CONFIRM_BLOCK_DIALOG(data.width + "x" + data.height))) return null;
-    }*/
-    
-    return {"plugin": plugin, "isInvisible": isInvisible};
+    return {"plugin": getPluginName(plugin, type), "isInvisible": isInvisible};
 }
 
 function isAllowed(plugin) {
@@ -181,20 +173,21 @@ function handleContextMenu(event) {
     }
     
     var pluginName = /[A-Z]/.test(u.plugin) ? u.plugin : PLUGIN_GENERIC;
-    if(u.isVideo) event.contextMenu.appendContextMenuItem("reload", RESTORE_PLUGIN(pluginName));
+    if(u.isMedia) event.contextMenu.appendContextMenuItem("reload", RESTORE_PLUGIN(pluginName));
     else {
-        if(u.hasVideo) event.contextMenu.appendContextMenuItem("plugin", LOAD_PLUGIN(pluginName));
+        if(u.hasMedia) event.contextMenu.appendContextMenuItem("plugin", LOAD_PLUGIN(pluginName));
         event.contextMenu.appendContextMenuItem("remove", HIDE_PLUGIN(pluginName));
     }
-    if(u.hasVideo && u.source !== undefined) {
+    if(u.hasMedia && u.source !== undefined) {
         if(s.downloadContext && !u.noDownload) event.contextMenu.appendContextMenuItem("download", u.mediaType === "audio" ? DOWNLOAD_AUDIO : DOWNLOAD_VIDEO);
         if(u.siteInfo && s.viewOnSiteContext) event.contextMenu.appendContextMenuItem("viewOnSite", VIEW_ON_SITE(u.siteInfo.name));
         if(s.viewInQTPContext) event.contextMenu.appendContextMenuItem("viewInQTP", VIEW_IN_QUICKTIME_PLAYER);
     }
-    if(!u.isVideo) {
+    if(!u.isMedia) {
         if(s.addToWhitelistContext && !s.invertWhitelists) event.contextMenu.appendContextMenuItem("sourcesWhitelist", ALWAYS_ALLOW_SOURCE);
+        if(s.addToBlacklistContext && !s.invertBlacklists) event.contextMenu.appendContextMenuItem("sourcesBlacklist", ALWAYS_HIDE_SOURCE);
         // BEGIN DEBUG
-        if(s.debug) event.contextMenu.appendContextMenuItem("show", GET_PLUGIN_INFO);
+        if(s.debug) event.contextMenu.appendContextMenuItem("info", GET_PLUGIN_INFO);
         //END DEBUG
     }
 }
@@ -207,11 +200,11 @@ function doCommand(event) {
             break;
         case "locationsWhitelist":
         case "locationsBlacklist":
-            handleWhitelisting(event.command, extractDomain(event.userInfo.location), event.target);
+            handleWhitelisting(event.command, extractDomain(event.userInfo.location));
             break;
         case "sourcesWhitelist":
         case "sourcesBlacklist":
-            handleWhitelisting(event.command, event.userInfo.src, event.target);
+            handleWhitelisting(event.command, event.userInfo.src);
             break;
         case "switchOff":
             switchOff();
@@ -242,20 +235,20 @@ function switchOn() {
     safari.application.activeBrowserWindow.activeTab.url = safari.application.activeBrowserWindow.activeTab.url;
 }
 
-function handleWhitelisting(list, newWLString, tab) {
+function handleWhitelisting(list, newWLString) {
     safari.extension.settings[list] = safari.extension.settings[list].concat(newWLString); // push doesn't seem to work??
     // load targeted content at once
     switch(list) {
         case "locationsWhitelist":
             if(!safari.extension.settings.invertWhitelists) dispatchMessageToAllPages("loadLocation", newWLString);
-            else tab.url = tab.url; // reload page DOESN'T WORK
+            else safari.application.activeBrowserWindow.activeTab.url = safari.application.activeBrowserWindow.activeTab.url;
             break;
         case "sourcesWhitelist":
             dispatchMessageToAllPages("loadSource", newWLString);
             break;
         case "locationsBlacklist":
             if(!safari.extension.settings.invertBlacklists) dispatchMessageToAllPages("hideLocation", newWLString);
-            else tab.url = tab.url; // reload page
+            else safari.application.activeBrowserWindow.activeTab.url = safari.application.activeBrowserWindow.activeTab.url;
             break;
         case "sourcesBlacklist":
             dispatchMessageToAllPages("hideSource", newWLString);

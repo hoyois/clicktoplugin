@@ -2,7 +2,7 @@ function VimeoKiller() {}
 
 VimeoKiller.prototype.canKill = function(data) {
     if(data.plugin !== "Flash") return false;
-    return (data.src.indexOf("vimeo.com/moogaloop") != -1 || data.src.indexOf("vimeocdn.com/p/flash/moogalo") != -1);
+    return (data.src.indexOf("vimeo.com/moogaloop") !== -1 || data.src.indexOf("vimeocdn.com/p/flash/moogalo") !== -1);
 };
 
 VimeoKiller.prototype.processElement = function(data, callback) {
@@ -48,7 +48,7 @@ VimeoKiller.prototype.processElement = function(data, callback) {
                     title = xml.getElementsByTagName("caption")[0].textContent;
                 }
                 
-                if(data.location.indexOf("vimeo.com/") === -1 || data.location == "http://vimeo.com/" || data.location.indexOf("player.vimeo.com/") !== -1) siteInfo = {"name": "Vimeo", "url": "http://vimeo.com/" + videoID};
+                if(data.location.indexOf("vimeo.com/") === -1 || data.location === "http://vimeo.com/" || data.location.indexOf("player.vimeo.com/") !== -1) siteInfo = {"name": "Vimeo", "url": "http://vimeo.com/" + videoID};
 
                 var videoData = {
                     "playlist": [{"siteInfo": siteInfo, "mediaType": "video", "title": title, "posterURL": posterURL, "sources": sources}]

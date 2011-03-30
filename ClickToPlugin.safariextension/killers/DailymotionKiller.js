@@ -2,7 +2,7 @@ function DailymotionKiller() {}
 
 DailymotionKiller.prototype.canKill = function(data) {
     if(data.plugin !== "Flash") return false;
-    return (data.src.indexOf("/dmplayerv4/") != -1 || data.src.indexOf("www.dailymotion.com") != -1);
+    return (data.src.indexOf("/dmplayerv4/") !== -1 || data.src.indexOf("www.dailymotion.com") !== -1);
 };
 
 DailymotionKiller.prototype.processElement = function(data, callback) {
@@ -25,17 +25,15 @@ DailymotionKiller.prototype.processElementFromSequence = function(sequence, call
     if(matches) {
         sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "720p MP4", "resolution": 720, "isNative": true});
     }
-    // hqURL (<=480p)
+    // hqURL
     matches = sequence.match(/\"hqURL\":\"([^"]*)\"/);
     if(matches) {
         sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "SD MP4", "resolution": 360, "isNative": true});
     }
-    // sdURL (FLV only)
-    if(canPlayFLV) {
-        matches = sequence.match(/\"sdURL\":\"([^"]*)\"/);
-        if(matches) {
-            sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "LD FLV", "resolution": 240, "isNative": false});
-        }
+    // sdURL
+    matches = sequence.match(/\"sdURL\":\"([^"]*)\"/);
+    if(matches) {
+        sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "LD MP4", "resolution": 240, "isNative": true});
     }
     
     matches = sequence.match(/\"backgroundImageURL\":\"([^"]*)\"/);

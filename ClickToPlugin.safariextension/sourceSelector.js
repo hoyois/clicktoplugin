@@ -2,18 +2,18 @@ const OFFSET_LEFT = 10;
 const OFFSET_TOP = 10;
 
 function sourceSelector(plugin, loadPlugin, viewInQTP, handleClickEvent, handleContextMenuEvent) {
-    this.element = document.createElement("div");
-    this.element.className = "CTFsourceSelector CTFhidden";
-    this.element.innerHTML = "<ul class=\"CTFsourceList\"></ul>";
+    this.containerElement = document.createElement("div");
+    this.containerElement.className = "CTFsourceSelector CTFhidden";
+    this.containerElement.innerHTML = "<ul class=\"CTFsourceList\"></ul>";
     
-    this.element.style.WebkitTransitionProperty = "none !important";
+    this.containerElement.style.WebkitTransitionProperty = "none !important";
     var _this = this;
-    setTimeout(function() {_this.element.style.WebkitTransitionProperty = "opacity !important";}, 0);
+    setTimeout(function() {_this.containerElement.style.WebkitTransitionProperty = "opacity !important";}, 0);
     
     this.sources = null;
     this.plugin = plugin;
     
-    this.currentSource = null;
+    this.currentSource;
     
     this.handleClickEvent = handleClickEvent;
     this.handleContextMenuEvent = handleContextMenuEvent;
@@ -21,26 +21,23 @@ function sourceSelector(plugin, loadPlugin, viewInQTP, handleClickEvent, handleC
     this.viewInQTP = viewInQTP;
 }
 
-sourceSelector.prototype.setPosition = function(left, top) {
-    this.element.style.left = (OFFSET_LEFT + left) + "px !important";
-    this.element.style.top = (OFFSET_TOP + top) + "px !important";
-};
-
 sourceSelector.prototype.setCurrentSource = function(source) {
-    if(this.currentSource !== null) {
-        if(this.currentSource === undefined) this.pluginSourceItem.removeAttribute("class");
-        else this.element.firstChild.childNodes[this.currentSource].removeAttribute("class");
+    if(source === undefined) source = "plugin";
+    if(this.currentSource !== undefined) {
+        if(this.currentSource === "plugin") this.pluginSourceItem.removeAttribute("class");
+        else if(this.currentSource === "qtp") this.QTPSourceItem.removeAttribute("class");
+        else this.containerElement.firstChild.childNodes[this.currentSource].removeAttribute("class");
     }
-    if(source === undefined) {
+    if(source === "plugin") {
         if(this.pluginSourceItem) this.pluginSourceItem.className = "CTFcurrentSource";
-    } else if(settings.defaultPlayer === "qtp") {
+    } else if(source === "qtp") {
         if(this.QTPSourceItem) this.QTPSourceItem.className = "CTFcurrentSource";
-    } else this.element.firstChild.childNodes[source].className = "CTFcurrentSource";
+    } else this.containerElement.firstChild.childNodes[source].className = "CTFcurrentSource";
     this.currentSource = source;
 };
 
 sourceSelector.prototype.buildSourceList = function(sources) {
-    this.element.firstChild.innerHTML = "";
+    this.containerElement.firstChild.innerHTML = "";
     this.sources = sources;
     for(var i = 0; i < sources.length; i++) {
         this.appendSource(i);
@@ -58,7 +55,7 @@ sourceSelector.prototype.buildSourceList = function(sources) {
             _this.handleContextMenuEvent(event);
             event.stopPropagation();
         }, false);
-        this.element.firstChild.appendChild(this.pluginSourceItem);
+        this.containerElement.firstChild.appendChild(this.pluginSourceItem);
     }
     // QuickTime Player source item
     if(settings.showQTPSourceItem) {
@@ -73,7 +70,7 @@ sourceSelector.prototype.buildSourceList = function(sources) {
             _this.handleContextMenuEvent(event);
             event.stopPropagation();
         }, false);
-        this.element.firstChild.appendChild(this.QTPSourceItem);
+        this.containerElement.firstChild.appendChild(this.QTPSourceItem);
     }
 };
 
@@ -93,23 +90,18 @@ sourceSelector.prototype.appendSource = function(source) {
         _this.handleContextMenuEvent(event, source);
         event.stopPropagation();
     }, false);
-    this.element.firstChild.appendChild(sourceItem);
-};
-
-sourceSelector.prototype.setTitle = function(title) {
-    //if(!title) title = "";
-    //this.pluginSourceItem.title = title;
+    this.containerElement.firstChild.appendChild(sourceItem);
 };
 
 sourceSelector.prototype.unhide = function(width, height) {
-    if(this.element.offsetWidth + OFFSET_LEFT < width && this.element.offsetHeight + OFFSET_TOP < height) {
-        this.element.className = "CTFsourceSelector";
+    if(this.containerElement.offsetWidth + OFFSET_LEFT < width && this.containerElement.offsetHeight + OFFSET_TOP < height) {
+        this.containerElement.className = "CTFsourceSelector";
         return true;
     }
     return false;
 };
 
 sourceSelector.prototype.hide = function() {
-    this.element.className = "CTFsourceSelector CTFhidden";
+    this.containerElement.className = "CTFsourceSelector CTFhidden";
 }
 

@@ -106,6 +106,10 @@ menu, ul {
     list-style-type: none;
 }
 
+menu {
+    margin: 15px;
+}
+
 section {
     display: none;
     clear: left;

@@ -1,7 +1,7 @@
 function WMKiller() {}
 
 WMKiller.prototype.canKill = function(data) {
-    return (data.plugin == "Flip4Mac" && canPlayWM);
+    return (data.plugin === "Flip4Mac" && canPlayWM);
 };
 
 WMKiller.prototype.processElement = function(data, callback) {
