@@ -10,13 +10,9 @@ MegavideoKiller.prototype.canKill = function(data) {
 
 MegavideoKiller.prototype.process = function(data, callback) {
     if(data.onsite) {
-        /*flashvars = parseFlashVariables(data.params)
-        var getVariable = function(s) {
-            return getFlashVariable(data.params, s);
-        };*/
         this.finalizeProcessing(parseFlashVariables(data.params), null, callback);
         return;
-    } 
+    }
     
     // embedded video
     var matches = data.src.match(/megavideo\.com\/v\/([A-Z0-9]{8})/);
@@ -37,7 +33,8 @@ MegavideoKiller.prototype.process = function(data, callback) {
 MegavideoKiller.prototype.finalizeProcessing = function(flashvars, siteInfo, callback) {
     var sources = new Array();
     
-    var title = decodeURIComponent(flashvars.title).replace(/\+/g, " ").toUpperCase();
+    var title;
+    if(flashvars.title) title = decodeURIComponent(flashvars.title).replace(/\+/g, " ").toUpperCase();
     
     if(flashvars.hd === "1") {
         sources.push({"url": "http://www" + flashvars.hd_s + ".megavideo.com/files/" + this.decrypt(flashvars.hd_un, flashvars.hd_k1, flashvars.hd_k2) + "/" + title + ".flv", "format": "HD FLV", "resolution": 720, "isNative": false, "mediaType": "video"});

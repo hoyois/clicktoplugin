@@ -9,7 +9,7 @@ VimeoKiller.prototype.process = function(data, callback) {
     var videoID = null;
     if(data.params) videoID = parseFlashVariables(data.params).clip_id;
     if(!videoID) {
-        var matches = data.src.match(/clip_id=([^&]+)(?:&|$)/);
+        var matches = data.src.match(/clip_id=([^&]+)/);
         if(matches) videoID = matches[1];
     }
     if(!videoID) return;

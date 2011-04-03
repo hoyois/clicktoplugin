@@ -22,8 +22,9 @@ FacebookKiller.prototype.processFromFlashVars = function(flashvars, siteInfo, ca
         sources.push({"url": decodeURIComponent(parse(flashvars.video_src)), "format": "240p MP4", "resolution": 240, "isNative": true, "mediaType": "video"});
     } else return;
     
-    var posterURL = decodeURIComponent(parse(flashvars.thumb_url));
-    var title = decodeURIComponent(parse(flashvars.video_title)).replace(/\+/g, " ");
+    var posterURL, title;
+    if(flashvars.thumb_url) posterURL = decodeURIComponent(parse(flashvars.thumb_url));
+    if(flashvars.video_title) title = decodeURIComponent(parse(flashvars.video_title)).replace(/\+/g, " ");
     var videoData = {
         "playlist": [{"title": title, "posterURL": posterURL, "sources": sources, "siteInfo": siteInfo}]
     };

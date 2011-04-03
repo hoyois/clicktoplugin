@@ -73,6 +73,10 @@ mediaPlayer.prototype.createMediaElement = function(width, height, style, contex
     this.height = height;
     this.containerElement.style.width = width + "px !important";
     this.containerElement.style.height = height + "px !important";
+    // z-index: < 1 -> 1 (avoid WebKit font-rendering bugs with transitions)
+    var zIndex = style.getPropertyValue("z-index");
+    if(zIndex === "auto" || parseInt(zIndex) < 1) this.containerElement.style.setProperty("z-index", "1", "important");
+    else this.containerElement.style.setProperty("z-index", zIndex, "important");
     applyCSS(this.containerElement, style, ["position", "top", "right", "bottom", "left", "z-index", "clear", "float", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-top-collapse", "-webkit-margin-right-collapse", "-webkit-margin-bottom-collapse", "-webkit-margin-left-collapse"]);
     
     // Set volume
@@ -159,7 +163,6 @@ mediaPlayer.prototype.initializeTrackInfo = function() {
 
 mediaPlayer.prototype.showTrackInfo = function(isLoading) {
     var leftOffset = 0;
-    //var leftPadding = 7;
     if(isLoading) {
         leftOffset = 53;
         if(this.shadowDOM.rewindButton.style.display === "none") leftOffset -= 26;
@@ -207,11 +210,11 @@ mediaPlayer.prototype.initializePlaylistControls = function() {
     
     var _this = this;
     this.showControls = function(fade) {
-        opacityTransition(_this.playlistControls, 1, fade ? .18 : 0, 0, "ease-in");
+        opacityTransition(_this.playlistControls, 1, fade ? .17 : 0, 0, "ease-in");
     };
     this.hideControls = function(fade) {
         if(_this.mediaElement.paused || this.playlist[this.currentTrack].sources[this.currentSource].mediaType === "audio") return;
-        opacityTransition(_this.playlistControls, 0, fade ? .3 : 0, 0, "ease-in"); // or .4 linear?
+        opacityTransition(_this.playlistControls, 0, fade ? .3 : 0, 0, "ease-in");
     };
     
     prevButton.addEventListener("click", function() {

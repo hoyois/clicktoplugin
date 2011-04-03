@@ -21,7 +21,7 @@ body {
     top: 0;
     bottom: 0;
     visibility: hidden;
-    max-height: 255px;
+    max-height: 175px;
 }
 
 span.local {

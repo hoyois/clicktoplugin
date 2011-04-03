@@ -36,7 +36,13 @@ function unescapeHTML(text) {
     return e.firstChild.nodeValue;
 }
 
+/*function escapeURIComponent(text) {
+    if(!text) return "";
+    return decodeURIComponent(text);
+}*/
+
 function parseUnicode(text) {
+    //if(!text) return "";
     return text.replace(/\\u([0-9a-fA-F]{4})/g, function(s,c) {return String.fromCharCode(parseInt(c, 16));});
 }
 
@@ -52,32 +58,6 @@ function hasSLVariable(initParams, key) {
     return s.test(initParams);
 }
 
-function parseFlashVariables(s) {
-    /*var data =  new Object();
-    s = s.split("&");
-    var index;
-    for(var i = 0; i < s.length; i++) {
-        index = s[i].indexOf("=");
-        if(index === -1) continue;
-        data[s[i].substr(0, index)] = s[i].substr(index + 1);
-    }
-    return data;*/
-    return parseWithRegExp(s, /([^&=]*)=([^&]*)/g);
-}
-
-function parseSLVariables(s) {
-    /*var data =  new Object();
-    s = s.split(",");
-    var index;
-    for(var i = 0; i < s.length; i++) {
-        index = s[i].indexOf("=");
-        if(index === -1) continue;
-        data[s[i].substr(0, index).toLowerCase()] = s[i].substr(index + 1);
-    }
-    return data;*/
-    return parseWithRegExp(s, /([^,=]*)=([^,]*)/gi);
-}
-
 function parseWithRegExp(string, regex) { // regex needs 'g' flag
     var match;
     var obj = new Object();
@@ -86,6 +66,8 @@ function parseWithRegExp(string, regex) { // regex needs 'g' flag
     }
     return obj;
 }
+function parseFlashVariables(s) {return parseWithRegExp(s, /([^&=]*)=([^&]*)/g);}
+function parseSLVariables(s) {return parseWithRegExp(s, /([^,=]*)=([^,]*)/gi);}
 
 function extractExt(url) {
     url = url.split(/[?#]/)[0];
@@ -107,7 +89,7 @@ const canPlayFLV = canPlayTypeWithHTML5("video/x-flv");
 const canPlayWM = canPlayTypeWithHTML5("video/x-ms-wmv");
 const canPlayDivX = canPlayFLV; // 'video/divx' always returns "", probably a Perian oversight
 const canPlayOGG = canPlayTypeWithHTML5("video/ogg"); // OK with Xiph component
-//const canPlayWebM = canPlayTypeWithHTML5("video/webm"); // still can't with alpha version of QuickTime WebM component
+//const canPlayWebM = canPlayTypeWithHTML5("video/webm"); // can play WebM with Perian 2.2 (but returns "")
 
 // and certainly not this this one! but it does the job reasonably well
 function canPlaySrcWithHTML5(url) {
@@ -120,7 +102,7 @@ function canPlaySrcWithHTML5(url) {
     if(/^(?:mp3|wav|midi?|aif[fc]?|aac|m4a)$/i.test(url)) return {"type": "audio", "isNative": true};
     if(canPlayFLV && /^fla$/i.test(url)) return {"type": "audio", "isNative": false};
     if(canPlayWM && /^wma$/i.test(url)) return {"type": "audio", "isNative": false};
-    return null;
+    return false;
 }
 
 function chooseDefaultSource(sourceArray) {

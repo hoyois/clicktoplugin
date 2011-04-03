@@ -12,7 +12,7 @@ BlipKiller.prototype.process = function(data, callback) {
     if(matches) {
         url = "http://www.blip.tv/file/" + matches[1] + "/?skin=json&version=2&no_wrap=1";
     } else {
-        matches = data.src.match(/blip\.tv\/play\/([^%]*)(?:%|$)/);
+        matches = data.src.match(/blip\.tv\/play\/([^%]*)/);
         if(matches) {
             url = "http://blip.tv/players/episode/" + matches[1] + "?skin=json&version=2&no_wrap=1";
             isEmbed = true;

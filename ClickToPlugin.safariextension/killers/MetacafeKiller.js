@@ -16,6 +16,7 @@ MetacafeKiller.prototype.process = function(data, callback) {
 };
 
 MetacafeKiller.prototype.processFromFlashVars = function(flashvars, siteInfo, callback) {
+    if(!flashvars.mediaData) return;
     var mediaList = JSON.parse(decodeURIComponent(flashvars.mediaData));
     for(var type in mediaList) {
         mediaList[type] = mediaList[type].mediaURL + "?__gda__=" + mediaList[type].key;
@@ -32,7 +33,8 @@ MetacafeKiller.prototype.processFromFlashVars = function(flashvars, siteInfo, ca
         sources.push({"url": mediaList.flv, "format": "SD FLV", "resolution": 360, "isNative": false, "mediaType": "video"});
     }
     
-    var title = decodeURIComponent(flashvars.title);
+    var title;
+    if(flashvars.title)  title = decodeURIComponent(flashvars.title);
     
     var videoData = {
         "playlist": [{"title": title, "sources": sources, "siteInfo": siteInfo}]
