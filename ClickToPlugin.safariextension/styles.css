@@ -6,11 +6,13 @@ CSS Reset (specificity 0,0,1,0)
 
 /*
 Not reset here:
--webkit-box-flex
+-webkit-box-* (flex boxes)
 -webkit-transition-property
 background
 color
 display
+font-family
+font-size
 height
 left
 opacity
@@ -22,6 +24,11 @@ width
 Should pseudo-elements be reset as well? e.g.
 .CTFplaceholder ::before {content: none !important;}
 etc.
+*/
+
+/*
+In the WebKit nightlies the universal selector seems to select pseudo-elements as well.
+If this is the correct behavior (??), * should not be used.
 */
 
 .CTFplaceholder,
@@ -40,7 +47,7 @@ etc.
     border: none !important;
     /* This is incorrectly computed as rect(0px,0px,0px,0px) on video elements, which screws things up */
     /* clip: auto !important; */
-    cursor: default !important;
+    cursor: default !important; /* not default */
     outline: none !important;
     padding: 0 !important;
     pointer-events: auto !important;
@@ -152,9 +159,12 @@ Placeholder element
     position: relative !important;
     display: block !important;
     -webkit-box-flex: 0 !important;
+    /* Using float: none can change the vertical alignment of inline placeholders. Que?? */
+    float: left !important;
 }
 
 .CTFplaceholder .CTFlogo {
+    width: intrinsic !important;
     position: static !important;
     display: block !important;
     -webkit-box-shadow: 0 0 2px rgba(0, 0, 0, 1), inset 0 0 2px rgba(0, 0, 0, 1), 0 0 6px rgba(0, 0, 0, 0.6), inset 0 0 6px rgba(0, 0, 0, 0.6) !important;
@@ -192,10 +202,6 @@ Placeholder element
     border-width: 2px !important;
     font-size: 10px !important;
     padding: 1px 2px 1px 2px !important;
-}
-
-.CTFplaceholder .CTFlogoContainer.CTFhidden .CTFlogo.CTFtmp {
-    position: absolute !important;
 }
 
 .CTFplaceholder.CTFnoimage .CTFlogoContainer.CTFmini .CTFlogo {
@@ -260,7 +266,6 @@ Media player
     padding: 0 7px !important;
     pointer-events: none !important;
     right: 0 !important;
-/*    z-index: 1 !important;*/
 }
 
 .CTFmediaPlayer .CTFtrackStatus,
@@ -301,7 +306,6 @@ Media player
     height: 25px !important;
     pointer-events: none !important;
     width: intrinsic !important;
-/*    z-index: 1 !important;*/
 }
 
 .CTFmediaPlayer .CTFprevButton,
@@ -341,7 +345,7 @@ Media player
 }*/
 
 /**************
-Source switcher
+Source selector
 **************/
 
 .CTFsourceSelector * {
@@ -447,10 +451,6 @@ Source switcher
     opacity: 1 !important;
     width: 7px !important;
 }
-
-/*.CTFmediaPlayer li.CTFcurrentSource a::before {
-    
-}*/
 
 /*************************
 Invisible QuickTime object

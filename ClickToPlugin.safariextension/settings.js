@@ -109,9 +109,7 @@ function resizeTextArea(textarea) {
     if(height < 47) height = 47;
     if(width > document.body.firstChild.offsetWidth - 350) width = document.body.firstChild.offsetWidth - 350;
     if(width < 300) width = 300
-    //if(textarea.offsetHeight < height)
     textarea.style.minHeight = height + "px";
-    //if(textarea.offsetWidth < width)
     textarea.style.minWidth = width + "px";
 }
 

@@ -16,8 +16,11 @@ SLKiller.prototype.process = function(data, callback) {
     var sources = new Array();
     if(mediaType && (mediaType.isNative || canPlayWM)) sources.push({"url": mediaURL, "isNative": mediaType.isNative, "mediaType": mediaType});
     
+    var posterURL;
+    if(SLvars.thumbnail) posterURL = decodeURIComponent(SLvars.thumbnail);
+    
     var mediaData = {
-        "playlist": [{"posterURL": decodeURIComponent(SLvars.thumbnail), "sources": sources}],
+        "playlist": [{"posterURL": posterURL, "sources": sources}],
         "isAudio": mediaType.type === "audio"
     }
     callback(mediaData);

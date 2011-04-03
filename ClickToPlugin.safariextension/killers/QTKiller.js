@@ -7,11 +7,21 @@ QTKiller.prototype.canKill = function(data) {
 
 
 QTKiller.prototype.process = function(data, callback) {
-    var playlist = [{"sources": [{"url": data.src, "isNative": true, "mediaType": "video"}]}];
-    if(data.href) playlist.push({"sources": [{"url": data.href, "isNative": true, "mediaType": "video"}]});
+    var isAudio = true;
+    var playlist = new Array();
+    var addTrack = function(url) {
+        var source = {"url": url, "isNative": true, "mediaType": "video"};
+        var mediaType = canPlaySrcWithHTML5(url);
+        if(mediaType && mediaType.type === "audio") source.mediaType = "audio";
+        else isAudio = false;
+        playlist.push({"sources": [source]});
+    };
+    addTrack(data.src);
+    if(data.href) addTrack(data.href);
     var videoData = {
         "noPlaylistControls": true,
-        "playlist": playlist
+        "playlist": playlist,
+        "isAudio": isAudio
     };
     callback(videoData);
 };

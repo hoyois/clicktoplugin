@@ -22,7 +22,7 @@ BreakKiller.prototype.process = function(data, callback) {
         }
     } else {
         // only works with the newer [0-9] IDs...
-        var matches = data.src.match(/embed\.break\.com\/([^?]+)(?:\?|$)/);
+        var matches = data.src.match(/embed\.break\.com\/([^?]+)/);
         if(matches) url = "http://view.break.com/" + matches[1];
         else return;
     }

@@ -33,7 +33,7 @@ YouTubeKiller.prototype.process = function(data, callback) {
         return;
     }
     // Embedded YT video
-    var matches = data.src.match(/\.com\/([vpe])\/([^&?]+)(?:[&?]|$)/);
+    var matches = data.src.match(/\.com\/([vpe])\/([^&?]+)/);
     if(matches) {
         if(matches[1] === "v" || matches[1] === "e") { // video
             this.processFromVideoID(matches[2], callback);
@@ -67,7 +67,7 @@ YouTubeKiller.prototype.buildVideoIDList = function(flashvars, documentTitle, lo
         if(flashvars) {
             var videoID = flashvars.video_id;
             if(!videoID) { // new YT AJAX player
-                var matches = location.match(/[!&]v=([^&]+)(?:&|$)/);
+                var matches = location.match(/[!&]v=([^&]+)/);
                 if(!matches) return;
                 videoID = matches[1];
                 flashvars = null;
@@ -123,7 +123,7 @@ YouTubeKiller.prototype.processFromFlashVars = function(flashvars, documentTitle
     var videoID = flashvars.video_id;
     // see http://apiblog.youtube.com/2010/03/upcoming-change-to-youtube-video-page.html:
     if(!videoID) { // new YT AJAX player (not yet used?)
-        var matches = location.match(/[!&]v=([^&]+)(?:&|$)/);
+        var matches = location.match(/[!&]v=([^&]+)/);
         if(!matches) return;
         videoID = matches[1];
         this.processFromVideoID(videoID, callback);
@@ -134,10 +134,10 @@ YouTubeKiller.prototype.processFromFlashVars = function(flashvars, documentTitle
         this.processFromVideoID(videoID, callback);
         return;
     }
+    if(!flashvars.fmt_url_map) return;
     var urlMap = decodeURIComponent(flashvars.fmt_url_map);
-    if(!urlMap) return;
-    var title = decodeURIComponent(flashvars.rec_title);
-    if(title) title = title.substring(4).replace(/\+/g, " ");
+    var title;
+    if(flashvars.rec_title) title = decodeURIComponent(flashvars.rec_title).substring(4).replace(/\+/g, " ");
     else if(/^YouTube\s-\s/.test(documentTitle)) title = documentTitle.substring(10);
     
     this.finalizeProcessing(videoID, urlMap, title, false, callback);

@@ -6,8 +6,9 @@ BIMKiller.prototype.canKill = function(data) {
 };
 
 BIMKiller.prototype.process = function(data, callback) {
-    var url = decodeURIComponent(parseFlashVariables(data.params).mediaXML);
+    var url = parseFlashVariables(data.params).mediaXML;
     if(!url) return;
+    url = decodeURIComponent(url);
     
     var title, posterURL, videoURL;
     

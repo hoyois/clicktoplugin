@@ -66,10 +66,6 @@ const STRINGS = {
         "en-us": "You currently have no enabled plug-ins!",
         "fr-fr": "Aucun plugin actif!"
     },
-    PLUGIN_VERSION: {
-        "en-us": "Version",
-        "fr-fr": "Version"
-    },
     PLUGIN_FILENAME: {
         "en-us": "Filename",
         "fr-fr": "Fichier"
@@ -105,7 +101,7 @@ const STRINGS = {
     },
     ENABLE_THESE_KILLERS: {
         "en-us": "Use HTML5 replacements for these services",
-        "fr-fr": "Utiliser des remplacements HTML5 pour ces services"
+        "fr-fr": "Substituter les plugins par HTML5 pour ces services"
     },
     USE_FALLBACK_MEDIA: {
         "en-us": "Use HTML5 fallbacks",

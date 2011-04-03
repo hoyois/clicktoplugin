@@ -25,11 +25,6 @@ document.addEventListener("contextmenu", function(event) {
     safari.self.tab.setContextMenuEventUserInfo(event, {"instance": instance, "location": window.location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length, "invisible": this.getElementsByClassName("CTFinvisible").length});
 }, false);
 
-document.addEventListener("contextmenu", function(event) {
-    safari.self.tab.setContextMenuEventUserInfo(event, {"instance": instance, "location": window.location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length, "invisible": this.getElementsByClassName("CTFinvisible").length});
-}, false);
-
-
 function clearAll(elementID) {
     delete blockedElements[elementID];
     delete blockedData[elementID];
@@ -266,7 +261,7 @@ function handleBeforeLoadEvent(event) {
     displayBadge(data.plugin ? data.plugin : "?", elementID);
     
     if(!data.plugin) safari.self.tab.dispatchMessage("checkMIMEType", {"instance": instance, "elementID": elementID, "url": event.url});
-    
+
     // Look for video replacements
     if(settings.enabledKillers.length > 0) {
         var elementData = false;
@@ -416,7 +411,7 @@ function loadMedia(elementID, autoplay, source) {
     };
     
     // Initialize player
-    mediaPlayers[elementID].createMediaElement(this.blockedData[elementID].width, this.blockedData[elementID].height, getComputedStyle(this.placeholderElements[elementID], null), contextInfo);
+    mediaPlayers[elementID].createMediaElement(blockedData[elementID].width, blockedData[elementID].height, getComputedStyle(placeholderElements[elementID], null), contextInfo);
     
     // Replace placeholder and load first track
     placeholderElements[elementID].parentNode.replaceChild(mediaPlayers[elementID].containerElement, placeholderElements[elementID]);
@@ -477,7 +472,7 @@ function hidePlugin(elementID) {
 }
 
 function getPluginInfo(elementID) {
-    alert("Location: " + window.location.href + "\nSource: " + blockedData[elementID].src + "\n\n" + HTMLToString(blockedElements[elementID]));
+    alert("Plugin: " + blockedData[elementID].plugin + " (" + blockedData[elementID].width + "x" + blockedData[elementID].height + ")\nLocation: " + window.location.href + "\nSource: " + blockedData[elementID].src + "\n\nEmbed code:\n" + HTMLToString(blockedElements[elementID]));
 }
 
 function displayBadge(badgeLabel, elementID) {

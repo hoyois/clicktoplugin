@@ -6,7 +6,7 @@ TumblrKiller.prototype.canKill = function(data) {
 };
 
 TumblrKiller.prototype.process = function(data, callback) {
-    var audioURL = data.src.match(/\?audio_file=([^&]*)(?:&|$)/);
+    var audioURL = data.src.match(/\?audio_file=([^&]*)/);
     if(audioURL) audioURL =  audioURL[1] + "?plead=please-dont-download-this-or-our-lawyers-wont-let-us-host-audio";
 
     var mediaData = {
