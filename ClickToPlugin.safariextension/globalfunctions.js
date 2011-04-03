@@ -25,6 +25,7 @@ function makeAbsoluteURL(url, base) {
     }
     return base + url;
 }
+
 function extractDomain(url) {
     return url.match(/\/\/([^\/]+)\//)[1];
 }
@@ -45,34 +46,45 @@ function hasFlashVariable(flashvars, key) {
     return s.test(flashvars);
 }
 
-function getFlashVariable(flashvars, key) {
-    if (!flashvars) return "";
-    var flashVarsArray = flashvars.split("&");
-    for (var i = 0; i < flashVarsArray.length; i++) {
-        var keyValuePair = flashVarsArray[i].split("=");
-        if (keyValuePair.shift() === key) {
-            return keyValuePair.join("=");
-        }
-    }
-    return "";
-}
-
 function hasSLVariable(initParams, key) {
     var s = "(?:^|,)" + key + "=";
     s = new RegExp(s, "i");
     return s.test(initParams);
 }
 
-function getSLVariable(initParams, key) {
-    if (!initParams) return "";
-    var initParamsArray = initParams.split(",");
-    for (var i = 0; i < initParamsArray.length; i++) {
-        var keyValuePair = initParamsArray[i].split("=");
-        if (keyValuePair.shift().toLowerCase() === key) {
-            return keyValuePair.join("=");
-        }
+function parseFlashVariables(s) {
+    /*var data =  new Object();
+    s = s.split("&");
+    var index;
+    for(var i = 0; i < s.length; i++) {
+        index = s[i].indexOf("=");
+        if(index === -1) continue;
+        data[s[i].substr(0, index)] = s[i].substr(index + 1);
     }
-    return "";
+    return data;*/
+    return parseWithRegExp(s, /([^&=]*)=([^&]*)/g);
+}
+
+function parseSLVariables(s) {
+    /*var data =  new Object();
+    s = s.split(",");
+    var index;
+    for(var i = 0; i < s.length; i++) {
+        index = s[i].indexOf("=");
+        if(index === -1) continue;
+        data[s[i].substr(0, index).toLowerCase()] = s[i].substr(index + 1);
+    }
+    return data;*/
+    return parseWithRegExp(s, /([^,=]*)=([^,]*)/gi);
+}
+
+function parseWithRegExp(string, regex) { // regex needs 'g' flag
+    var match;
+    var obj = new Object();
+    while((match = regex.exec(string)) !== null) {
+        obj[match[1]] = match[2];
+    }
+    return obj;
 }
 
 function extractExt(url) {
@@ -108,7 +120,7 @@ function canPlaySrcWithHTML5(url) {
     if(/^(?:mp3|wav|midi?|aif[fc]?|aac|m4a)$/i.test(url)) return {"type": "audio", "isNative": true};
     if(canPlayFLV && /^fla$/i.test(url)) return {"type": "audio", "isNative": false};
     if(canPlayWM && /^wma$/i.test(url)) return {"type": "audio", "isNative": false};
-    return false;
+    return null;
 }
 
 function chooseDefaultSource(sourceArray) {
@@ -139,20 +151,20 @@ function chooseDefaultSource(sourceArray) {
     return defaultSource;
 }
 
-function makeLabel(source, mediaType) {
+function makeLabel(source) {
     if(!source) return false; // the injected script will take care of the label
     if(safari.extension.settings.defaultPlayer === "plugin") return false;
     if(safari.extension.settings.defaultPlayer === "qtp") return "QTP";
-    if(mediaType === "audio") return "Audio";
+    if(source.mediaType === "audio") return "Audio";
     var prefix = "";
-    if(source.resolution >= 720) prefix = "HD&nbsp;";
-    if(source.resolution >= 2304) prefix = "4K&nbsp;";
+    if(source.resolution >= 720) prefix = "HD ";
+    if(source.resolution >= 2304) prefix = "4K ";
     return prefix + (source.isNative ? "H.264" : "Video"); // right...
 }
 
 // native MIME types that might realistically appear in <object> tags
-const nativeTypes = ["image/svg+xml", "image/png", "image/tiff", "image/gif", "image/jpeg", "image/jp2", "image/x-icon", "application/pdf", "text/html", "text/xml"];
-const nativeExts = ["svg", "png", "tif", "tiff", "gif", "jpg", "jpeg", "jp2", "ico", "pdf", "html", "xml"];
+const nativeTypes = ["image/svg+xml", "image/png", "image/tiff", "image/gif", "image/jpeg", "image/jp2", "image/x-icon", "text/html", "text/xml", "application/pdf"];
+const nativeExts = ["svg", "png", "tif", "tiff", "gif", "jpg", "jpeg", "jp2", "ico", "html", "xml", "pdf"];
 function isNativeType(MIMEType) {
     for(var i = 0; i < 10; i++) {
         if(MIMEType === nativeTypes[i]) return true;
@@ -214,7 +226,7 @@ function parseXSPFPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlay
                 list = x[I].getElementsByTagName("annotation");
                 if(list.length > 0) title = list[0].firstChild.nodeValue;
             }
-            playlist.push({"mediaType": mediaType.type, "sources": [{"url": mediaURL, "isNative": mediaType.isNative}], "posterURL": posterURL, "title": title});
+            playlist.push({"sources": [{"url": mediaURL, "isNative": mediaType.isNative, "mediaType": mediaType.type}], "posterURL": posterURL, "title": title});
         }
         var playlistData = {
             "playlist": playlist,

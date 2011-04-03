@@ -6,9 +6,9 @@ QTKiller.prototype.canKill = function(data) {
 };
 
 
-QTKiller.prototype.processElement = function(data, callback) {
-    var playlist = [{"mediaType": "video", "sources": [{"url": data.src, "isNative": true}]}];
-    if(data.href) playlist.push({"mediaType": "video", "sources": [{"url": data.href, "isNative": true}]});
+QTKiller.prototype.process = function(data, callback) {
+    var playlist = [{"sources": [{"url": data.src, "isNative": true, "mediaType": "video"}]}];
+    if(data.href) playlist.push({"sources": [{"url": data.href, "isNative": true, "mediaType": "video"}]});
     var videoData = {
         "noPlaylistControls": true,
         "playlist": playlist

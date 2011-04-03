@@ -62,6 +62,7 @@
 		    <integer>12</integer>
 		    <integer>13</integer>
 		    <integer>14</integer>
+		    <integer>15</integer>
 		</array>
 		<key>Key</key>
 		<string>enabledKillers</string>
@@ -124,9 +125,9 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string>autoplay</string>
+		<false/>
 		<key>Key</key>
-		<string>initialBehavior</string>
+		<string>preload</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
@@ -154,7 +155,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<real>0.5</real>
+		<real>1</real>
 		<key>Key</key>
 		<string>volume</string>
 	</dict>
@@ -205,18 +206,6 @@
 		<false/>
 		<key>Key</key>
 		<string>viewInQTPContext</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
-		<string>enableKeyboardShortcuts</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
-		<string>enableMediaKeyboardShortcuts</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
@@ -277,13 +266,39 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<false/>
+		<dict>
+		    <key>type</key>
+		    <string>keydown</string>
+		    <key>shiftKey</key>
+		    <false/>
+		    <key>ctrlKey</key>
+		    <false/>
+		    <key>altKey</key>
+		    <false/>
+		    <key>metaKey</key>
+		    <false/>
+		    <key>keyIdentifier</key>
+		    <string>U+0020</string>
+		</dict>
 		<key>Key</key>
 		<string>playPauseShortcut</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-	    <false/>
+	    <dict>
+		    <key>type</key>
+		    <string>keydown</string>
+		    <key>shiftKey</key>
+		    <false/>
+		    <key>ctrlKey</key>
+		    <false/>
+		    <key>altKey</key>
+		    <false/>
+		    <key>metaKey</key>
+		    <false/>
+		    <key>keyIdentifier</key>
+		    <string>U+0046</string>
+		</dict>
 		<key>Key</key>
 		<string>enterFullscreenShortcut</string>
 	</dict>

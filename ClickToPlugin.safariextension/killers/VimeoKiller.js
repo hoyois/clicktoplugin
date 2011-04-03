@@ -5,9 +5,9 @@ VimeoKiller.prototype.canKill = function(data) {
     return (data.src.indexOf("vimeo.com/moogaloop") !== -1 || data.src.indexOf("vimeocdn.com/p/flash/moogalo") !== -1);
 };
 
-VimeoKiller.prototype.processElement = function(data, callback) {
+VimeoKiller.prototype.process = function(data, callback) {
     var videoID = null;
-    if(data.params) videoID = getFlashVariable(data.params, "clip_id");
+    if(data.params) videoID = parseFlashVariables(data.params).clip_id;
     if(!videoID) {
         var matches = data.src.match(/clip_id=([^&]+)(?:&|$)/);
         if(matches) videoID = matches[1];
@@ -35,11 +35,11 @@ VimeoKiller.prototype.processElement = function(data, callback) {
             if(xml.getElementsByTagName("isHD").length > 0 && xml.getElementsByTagName("isHD")[0].textContent === "1") {
                 var resolution = 720;
                 if(xml.getElementsByTagName("height")[0] && xml.getElementsByTagName("height")[0].textContent === "1080") resolution = 1080;
-                if(isNative || canPlayFLV) sources.push({"url": url + "hd", "format": resolution + "p " + (isNative ? "MP4" : "FLV"), "resolution": resolution, "isNative": isNative, "noDownload": true});
+                if(isNative || canPlayFLV) sources.push({"url": url + "hd", "format": resolution + "p " + (isNative ? "MP4" : "FLV"), "resolution": resolution, "isNative": isNative, "mediaType": "video", "noDownload": true});
             }
-            if(isNative || canPlayFLV) sources.push({"url": url + "sd", "format": "360p " + (isNative ? "MP4" : "FLV"), "resolution": 360, "isNative": isNative, "noDownload": true});
+            if(isNative || canPlayFLV) sources.push({"url": url + "sd", "format": "360p " + (isNative ? "MP4" : "FLV"), "resolution": 360, "isNative": isNative, "mediaType": "video", "noDownload": true});
             var handleMIMEType2 = function(MIMEType) {
-                if(MIMEType === "video/mp4") sources.push({"url": url + "mobile", "format": "Mobile MP4", "resolution": 240, "isNative": true, "noDownload": true});
+                if(MIMEType === "video/mp4") sources.push({"url": url + "mobile", "format": "Mobile MP4", "resolution": 240, "isNative": true, "mediaType": "video", "noDownload": true});
                 
                 if(xml.getElementsByTagName("thumbnail").length > 0) {
                     posterURL = xml.getElementsByTagName("thumbnail")[0].textContent;
@@ -51,7 +51,7 @@ VimeoKiller.prototype.processElement = function(data, callback) {
                 if(data.location.indexOf("vimeo.com/") === -1 || data.location === "http://vimeo.com/" || data.location.indexOf("player.vimeo.com/") !== -1) siteInfo = {"name": "Vimeo", "url": "http://vimeo.com/" + videoID};
 
                 var videoData = {
-                    "playlist": [{"siteInfo": siteInfo, "mediaType": "video", "title": title, "posterURL": posterURL, "sources": sources}]
+                    "playlist": [{"siteInfo": siteInfo, "title": title, "posterURL": posterURL, "sources": sources}]
                 };
                 callback(videoData);
             };

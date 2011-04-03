@@ -5,7 +5,7 @@ BlipKiller.prototype.canKill = function(data) {
     return data.src.indexOf("blip.tv/") !== -1;
 };
 
-BlipKiller.prototype.processElement = function(data, callback) {
+BlipKiller.prototype.process = function(data, callback) {
     var isEmbed, url;
     var matches = data.location.match(/blip\.tv\/file\/([0-9]+)(?:[\/?]|$)/);
     if(!matches) matches = data.location.match(/[;?]id=([0-9]+)(?:;|$)/);
@@ -30,7 +30,7 @@ BlipKiller.prototype.processElement = function(data, callback) {
         var ext, format, isNative;
         for(var i = 0; i < json.additionalMedia.length; i++) {
             ext = json.additionalMedia[i].url.substr(json.additionalMedia[i].url.lastIndexOf(".") + 1).toUpperCase();
-            if(ext === "MP4" || ext === "M4V" || ext === "MOV" || ext === "MPG" || ext === "MPEG") isNative = true;
+            if(ext === "MP4" || ext === "M4V" || ext === "MOV" || ext === "MPG" || ext === "MPEG" || ext === "MP3") isNative = true;
             else if((ext === "FLV" && canPlayFLV) || (ext === "WMV" && canPlayWM)) isNative = false;
             else continue;
             
@@ -38,11 +38,11 @@ BlipKiller.prototype.processElement = function(data, callback) {
             /*if(json.additionalMedia[i].role === "Source") {
                 bestSource = sources.length;
             }*/
-            sources.push({"url": json.additionalMedia[i].url, "format": format, "isNative": isNative, "resolution": parseInt(json.additionalMedia[i].height)});
+            sources.push({"url": json.additionalMedia[i].url, "format": format, "isNative": isNative, "mediaType": "video", "resolution": parseInt(json.additionalMedia[i].height)});
         }
         
         var videoData = {
-            "playlist": [{"mediaType": "video", "title": unescapeHTML(json.title), "posterURL": json.thumbnailUrl, "sources": sources}]
+            "playlist": [{"title": unescapeHTML(json.title), "posterURL": json.thumbnailUrl, "sources": sources}]
         };
         if(isEmbed) videoData.playlist[0].siteInfo = {"name": "Blip.tv", "url": "http://www.blip.tv/file/" + json.itemId};
         callback(videoData);

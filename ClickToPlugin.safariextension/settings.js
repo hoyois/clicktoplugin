@@ -59,8 +59,11 @@ if(navigator.plugins.length === 0) {
     for(var i = 0; i < navigator.plugins.length || i < 2; i++) {
         var li = document.createElement("li");
         var title = "";
-        if(navigator.plugins[i]) title = navigator.plugins[i].description.replace(/\"/g, "");
-        li.innerHTML = "<span class=\"left\">" + (i === 0 ? (ALLOW_THESE_PLUGINS + ":") : i === 1 ? "<input id=\"plugins_reset\" type=\"button\" value=\"" + DESELECT_ALL_BUTTON + "\"/><input id=\"plugins_toggle\" type=\"button\" value=\"" + TOGGLE_BUTTON + "\"/>" : "") + "</span><span class=\"right\" title=\"" + title + "\">" + (navigator.plugins[i] ? ("<input id=\"plugin" + i + "\" class=\"plugin\" type=\"checkbox\"/><label for=\"plugin" + i + "\">" + navigator.plugins[i].name + "</label>") : "") + "</span>";
+        li.innerHTML = "<span class=\"left\">" + (i === 0 ? (ALLOW_THESE_PLUGINS + ":") : i === 1 ? "<input id=\"plugins_reset\" type=\"button\" value=\"" + DESELECT_ALL_BUTTON + "\"/><input id=\"plugins_toggle\" type=\"button\" value=\"" + TOGGLE_BUTTON + "\"/>" : "") + "</span><span class=\"right\">" + (navigator.plugins[i] ? ("<input id=\"plugin" + i + "\" class=\"plugin\" type=\"checkbox\"/><label for=\"plugin" + i + "\"></label>") : "") + "</span>";
+        if(navigator.plugins[i]) {
+            li.childNodes[1].title = PLUGIN_FILENAME + ": " + navigator.plugins[i].filename + "\n" + PLUGIN_DESCRIPTION + ": " + navigator.plugins[i].description;
+            li.childNodes[1].childNodes[1].textContent = navigator.plugins[i].name;
+        }
         pluginList.appendChild(li);
     }
     document.getElementById("plugins_toggle").addEventListener("click", function() {
@@ -102,15 +105,21 @@ function resizeTextArea(textarea) {
     auxDiv.innerHTML = auxDiv.innerHTML.replace(/\n/g, "<br/>");
     var height = textarea.value.split("\n").length*16 + 15;
     var width = auxDiv.offsetWidth + 16;
-    if(height > 255) height = 255;
+    if(height > 175) height = 175;
     if(height < 47) height = 47;
-    if(width > 700) width = 700;
+    if(width > document.body.firstChild.offsetWidth - 350) width = document.body.firstChild.offsetWidth - 350;
     if(width < 300) width = 300
-    textarea.style.height = height + "px";
-    textarea.style.width = width + "px";
+    //if(textarea.offsetHeight < height)
+    textarea.style.minHeight = height + "px";
+    //if(textarea.offsetWidth < width)
+    textarea.style.minWidth = width + "px";
 }
 
 var textareas = document.getElementsByTagName("textarea");
+function handleTextAreaInput(event) {
+    event.target.value = event.target.value.replace(/[\t ]+/g, "\n");
+    resizeTextArea(event.target);
+}
 for(var i = 0; i < textareas.length; i++) {
     textareas[i].addEventListener("keypress", function(event) {
         if(event.keyCode === 32) {
@@ -124,14 +133,10 @@ for(var i = 0; i < textareas.length; i++) {
         }
     }, false);
     
-    textareas[i].addEventListener("input", function(event) {
-        this.value = this.value.replace(/[\t ]+/g, "\n");
-        resizeTextArea(this);
-    }, false);
-    textareas[i].addEventListener("focus", function(event) {
-        this.value = this.value.replace(/[\t ]+/g, "\n");
-        resizeTextArea(this);
-    }, false);
+    
+    textareas[i].addEventListener("input", handleTextAreaInput, false);
+    textareas[i].addEventListener("focus", handleTextAreaInput, false);
+    //textareas[i].addEventListener("change", function(event) {auxDiv.innerHTML = "";}, false);
 }
 
 
@@ -223,11 +228,18 @@ function handleClickEvent(event) {
 }
 function handleWheelEvent(event) { // only works for "click"-wheels
     event.preventDefault();
-    registerShortcut({"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "wheelDeltaX": event.wheelDeltaX, "wheelDeltaY": event.wheelDeltaY}, event.target.previousSibling);
+    registerShortcut({"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "direction": simplifyWheelDelta(event.wheelDeltaX, event.wheelDeltaY)}, event.target.previousSibling);
 }
 function registerShortcut(shortcut, input) {
     input.value = showShortcut(shortcut)
     changeSetting(input.id, shortcut);
+}
+
+function simplifyWheelDelta(x, y) {
+    if(x > y && y > -x) return "left";
+    if(x > y) return "down";
+    if(-x > y) return "right";
+    return "up";
 }
 
 function checked(inputList) {
@@ -257,6 +269,7 @@ document.getElementById("defaultPlayer").addEventListener("change", function(eve
     }
 }, false);
 document.getElementById("mediaAutoload").addEventListener("change", function(event) {
+    document.getElementById("preload").disabled = event.target.value === "";
     document.getElementById("showPoster").disabled = event.target.value === "on";
     document.getElementById("showMediaTooltip").disabled = event.target.value === "on";
 }, false);
@@ -291,12 +304,6 @@ function parseKeyID(keyID) {
         case "Clear": return "\u2327";
     }
 }
-function parseWheelDelta(x, y) {
-    if(x > y && y > -x) return "left";
-    if(x > y) return "down";
-    if(-x > y) return "right";
-    return "up";
-}
 
 function showShortcut(shortcut) {
     if(!shortcut) return "";
@@ -304,11 +311,12 @@ function showShortcut(shortcut) {
     if(shortcut.type === "keydown") return prefix + parseKeyID(shortcut.keyIdentifier);
     if(shortcut.type === "click") return prefix + "[click" + shortcut.button + "]";
     if(shortcut.type === "dblclick") return prefix + "[dblclick" + shortcut.button + "]";
-    if(shortcut.type === "mousewheel") return prefix + "[wheel" + parseWheelDelta(shortcut.wheelDeltaX, shortcut.wheelDeltaY) + "]";
+    if(shortcut.type === "mousewheel") return prefix + "[wheel" + shortcut.direction + "]";
 }
 
 // Load settings
 function loadSettings(event) {
+    if(event.name !== "settings") return;
     var settings = event.message;
     for(var i = 0; i < settings.allowedPlugins.length; i++) {
         document.getElementById("plugin" + settings.allowedPlugins[i]).checked = true;
@@ -361,6 +369,11 @@ function loadSettings(event) {
     if(settings.mediaAutoload) {
         document.getElementById("showPoster").disabled = true;
         document.getElementById("showMediaTooltip").disabled = true;
+    } else document.getElementById("preload").disabled = true;
+    
+    if(settings.sIFRPolicy === "textonly") { // temporary
+        document.getElementById("sIFRPolicy").children[0].selected = false;
+        document.getElementById("sIFRPolicy").children[1].selected = true;
     }
 }
 

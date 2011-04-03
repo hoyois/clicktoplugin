@@ -11,9 +11,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.2b</string>
+	<string>2.2b2</string>
 	<key>CFBundleVersion</key>
-	<string>8</string>
+	<string>9</string>
 	<key>Chrome</key>
 	<dict>
 		<key>Global Page</key>
@@ -37,7 +37,7 @@
 		</array>
 	</dict>
 	<key>Description</key>
-	<string>Prevents plugins from loading automatically</string>
+	<string>Prevents plug-ins from loading automatically</string>
 	<key>ExtensionInfoDictionaryVersion</key>
 	<string>1.0</string>
 	<key>Permissions</key>

@@ -1,5 +1,6 @@
-const OFFSET_LEFT = 10;
-const OFFSET_TOP = 10;
+/******************************
+sourceSelector class definition
+*******************************/
 
 function sourceSelector(plugin, loadPlugin, viewInQTP, handleClickEvent, handleContextMenuEvent) {
     this.containerElement = document.createElement("div");
@@ -24,15 +25,15 @@ function sourceSelector(plugin, loadPlugin, viewInQTP, handleClickEvent, handleC
 sourceSelector.prototype.setCurrentSource = function(source) {
     if(source === undefined) source = "plugin";
     if(this.currentSource !== undefined) {
-        if(this.currentSource === "plugin") this.pluginSourceItem.removeAttribute("class");
-        else if(this.currentSource === "qtp") this.QTPSourceItem.removeAttribute("class");
-        else this.containerElement.firstChild.childNodes[this.currentSource].removeAttribute("class");
+        if(this.currentSource === "plugin") this.pluginSourceItem.className = "CTFsourceItem";
+        else if(this.currentSource === "qtp") this.QTPSourceItem.className = "CTFsourceItem";
+        else this.containerElement.firstChild.childNodes[this.currentSource].className = "CTFsourceItem";
     }
     if(source === "plugin") {
-        if(this.pluginSourceItem) this.pluginSourceItem.className = "CTFcurrentSource";
+        if(this.pluginSourceItem) this.pluginSourceItem.className += " CTFcurrentSource";
     } else if(source === "qtp") {
-        if(this.QTPSourceItem) this.QTPSourceItem.className = "CTFcurrentSource";
-    } else this.containerElement.firstChild.childNodes[source].className = "CTFcurrentSource";
+        if(this.QTPSourceItem) this.QTPSourceItem.className += " CTFcurrentSource";
+    } else this.containerElement.firstChild.childNodes[source].className += " CTFcurrentSource";
     this.currentSource = source;
 };
 
@@ -46,7 +47,8 @@ sourceSelector.prototype.buildSourceList = function(sources) {
     // Plugin source item
     if(settings.showPluginSourceItem) {
         this.pluginSourceItem = document.createElement("li");
-        this.pluginSourceItem.innerHTML = this.plugin;
+        this.pluginSourceItem.className = "CTFsourceItem";
+        this.pluginSourceItem.textContent = this.plugin;
         this.pluginSourceItem.addEventListener("click", function(event) {
             _this.loadPlugin(event);
             event.stopPropagation();
@@ -61,7 +63,8 @@ sourceSelector.prototype.buildSourceList = function(sources) {
     if(settings.showQTPSourceItem) {
         if(this.viewInQTP === undefined) return;
         this.QTPSourceItem = document.createElement("li");
-        this.QTPSourceItem.innerHTML = "QuickTime&nbsp;Player";
+        this.QTPSourceItem.className = "CTFsourceItem";
+        this.QTPSourceItem.textContent = "QuickTime Player";
         this.QTPSourceItem.addEventListener("click", function(event) {
             _this.viewInQTP(event);
             event.stopPropagation();
@@ -76,12 +79,17 @@ sourceSelector.prototype.buildSourceList = function(sources) {
 
 sourceSelector.prototype.appendSource = function(source) {
     var sourceItem = document.createElement("li");
-    sourceItem.innerHTML = "<a href=\"" + this.sources[source].url + "\">" + (this.sources[source].format ? this.sources[source].format : "HTML5") + "</a>";
-    sourceItem.firstChild.addEventListener("click", function(event) {
-        if(event.altKey) event.stopPropagation(); // to allow option-click download
-        else event.preventDefault();
-    }, false);
+    sourceItem.className = "CTFsourceItem";
+    sourceItem.innerHTML = "<a class=\"CTFsourceLink\" href=\"" + this.sources[source].url + "\">" + (this.sources[source].format ? this.sources[source].format : "HTML5") + "</a>";
     var _this = this;
+    
+    sourceItem.firstChild.addEventListener("click", function(event) {
+        if(event.altKey) return; // to allow option-click download
+        event.preventDefault();
+        _this.handleClickEvent(event, source);
+        event.stopImmediatePropagation(); // For Facebook...
+    }, false);
+    
     sourceItem.addEventListener("click", function(event) {
         _this.handleClickEvent(event, source);
         event.stopPropagation();
@@ -94,7 +102,7 @@ sourceSelector.prototype.appendSource = function(source) {
 };
 
 sourceSelector.prototype.unhide = function(width, height) {
-    if(this.containerElement.offsetWidth + OFFSET_LEFT < width && this.containerElement.offsetHeight + OFFSET_TOP < height) {
+    if(this.containerElement.offsetWidth + 10 < width && this.containerElement.offsetHeight + 10 < height) {
         this.containerElement.className = "CTFsourceSelector";
         return true;
     }
@@ -103,5 +111,5 @@ sourceSelector.prototype.unhide = function(width, height) {
 
 sourceSelector.prototype.hide = function() {
     this.containerElement.className = "CTFsourceSelector CTFhidden";
-}
+};
 

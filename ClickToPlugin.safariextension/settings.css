@@ -18,9 +18,10 @@ body {
 #aux {
     display: inline-block;
     position: absolute;
-    top: -100px;
-    bottom: -100px;
+    top: 0;
+    bottom: 0;
     visibility: hidden;
+    max-height: 255px;
 }
 
 span.local {
@@ -43,11 +44,12 @@ span.right.sub {
     margin-left: 18px;
 }
 
-.tip {
+span.right.tip {
     display: inline-block;
     font: -webkit-small-control;
     font-size: 10px;
     line-height: 15px;
+    width: 450px;
     white-space: normal;
 }
 
@@ -102,7 +104,7 @@ li.glue {
 }
 
 menu, ul {
-    -webkit-padding-start: 0px;
+    -webkit-padding-start: 0;
     list-style-type: none;
 }
 

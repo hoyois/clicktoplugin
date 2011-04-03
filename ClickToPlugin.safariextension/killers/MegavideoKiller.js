@@ -8,12 +8,13 @@ MegavideoKiller.prototype.canKill = function(data) {
     return false;
 };
 
-MegavideoKiller.prototype.processElement = function(data, callback) {
+MegavideoKiller.prototype.process = function(data, callback) {
     if(data.onsite) {
+        /*flashvars = parseFlashVariables(data.params)
         var getVariable = function(s) {
             return getFlashVariable(data.params, s);
-        };
-        this.finalizeProcessing(getVariable, null, callback);
+        };*/
+        this.finalizeProcessing(parseFlashVariables(data.params), null, callback);
         return;
     } 
     
@@ -27,29 +28,24 @@ MegavideoKiller.prototype.processElement = function(data, callback) {
     xhr.open('GET', url, true);
     var _this = this;
     xhr.onload = function() {
-        var getVariable = function(s) {
-            var matches = xhr.responseText.match(new RegExp("flashvars\\." + s + "\\s=\\s\\\"([^\"]*)\\\";"));
-            if(matches) return matches[1];
-            else return "";
-        };
-                
-        _this.finalizeProcessing(getVariable, {"name": "Megavideo", "url": url}, callback);
+        var regex = new RegExp("flashvars\\.([0-9a-z_]*)\\s=\\s\\\"([^\"]*)\\\";", "g");
+        _this.finalizeProcessing(parseWithRegExp(xhr.responseText, regex), {"name": "Megavideo", "url": url}, callback);
     };
     xhr.send(null);
 };
 
-MegavideoKiller.prototype.finalizeProcessing = function(getVariable, siteInfo, callback) {
+MegavideoKiller.prototype.finalizeProcessing = function(flashvars, siteInfo, callback) {
     var sources = new Array();
     
-    var title = decodeURIComponent(getVariable("title")).replace(/\+/g, " ").toUpperCase();
+    var title = decodeURIComponent(flashvars.title).replace(/\+/g, " ").toUpperCase();
     
-    if(getVariable("hd") === "1") {
-        sources.push({"url": "http://www" + getVariable("hd_s") + ".megavideo.com/files/" + this.decrypt(getVariable("hd_un"), getVariable("hd_k1"), getVariable("hd_k2")) + "/" + title + ".flv", "format": "HD FLV", "resolution": 720, "isNative": false});
+    if(flashvars.hd === "1") {
+        sources.push({"url": "http://www" + flashvars.hd_s + ".megavideo.com/files/" + this.decrypt(flashvars.hd_un, flashvars.hd_k1, flashvars.hd_k2) + "/" + title + ".flv", "format": "HD FLV", "resolution": 720, "isNative": false, "mediaType": "video"});
     }
-    sources.push({"url": "http://www" + getVariable("s") + ".megavideo.com/files/" + this.decrypt(getVariable("un"), getVariable("k1"), getVariable("k2")) + "/" + title + ".flv", "format": "SD FLV", "resolution": 360, "isNative": false});
+    sources.push({"url": "http://www" + flashvars.s + ".megavideo.com/files/" + this.decrypt(flashvars.un, flashvars.k1, flashvars.k2) + "/" + title + ".flv", "format": "SD FLV", "resolution": 360, "isNative": false, "mediaType": "video"});
     
     var videoData = {
-        "playlist": [{"siteInfo": siteInfo, "mediaType": "video", "title": title, "sources": sources}]
+        "playlist": [{"siteInfo": siteInfo, "title": title, "sources": sources}]
     };
     callback(videoData);
 };

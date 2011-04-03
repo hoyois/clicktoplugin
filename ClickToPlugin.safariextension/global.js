@@ -1,13 +1,13 @@
 // UPDATE
-if(!safari.extension.settings.version || safari.extension.settings.version < 8) {
-    alert("ClickToPlugin 2.2b Release Notes\n\n--- New Features ---\n\n\u2022 The extension\u2019s settings are now on their own HTML page accessible through the context menu\n\u2022 Perfected plugin detection by using MIME type sniffing as a last resort, following WebKit's internal mechanism\n\u2022 New blacklists and context menu item to permanently hide plugins\n\u2022 Customizable keyboard and mouse shortcuts for media playback and other actions\n\u2022 Playlist controls are integrated to the main controls\n\u2022 Safari's incomplete volume slider for HTML5 media elements can be used (use the WebKit nightlies for the finalized volume slider)\n\u2022 The title of the video appears in the controls while loading\n\u2022 All localizations will now be bundled within the same extension\n\n--- Fixed Bugs ---\n\n\u2022 Fixed HTML5 video aspect ratio issues using shadow DOM styling\n\u2022 Fixed Megavideo killer");
+if(!safari.extension.settings.version || safari.extension.settings.version < 9) {
+    alert("ClickToPlugin 2.2b2 Release Notes\n\n--- New Features ---\n\n\u2022 The extension\u2019s settings are now on their own HTML page accessible through the context menu\n\u2022 Perfected plugin detection by using MIME type sniffing as a last resort, following WebKit's internal mechanism\n\u2022 New blacklists and context menu item to permanently hide plugins\n\u2022 Customizable keyboard and mouse shortcuts for media playback and other actions\n\u2022 Playlist controls are integrated to the main controls\n\u2022 Safari's incomplete volume slider for HTML5 media elements can be used (use the WebKit nightlies for the finalized volume slider)\n\u2022 The title of the video appears in the controls while loading\n\u2022 All localizations will now be bundled within the same extension\n\n--- Fixed Bugs ---\n\n\u2022 Fixed HTML5 video aspect ratio issues using shadow DOM styling\n\u2022 Fixed Megavideo and Veoh killers");
 }
-safari.extension.settings.version = 8;
+safari.extension.settings.version = 9;
 
 // SETTINGS
-const allSettings = ["allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "useFallbackMedia", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "codecsPolicy", "volume", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+const allSettings = ["allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "useFallbackMedia", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "preloadavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "codecsPolicy", "volume", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
 
-const injectedSettings = ["enabledKillers", "useFallbackMedia", "showSourceSelector", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "volume", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+const injectedSettings = ["enabledKillers", "useFallbackMedia", "showSourceSelector", "preload", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "volume", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
 
 function getSettings(array) {
     var s = new Object();
@@ -158,7 +158,8 @@ function handleContextMenu(event) {
     try {
         var u = event.userInfo; // throws exception if there are no content scripts
     } catch(err) {
-        if(s.disableEnableContext) event.contextMenu.appendContextMenuItem("switchOn", TURN_CTP_ON);
+        if(s.disableEnableContext && event.target.url) event.contextMenu.appendContextMenuItem("switchOn", TURN_CTP_ON);
+        else event.contextMenu.appendContextMenuItem("settings", CTP_PREFERENCES + "\u2026");
         return;
     }
     
@@ -204,7 +205,7 @@ function doCommand(event) {
             break;
         case "sourcesWhitelist":
         case "sourcesBlacklist":
-            handleWhitelisting(event.command, event.userInfo.src);
+            handleWhitelisting(event.command, event.userInfo.src.split(/[?#]/)[0]);
             break;
         case "switchOff":
             switchOff();
@@ -213,7 +214,8 @@ function doCommand(event) {
             switchOn();
             break;
         case "settings":
-            var newTab = safari.application.activeBrowserWindow.openTab("foreground");
+            var newTab = safari.application.activeBrowserWindow.activeTab;
+            if(newTab.url) newTab = safari.application.activeBrowserWindow.openTab("foreground");
             newTab.url = safari.extension.baseURI + "settings.html";
             break;
         default:
@@ -257,7 +259,7 @@ function handleWhitelisting(list, newWLString) {
 }
 
 // KILLERS
-var killers = [new YouTubeKiller(), new VimeoKiller(), new DailymotionKiller(), new BreakKiller(), new BlipKiller(), new MetacafeKiller(), new TumblrKiller(), new VeohKiller(), new MegavideoKiller(), new BIMKiller(), new GenericKiller(), new SLKiller(), new QTKiller(), new WMKiller(), new DivXKiller()];
+var killers = [new YouTubeKiller(), new VimeoKiller(), new DailymotionKiller(), new FacebookKiller(), new BreakKiller(), new BlipKiller(), new MetacafeKiller(), new TumblrKiller(), new VeohKiller(), new MegavideoKiller(), new BIMKiller(), new GenericKiller(), new SLKiller(), new QTKiller(), new WMKiller(), new DivXKiller()];
 
 function findKillerFor(data) {
     for (var i = 0; i < safari.extension.settings.enabledKillers.length; i++) {
@@ -281,7 +283,7 @@ function killPlugin(data, tab) {
         if(!mediaData.loadAfter) {
             var defaultSource = chooseDefaultSource(mediaData.playlist[0].sources);
             mediaData.playlist[0].defaultSource = defaultSource;
-            mediaData.badgeLabel = makeLabel(mediaData.playlist[0].sources[defaultSource], mediaData.playlist[0].mediaType);
+            mediaData.badgeLabel = makeLabel(mediaData.playlist[0].sources[defaultSource]);
         }
         for(var i = (mediaData.loadAfter ? 0 : 1); i < mediaData.playlist.length; i++) {
             mediaData.playlist[i].defaultSource = chooseDefaultSource(mediaData.playlist[i].sources);
@@ -304,7 +306,7 @@ function killPlugin(data, tab) {
         tab.page.dispatchMessage("mediaData", mediaData);
     };
     
-    if(data.baseURL) killers[killerID].processElement(data, callback);
+    if(data.baseURL) killers[killerID].process(data, callback);
     else callback(data);
 }
 
