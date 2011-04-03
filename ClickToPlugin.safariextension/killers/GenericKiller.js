@@ -10,27 +10,28 @@ GenericKiller.prototype.canKill = function(data) {
     return false;
 };
 
-GenericKiller.prototype.processElement = function(data, callback) {
-    if(getFlashVariable(data.params, "streamer").substring(0,4) === "rtmp") return;
-    var baseURL = decodeURIComponent(getFlashVariable(data.params, "netstreambasepath"));
-    if(!baseURL) baseURL = data.src; // used to resolve video URLs
+GenericKiller.prototype.process = function(data, callback) {
+    var flashvars = parseFlashVariables(data.params);
+    if(flashvars.streamer && flashvars.streamer.substring(0,4) === "rtmp") return;
+    var baseURL = data.src; // used to resolve video URLs
+    if(flashvars.netstreambasepath) baseURL = decodeURIComponent(flashvars.netstreambasepath);
     
     // get media and poster URL
     var sourceURL, posterURL;
     if(data.file) {
-        sourceURL = decodeURIComponent(getFlashVariable(data.params, data.file));
+        sourceURL = decodeURIComponent(flashvars[data.file]);
         switch(data.file) {
             case "file_url":
-                posterURL = decodeURIComponent(getFlashVariable(data.params, "poster_url"));
+                if(flashvars.poster_url) posterURL = decodeURIComponent(flashvars.poster_url);
                 break;
             default:
-                posterURL = decodeURIComponent(getFlashVariable(data.params, "image"));
+                if(flashvars.image) posterURL = decodeURIComponent(flashvars.image);
         }
     } else {
-        sourceURL = data.src.match(new RegExp("[?&]" + data.hash + "=([^&]*)(?:&|$)"));
+        sourceURL = data.src.match(new RegExp("[?&]" + data.hash + "=([^&]*)"));
         if(sourceURL) {
             sourceURL = decodeURIComponent(sourceURL[1]);
-            posterURL = data.src.match(/[?&]image=([^&]*)(?:&|$)/);
+            posterURL = data.src.match(/[?&]image=([^&]*)/);
             if(posterURL) posterURL = decodeURIComponent(posterURL[1]);
         }
     }
@@ -44,33 +45,31 @@ GenericKiller.prototype.processElement = function(data, callback) {
     // Playlist support
     if(isPlaylist) {
         if(!safari.extension.settings.usePlaylists) return;
-        this.processElementFromPlaylist(makeAbsoluteURL(sourceURL, data.baseURL), baseURL, posterURL, getFlashVariable(data.params, "item"), callback);
+        this.processFromPlaylist(makeAbsoluteURL(sourceURL, data.baseURL), baseURL, posterURL, flashvars.item, callback);
         return;
     }
     
-    var sourceURL2 = getFlashVariable(data.params, "real_file");
+    var sourceURL2 = flashvars.real_file;
     if(sourceURL2) sourceURL = decodeURIComponent(sourceURL2);
+    sourceURL2 = flashvars["hd.file"];
     
     var sources = new Array();
-    var mediaType = canPlaySrcWithHTML5(sourceURL);
-    if(!mediaType) return;
-    
-    sourceURL2 = getFlashVariable(data.params, "hd.file");
     if(sourceURL2) {
-        var m = canPlaySrcWithHTML5(sourceURL2);
-        if(m) sources.push({"url": makeAbsoluteURL(sourceURL2, baseURL), "format": "HD", "isNative": m.isNative, "resolution": 720});
+        var mediaType = canPlaySrcWithHTML5(sourceURL2);
+        if(mediaType) sources.push({"url": makeAbsoluteURL(sourceURL2, baseURL), "format": "HD", "isNative": m.isNative, "resolution": 720, "mediaType": mediaType.type});
     }
     
-    sources.push({"url": makeAbsoluteURL(sourceURL, baseURL), "format": sources[0] ? "SD" : "", "isNative": mediaType.isNative});
+    mediaType = canPlaySrcWithHTML5(sourceURL);
+    if(mediaType) sources.push({"url": makeAbsoluteURL(sourceURL, baseURL), "format": sources[0] ? "SD" : "", "isNative": mediaType.isNative, "mediaType": mediaType.type});
     
     var mediaData = {
-        "playlist": [{"mediaType": mediaType.type, "posterURL": posterURL, "sources": sources}],
+        "playlist": [{"posterURL": posterURL, "sources": sources}],
         "isAudio": mediaType.type === "audio"
     };
     callback(mediaData);
 };
 
-GenericKiller.prototype.processElementFromPlaylist = function(playlistURL, baseURL, posterURL, track, callback) {
+GenericKiller.prototype.processFromPlaylist = function(playlistURL, baseURL, posterURL, track, callback) {
     var handlePlaylistData = function(playlistData) {
         callback(playlistData);
     };

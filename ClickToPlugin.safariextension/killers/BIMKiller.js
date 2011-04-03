@@ -1,12 +1,12 @@
-function BIMKiller() {this.index = 2;}
+function BIMKiller() {}
 
 BIMKiller.prototype.canKill = function(data) {
     if(data.plugin !== "Flash") return false;
     return (/bimVideoPlayer[^\/.]*\.swf$/.test(data.src) && hasFlashVariable(data.params, "mediaXML"));
 };
 
-BIMKiller.prototype.processElement = function(data, callback) {
-    var url = decodeURIComponent(getFlashVariable(data.params, "mediaXML"));
+BIMKiller.prototype.process = function(data, callback) {
+    var url = decodeURIComponent(parseFlashVariables(data.params).mediaXML);
     if(!url) return;
     
     var title, posterURL, videoURL;

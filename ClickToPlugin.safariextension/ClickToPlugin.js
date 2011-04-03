@@ -2,17 +2,15 @@
 ClickToPlugin global scope
 *************************/
 
-//if(!safari) throw null; // WTF?
-
 var blockedElements = new Array(); // array containing the blocked HTML elements
 var blockedData = new Array(); // array containing info on the blocked element (plugin, dimension, source, ...)
 var placeholderElements = new Array(); // array containing the corresponding placeholder elements
 var mediaPlayers = new Array(); // array containing the HTML5 media players
 
-var settings = null;
-var instance = null;
+var settings;
+var instance;
 var numberOfBlockedElements = 0;
-var stack = null;
+var stack;
 /*
 The stack is a <div> appended as a child of <body> in which the blocked elements are stored unmodified.
 This allows scripts that need to set custom JS properties to those elements (or otherwise modify them) to work.
@@ -22,6 +20,10 @@ Scripts that try to interact with the plugin will still fail, of course. No way 
 
 safari.self.addEventListener("message", respondToMessage, false);
 document.addEventListener("beforeload", handleBeforeLoadEvent, true);
+
+document.addEventListener("contextmenu", function(event) {
+    safari.self.tab.setContextMenuEventUserInfo(event, {"instance": instance, "location": window.location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length, "invisible": this.getElementsByClassName("CTFinvisible").length});
+}, false);
 
 document.addEventListener("contextmenu", function(event) {
     safari.self.tab.setContextMenuEventUserInfo(event, {"instance": instance, "location": window.location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length, "invisible": this.getElementsByClassName("CTFinvisible").length});
@@ -98,18 +100,24 @@ function handleBeforeLoadEvent(event) {
     const element = event.target;
     
     // deal with sIFR script first
-    if(element instanceof HTMLScriptElement && element.src.indexOf("sifr.js") !== -1) {
-        var sIFRData = safari.self.tab.canLoad(event, "sIFR");
-        if(!sIFRData.canLoad) {
-            // BEGIN DEBUG
-            if(sIFRData.debug) {
-                if(!confirm("ClickToPlugin is about to block an sIFR script:\n\n" + element.src)) return;
+    /*if(element instanceof HTMLScriptElement) {
+        if(element.src.indexOf("sifr-config.js") !== -1) {
+            event.preventDefault();
+        } else if(element.src.indexOf("sifr.js") !== -1) {
+            var sIFRData = safari.self.tab.canLoad(event, "sIFR");
+            if(!sIFRData.canLoad) {
+                // BEGIN DEBUG
+                if(sIFRData.debug) {
+                    if(!confirm("ClickToPlugin is about to modify an sIFR configuration script:\n\n" + element.src)) return;
+                }
+                //element.setAttribute("defer", "");
+                // END DEBUG
+                //event.preventDefault(); // prevents loading of sifr.js
+                disableSIFR(event);
+                return;
             }
-            // END DEBUG
-            event.preventDefault(); // prevents loading of sifr.js
-            return;
         }
-    }
+    }*/
     
     // the following happens when the Flash element is reloaded
     // (for instance after the user clicks on its placeholder):
@@ -140,20 +148,29 @@ function handleBeforeLoadEvent(event) {
     }
     
     // Load the user settings
-    if(settings === null) {
+    if(settings === undefined) {
         settings = safari.self.tab.canLoad(event, "getSettings");
+        //if(settings.sIFRPolicy === "textonly") {
+            //disableSIFR();
+            //document.addEventListener("DOMContentLoaded", disableSIFR, true);
+        //}
     }
     
     // Deal with sIFR Flash
-    if (element.className === "sIFR-flash" || element.hasAttribute("sifr")) {
-        if (settings.sIFRPolicy === "autoload") return;
+    if (element.className === "sIFR-flash") {
+        if(settings.sIFRPolicy === "autoload") return;
+        //if(settings.sIFRPolicy === "textonly") {
+            //event.preventDefault();
+            //if(element.parentNode) disableSIFR(element);
+            //return;
+        //}
     }
     
     // At this point we know we have to block 'element' from loading
     var elementID = numberOfBlockedElements++;
     
     // Give an address to this CTP instance to receive messages
-    if(instance === null) {
+    if(instance === undefined) {
         instance = safari.self.tab.canLoad(event, "getInstance");
         registerGlobalShortcuts();
     }
@@ -169,6 +186,7 @@ function handleBeforeLoadEvent(event) {
     // END DEBUG
     
     event.preventDefault(); // prevents 'element' from loading
+    event.stopImmediatePropagation(); // compatibility with other extensions
     
     if(!event.url && !element.id) return;
     data.plugin = responseData.plugin;
@@ -182,22 +200,12 @@ function handleBeforeLoadEvent(event) {
     if(responseData.isInvisible) placeholderElement.className += " CTFinvisible"; // .classList supported in WK nightlies
     
     // Copy CSS box & positioning properties that have an effect on page layout
-    // Note: 'display' is set to 'inline-block', which is always the effective value for 'replaced elements'
+    // Note: 'display' is set to 'inline-block', which is ALWAYS the effective value for plugin-loading elements
     var style = getComputedStyle(element, null);
     var position = style.getPropertyValue("position");
     if(position === "static") placeholderElement.style.setProperty("position", "relative", "important");
     else placeholderElement.style.setProperty("position", position, "important");
-    placeholderElement.style.setProperty("top", style.getPropertyValue("top"), "important");
-    placeholderElement.style.setProperty("right", style.getPropertyValue("right"), "important");
-    placeholderElement.style.setProperty("bottom", style.getPropertyValue("bottom"), "important");
-    placeholderElement.style.setProperty("left", style.getPropertyValue("left"), "important");
-    placeholderElement.style.setProperty("z-index", style.getPropertyValue("z-index"), "important");
-    placeholderElement.style.setProperty("clear", style.getPropertyValue("clear"), "important");
-    placeholderElement.style.setProperty("float", style.getPropertyValue("float"), "important");
-    placeholderElement.style.setProperty("margin-top", style.getPropertyValue("margin-top"), "important");
-    placeholderElement.style.setProperty("margin-right", style.getPropertyValue("margin-right"), "important");
-    placeholderElement.style.setProperty("margin-bottom", style.getPropertyValue("margin-bottom"), "important");
-    placeholderElement.style.setProperty("margin-left", style.getPropertyValue("margin-left"), "important");
+    applyCSS(placeholderElement, style, ["top", "right", "bottom", "left", "z-index", "clear", "float", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-top-collapse", "-webkit-margin-right-collapse", "-webkit-margin-bottom-collapse", "-webkit-margin-left-collapse"]);
     
     // Fill the main arrays
     blockedElements[elementID] = element;
@@ -235,7 +243,7 @@ function handleBeforeLoadEvent(event) {
     }
     
     // Place the blocked element in the stack
-    if(stack ===  null) {
+    if(stack ===  undefined) {
         stack = document.createElement("div");
         stack.id = "CTFstack";
         stack.className = "CTFnodisplay";
@@ -251,7 +259,7 @@ function handleBeforeLoadEvent(event) {
     }
     
     // Build the placeholder
-    placeholderElement.innerHTML = "<div class=\"CTFplaceholderContainer\"><div class=\"CTFlogoVerticalPosition\"><div class=\"CTFlogoHorizontalPosition\"><div class=\"CTFlogoContainer CTFnodisplay\"><div class=\"CTFlogo\"></div><div class=\"CTFlogo CTFinset\"></div></div></div></div></div>";
+    placeholderElement.innerHTML = "<div class=\"CTFplaceholderContainer\"><div class=\"CTFlogoContainer CTFnodisplay\"><div class=\"CTFlogo\"></div><div class=\"CTFlogo CTFinset\"></div></div></div>";
     placeholderElement.firstChild.style.opacity = settings.opacity + " !important";
     
     // Display the badge
@@ -279,7 +287,7 @@ function handleBeforeLoadEvent(event) {
                 "title": document.title,
                 "baseURL": tmpAnchor.href,
                 "href": data.href,
-                "params": getParams(blockedElements[elementID], data.plugin)
+                "params": getParams(element, data.plugin)
             };
         }
         safari.self.tab.dispatchMessage("killPlugin", elementData);
@@ -334,7 +342,7 @@ function hideSource(string) {
 
 function loadInvisible() {
     for(var i = 0; i < numberOfBlockedElements; i++) {
-        if(placeholderElements[i] && /CTFinvisible/.test(placeholderElements[i].className)) {
+        if(placeholderElements[i] && /\bCTFinvisible\b/.test(placeholderElements[i].className)) {
             loadPlugin(i);
         }
     }
@@ -408,7 +416,7 @@ function loadMedia(elementID, autoplay, source) {
     };
     
     // Initialize player
-    mediaPlayers[elementID].createMediaElement(blockedData[elementID].width, blockedData[elementID].height, contextInfo);
+    mediaPlayers[elementID].createMediaElement(this.blockedData[elementID].width, this.blockedData[elementID].height, getComputedStyle(this.placeholderElements[elementID], null), contextInfo);
     
     // Replace placeholder and load first track
     placeholderElements[elementID].parentNode.replaceChild(mediaPlayers[elementID].containerElement, placeholderElements[elementID]);
@@ -472,27 +480,23 @@ function getPluginInfo(elementID) {
     alert("Location: " + window.location.href + "\nSource: " + blockedData[elementID].src + "\n\n" + HTMLToString(blockedElements[elementID]));
 }
 
-// I really don't like the next two methods, but can't come up with something better
-// They are certainly NOT theoretically sound (due to asynchronicity)
-// The worst that can happen though is the badge overflowing the placeholder, or staying hidden.
-// Never saw either happen
 function displayBadge(badgeLabel, elementID) {
     if(!badgeLabel) return;
     // Hide the logo before changing the label
-    placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild.className = "CTFlogoContainer CTFhidden";
+    placeholderElements[elementID].firstChild.firstChild.className = "CTFlogoContainer CTFhidden";
     // Set the new label
-    placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild.childNodes[0].innerHTML = badgeLabel;
-    placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild.childNodes[1].innerHTML = badgeLabel;
+    placeholderElements[elementID].firstChild.firstChild.childNodes[0].textContent = badgeLabel;
+    placeholderElements[elementID].firstChild.firstChild.childNodes[1].textContent = badgeLabel;
     
     // Prepare for logo unhiding
-    placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild.childNodes[1].className = "CTFlogo CTFtmp";
+    placeholderElements[elementID].firstChild.firstChild.childNodes[1].className = "CTFlogo CTFtmp";
     
     unhideLogo(elementID, 0);
 }
 
 // NOTE: this function should never be called directly (use displayBadge instead)
 function unhideLogo(elementID, i) {
-    var logoContainer = placeholderElements[elementID].firstChild.firstChild.firstChild.firstChild;
+    var logoContainer = placeholderElements[elementID].firstChild.firstChild;
     var w0 = placeholderElements[elementID].offsetWidth;
     var h0 = placeholderElements[elementID].offsetHeight;
     var w1 = logoContainer.childNodes[0].offsetWidth;
@@ -501,28 +505,17 @@ function unhideLogo(elementID, i) {
     var h2 = logoContainer.childNodes[1].offsetHeight;
     
     if(w2 === 0 || h2 === 0 || w1 === 0 || h1 === 0 || w0 === 0 || h0 === 0) {
-        if(i > 9) return;
-        // 2 options: leave the logo hidden (no big deal, and rarely happens), 
-        // or run unhideLogo again later <- THIS
+        if(i > 5) return;
         setTimeout(function() {unhideLogo(elementID, ++i);}, 100); // there's no hurry here
         return;
     }
     
     if(logoContainer.childNodes[1].className !== "CTFlogo CTFtmp") return;
     
-    if (w1 <= w0 - 6 && h1 <= h0 - 6) {
-        logoContainer.childNodes[1].className = "CTFlogo CTFinset";
-        logoContainer.className = "CTFlogoContainer";
-        return;
-    } else if (w2 <= w0 - 4 && h2 <= h0 - 5) {
-        logoContainer.childNodes[1].className = "CTFlogo CTFinset";
-        logoContainer.className = "CTFlogoContainer CTFmini";
-        return;
-    } else {
-        logoContainer.childNodes[1].className = "CTFlogo CTFinset";
-        logoContainer.className = "CTFlogoContainer CTFnodisplay";
-        return;
-    }
+    logoContainer.childNodes[1].className = "CTFlogo CTFinset";
+    if (w1 <= w0 - 4 && h1 <= h0 - 4) logoContainer.className = "CTFlogoContainer";
+    else if (w2 <= w0 - 4 && h2 <= h0 - 4) logoContainer.className = "CTFlogoContainer CTFmini";
+    else logoContainer.className = "CTFlogoContainer CTFnodisplay";
 }
 
 function clickPlaceholder(elementID) {
@@ -585,16 +578,15 @@ function directKill(elementID) {
         var sourceElements = mediaElements[0].getElementsByTagName("source");
         for(var i = 0; i < sourceElements.length; i++) {
             if(mediaElements[0].canPlayType(sourceElements[i].getAttribute("type"))) {
-                sources.push({"url": sourceElements[i].getAttribute("src"), "format": sourceElements[i].getAttribute("type").split(";")[0]});
+                sources.push({"url": sourceElements[i].getAttribute("src"), "format": sourceElements[i].getAttribute("type").split(";")[0], "mediaType": mediaType});
             }
         }
-    } else sources.push({"url": mediaElements[0].getAttribute("src"), "format": mediaElements[0].getAttribute("type").split(";")[0]});
-    if(sources.length === 0) return false;
+    } else sources.push({"url": mediaElements[0].getAttribute("src"), "format": mediaElements[0].getAttribute("type").split(";")[0], "mediaType": mediaType});
     
     return {
         "instance": instance,
         "elementID": elementID,
         "location": window.location.href,
-        "playlist": [{"mediaType": mediaType, "posterURL": mediaElements[0].getAttribute("poster"), "sources": sources}]
+        "playlist": [{"posterURL": mediaElements[0].getAttribute("poster"), "sources": sources, "title": mediaElements[0].title}]
     };
 }

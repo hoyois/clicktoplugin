@@ -8,8 +8,34 @@ function downloadURL(url) {
     downloadLink.dispatchEvent(event);
 }
 
+/*function disableSIFR(event) {
+    var sIFRScript = document.createElement("script");
+    sIFRScript.id = "CTFdisabledSIFR";
+    sIFRScript.type = "text/javascript";
+    sIFRScript.src = safari.extension.baseURI + "disableSIFR.js";
+    event.target.parentNode.insertBefore(sIFRScript, event.target.nextSibling);
+    //event.preventDefault();
+}*/
+
+function applyCSS(element, style, properties) {
+    for(var x in properties) {
+        element.style.setProperty(properties[x], style.getPropertyValue(properties[x]), "important");
+    }
+}
+
+function simplifyWheelDelta(x, y) {
+    if(x > y && y > -x) return "left";
+    if(x > y) return "down";
+    if(-x > y) return "right";
+    return "up";
+}
+
 function testShortcut(event, shortcut) {
     for(var x in shortcut) {
+        if(x === "direction") {
+            if(simplifyWheelDelta(event.wheelDeltaX, event.wheelDeltaY) !== shortcut.direction) return false;
+            else continue;
+        }
         if(event[x] !== shortcut[x]) return false;
     }
     event.preventDefault();

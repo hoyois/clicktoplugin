@@ -13,7 +13,7 @@ function fallback(lang) {
 const STRINGS = {
     // Settings
     PLUGINS_TAB: {
-        "en-us": "Plugins",
+        "en-us": "Plug-ins",
         "fr-fr": "Plugins"
     },
     WHITELISTS_TAB: {
@@ -21,15 +21,15 @@ const STRINGS = {
         "fr-fr": "Listes de contrôle"
     },
     KILLERS_TAB: {
-        "en-us": "Killers",
-        "fr-fr": "Assassins"
+        "en-us": "HTML5 replacements",
+        "fr-fr": "Substitutions HTML5"
     },
     MEDIA_TAB: {
-        "en-us": "Audio/Video",
-        "fr-fr": "Audio/vidéo"
+        "en-us": "Media player",
+        "fr-fr": "Lecteur multimédia"
     },
     CONTEXT_MENU_TAB: {
-        "en-us": "Context menu",
+        "en-us": "Shortcut menu",
         "fr-fr": "Menu contextuel"
     },
     KEYBOARD_SHORTCUTS_TAB: {
@@ -59,19 +59,32 @@ const STRINGS = {
     },
     
     ALLOW_THESE_PLUGINS: {
-        "en-us": "Allow these plugins",
+        "en-us": "Allow these plug-ins",
         "fr-fr": "Autoriser ces plugins"
     },
     NO_PLUGINS_NOTICE: {
-        "en-us": "You currently have no enabled plugins!",
+        "en-us": "You currently have no enabled plug-ins!",
         "fr-fr": "Aucun plugin actif!"
     },
+    PLUGIN_VERSION: {
+        "en-us": "Version",
+        "fr-fr": "Version"
+    },
+    PLUGIN_FILENAME: {
+        "en-us": "Filename",
+        "fr-fr": "Fichier"
+    },
+    PLUGIN_DESCRIPTION: {
+        "en-us": "Description",
+        "fr-fr": "Description"
+    },
+    
     ALLOW_LOCATIONS: {
-        "en-us": "Allow plugins on these sites",
+        "en-us": "Allow plug-ins on these sites",
         "fr-fr": "Autoriser les plugins sur ces sites"
     },
     ALLOW_SOURCES: {
-        "en-us": "Allow plugins from these sources",
+        "en-us": "Allow plug-ins from these sources",
         "fr-fr": "Autoriser les plugins provenant de"
     },
     INVERT_WHITELISTS: {
@@ -79,11 +92,11 @@ const STRINGS = {
         "fr-fr": "Inverser"
     },
     HIDE_LOCATIONS: {
-        "en-us": "Hide plugins on these sites",
+        "en-us": "Hide plug-ins on these sites",
         "fr-fr": "Masquer les plugins sur ces sites"
     },
     HIDE_SOURCES: {
-        "en-us": "Hide plugins from these sources",
+        "en-us": "Hide plug-ins from these sources",
         "fr-fr": "Masquer les plugins provenant de"
     },
     INVERT_BLACKLISTS: {
@@ -91,11 +104,11 @@ const STRINGS = {
         "fr-fr": "Inverser"
     },
     ENABLE_THESE_KILLERS: {
-        "en-us": "Enable these killers",
-        "fr-fr": "Activer ces assassins"
+        "en-us": "Use HTML5 replacements for these services",
+        "fr-fr": "Utiliser des remplacements HTML5 pour ces services"
     },
     USE_FALLBACK_MEDIA: {
-        "en-us": "Use media fallbacks",
+        "en-us": "Use HTML5 fallbacks",
         "fr-fr": "Utiliser les replis HTML5"
     },
     SHOW_SOURCE_SELECTOR: {
@@ -103,7 +116,7 @@ const STRINGS = {
         "fr-fr": "Afficher la liste des formats disponibles"
     },
     SHOW_PLUGIN_SOURCE: {
-        "en-us": "Include plugin",
+        "en-us": "Include plug-in",
         "fr-fr": "Inclure le plugin"
     },
     SHOW_QTP_SOURCE: {
@@ -127,16 +140,20 @@ const STRINGS = {
         "fr-fr": "Afficher le controlleur de volume"
     },
     HIDE_REWIND_BUTTON: {
-        "en-us": "Hide ‘Rewind’ button",
+        "en-us": "Hide “Rewind” button",
         "fr-fr": "Supprimer le bouton « Rembobiner 30 secondes »"
     },
     AUTOLOAD_MEDIA_PLAYER: {
         "en-us": "Load media player automatically",
-        "fr-fr": "Lancer le lecteur automatiquement"
+        "fr-fr": "Charger le lecteur automatiquement"
     },
     AUTOPLAY_LOCATIONS: {
         "en-us": "Autoplay on these sites",
         "fr-fr": "Lancer la lecture automatiquement sur ces sites"
+    },
+    START_BUFFERING: {
+        "en-us": "Start buffering once loaded",
+        "fr-fr": "Commencer le téléchargement automatiquement"
     },
     INITIAL_BEHAVIOR: {
         "en-us": "Initial behavior",
@@ -172,7 +189,7 @@ const STRINGS = {
         "fr-fr": "QuickTime Player"
     },
     PLUGIN_PLAYER: {
-        "en-us": "Plugin",
+        "en-us": "Plug-in",
         "fr-fr": "Plugin"
     },
     NONNATIVE_FORMATS_POLICY: {
@@ -180,8 +197,8 @@ const STRINGS = {
         "fr-fr": "Formats non natifs"
     },
     NONNATIVE_IGNORE: {
-        "en-us": "Do not use",
-        "fr-fr": "Ne pas utiliser"
+        "en-us": "Never use as default",
+        "fr-fr": "Ne jamais utiliser comme défaut"
     },
     NONNATIVE_LAST_RESORT: {
         "en-us": "Use only as a last resort",
@@ -192,11 +209,11 @@ const STRINGS = {
         "fr-fr": "Utiliser sans restrictions"
     },
     SOUND_VOLUME: {
-        "en-us": "Sound volume",
-        "fr-fr": "Volume sonore"
+        "en-us": "Initial sound volume",
+        "fr-fr": "Volume sonore initial"
     },
     SHOW_IN_CONTEXT_MENU: {
-        "en-us": "Show these options in the context menu",
+        "en-us": "Show these options in the shortcut menu",
         "fr-fr": "Afficher ces options dans le menu contextuel"
     },
     DISABLE_ENABLE_CONTEXT: {
@@ -212,15 +229,15 @@ const STRINGS = {
         "fr-fr": "Toujours masquer"
     },
     LOAD_ALL_CONTEXT: {
-        "en-us": "Load All Plugins",
+        "en-us": "Load All Plug-ins",
         "fr-fr": "Débloquer tous les plugins"
     },
     LOAD_INVISIBLE_CONTEXT: {
-        "en-us": "Load Invisible Plugins",
+        "en-us": "Load Invisible Plug-ins",
         "fr-fr": "Débloquer les plugins invisibles"
     },
     HIDE_ALL_CONTEXT: {
-        "en-us": "Hide All Plugins",
+        "en-us": "Hide All Plug-ins",
         "fr-fr": "Masquer tous les plugins"
     },
     DOWNLOAD_CONTEXT: {
@@ -236,15 +253,15 @@ const STRINGS = {
         "fr-fr": "Ouvrir avec QuickTime Player"
     },
     LOAD_ALL_SHORTCUT: {
-        "en-us": "Load all plugins in frontmost tab",
+        "en-us": "Load all plug-ins in frontmost tab",
         "fr-fr": "Débloquer tous les plugins"
     },
     HIDE_ALL_SHORTCUT: {
-        "en-us": "Hide all plugins in frontmost tab",
+        "en-us": "Hide all plug-ins in frontmost tab",
         "fr-fr": "Masquer tous les plugins"
     },
     HIDE_PLUGIN_SHORTCUT: {
-        "en-us": "Hide targeted plugin",
+        "en-us": "Hide targeted plug-in",
         "fr-fr": "Masquer le plugin ciblé"
     },
     PLAY_PAUSE_SHORTCUT: {
@@ -308,15 +325,15 @@ const STRINGS = {
         "fr-fr": "pixels"
     },
     ALLOW_INVISIBLE_PLUGINS: {
-        "en-us": "Allow invisible plugins",
+        "en-us": "Allow invisible plug-ins",
         "fr-fr": "Autoriser les plugins invisibles"
     },
     DEBUG_MODE: {
-        "en-us": "Block plugins manually",
+        "en-us": "Block plug-ins manually",
         "fr-fr": "Bloquer les plugins manuellement"
     },
     SHOW_TOOLTIP: {
-        "en-us": "Show plugin source as tooltip",
+        "en-us": "Show plug-in source as tooltip",
         "fr-fr": "Afficher la source du plugin en infobulle"
     },
     YT5_COMPATIBILITY: {
@@ -326,7 +343,7 @@ const STRINGS = {
     
     // Context menu items
     PLUGIN_GENERIC: {
-        "en-us": "Plugin",
+        "en-us": "Plug-in",
         "fr-fr": "le plugin"
     },
     CTP_PREFERENCES: {
@@ -342,23 +359,23 @@ const STRINGS = {
         "fr-fr": "Désactiver ClickToPlugin"
     },
     LOAD_ALL_PLUGINS: {
-        "en-us": "Load All Plugins",
+        "en-us": "Load All Plug-ins",
         "fr-fr": "Débloquer tous les plugins"
     },
     LOAD_INVISIBLE_PLUGINS: {
-        "en-us": "Load Invisible Plugins",
+        "en-us": "Load Invisible Plug-ins",
         "fr-fr": "Débloquer les plugins invisibles"
     },
     HIDE_ALL_PLUGINS: {
-        "en-us": "Hide All Plugins",
+        "en-us": "Hide All Plug-ins",
         "fr-fr": "Masquer tous les plugins"
     },
     ALWAYS_ALLOW_ON_DOMAIN: {
-        "en-us": "Allow Plugins on Domain",
+        "en-us": "Allow Plug-ins on Domain",
         "fr-fr": "Autoriser les plugins sur ce domaine"
     },
     ALWAYS_BLOCK_ON_DOMAIN: {
-        "en-us": "Block Plugins on Domain",
+        "en-us": "Block Plug-ins on Domain",
         "fr-fr": "Bloquer les plugins sur ce domaine"
     },
     ALWAYS_ALLOW_SOURCE: {
@@ -366,11 +383,11 @@ const STRINGS = {
         "fr-fr": "Toujours autoriser"
     },
     ALWAYS_HIDE_ON_DOMAIN: {
-        "en-us": "Hide Plugins on Domain",
+        "en-us": "Hide Plug-ins on Domain",
         "fr-fr": "Masquer les plugins sur ce domaine"
     },
     ALWAYS_SHOW_ON_DOMAIN: {
-        "en-us": "Show Plugins on Domain",
+        "en-us": "Show Plug-ins on Domain",
         "fr-fr": "Afficher les plugins sur ce domaine"
     },
     ALWAYS_HIDE_SOURCE: {
@@ -390,12 +407,12 @@ const STRINGS = {
         "fr-fr": "Ouvrir avec QuickTime Player"
     },
     GET_PLUGIN_INFO: {
-        "en-us": "Get Plugin Info",
+        "en-us": "Get Plug-in Info",
         "fr-fr": "Lire les informations"
     },
     LOAD_PLUGIN: {
         "en-us": function(plugin) {return "Load " + plugin;},
-        "fr-fr": function(plugin) {return "Lancer " + plugin;}
+        "fr-fr": function(plugin) {return "Charger " + plugin;}
     },
     HIDE_PLUGIN: {
         "en-us": function(plugin) {return "Hide " + plugin;},

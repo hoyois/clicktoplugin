@@ -6,9 +6,9 @@ DivXKiller.prototype.canKill = function(data) {
 };
 
 
-DivXKiller.prototype.processElement = function(data, callback) {
+DivXKiller.prototype.process = function(data, callback) {
     var videoData = {
-        "playlist": [{"mediaType": "video", "posterURL": data.params, "sources": [{"url": data.src, "isNative": false}]}]
+        "playlist": [{"posterURL": data.params, "sources": [{"url": data.src, "isNative": false, "mediaType": "video"}]}]
     };
     callback(videoData);
 };
