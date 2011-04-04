@@ -164,7 +164,6 @@ Placeholder element
 }
 
 .CTFplaceholder .CTFlogo {
-    width: intrinsic !important;
     position: static !important;
     display: block !important;
     -webkit-box-shadow: 0 0 2px rgba(0, 0, 0, 1), inset 0 0 2px rgba(0, 0, 0, 1), 0 0 6px rgba(0, 0, 0, 0.6), inset 0 0 6px rgba(0, 0, 0, 0.6) !important;

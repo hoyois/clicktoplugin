@@ -130,7 +130,7 @@ YouTubeKiller.prototype.processFromFlashVars = function(flashvars, documentTitle
         return;
     }
     
-    if(!hasFlashVariable(flashvars, "t")) { // channel page
+    if(!flashvars.t) { // channel page
         this.processFromVideoID(videoID, callback);
         return;
     }

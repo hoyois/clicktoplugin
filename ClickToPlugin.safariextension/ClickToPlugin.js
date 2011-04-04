@@ -94,26 +94,6 @@ function respondToMessage(event) {
 function handleBeforeLoadEvent(event) {
     const element = event.target;
     
-    // deal with sIFR script first
-    /*if(element instanceof HTMLScriptElement) {
-        if(element.src.indexOf("sifr-config.js") !== -1) {
-            event.preventDefault();
-        } else if(element.src.indexOf("sifr.js") !== -1) {
-            var sIFRData = safari.self.tab.canLoad(event, "sIFR");
-            if(!sIFRData.canLoad) {
-                // BEGIN DEBUG
-                if(sIFRData.debug) {
-                    if(!confirm("ClickToPlugin is about to modify an sIFR configuration script:\n\n" + element.src)) return;
-                }
-                //element.setAttribute("defer", "");
-                // END DEBUG
-                //event.preventDefault(); // prevents loading of sifr.js
-                disableSIFR(event);
-                return;
-            }
-        }
-    }*/
-    
     // the following happens when the Flash element is reloaded
     // (for instance after the user clicks on its placeholder):
     // the beforeload event is fired again but this time the
@@ -138,27 +118,23 @@ function handleBeforeLoadEvent(event) {
     if(responseData === true) return; // whitelisted
     if(responseData === false) { // hide plugin
         event.preventDefault();
+        event.stopImmediatePropagation();
         removeHTMLNode(element);
         return;
     }
     
     // Load the user settings
-    if(settings === undefined) {
-        settings = safari.self.tab.canLoad(event, "getSettings");
-        //if(settings.sIFRPolicy === "textonly") {
-            //disableSIFR();
-            //document.addEventListener("DOMContentLoaded", disableSIFR, true);
-        //}
-    }
+    if(settings === undefined) settings = safari.self.tab.canLoad(event, "getSettings");
     
     // Deal with sIFR Flash
     if (element.className === "sIFR-flash") {
         if(settings.sIFRPolicy === "autoload") return;
-        //if(settings.sIFRPolicy === "textonly") {
-            //event.preventDefault();
-            //if(element.parentNode) disableSIFR(element);
-            //return;
-        //}
+        if(settings.sIFRPolicy === "textonly") {
+            setTimeout(function() {disableSIFR(element);}, 0);
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            return;
+        }
     }
     
     // At this point we know we have to block 'element' from loading
