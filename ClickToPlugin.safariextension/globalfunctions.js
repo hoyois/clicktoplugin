@@ -36,13 +36,7 @@ function unescapeHTML(text) {
     return e.firstChild.nodeValue;
 }
 
-/*function escapeURIComponent(text) {
-    if(!text) return "";
-    return decodeURIComponent(text);
-}*/
-
 function parseUnicode(text) {
-    //if(!text) return "";
     return text.replace(/\\u([0-9a-fA-F]{4})/g, function(s,c) {return String.fromCharCode(parseInt(c, 16));});
 }
 
@@ -88,8 +82,8 @@ function canPlayTypeWithHTML5(MIMEType) {
 const canPlayFLV = canPlayTypeWithHTML5("video/x-flv");
 const canPlayWM = canPlayTypeWithHTML5("video/x-ms-wmv");
 const canPlayDivX = canPlayFLV; // 'video/divx' always returns "", probably a Perian oversight
+//const canPlayWebM = canPlayFLV; // same as above (needs Perian 2.2)
 const canPlayOGG = canPlayTypeWithHTML5("video/ogg"); // OK with Xiph component
-//const canPlayWebM = canPlayTypeWithHTML5("video/webm"); // can play WebM with Perian 2.2 (but returns "")
 
 // and certainly not this this one! but it does the job reasonably well
 function canPlaySrcWithHTML5(url) {

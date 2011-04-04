@@ -8,14 +8,16 @@ function downloadURL(url) {
     downloadLink.dispatchEvent(event);
 }
 
-/*function disableSIFR(event) {
-    var sIFRScript = document.createElement("script");
-    sIFRScript.id = "CTFdisabledSIFR";
-    sIFRScript.type = "text/javascript";
-    sIFRScript.src = safari.extension.baseURI + "disableSIFR.js";
-    event.target.parentNode.insertBefore(sIFRScript, event.target.nextSibling);
-    //event.preventDefault();
-}*/
+function disableSIFR(element) {
+    var sIFRElement = element.parentNode;
+    if(!sIFRElement) return;
+    var regex = /\bsIFR-(?:hasFlash|active)\b/g;
+    document.documentElement.className = document.documentElement.className.replace(regex, "");
+    document.body.className = document.body.className.replace(regex, "");
+    var sIFRAlternate = sIFRElement.getElementsByClassName("sIFR-alternate")[0];
+    if(sIFRAlternate) sIFRElement.innerHTML = sIFRAlternate.innerHTML;
+    sIFRElement.className = sIFRElement.className.replace(/\bsIFR-replaced\b/, "");
+}
 
 function applyCSS(element, style, properties) {
     for(var x in properties) {

@@ -368,11 +368,6 @@ function loadSettings(event) {
         document.getElementById("showPoster").disabled = true;
         document.getElementById("showMediaTooltip").disabled = true;
     } else document.getElementById("preload").disabled = true;
-    
-    if(settings.sIFRPolicy === "textonly") { // temporary
-        document.getElementById("sIFRPolicy").children[0].selected = false;
-        document.getElementById("sIFRPolicy").children[1].selected = true;
-    }
 }
 
 safari.self.addEventListener("message", loadSettings, false);

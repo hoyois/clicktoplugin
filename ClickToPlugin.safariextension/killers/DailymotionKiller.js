@@ -8,7 +8,7 @@ DailymotionKiller.prototype.canKill = function(data) {
 DailymotionKiller.prototype.process = function(data, callback) {
     if(data.params) {
         var sequence = parseFlashVariables(data.params).sequence;
-        if(seqeunce) this.processFromSequence(decodeURIComponent(sequence), callback);
+        if(sequence) this.processFromSequence(decodeURIComponent(sequence), callback);
         return;
     }
     // The vid has no flashvars... It has to be an embed
