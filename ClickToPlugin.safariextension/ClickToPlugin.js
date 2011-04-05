@@ -1,9 +1,11 @@
+if(window.location.href !== "about:blank") {
+
 /*************************
 ClickToPlugin global scope
 *************************/
 
 var blockedElements = new Array(); // array containing the blocked HTML elements
-var blockedData = new Array(); // array containing info on the blocked element (plugin, dimension, source, ...)
+var blockedData = new Array(); // array containing info on the blocked element (plugin, dimensions, source, ...)
 var placeholderElements = new Array(); // array containing the corresponding placeholder elements
 var mediaPlayers = new Array(); // array containing the HTML5 media players
 
@@ -92,15 +94,15 @@ function respondToMessage(event) {
 }
 
 function handleBeforeLoadEvent(event) {
-    const element = event.target;
+    var element = event.target;
     
     // the following happens when the Flash element is reloaded
     // (for instance after the user clicks on its placeholder):
     // the beforeload event is fired again but this time the
     // flash element must not be blocked
-    if (element.allowedToLoad) return;
+    if(element.allowedToLoad) return;
     
-    if (!(element instanceof HTMLObjectElement || element instanceof HTMLEmbedElement)) return;
+    if(!(element instanceof HTMLObjectElement || element instanceof HTMLEmbedElement)) return;
     
     var data = getAttributes(element, event.url);
     /* PROBLEM: elements within display:none iframes fire beforeload events, and the following is incorrect
@@ -127,7 +129,7 @@ function handleBeforeLoadEvent(event) {
     if(settings === undefined) settings = safari.self.tab.canLoad(event, "getSettings");
     
     // Deal with sIFR Flash
-    if (element.className === "sIFR-flash") {
+    if(element.className === "sIFR-flash") {
         if(settings.sIFRPolicy === "autoload") return;
         if(settings.sIFRPolicy === "textonly") {
             setTimeout(function() {disableSIFR(element);}, 0);
@@ -197,7 +199,7 @@ function handleBeforeLoadEvent(event) {
             "src": data.src,
             "plugin": blockedData[elementID].plugin // it can change in time
         };
-        if (mediaPlayers[elementID] && mediaPlayers[elementID].startTrack !== undefined && mediaPlayers[elementID].currentSource !== undefined) {
+        if(mediaPlayers[elementID] && mediaPlayers[elementID].startTrack !== undefined && mediaPlayers[elementID].currentSource !== undefined) {
             mediaPlayers[elementID].setContextInfo(event, contextInfo);
             event.stopPropagation();
         } else {
@@ -236,7 +238,11 @@ function handleBeforeLoadEvent(event) {
     // Display the badge
     displayBadge(data.plugin ? data.plugin : "?", elementID);
     
-    if(!data.plugin) safari.self.tab.dispatchMessage("checkMIMEType", {"instance": instance, "elementID": elementID, "url": event.url});
+    if(!data.plugin) {
+        var tmpAnchor = document.createElement("a");
+        tmpAnchor.href = event.url;
+        safari.self.tab.dispatchMessage("checkMIMEType", {"instance": instance, "elementID": elementID, "url": tmpAnchor.href});
+    }
 
     // Look for video replacements
     if(settings.enabledKillers.length > 0) {
@@ -324,7 +330,7 @@ function prepMedia(mediaData) {
     if(!blockedElements[elementID]) return; // User has loaded plugin already
 
     if(!mediaPlayers[elementID]) {
-        mediaPlayers[elementID] = new mediaPlayer(mediaData.elementID);
+        mediaPlayers[elementID] = new mediaPlayer();
     }
     
     mediaPlayers[elementID].handleMediaData(mediaData);
@@ -484,13 +490,13 @@ function unhideLogo(elementID, i) {
     if(logoContainer.childNodes[1].className !== "CTFlogo CTFtmp") return;
     
     logoContainer.childNodes[1].className = "CTFlogo CTFinset";
-    if (w1 <= w0 - 4 && h1 <= h0 - 4) logoContainer.className = "CTFlogoContainer";
-    else if (w2 <= w0 - 4 && h2 <= h0 - 4) logoContainer.className = "CTFlogoContainer CTFmini";
+    if(w1 <= w0 - 4 && h1 <= h0 - 4) logoContainer.className = "CTFlogoContainer";
+    else if(w2 <= w0 - 4 && h2 <= h0 - 4) logoContainer.className = "CTFlogoContainer CTFmini";
     else logoContainer.className = "CTFlogoContainer CTFnodisplay";
 }
 
 function clickPlaceholder(elementID) {
-    if (mediaPlayers[elementID] && mediaPlayers[elementID].startTrack !== undefined && mediaPlayers[elementID].currentSource !== undefined) {
+    if(mediaPlayers[elementID] && mediaPlayers[elementID].startTrack !== undefined && mediaPlayers[elementID].currentSource !== undefined) {
         switch(settings.defaultPlayer) {
             case "html5": 
                 loadMedia(elementID, true);
@@ -560,4 +566,6 @@ function directKill(elementID) {
         "location": window.location.href,
         "playlist": [{"posterURL": mediaElements[0].getAttribute("poster"), "sources": sources, "title": mediaElements[0].title}]
     };
+}
+
 }

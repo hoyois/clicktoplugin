@@ -22,7 +22,7 @@
     </section>
     <section>
         <menu>
-                <li><span class="left textarea"><label for="locationsWhitelist"><span class="string" title="ALLOW_LOCATIONS"></span>:</label></span><span class="right"><textarea id="locationsWhitelist" class="setting" wrap="off" placeholder="http://www.example.com&#xA;example2.com/path/"></textarea></span></li>
+                <li><span class="left textarea"><label for="locationsWhitelist"><span class="string" title="ALLOW_LOCATIONS"></span>:</label></span><span class="right"><textarea id="locationsWhitelist" class="setting" wrap="off" placeholder="www.example.com/path&#xA;@^http://[a-z]*\.reg(ex)?\.com/"></textarea></span></li>
                 <li><span class="left textarea"><label for="sourcesWhitelist"><span class="string" title="ALLOW_SOURCES"></span>:</label></span><span class="right"><textarea id="sourcesWhitelist" class="setting" wrap="off" placeholder="example.swf"></textarea></span></li>
                 <li><span class="left"></span><span class="right"><input id="invertWhitelists" class="setting" type="checkbox"/><label for="invertWhitelists"><span class="string" title="INVERT_WHITELISTS"></span></label></span></li>
                 <li class="glue"></li>
@@ -33,22 +33,22 @@
     </section>
     <section>
         <menu>
-                <li><span class="left"><span class="string" title="ENABLE_THESE_KILLERS"></span>:</span><span class="right"><input id="killer0" class="killer" type="checkbox"/><label for="killer0">YouTube</label></span></li>
-                <li><span class="left"><input id="killers_all" type="button" value="Select All"/><input id="killers_toggle" type="button" value="Toggle"/></span><span class="right"><input id="killer1" class="killer" type="checkbox"/><label for="killer1">Vimeo</label></span></li>
-                <li><span class="left"></span><span class="right"><input id="killer2" class="killer" type="checkbox"/><label for="killer2">Dailymotion</label></span></li>
-                <li><span class="left"></span><span class="right"><input id="killer3" class="killer" type="checkbox"/><label for="killer3">Facebook</label></span></li>
-                <li><span class="left"></span><span class="right"><input id="killer4" class="killer" type="checkbox"/><label for="killer4">Break</label></span></li>                
-                <li><span class="left"></span><span class="right"><input id="killer5" class="killer" type="checkbox"/><label for="killer5">Blip.tv</label></span></li>
-                <li><span class="left"></span><span class="right"><input id="killer6" class="killer" type="checkbox"/><label for="killer6">Metacafe</label></span></li>
-                <li><span class="left"></span><span class="right"><input id="killer7" class="killer" type="checkbox"/><label for="killer7">Tumblr Audio</label></span></li>
-                <li><span class="left"></span><span class="right"><input id="killer8" class="killer" type="checkbox"/><label for="killer8">Veoh</label></span></li>
-                <li><span class="left"></span><span class="right"><input id="killer9" class="killer" type="checkbox"/><label for="killer9">Megavideo</label></span></li>
+                <li><span class="left"><span class="string" title="ENABLE_THESE_KILLERS"></span>:</span><span class="right"><input id="killer5" class="killer" type="checkbox"/><label for="killer5">Blip.tv</label></span></li>
+                <li><span class="left"><input id="killers_all" type="button" value="Select All"/><input id="killers_toggle" type="button" value="Toggle"/></span><span class="right"><input id="killer4" class="killer" type="checkbox"/><label for="killer4">Break</label></span></li>
                 <li><span class="left"></span><span class="right"><input id="killer10" class="killer" type="checkbox"/><label for="killer10">Broadcast Interactive Media</label></span></li>
+                <li><span class="left"></span><span class="right"><input id="killer2" class="killer" type="checkbox"/><label for="killer2">Dailymotion</label></span></li>
+                <li><span class="left"></span><span class="right"><input id="killer15" class="killer" type="checkbox"/><label for="killer15">DivX</label></span></li>
+                <li><span class="left"></span><span class="right"><input id="killer3" class="killer" type="checkbox"/><label for="killer3">Facebook</label></span></li>
                 <li><span class="left"></span><span class="right"><input id="killer11" class="killer" type="checkbox"/><label for="killer11">Generic Flash</label></span></li>
                 <li><span class="left"></span><span class="right"><input id="killer12" class="killer" type="checkbox"/><label for="killer12">Generic Silverlight</label></span></li>
+                <li><span class="left"></span><span class="right"><input id="killer9" class="killer" type="checkbox"/><label for="killer9">Megavideo</label></span></li>
+                <li><span class="left"></span><span class="right"><input id="killer6" class="killer" type="checkbox"/><label for="killer6">Metacafe</label></span></li>
                 <li><span class="left"></span><span class="right"><input id="killer13" class="killer" type="checkbox"/><label for="killer13">QuickTime</label></span></li>
+                <li><span class="left"></span><span class="right"><input id="killer7" class="killer" type="checkbox"/><label for="killer7">Tumblr Audio</label></span></li>
+                <li><span class="left"></span><span class="right"><input id="killer8" class="killer" type="checkbox"/><label for="killer8">Veoh</label></span></li>
+                <li><span class="left"></span><span class="right"><input id="killer1" class="killer" type="checkbox"/><label for="killer1">Vimeo</label></span></li>
                 <li><span class="left"></span><span class="right"><input id="killer14" class="killer" type="checkbox"/><label for="killer14">Windows Media</label></span></li>
-                <li><span class="left"></span><span class="right"><input id="killer15" class="killer" type="checkbox"/><label for="killer15">DivX</label></span></li>
+                <li><span class="left"></span><span class="right"><input id="killer0" class="killer" type="checkbox"/><label for="killer0">YouTube</label></span></li>
                 <li class="glue"></li>
                 <li><span class="left"></span><span class="right"><input id="useFallbackMedia" class="setting" type="checkbox"/><label for="useFallbackMedia"><span class="string" title="USE_FALLBACK_MEDIA"></span></label></span></li>
         </menu>
@@ -134,7 +134,6 @@
             <li><span class="left"><label for="maxInvisibleSize"><span class="string" title="MAX_INVISIBLE_SIZE"></span>:</label></span><span class="right"><input id="maxInvisibleSize" class="setting" type="number" min="1" step="1" size="3"/><span class="string" title="PIXELS_UNIT"></span></span></li>
             <li><span class="left"></span><span class="right"><input id="loadInvisible" class="setting" type="checkbox"/><label for="loadInvisible"><span class="string" title="ALLOW_INVISIBLE_PLUGINS"></span></label></span></li>
             <li><span class="left"></span><span class="right"><input id="debug" class="setting" type="checkbox"/><label for="debug"><span class="string" title="DEBUG_MODE"></span></label></span></li>
-            <!--<li><span class="left"></span><span class="right"><input id="YT5Compatibility" class="setting" type="checkbox"/><label for="YT5Compatibility"><span class="string" title="YT5_COMPATIBILITY"></span></label></span></li>-->
     </menu>
     </section>
     <script type="text/javascript" src="settings.js"></script>

@@ -2,7 +2,7 @@ function MegavideoKiller() {}
 
 MegavideoKiller.prototype.canKill = function(data) {
     if(data.plugin !== "Flash") return false;
-    if(safari.extension.settings.codecsPolicy === 1 || !canPlayFLV) return false;
+    if(!canPlayFLV) return false;
     if(data.src === "http://wwwstatic.megavideo.com/mv_player2.swf") {data.onsite = true; return true;};
     if(data.src.indexOf("megavideo.com/v/") !== -1) {data.onsite = false; return true;}
     return false;
@@ -10,7 +10,7 @@ MegavideoKiller.prototype.canKill = function(data) {
 
 MegavideoKiller.prototype.process = function(data, callback) {
     if(data.onsite) {
-        this.finalizeProcessing(parseFlashVariables(data.params), null, callback);
+        this.processFromFlashVars(parseFlashVariables(data.params), callback);
         return;
     }
     
@@ -24,13 +24,17 @@ MegavideoKiller.prototype.process = function(data, callback) {
     xhr.open('GET', url, true);
     var _this = this;
     xhr.onload = function() {
+        var callbackForEmbed = function(videoData) {
+            videoData.playlist[0].siteInfo = {"name": "Megavideo", "url": url};
+            callback(videoData);
+        };
         var regex = new RegExp("flashvars\\.([0-9a-z_]*)\\s=\\s\\\"([^\"]*)\\\";", "g");
-        _this.finalizeProcessing(parseWithRegExp(xhr.responseText, regex), {"name": "Megavideo", "url": url}, callback);
+        _this.processFromFlashVars(parseWithRegExp(xhr.responseText, regex), callbackForEmbed);
     };
     xhr.send(null);
 };
 
-MegavideoKiller.prototype.finalizeProcessing = function(flashvars, siteInfo, callback) {
+MegavideoKiller.prototype.processFromFlashVars = function(flashvars, callback) {
     var sources = new Array();
     
     var title;
@@ -42,7 +46,7 @@ MegavideoKiller.prototype.finalizeProcessing = function(flashvars, siteInfo, cal
     sources.push({"url": "http://www" + flashvars.s + ".megavideo.com/files/" + this.decrypt(flashvars.un, flashvars.k1, flashvars.k2) + "/" + title + ".flv", "format": "SD FLV", "resolution": 360, "isNative": false, "mediaType": "video"});
     
     var videoData = {
-        "playlist": [{"siteInfo": siteInfo, "title": title, "sources": sources}]
+        "playlist": [{"title": title, "sources": sources}]
     };
     callback(videoData);
 };

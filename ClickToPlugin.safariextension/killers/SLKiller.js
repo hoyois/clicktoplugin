@@ -2,9 +2,8 @@ function SLKiller() {}
 
 SLKiller.prototype.canKill = function(data) {
     if(!data.plugin === "Silverlight") return false;
-    if(hasSLVariable(data.params, "m")) {data.file = "m"; return true;}
-    if(hasSLVariable(data.params, "fileurl")) {data.file = "fileurl"; return true;}
-    if(hasSLVariable(data.params, "mediaurl")) {data.file = "mediaurl"; return true;}
+    var matches = data.params.match(/(?:^|,)(m|fileurl|mediaurl)=/);
+    if(matches) {data.file = matches[1]; return true;}
     return false;
 };
 

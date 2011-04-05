@@ -56,16 +56,35 @@ var pluginList = sections[0].getElementsByTagName("menu")[0];
 if(navigator.plugins.length === 0) {
     pluginList.innerHTML = "<li><span>" + NO_PLUGINS_NOTICE + "</span></li>";
 } else {
+    var pluginItems = new Array();
+    for(var i = 0; i < navigator.plugins.length; i++) {
+        var span = document.createElement("span");
+        span.className = "right";
+        span.title = PLUGIN_FILENAME + ": " + navigator.plugins[i].filename + "\n" + PLUGIN_DESCRIPTION + ": " + navigator.plugins[i].description;
+        //var title = "";
+        span.innerHTML = "<input id=\"plugin" + i + "\" class=\"plugin\" type=\"checkbox\"/><label for=\"plugin" + i + "\"></label></span>";
+        span.childNodes[1].textContent = navigator.plugins[i].name;
+        pluginItems.push(span);
+    }
+    var alphabeticalSort = function(a, b) {
+        a = a.childNodes[1].textContent.toLowerCase();
+        b = b.childNodes[1].textContent.toLowerCase();
+        if(a < b) return -1;
+        if(a > b) return 1;
+        return 0;
+    };
+    pluginItems.sort(alphabeticalSort);
     for(var i = 0; i < navigator.plugins.length || i < 2; i++) {
         var li = document.createElement("li");
-        var title = "";
-        li.innerHTML = "<span class=\"left\">" + (i === 0 ? (ALLOW_THESE_PLUGINS + ":") : i === 1 ? "<input id=\"plugins_reset\" type=\"button\" value=\"" + DESELECT_ALL_BUTTON + "\"/><input id=\"plugins_toggle\" type=\"button\" value=\"" + TOGGLE_BUTTON + "\"/>" : "") + "</span><span class=\"right\">" + (navigator.plugins[i] ? ("<input id=\"plugin" + i + "\" class=\"plugin\" type=\"checkbox\"/><label for=\"plugin" + i + "\"></label>") : "") + "</span>";
-        if(navigator.plugins[i]) {
-            li.childNodes[1].title = PLUGIN_FILENAME + ": " + navigator.plugins[i].filename + "\n" + PLUGIN_DESCRIPTION + ": " + navigator.plugins[i].description;
-            li.childNodes[1].childNodes[1].textContent = navigator.plugins[i].name;
-        }
+        var span = document.createElement("span");
+        span.className = "left";
+        if(i === 0) span.textContent = ALLOW_THESE_PLUGINS + ":";
+        else if(i === 1) span.innerHTML = "<input id=\"plugins_reset\" type=\"button\" value=\"" + DESELECT_ALL_BUTTON + "\"/><input id=\"plugins_toggle\" type=\"button\" value=\"" + TOGGLE_BUTTON + "\"/>";
+        li.appendChild(span);
+        if(i < navigator.plugins.length) li.appendChild(pluginItems[i]);
         pluginList.appendChild(li);
     }
+    
     document.getElementById("plugins_toggle").addEventListener("click", function() {
         for(var i = 0; i < pluginInputs.length; i++) {
             pluginInputs[i].checked ^= true;
@@ -243,7 +262,7 @@ function simplifyWheelDelta(x, y) {
 function checked(inputList) {
     var array = new Array();
     for(var i = 0; i < inputList.length; i++) {
-        if(inputList[i].checked) array.push(i);
+        if(inputList[i].checked) array.push(parseInt(inputList[i].id.substr(6)));
     }
     return array;
 }
@@ -280,7 +299,7 @@ function parseKeyID(keyID) {
             case 8: return "\u232b";
             case 9: return "\u21e5";
             case 27: return "\u238b";
-            case 32: return "\u2423";
+            case 32: return "[space]";
             case 127: return "\u2326";
             default: return String.fromCharCode(code);
         }
