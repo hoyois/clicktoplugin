@@ -54,7 +54,8 @@ if(/\+/.test(navigator.appVersion)) {
 // Plugins list
 var pluginList = sections[0].getElementsByTagName("menu")[0];
 if(navigator.plugins.length === 0) {
-    pluginList.innerHTML = "<li><span>" + NO_PLUGINS_NOTICE + "</span></li>";
+    pluginList.innerHTML = "<li><span></span></li>";
+    pluginList.firstChild.firstChild.textContent = NO_PLUGINS_NOTICE;
 } else {
     var pluginItems = new Array();
     for(var i = 0; i < navigator.plugins.length; i++) {
@@ -79,7 +80,11 @@ if(navigator.plugins.length === 0) {
         var span = document.createElement("span");
         span.className = "left";
         if(i === 0) span.textContent = ALLOW_THESE_PLUGINS + ":";
-        else if(i === 1) span.innerHTML = "<input id=\"plugins_reset\" type=\"button\" value=\"" + DESELECT_ALL_BUTTON + "\"/><input id=\"plugins_toggle\" type=\"button\" value=\"" + TOGGLE_BUTTON + "\"/>";
+        else if(i === 1) {
+            span.innerHTML = "<input id=\"plugins_reset\" type=\"button\"/><input id=\"plugins_toggle\" type=\"button\"/>";
+            span.childNodes[0].value = DESELECT_ALL_BUTTON;
+            span.childNodes[1].value = TOGGLE_BUTTON;
+        }
         li.appendChild(span);
         if(i < navigator.plugins.length) li.appendChild(pluginItems[i]);
         pluginList.appendChild(li);
@@ -121,7 +126,6 @@ document.body.appendChild(auxDiv);
 
 function resizeTextArea(textarea) {
     auxDiv.textContent = textarea.value;
-    auxDiv.innerHTML = auxDiv.innerHTML.replace(/\n/g, "<br/>");
     var height = textarea.value.split("\n").length*16 + 15;
     var width = auxDiv.offsetWidth + 16;
     if(height > 175) height = 175;
@@ -150,10 +154,8 @@ for(var i = 0; i < textareas.length; i++) {
         }
     }, false);
     
-    
     textareas[i].addEventListener("input", handleTextAreaInput, false);
     textareas[i].addEventListener("focus", handleTextAreaInput, false);
-    //textareas[i].addEventListener("change", function(event) {auxDiv.innerHTML = "";}, false);
 }
 
 
@@ -226,8 +228,6 @@ function handleKeyboardEvent(event) {
     registerShortcut({"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "keyIdentifier": event.keyIdentifier}, event.target);
 }
 
-
-
 for(var i = 0; i < mouseInputs.length; i++) {
     mouseInputs[i].addEventListener("click", handleClickEvent, false);
     mouseInputs[i].addEventListener("dblclick", handleClickEvent, false);
@@ -235,7 +235,7 @@ for(var i = 0; i < mouseInputs.length; i++) {
     /*mouseInputs[i].addEventListener("contextmenu", function(event) {
         event.preventDefault();
         var e = document.createEvent("MouseEvents");
-        e.initMouseEvent("click", false, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+        e.initMouseEvent("click", false, false, window, 0, 0, 0, 0, 0, false, false, false, false, 2, null);
         _this.mediaElement.dispatchEvent(e);
     }, false);*/
 }
@@ -243,7 +243,7 @@ function handleClickEvent(event) {
     event.preventDefault();
     registerShortcut({"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "button": event.button}, event.target.previousSibling);
 }
-function handleWheelEvent(event) { // only works for "click"-wheels
+function handleWheelEvent(event) {
     event.preventDefault();
     registerShortcut({"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "direction": simplifyWheelDelta(event.wheelDeltaX, event.wheelDeltaY)}, event.target.previousSibling);
 }
