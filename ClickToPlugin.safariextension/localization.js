@@ -60,7 +60,7 @@ const STRINGS = {
     
     ALLOW_THESE_PLUGINS: {
         "en-us": "Allow these plug-ins",
-        "fr-fr": "Autoriser ces plugins"
+        "fr-fr": "Autoriser ces plugins "
     },
     NO_PLUGINS_NOTICE: {
         "en-us": "You currently have no enabled plug-ins!",
@@ -68,20 +68,20 @@ const STRINGS = {
     },
     PLUGIN_FILENAME: {
         "en-us": "From file",
-        "fr-fr": "Fichier"
+        "fr-fr": "Fichier "
     },
     PLUGIN_DESCRIPTION: {
         "en-us": "Description",
-        "fr-fr": "Description"
+        "fr-fr": "Description "
     },
     
     ALLOW_LOCATIONS: {
         "en-us": "Allow plug-ins on these sites",
-        "fr-fr": "Autoriser les plugins sur ces sites"
+        "fr-fr": "Autoriser les plugins sur ces sites "
     },
     ALLOW_SOURCES: {
         "en-us": "Allow plug-ins from these sources",
-        "fr-fr": "Autoriser les plugins provenant de"
+        "fr-fr": "Autoriser les plugins provenant de "
     },
     INVERT_WHITELISTS: {
         "en-us": "Negate lists",
@@ -89,11 +89,11 @@ const STRINGS = {
     },
     HIDE_LOCATIONS: {
         "en-us": "Hide plug-ins on these sites",
-        "fr-fr": "Masquer les plugins sur ces sites"
+        "fr-fr": "Masquer les plugins sur ces sites "
     },
     HIDE_SOURCES: {
         "en-us": "Hide plug-ins from these sources",
-        "fr-fr": "Masquer les plugins provenant de"
+        "fr-fr": "Masquer les plugins provenant de "
     },
     INVERT_BLACKLISTS: {
         "en-us": "Negate lists",
@@ -101,7 +101,7 @@ const STRINGS = {
     },
     ENABLE_THESE_KILLERS: {
         "en-us": "Use HTML5 replacements for these services",
-        "fr-fr": "Substituter les plugins par HTML5 pour ces services"
+        "fr-fr": "Substituter les plugins par HTML5 pour ces services "
     },
     USE_FALLBACK_MEDIA: {
         "en-us": "Use HTML5 fallbacks",
@@ -145,7 +145,7 @@ const STRINGS = {
     },
     AUTOPLAY_LOCATIONS: {
         "en-us": "Autoplay on these sites",
-        "fr-fr": "Lancer la lecture automatiquement sur ces sites"
+        "fr-fr": "Lancer la lecture automatiquement sur ces sites "
     },
     START_BUFFERING: {
         "en-us": "Start buffering once loaded",
@@ -170,11 +170,11 @@ const STRINGS = {
     },
     MAX_RESOLUTION: {
         "en-us": "Default resolution",
-        "fr-fr": "Résolution par défaut"
+        "fr-fr": "Résolution par défaut "
     },
     DEFAULT_PLAYER: {
         "en-us": "Default media player",
-        "fr-fr": "Lecteur par défaut"
+        "fr-fr": "Lecteur par défaut "
     },
     HTML5_PLAYER: {
         "en-us": "HTML5",
@@ -190,7 +190,7 @@ const STRINGS = {
     },
     NONNATIVE_FORMATS_POLICY: {
         "en-us": "Nonnative formats policy",
-        "fr-fr": "Formats non natifs"
+        "fr-fr": "Formats non natifs "
     },
     NONNATIVE_IGNORE: {
         "en-us": "Never use as default",
@@ -206,11 +206,11 @@ const STRINGS = {
     },
     SOUND_VOLUME: {
         "en-us": "Initial sound volume",
-        "fr-fr": "Volume sonore initial"
+        "fr-fr": "Volume sonore initial "
     },
     SHOW_IN_CONTEXT_MENU: {
         "en-us": "Show these options in the shortcut menu",
-        "fr-fr": "Afficher ces options dans le menu contextuel"
+        "fr-fr": "Afficher ces options dans le menu contextuel "
     },
     DISABLE_ENABLE_CONTEXT: {
         "en-us": "Disable/Enable ClickToPlugin",
@@ -250,55 +250,55 @@ const STRINGS = {
     },
     LOAD_ALL_SHORTCUT: {
         "en-us": "Load all plug-ins in frontmost tab",
-        "fr-fr": "Débloquer tous les plugins"
+        "fr-fr": "Débloquer tous les plugins "
     },
     HIDE_ALL_SHORTCUT: {
         "en-us": "Hide all plug-ins in frontmost tab",
-        "fr-fr": "Masquer tous les plugins"
+        "fr-fr": "Masquer tous les plugins "
     },
     HIDE_PLUGIN_SHORTCUT: {
         "en-us": "Hide targeted plug-in",
-        "fr-fr": "Masquer le plugin ciblé"
+        "fr-fr": "Masquer le plugin ciblé "
     },
     PLAY_PAUSE_SHORTCUT: {
         "en-us": "Play/pause",
-        "fr-fr": "Lecture/pause"
+        "fr-fr": "Lecture/pause "
     },
     ENTER_FULLSCREEN_SHORTCUT: {
         "en-us": "Enter fullscreen",
-        "fr-fr": "Mode plein écran"
+        "fr-fr": "Mode plein écran "
     },
     VOLUME_UP_SHORTCUT: {
         "en-us": "Volume up",
-        "fr-fr": "Augmenter le volume"
+        "fr-fr": "Augmenter le volume "
     },
     VOLUME_DOWN_SHORTCUT: {
         "en-us": "Volume down",
-        "fr-fr": "Diminuer le volume"
+        "fr-fr": "Diminuer le volume "
     },
     TOGGLE_LOOPING_SHORTCUT: {
         "en-us": "Toggle looping",
-        "fr-fr": "Activer/désactiver la répétition"
+        "fr-fr": "Activer/désactiver la répétition "
     },
     PREV_TRACK_SHORTCUT: {
         "en-us": "Previous track",
-        "fr-fr": "Piste précédente"
+        "fr-fr": "Piste précédente "
     },
     NEXT_TRACK_SHORTCUT: {
         "en-us": "Next track",
-        "fr-fr": "Piste suivante"
+        "fr-fr": "Piste suivante "
     },
     SHOW_TITLE_SHORTCUT: {
         "en-us": "Show/hide track title",
-        "fr-fr": "Afficher/masquer le titre"
+        "fr-fr": "Afficher/masquer le titre "
     },
     PLACEHOLDER_OPACITY: {
         "en-us": "Placeholder opacity",
-        "fr-fr": "Transparence des boîtes de remplacement"
+        "fr-fr": "Transparence des boîtes de remplacement "
     },
     SIFR_POLICY: {
         "en-us": "sIFR text policy",
-        "fr-fr": "Texte sIFR"
+        "fr-fr": "Texte sIFR "
     },
     SIFR_TEXT_ONLY: {
         "en-us": "Show text only",
@@ -314,7 +314,7 @@ const STRINGS = {
     },
     MAX_INVISIBLE_SIZE: {
         "en-us": "Invisibility threshold",
-        "fr-fr": "Seuil d'invisibilité"
+        "fr-fr": "Seuil d'invisibilité "
     },
     PIXELS_UNIT: {
         "en-us": "pixels",

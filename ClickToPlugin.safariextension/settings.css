@@ -6,7 +6,6 @@
 
 body {
     margin: 20px;
-    /*display: none;*/
 }
 
 #main {
@@ -22,6 +21,7 @@ body {
     bottom: 0;
     visibility: hidden;
     max-height: 175px;
+    white-space: pre;
 }
 
 span.local {
@@ -132,13 +132,11 @@ input.keyboard {
     width: 135px;
 }
 
-input[type="number"]::-webkit-outer-spin-button {
-    
-}
-
 textarea {
      margin: 2px 0;
      vertical-align: top;
+     white-space: nowrap;
+     overflow: auto;
 }
 
 span.left.textarea {
