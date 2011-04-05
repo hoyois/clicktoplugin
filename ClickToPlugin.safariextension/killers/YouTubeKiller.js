@@ -10,73 +10,54 @@ YouTubeKiller.prototype.canKill = function(data) {
 YouTubeKiller.prototype.process = function(data, callback) {
     if(data.onsite) {
         var flashvars = parseFlashVariables(data.params);
+        flashvars.title = data.title;
+        flashvars.location = data.location;
+        
+        var videoID = flashvars.video_id;
+        if(!videoID) { // new YouTube AJAX player
+            var match = data.location.match(/[!&]v=([^&]+)/);
+            if(!match) return;
+            videoID = match[1];
+            flashvars = false;
+        }
+        if(!flashvars.t) flashvars = false; // channel page
+        
         if(safari.extension.settings.usePlaylists) {
-            var URLvars = data.location.split(/#!|\?/)[1];
-            var playlistID = null;
-            if(URLvars) {
-                URLvars = URLvars.split("&");
-                for (var i = 0; i < URLvars.length; i++) {
-                    var keyValuePair = URLvars[i].split("="); 
-                    if (keyValuePair[0] === "p") {
-                        playlistID = keyValuePair[1];
-                        break;
-                    } else if (keyValuePair[0] === "list" && /^PL/.test(keyValuePair[1])) {
-                        playlistID = keyValuePair[1].substring(2);
-                        break;
-                    }
-                }
+            var match = data.location.match(/(?:^|&)(?:p=|list=PL)([^&]+)/);
+            if(match) {
+                this.processFromPlaylistID(match[1], videoID, flashvars, callback);
+                return;
             }
-            if(playlistID) {
-                this.buildVideoIDList(flashvars, data.title, data.location, playlistID, 0, new Array(), callback);
-            } else this.processFromFlashVars(flashvars, data.title, data.location, callback);
-        } else this.processFromFlashVars(flashvars, data.title, data.location, callback);
+        }
+        
+        if(flashvars) this.processFromFlashVars(flashvars, callback);
+        else this.processFromVideoID(videoID, callback);
         return;
     }
+    
     // Embedded YT video
-    var matches = data.src.match(/\.com\/([vpe])\/([^&?]+)/);
-    if(matches) {
-        if(matches[1] === "v" || matches[1] === "e") { // video
-            this.processFromVideoID(matches[2], callback);
+    var match = data.src.match(/\.com\/([vpe])\/([^&?]+)/);
+    if(match) {
+        if(match[1] === "v" || match[1] === "e") { // video
+            this.processFromVideoID(match[2], callback);
         } else { // playlist
-            this.buildVideoIDList(false, data.title, data.location, matches[2], 0, new Array(), callback);
+            this.processFromPlaylistID(match[2], false, false, callback);
         }
     }
 };
 
-YouTubeKiller.prototype.buildVideoIDList = function(flashvars, documentTitle, location, playlistID, i, videoIDList, callback) {
-    xhr = new XMLHttpRequest();
-    xhr.open('GET', "http://gdata.youtube.com/feeds/api/playlists/" + playlistID + "?start-index=" + (50*i + 1) + "&max-results=50", true);
+YouTubeKiller.prototype.processFromPlaylistID = function(playlistID, videoID, flashvars, callback) {
     var _this = this;
-    xhr.onload = function() {
-        var entries = xhr.responseXML.getElementsByTagName("entry");
-        for(var j = 0; j < entries.length; j++) {
-            try{ // being lazy
-                videoIDList.push(entries[j].getElementsByTagNameNS("http://search.yahoo.com/mrss/", "player")[0].getAttribute("url").match(/\?v=([^&?']+)[&?']/)[1]);
-            } catch(err) {}
-        }
-        var links = xhr.responseXML.getElementsByTagName("link");
-        for(var j = 0; j < links.length; j++) {
-            if(links[j].getAttribute("rel") === "next") {
-                _this.buildVideoIDList(flashvars, documentTitle, location, playlistID, ++i, videoIDList, callback);
-                return;
-            }
-        }
-        // We've got the whole list of videoIDs
+    var processList = function(list) {
         var track = 0;
-        var length = videoIDList.length;
-        if(flashvars) {
-            var videoID = flashvars.video_id;
-            if(!videoID) { // new YT AJAX player
-                var matches = location.match(/[!&]v=([^&]+)/);
-                if(!matches) return;
-                videoID = matches[1];
-                flashvars = null;
-            }
-            for(var j = 0; j < videoIDList.length; j++) {
-                if(videoIDList[0] === videoID) {track = j; break;}
-                videoIDList.push(videoIDList.shift());
+        var length = list.length;
+        if(videoID) { // shift list so that videoID is first
+            for(var i = 0; i < length; i++) {
+                if(list[0] === videoID) {track = i; break;}
+                list.push(list.shift());
             }
         }
+        
         var callbackForPlaylist = function(videoData) {
             videoData.playlistLength = length;
             videoData.startTrack = track;
@@ -84,21 +65,44 @@ YouTubeKiller.prototype.buildVideoIDList = function(flashvars, documentTitle, lo
             callback(videoData);
         };
         // load the first video at once
-        if(flashvars) _this.processFromFlashVars(flashvars, documentTitle, location, callbackForPlaylist);
-        else _this.processFromVideoID(videoIDList[0], callbackForPlaylist);
-        videoIDList.shift();
+        if(flashvars) _this.processFromFlashVars(flashvars, callbackForPlaylist);
+        else _this.processFromVideoID(list[0], callbackForPlaylist);
+        list.shift();
         // load the rest of the playlist 3 by 3
-        _this.buildPlaylist(videoIDList, playlistID, true, 3, callback);
+        _this.buildPlaylist(playlistID, list, 3, callback);
+    };
+    this.buildVideoIDList(playlistID, 1, new Array(), processList);
+};
+
+YouTubeKiller.prototype.buildVideoIDList = function(playlistID, startIndex, videoIDList, processList) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', "http://gdata.youtube.com/feeds/api/playlists/" + playlistID + "?start-index=" + startIndex + "&max-results=50", true);
+    var _this = this;
+    xhr.onload = function() {
+        var entries = xhr.responseXML.getElementsByTagName("entry");
+        for(var i = 0; i < entries.length; i++) {
+            try{ // being lazy
+                videoIDList.push(entries[i].getElementsByTagNameNS("http://search.yahoo.com/mrss/", "player")[0].getAttribute("url").match(/\?v=([^&?']+)/)[1]);
+            } catch(err) {}
+        }
+        var links = xhr.responseXML.getElementsByTagName("link");
+        for(var i = 0; i < links.length; i++) {
+            if(links[i].getAttribute("rel") === "next") {
+                _this.buildVideoIDList(playlistID, startIndex + 50, videoIDList, callback);
+                return;
+            }
+        }
+        // If we're here we reached the end of the list
+        processList(videoIDList);
     };
     xhr.send(null);
 };
 
-YouTubeKiller.prototype.buildPlaylist = function(videoIDList, playlistID, isFirst, n, callback) {
+YouTubeKiller.prototype.buildPlaylist = function(playlistID, videoIDList, n, callback) {
     if(videoIDList.length === 0) return;
-    var j = 0;
-    var jmax = videoIDList.length;
-    if(isFirst) {if(jmax > n-1) jmax = n-1;}
-    else {if(jmax > n) jmax = n;} // load by groups of n
+    var i = 0;
+    var imax = videoIDList.length;
+    if(imax > n) imax = n; // load by groups of n
     var mediaData = {"loadAfter": true, "missed": 0, "playlist": []};
     var _this = this;
     var next = function(videoData) {
@@ -109,43 +113,28 @@ YouTubeKiller.prototype.buildPlaylist = function(videoIDList, playlistID, isFirs
         } else { // playlist is 1 shorter than announced
             ++mediaData.missed;
         }
-        ++j;
-        if(j === jmax) {
+        ++i;
+        if(i === imax) {
             callback(mediaData);
-            _this.buildPlaylist(videoIDList, playlistID, false, n, callback);
+            _this.buildPlaylist(playlistID, videoIDList, n, callback);
         } else _this.processFromVideoID(videoIDList.shift(), next);
     };
     this.processFromVideoID(videoIDList.shift(), next);
     return;
 };
 
-YouTubeKiller.prototype.processFromFlashVars = function(flashvars, documentTitle, location, callback) {
-    var videoID = flashvars.video_id;
-    // see http://apiblog.youtube.com/2010/03/upcoming-change-to-youtube-video-page.html:
-    if(!videoID) { // new YT AJAX player (not yet used?)
-        var matches = location.match(/[!&]v=([^&]+)/);
-        if(!matches) return;
-        videoID = matches[1];
-        this.processFromVideoID(videoID, callback);
-        return;
-    }
-    
-    if(!flashvars.t) { // channel page
-        this.processFromVideoID(videoID, callback);
-        return;
-    }
+YouTubeKiller.prototype.processFromFlashVars = function(flashvars, callback) {
     if(!flashvars.fmt_url_map) return;
     var urlMap = decodeURIComponent(flashvars.fmt_url_map);
     var title;
     if(flashvars.rec_title) title = decodeURIComponent(flashvars.rec_title).substring(4).replace(/\+/g, " ");
-    else if(/^YouTube\s-\s/.test(documentTitle)) title = documentTitle.substring(10);
+    else if(/^YouTube\s-\s/.test(flashvars.title)) title = flashvars.title.substring(10);
     
-    this.finalizeProcessing(videoID, urlMap, title, false, callback);
+    this.finalizeProcessing(flashvars.video_id, urlMap, title, callback);
 };
 
 YouTubeKiller.prototype.processFromVideoID = function(videoID, callback) {
-    if(!videoID) return; // needed!?
-    var urlMapMatch = /\"fmt_url_map\":\s\"([^"]*)\"/; // works for both Flash and HTML5 Beta player pages
+    var urlMapMatch = /\"fmt_url_map\":\s\"([^"]*)/; // works for both Flash and HTML5 Beta player pages
     var titleMatch = /document\.title\s=\s'YouTube\s-\s('?)(.*)/;
     var _this = this;
     var xhr = new XMLHttpRequest();
@@ -161,7 +150,11 @@ YouTubeKiller.prototype.processFromVideoID = function(videoID, callback) {
         if(matches) urlMap = parseUnicode(matches[1].replace(/\\\//g,"/"));
         
         if(urlMap) {
-            _this.finalizeProcessing(videoID, urlMap, title, true, callback);
+            var callbackForEmbed = function(videoData) {
+                videoData.playlist[0].siteInfo = {"name": "YouTube", "url": "http://www.youtube.com/watch?v=" + videoID};
+                callback(videoData);
+            };
+            _this.finalizeProcessing(videoID, urlMap, title, callbackForEmbed);
         } else { // happens if YT just removed content and didn't update its playlists yet
             callback({"playlist": []});
         }
@@ -169,12 +162,12 @@ YouTubeKiller.prototype.processFromVideoID = function(videoID, callback) {
     xhr.send(null);
 };
 
-YouTubeKiller.prototype.finalizeProcessing = function(videoID, urlMap, title, isEmbed, callback) {
+YouTubeKiller.prototype.finalizeProcessing = function(videoID, urlMap, title, callback) {
     var downloadTitle = escape(title); // using escape here because YT needs latin1, and it cannot handle other Unicode chars anyway
     if(/%u/.test(downloadTitle)) downloadTitle = ""; // revert to 'videoplayback' if the title will be garbled (WTF youtube?)
     
-    var sources = new Array(); // all playable video sources
-        
+    var sources = new Array();
+    
     /*
     Only 18, 22, 37, and 38 are MP4 playable natively by QuickTime.
     Other containers are FLV (5, 34, 35, the latter two are H.264 360p and 480p),
@@ -206,7 +199,6 @@ YouTubeKiller.prototype.finalizeProcessing = function(videoID, urlMap, title, is
     var videoData = {
         "playlist": [{"title": title, "posterURL": posterURL, "sources": sources}]
     };
-    if(isEmbed) videoData.playlist[0].siteInfo = {"name": "YouTube", "url": "http://www.youtube.com/watch?v=" + videoID};
     callback(videoData);
 };
 

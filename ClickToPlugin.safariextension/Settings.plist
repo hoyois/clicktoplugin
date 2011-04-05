@@ -411,7 +411,7 @@
 		    <key>metaKey</key>
 		    <false/>
 		    <key>keyIdentifier</key>
-		    <string>U+0049</string>
+		    <string>U+005C</string>
 		</dict>
 		<key>Key</key>
 		<string>showTitleShortcut</string>

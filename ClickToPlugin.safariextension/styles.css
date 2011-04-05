@@ -159,7 +159,8 @@ Placeholder element
     position: relative !important;
     display: block !important;
     -webkit-box-flex: 0 !important;
-    /* Using float: none can change the vertical alignment of inline placeholders. Que?? */
+    /* Using float: none can change the vertical alignment of inline placeholders.
+    This is a bug since float must compute to initial on flexbox items. */
     float: left !important;
 }
 

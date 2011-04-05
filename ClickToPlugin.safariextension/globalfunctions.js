@@ -40,23 +40,12 @@ function parseUnicode(text) {
     return text.replace(/\\u([0-9a-fA-F]{4})/g, function(s,c) {return String.fromCharCode(parseInt(c, 16));});
 }
 
-function hasFlashVariable(flashvars, key) {
-    var s = "(?:^|&)" + key + "=";
-    s = new RegExp(s);
-    return s.test(flashvars);
-}
-
-function hasSLVariable(initParams, key) {
-    var s = "(?:^|,)" + key + "=";
-    s = new RegExp(s, "i");
-    return s.test(initParams);
-}
-
-function parseWithRegExp(string, regex) { // regex needs 'g' flag
+function parseWithRegExp(string, regex, process) { // regex needs 'g' flag
+    if(process === undefined) process = function(s) {return s;};
     var match;
     var obj = new Object();
     while((match = regex.exec(string)) !== null) {
-        obj[match[1]] = match[2];
+        obj[match[1]] = process(match[2]);
     }
     return obj;
 }
@@ -88,7 +77,7 @@ const canPlayOGG = canPlayTypeWithHTML5("video/ogg"); // OK with Xiph component
 // and certainly not this this one! but it does the job reasonably well
 function canPlaySrcWithHTML5(url) {
     url = extractExt(url);
-    if (/^(?:mp4|mpe?g|mov|m4v)$/i.test(url)) return {"type": "video", "isNative": true};
+    if(/^(?:mp4|mpe?g|mov|m4v)$/i.test(url)) return {"type": "video", "isNative": true};
     if(canPlayFLV && /^flv$/i.test(url)) return {"type": "video", "isNative": false};
     if(canPlayWM && /^(?:wm[vp]?|asf)$/i.test(url)) return {"type": "video", "isNative": false};
     if(canPlayDivX && /^divx$/i.test(url)) return {"type": "video", "isNative": false};
@@ -247,10 +236,6 @@ function getTypeFromClassid(classid) { // from WebKit's source code (except divx
         case "clsid:166b1bca-3f9c-11cf-8075-444553540000": return "application/x-director";
         default: return false;
     }
-}
-
-function isDataURI(url) {
-    return /^data:/.test(url);
 }
 
 function getTypeFromDataURI(url) {

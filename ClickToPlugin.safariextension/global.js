@@ -1,8 +1,16 @@
 // UPDATE
-if(!safari.extension.settings.version || safari.extension.settings.version < 9) {
-    alert("ClickToPlugin 2.2b2 Release Notes\n\n--- New in 2.2b2 ---\n\n\u2022 HTML5 replacements for Facebook videos\n\u2022 Complete CSS overhaul\n\u2022 The HTML of placeholder elements has been simplified thanks to CSS3 flex boxes\n\u2022 Reviewed and fixed several killers\n\n--- New in 2.2b ---\n\n\u2022 The extension\u2019s settings are now on their own HTML page accessible through the context menu\n\u2022 Perfected plugin detection by using MIME type sniffing as a last resort, following WebKit's internal mechanism\n\u2022 New blacklists and context menu item to permanently hide plugins\n\u2022 Fixed HTML5 video aspect ratio issues using shadow DOM styling\n\u2022 Customizable keyboard and mouse shortcuts for media playback and other actions\n\u2022 Playlist controls are integrated to the main controls\n\u2022 Safari's incomplete volume slider for HTML5 media elements can be used (use the WebKit nightlies for the finalized volume slider)\n\u2022 The title of the video appears in the controls while loading\n\u2022 All localizations will now be bundled within the same extension");
+if(true){//safari.extension.settings.version < 10) {
+    alert("ClickToPlugin 2.2 Release Notes\n\n--- New Features ---\n\n\u2022 The extension\u2019s settings are now on their own HTML page accessible through the shortcut menu\n\u2022 Perfected plug-in detection following WebKit\u2019s internal mechanism\n\u2022 New blacklists to permanently hide plug-ins\n\u2022 Customizable keyboard and mouse shortcuts for media playback and other actions\n\u2022 The HTML of placeholder elements has been simplified thanks to CSS3 flex boxes\n\u2022 HTML5 replacements for Facebook videos\n\u2022 Revamped playlist controls\n\u2022 Safari\u2019s hidden volume slider for HTML5 media elements can be used\n\u2022 The title of the video can be shown in the controls\n\u2022 Contains English and French localizations\n\n--- Bugs Fixed ---\n\n\u2022 Fixed HTML5 video aspect ratio issues using shadow DOM styling\n\u2022 Fixed Megavideo and Veoh HTML5 replacements\n\u2022 The \u2018Show text only\u2019 sIFR setting could cause web pages to display incorrectly");
+    
+    // Clean deprecated settings
+    function clearSettings() {
+        for(var i = 0; i < arguments.length; i++) {
+            safari.extension.settings.removeItem(arguments[i]);
+        }
+    }
+    clearSettings("pluginsWhitelist", "invertPluginsWhitelist", "replacePlugins", "useSourceSelector", "mediaAutoload", "initialBehavior");
 }
-safari.extension.settings.version = 9;
+safari.extension.settings.version = 10;
 
 // SETTINGS
 const allSettings = ["allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "useFallbackMedia", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "preload", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "codecsPolicy", "volume", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
@@ -16,8 +24,6 @@ function getSettings(array) {
     }
     return s;
 }
-
-//const YT5Sources = ["youtube.com/v/", "s.ytimg.com", "vimeo.com/moogaloop", "vimeocdn.com/p/flash/mooga", "wn29KX6UvhD.swf"];
 
 // CORE
 var CTP_instance = 0; // incremented by one whenever a ClickToPlugin instance with content is created
@@ -48,16 +54,8 @@ function respondToMessage(event) {
 function respondToCanLoad(message) {
     // Make checks in correct order for optimal performance
     if(message.location !== undefined) return blockOrAllow(message);
-    switch(message) {
-        case "getSettings":
-            return getSettings(injectedSettings);
-        case "getInstance":
-            return ++CTP_instance;
-        case "sIFR":
-            if (safari.extension.settings.sIFRPolicy === "textonly") {
-                return {"canLoad": false, "debug": safari.extension.settings.debug};
-            } else return {"canLoad": true};
-    }
+    if(message === "getSettings") return getSettings(injectedSettings);
+    if(message === "getInstance") return ++CTP_instance;
 }
 
 function blockOrAllow(data) {
@@ -75,7 +73,6 @@ function blockOrAllow(data) {
     
     // Check whitelists
     if(safari.extension.settings.invertWhitelists !== (matchList(safari.extension.settings.locationsWhitelist, data.location) || matchList(safari.extension.settings.sourcesWhitelist, data.src))) return true;
-    //if(safari.extension.settings.YT5Compatibility && matchList(YT5Sources, data.src)) return true;
     // Check blacklists
     if(safari.extension.settings.invertBlacklists !== (matchList(safari.extension.settings.locationsBlacklist, data.location) || matchList(safari.extension.settings.sourcesBlacklist, data.src))) return false;
     
@@ -88,7 +85,7 @@ function blockOrAllow(data) {
             plugin = getPluginForType(type);
             throw null;
         }
-        if(isDataURI(data.url)) {
+        if(/^data:/.test(data.url)) {
             type = getTypeFromDataURI(data.url);
             if(isNativeType(type)) return true;
             plugin = getPluginForType(type);
@@ -123,7 +120,7 @@ function blockOrAllow(data) {
     
     // Exception: ask the user what to do if a QT object would launch QTP
     if(data.autohref && data.target === "quicktimeplayer" && data.href) {
-        if(data.className === "CTFallowedToLoad") return true; // for other extensions with open-in-QTP functionality
+        if(/\bCTFallowedToLoad\b/.test(data.className)) return true; // for other extensions with open-in-QTP functionality
         if(confirm(QT_CONFIRM_LAUNCH_DIALOG(data.href))) return true;
     }
     
@@ -301,7 +298,7 @@ function killPlugin(data, tab) {
                 mediaData.autoload = true;
                 mediaData.autoplay = false;
             }
-        }        
+        }
         
         tab.page.dispatchMessage("mediaData", mediaData);
     };

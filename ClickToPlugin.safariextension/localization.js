@@ -67,7 +67,7 @@ const STRINGS = {
         "fr-fr": "Aucun plugin actif!"
     },
     PLUGIN_FILENAME: {
-        "en-us": "Filename",
+        "en-us": "From file",
         "fr-fr": "Fichier"
     },
     PLUGIN_DESCRIPTION: {
@@ -331,10 +331,6 @@ const STRINGS = {
     SHOW_TOOLTIP: {
         "en-us": "Show plug-in source as tooltip",
         "fr-fr": "Afficher la source du plugin en infobulle"
-    },
-    YT5_COMPATIBILITY: {
-        "en-us": "Use with the YouTube5 extension",
-        "fr-fr": "Utiliser avec l'extension YouTube5"
     },
     
     // Context menu items

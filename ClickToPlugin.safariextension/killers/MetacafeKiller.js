@@ -6,8 +6,8 @@ MetacafeKiller.prototype.canKill = function(data) {
 };
 
 MetacafeKiller.prototype.process = function(data, callback) {
-    if(hasFlashVariable(data.params, "mediaData")) {
-        this.processFromFlashVars(parseFlashVariables(data.params), null, callback);
+    if(/(?:^|&)mediaData=/.test(data.params)) {
+        this.processFromFlashVars(parseFlashVariables(data.params), callback);
     } else {
         var matches = data.src.match(/metacafe\.com\/fplayer\/([0-9]*)\//);
         if(matches) this.processFromVideoID(matches[1], callback);
@@ -15,7 +15,7 @@ MetacafeKiller.prototype.process = function(data, callback) {
     }
 };
 
-MetacafeKiller.prototype.processFromFlashVars = function(flashvars, siteInfo, callback) {
+MetacafeKiller.prototype.processFromFlashVars = function(flashvars, callback) {
     if(!flashvars.mediaData) return;
     var mediaList = JSON.parse(decodeURIComponent(flashvars.mediaData));
     for(var type in mediaList) {
@@ -37,7 +37,7 @@ MetacafeKiller.prototype.processFromFlashVars = function(flashvars, siteInfo, ca
     if(flashvars.title)  title = decodeURIComponent(flashvars.title);
     
     var videoData = {
-        "playlist": [{"title": title, "sources": sources, "siteInfo": siteInfo}]
+        "playlist": [{"title": title, "sources": sources}]
     };
     callback(videoData);
 };
@@ -45,12 +45,17 @@ MetacafeKiller.prototype.processFromFlashVars = function(flashvars, siteInfo, ca
 MetacafeKiller.prototype.processFromVideoID = function(videoID, callback) {
     var xhr = new XMLHttpRequest();
     var url = "http://www.metacafe.com/watch/" + videoID;
-    var siteInfo = {"name": "Metacafe", "url": url};
     xhr.open('GET', url, true);
     var _this = this;
     xhr.onload = function() {
         var matches = xhr.responseText.match(/name=\"flashvars\"\svalue=\"([^"]*)\"/);
-        if(matches) _this.processFromFlashVars(matches[1], siteInfo, callback);
+        if(matches) {
+            var callbackForEmbed = function(videoData) {
+                videoData.playlist[0].siteInfo = {"name": "Metacafe", "url": url};
+                callback(videoData);
+            };
+            _this.processFromFlashVars(matches[1], callbackForEmbed);
+        }
     };
     xhr.send(null);
 };

@@ -1,3 +1,5 @@
+if(window.location.href !== "about:blank") {
+
 /******************************
 sourceSelector class definition
 *******************************/
@@ -113,3 +115,4 @@ sourceSelector.prototype.hide = function() {
     this.containerElement.className = "CTFsourceSelector CTFhidden";
 };
 
+}

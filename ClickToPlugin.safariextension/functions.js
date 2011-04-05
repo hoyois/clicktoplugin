@@ -1,3 +1,5 @@
+if(window.location.href !== "about:blank") {
+
 function downloadURL(url) {
     var downloadLink = document.createElement("a");
     downloadLink.href = url;
@@ -189,3 +191,4 @@ function HTMLToString(element) {
     return (new XMLSerializer()).serializeToString(element);
 };
 
+}

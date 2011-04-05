@@ -1,3 +1,5 @@
+if(window.location.href !== "about:blank") {
+
 /***************************
 mediaPlayer class definition
 ****************************/
@@ -53,8 +55,8 @@ mediaPlayer.prototype.handleMediaData = function(mediaData) {
 
 mediaPlayer.prototype.createMediaElement = function(width, height, style, contextInfo) {
     this.containerElement = document.createElement("div");
-    this.containerElement.className = "CTFmediaPlayer" + (settings.hideRewindButton ? " CTFnoRewindButton" : "");
-    this.containerElement.tabIndex = -1;
+    this.containerElement.className = "CTFmediaPlayer";
+    this.containerElement.tabIndex = -1; // make focusable
     
     var styleElement = document.createElement("style");
     styleElement.type = "text/css";
@@ -249,7 +251,7 @@ mediaPlayer.prototype.fixAspectRatio = function() {
     if(!w || !h) { // audio source
         this.mediaElement.style.width = this.width + "px";
         this.mediaElement.style.height = (this.height < 25 ? "25" : this.height) + "px";
-    } else if (w/h > this.width/this.height) {
+    } else if(w/h > this.width/this.height) {
         var height = h/w*this.width;
         this.mediaElement.style.width = this.width + "px";
         this.mediaElement.style.height = height + "px";
@@ -456,3 +458,4 @@ function opacityTransition(element, opacity, duration, delay, timing) {
     element.style.opacity = opacity + " !important";
 };
 
+}
