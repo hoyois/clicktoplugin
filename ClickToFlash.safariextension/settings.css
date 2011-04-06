@@ -1,0 +1,203 @@
+* {
+    -webkit-user-select: none;
+    cursor: default;
+    font: -webkit-control;
+    text-rendering: optimizelegibility;
+}
+
+body {
+    margin: 20px;
+}
+
+#main {
+    -webkit-box-shadow: 0 10px 30px 5px rgba(0, 0, 0, .3);
+    -webkit-transition-timing-function: linear;
+    background-color: #EDEDED;
+    border: 1px solid #9B9B9B;
+    margin: auto;
+    width: intrinsic;
+}
+
+#main.init {
+    visibility: hidden;
+}
+
+#aux {
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    visibility: hidden;
+    height: 0px;
+    white-space: pre;
+}
+
+menu, ul {
+    -webkit-padding-start: 0;
+    list-style-type: none;
+}
+
+nav {
+    display: block;
+    background: -webkit-gradient(linear, left top, left bottom, from(#D0D0D0), to(#A7A7A7));
+    border-bottom: 1px solid #515151;
+}
+
+nav ul {
+    display: -webkit-box;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: center;
+    -webkit-box-align: baseline;
+    margin: 0 auto;
+}
+
+nav ul li {
+    display: block;
+    -webkit-box-flex: 0;
+    padding: 0;
+    margin: 0;
+    height: 19px;
+    text-shadow: #EDEDED 0 1px 1px;
+    white-space: nowrap;
+}
+
+nav ul li.selected {
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#9B9B9B), to(#515151));
+    padding: 0 1px;
+}
+
+li span.tab {
+    display: block;
+    padding: 3px 6px;
+    cursor: pointer;
+    border-bottom: 1px solid #515151;
+    font: -webkit-small-control;
+}
+
+li.selected span.tab {
+    padding: 3px 5px;
+    background-color: #EDEDED;
+    border-bottom-color: #EDEDED;
+}
+
+section {
+    height: 0px;
+    overflow: hidden;
+    visibility: hidden;
+}
+
+section.selected {
+    height: auto;
+    visibility: visible;
+}
+
+.hidden section.selected {
+    visibility: hidden;
+}
+
+menu {
+    margin: 15px;
+}
+
+menu li {
+    white-space: nowrap;
+}
+
+li.glue {
+    height: 13px;
+}
+
+span.left {
+    display: inline-block;
+    width: 300px;
+    text-align: right;
+    margin-right: 7px;
+    white-space: normal;
+}
+
+span.right {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+span.right.sub {
+    margin-left: 18px;
+}
+
+span.right.tip {
+    display: inline-block;
+    font: -webkit-small-control;
+    font-size: 10px;
+    line-height: 15px;
+    width: 450px;
+    white-space: normal;
+}
+
+textarea, input[type="text"], input[type="number"] {
+    -webkit-appearance: textfield;
+    -webkit-user-select: text;
+    margin-left: 0;
+}
+
+input.keyboard {
+    text-align: center;
+    width: 135px;
+}
+
+textarea {
+     margin: 2px 0;
+     vertical-align: top;
+     white-space: nowrap;
+     overflow: auto;
+}
+
+span.left.textarea {
+    margin-top: 5px;
+    vertical-align: top;
+}
+
+textarea, select, input[type="range"] {
+    width: 300px;
+}
+
+input[type="range"] {
+    vertical-align: middle;
+}
+
+input[type="checkbox"] {
+    font-size: 17px;
+    margin: 3px 4px 3px 0;
+}
+
+select {
+    font-size: 17px;
+}
+
+input[type="button"] {
+    height: 13px;
+}
+
+span.mouse {
+    -webkit-box-sizing: border-box;
+    border: 1px solid #515151;
+    display: inline-block;
+    vertical-align: -5px;
+    width: 20px;
+    height: 20px;
+    margin-left: 5px;
+    padding: 0;
+    background-color: #CCC;
+}
+
+span.mouse:hover {
+    background-color: #A7A7A7;
+}
+
+span.mouse.disabled {
+    visibility: hidden;
+}
+
+input.shortcut_clear {
+    margin-left: 6px;
+}
+
