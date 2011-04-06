@@ -6,15 +6,15 @@
     <script type="text/javascript" src="localization.js"></script>
     <!--<script defer type="text/javascript" src="settings.js"></script>-->
 </head>
-<body><div id="main">
+<body><div id="main" class="hidden init">
     <nav><ul>
-        <li id="plugins_tab"><span class="tab"><span class="string" title="PLUGINS_TAB"></span></span></li>
-        <li id="whitelists_tab"><span class="tab"><span class="string" title="WHITELISTS_TAB"></span></span></li>
-        <li id="killers_tab"><span class="tab"><span class="string" title="KILLERS_TAB"></span></span></li>
-        <li id="html5_tab"><span class="tab"><span class="string" title="MEDIA_TAB"></span></span></li>
-        <li id="context_menu_tab"><span class="tab"><span class="string" title="CONTEXT_MENU_TAB"></span></span></li>
-        <li id="keyboard_shortcuts_tab"><span class="tab"><span class="string" title="KEYBOARD_SHORTCUTS_TAB"></span></span></li>
-        <li id="miscellaneous_tab"><span class="tab"><span class="string" title="MISC_TAB"></span></span></li>
+        <li><span class="tab"><span class="string" title="PLUGINS_TAB"></span></span></li>
+        <li><span class="tab"><span class="string" title="WHITELISTS_TAB"></span></span></li>
+        <li><span class="tab"><span class="string" title="KILLERS_TAB"></span></span></li>
+        <li><span class="tab"><span class="string" title="MEDIA_TAB"></span></span></li>
+        <li><span class="tab"><span class="string" title="CONTEXT_MENU_TAB"></span></span></li>
+        <li><span class="tab"><span class="string" title="KEYBOARD_SHORTCUTS_TAB"></span></span></li>
+        <li><span class="tab"><span class="string" title="MISC_TAB"></span></span></li>
     </ul></nav>
     <section>
         <menu>
@@ -73,11 +73,6 @@
                 <li><span class="left"></span><span class="right"><input id="hideRewindButton" class="setting" type="checkbox"><label for="hideRewindButton"><span class="string" title="HIDE_REWIND_BUTTON"></span></label></span></li>
                 <li><span class="left"></span><span class="right"><input id="showVolumeSlider" class="setting" type="checkbox"><label for="showVolumeSlider"><span class="string" title="SHOW_WEBKIT_VOLUME_SLIDER"></span></label></span></li>
                 <li><span class="left"><label for="volume"><span class="string" title="SOUND_VOLUME"></span>:</label></span><span class="right"><input id="volume" class="setting" type="range" min="0" max="100" step="1"></span></li>
-                <!--<li><span class="left"><label for="initialBehavior"><span class="string" title="INITIAL_BEHAVIOR"></span>:</label></span><span class="right"><select id="initialBehavior" class="setting">
-                    <option value="none" title="INITIAL_NO_BUFFER"></option>
-                    <option value="buffer" title="INITIAL_BUFFER"></option>
-                    <option value="autoplay" title="INITIAL_AUTOPLAY"></option>
-                </select></span></li>-->
                 <li><span class="left"><label for="maxResolution"><span class="string" title="MAX_RESOLUTION"></span>:</label></span><span class="right"><select id="maxResolution" class="setting">
                     <option value="360">360p</option>
                     <option value="480">480p</option>

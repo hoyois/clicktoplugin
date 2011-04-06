@@ -1,4 +1,6 @@
 
+var main = document.getElementById("main");
+var nav = document.getElementsByTagName("nav")[0].children[0];
 var inputs = document.getElementsByClassName("setting");
 var keyboardInputs = document.getElementsByClassName("keyboard");
 var mouseInputs = document.getElementsByClassName("mouse");
@@ -26,25 +28,45 @@ for(var i = 0; i < clearShortcutButtons.length; i++) {
 }
 
 // Bind tabs to sections
-var tabs = document.getElementsByTagName("nav")[0].children[0].children;
+var tabs = nav.children;
 var sections = document.getElementsByTagName("section");
 var currentSection = 0;
 tabs[0].className = "selected";
 sections[0].className = "selected";
 
+main.addEventListener("webkitTransitionEnd", function(event) {
+    event.target.className = "";
+    event.target.style.WebkitTransitionProperty = "none";
+    event.target.style.height = "intrinsic";
+}, false);
+
+function switchToTab(i) {
+    var oldHeight = sections[currentSection].offsetHeight + 20;
+    main.style.height = oldHeight + "px";
+    tabs[currentSection].className = "";
+    tabs[i].className = "selected";
+    main.className = "hidden";
+    sections[currentSection].className = "";
+    sections[i].className = "selected";
+    currentSection = i;
+    var newHeight = sections[i].offsetHeight + 20;
+    main.style.WebkitTransitionProperty = "height";
+    var heightDelta = newHeight - oldHeight;
+    if(heightDelta < 0) heightDelta = -heightDelta;    
+    main.style.WebkitTransitionDuration = (.001*heightDelta) + "s";
+    main.style.height = newHeight + "px";
+}
+
 function bindTab(i) {
-    tabs[i].firstChild.addEventListener("click", function() {
-        sections[currentSection].className = "";
-        tabs[currentSection].className = "";
-        sections[i].className = "selected";
-        tabs[i].className = "selected";
-        currentSection = i;
+    tabs[i].firstChild.addEventListener("click", function(event) {
+        if(currentSection !== i) switchToTab(i);
     }, false);
 }
 for(var i = 0; i < tabs.length; i++) {
     bindTab(i);
 }
 
+nav.style.minWidth = (nav.offsetWidth + 10) + "px";
 
 // Remove volume slider setting in WebKit nightlies
 if(/\+/.test(navigator.appVersion)) {
@@ -63,7 +85,7 @@ if(navigator.plugins.length === 0) {
         span.className = "right";
         span.title = PLUGIN_FILENAME + ": " + navigator.plugins[i].filename + "\n" + PLUGIN_DESCRIPTION + ": " + navigator.plugins[i].description;
         //var title = "";
-        span.innerHTML = "<input id=\"plugin" + i + "\" class=\"plugin\" type=\"checkbox\"/><label for=\"plugin" + i + "\"></label></span>";
+        span.innerHTML = "<input id=\"plugin" + i + "\" class=\"plugin\" type=\"checkbox\"><label for=\"plugin" + i + "\"></label></span>";
         span.childNodes[1].textContent = navigator.plugins[i].name;
         pluginItems.push(span);
     }
@@ -81,7 +103,7 @@ if(navigator.plugins.length === 0) {
         span.className = "left";
         if(i === 0) span.textContent = ALLOW_THESE_PLUGINS + ":";
         else if(i === 1) {
-            span.innerHTML = "<input id=\"plugins_reset\" type=\"button\"/><input id=\"plugins_toggle\" type=\"button\"/>";
+            span.innerHTML = "<input id=\"plugins_reset\" type=\"button\"><input id=\"plugins_toggle\" type=\"button\">";
             span.childNodes[0].value = DESELECT_ALL_BUTTON;
             span.childNodes[1].value = TOGGLE_BUTTON;
         }
@@ -130,7 +152,7 @@ function resizeTextArea(textarea) {
     var width = auxDiv.offsetWidth + 16;
     if(height > 175) height = 175;
     if(height < 47) height = 47;
-    if(width > document.body.firstChild.offsetWidth - 350) width = document.body.firstChild.offsetWidth - 350;
+    if(width > document.body.offsetWidth - 345) width = document.body.offsetWidth - 345;
     if(width < 300) width = 300
     textarea.style.minHeight = height + "px";
     textarea.style.minWidth = width + "px";
@@ -232,12 +254,6 @@ for(var i = 0; i < mouseInputs.length; i++) {
     mouseInputs[i].addEventListener("click", handleClickEvent, false);
     mouseInputs[i].addEventListener("dblclick", handleClickEvent, false);
     mouseInputs[i].addEventListener("mousewheel", handleWheelEvent, false);
-    /*mouseInputs[i].addEventListener("contextmenu", function(event) {
-        event.preventDefault();
-        var e = document.createEvent("MouseEvents");
-        e.initMouseEvent("click", false, false, window, 0, 0, 0, 0, 0, false, false, false, false, 2, null);
-        _this.mediaElement.dispatchEvent(e);
-    }, false);*/
 }
 function handleClickEvent(event) {
     event.preventDefault();
@@ -387,9 +403,17 @@ function loadSettings(event) {
         document.getElementById("showPoster").disabled = true;
         document.getElementById("showMediaTooltip").disabled = true;
     } else document.getElementById("preload").disabled = true;
+    
+    // Show settings pane
+    main.className = "";
 }
 
 safari.self.addEventListener("message", loadSettings, false);
 
 safari.self.tab.dispatchMessage("getSettings", "");
+
+window.addEventListener("focus", function(event) {
+    safari.self.tab.dispatchMessage("getSettings", "");
+}, false);
+
 
