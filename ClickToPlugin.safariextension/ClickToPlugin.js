@@ -10,7 +10,9 @@ function handleSettings(event) {
         if(event.name === "showSettings") {
             var iframe = document.createElement("iframe");
             iframe.id = "CTFsettingsPane";
+            iframe.className = "CTFhidden";
             iframe.src = safari.extension.baseURI + "settings.html";
+            iframe.addEventListener("load", function(e) {e.target.className = "";}, false);
             document.body.appendChild(iframe);
         }
         else if(event.name === "hideSettings") {
