@@ -5,16 +5,24 @@
     text-rendering: optimizelegibility;
 }
 
-body {
-    margin: 20px;
+html, body {
+    height: 100%;
+    width: 100%;
 }
 
-#main {
-    -webkit-box-shadow: 0 10px 30px 5px rgba(0, 0, 0, .3);
+body {
+    margin: 0px;
+    overflow: hidden;
+}
+
+html body div#main {
+    position: relative;
+    -webkit-box-shadow: 0 8px 20px 5px rgba(0, 0, 0, .3);
     -webkit-transition-timing-function: linear;
     background-color: #EDEDED;
     border: 1px solid #9B9B9B;
-    margin: auto;
+    top: 10%;
+    margin: auto !important;
     width: intrinsic;
 }
 

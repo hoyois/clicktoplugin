@@ -1,19 +1,10 @@
-// UPDATE
-if(safari.extension.settings.version < 10) {
-    alert("ClickToPlugin 2.2 Release Notes\n\n--- New Features ---\n\n\u2022 The extension\u2019s settings are now on their own HTML page accessible through the shortcut menu\n\u2022 Perfected plug-in detection following WebKit\u2019s internal mechanism\n\u2022 New blacklists to permanently hide plug-ins\n\u2022 Customizable keyboard and mouse shortcuts for media playback and other actions\n\u2022 HTML5 replacements for Facebook videos\n\u2022 Revamped playlist controls\n\u2022 Safari\u2019s hidden volume slider for HTML5 media elements can be used\n\u2022 The title of the video can be shown in the controls\n\u2022 Contains English and French localizations\n\n--- Bugs Fixed ---\n\n\u2022 Fixed HTML5 video aspect ratio issues using shadow DOM styling\n\u2022 Fixed Megavideo and Veoh HTML5 replacements\n\u2022 The \u2018Show text only\u2019 sIFR setting could cause web pages to display incorrectly");
-    
-    // Clean deprecated settings
-    function clearSettings() {
-        for(var i = 0; i < arguments.length; i++) {
-            safari.extension.settings.removeItem(arguments[i]);
-        }
-    }
-    clearSettings("replacePlugins", "useSourceSelector", "mediaAutoload", "initialBehavior");
-}
-safari.extension.settings.version = 10;
-
 // SETTINGS
-const allSettings = ["locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "useFallbackMedia", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "preload", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "codecsPolicy", "volume", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+const allSettings = ["defaultTab", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "useFallbackMedia", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "preload", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "codecsPolicy", "volume", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+
+/* Hidden settings:
+settingsContext: true
+zeroIsInvisible: undefined
+*/
 
 const injectedSettings = ["enabledKillers", "useFallbackMedia", "showSourceSelector", "preload", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "volume", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
 
@@ -33,20 +24,29 @@ function respondToMessage(event) {
         case "canLoad":
             event.message = respondToCanLoad(event.message);
             break;
+        case "getSettingsShortcut":
+            if(safari.extension.settings.settingsShortcut) event.target.page.dispatchMessage("settingsShortcut", safari.extension.settings.settingsShortcut);
+            break;
         case "killPlugin":
             killPlugin(event.message, event.target);
-            break;
-        case "loadAll":
-            event.target.page.dispatchMessage("loadAll", event.message);
             break;
         case "checkMIMEType":
             checkMIMEType(event.message, event.target);
             break;
-        case "getSettings":
-            event.target.page.dispatchMessage("settings", getSettings(allSettings));
+        case "loadAll":
+            event.target.page.dispatchMessage("loadAll", event.message);
+            break;
+        case "hideSettings":
+            event.target.page.dispatchMessage("hideSettings", "");
+            break;
+        case "showSettings":
+            event.target.page.dispatchMessage("showSettings", "");
             break;
         case "changeSetting":
             safari.extension.settings[event.message.setting] = event.message.value;
+            break;
+        case "getSettings":
+            event.target.page.dispatchMessage("settings", getSettings(allSettings));
             break;
     }
 }
@@ -104,16 +104,16 @@ function checkMIMEType(data, tab) {
 
 // CONTEXT MENU
 function handleContextMenu(event) {
-    if(event.target.url.substring(0,50) === "safari-extension://com.hoyois.safari.clicktoplugin") return;
     var s = safari.extension.settings;
     
     try {
         var u = event.userInfo; // throws exception if there are no content scripts
     } catch(err) {
         if(s.disableEnableContext && event.target.url) event.contextMenu.appendContextMenuItem("switchOn", TURN_CTF_ON);
-        else event.contextMenu.appendContextMenuItem("settings", CTF_PREFERENCES + "\u2026");
+        else if(s.settingsContext) event.contextMenu.appendContextMenuItem("settings", CTF_PREFERENCES + "\u2026");
         return;
     }
+    if(u.location === safari.extension.baseURI + "settings.html") return;
     
     if(u.elementID === undefined) { // Generic menu
         if(s.disableEnableContext) event.contextMenu.appendContextMenuItem("switchOff", TURN_CTF_OFF);
@@ -121,7 +121,7 @@ function handleContextMenu(event) {
         if(s.loadInvisibleContext && u.invisible > 0) event.contextMenu.appendContextMenuItem("loadInvisible", LOAD_INVISIBLE_FLASH + " (" + u.invisible + ")");
         if(s.addToWhitelistContext) event.contextMenu.appendContextMenuItem("locationsWhitelist", s.invertWhitelists ? ALWAYS_BLOCK_ON_DOMAIN : ALWAYS_ALLOW_ON_DOMAIN);
         if(s.addToBlacklistContext) event.contextMenu.appendContextMenuItem("locationsBlacklist", s.invertBlacklists ? ALWAYS_SHOW_ON_DOMAIN : ALWAYS_HIDE_ON_DOMAIN);
-        event.contextMenu.appendContextMenuItem("settings", CTF_PREFERENCES + "\u2026");
+        if(s.settingsContext) event.contextMenu.appendContextMenuItem("settings", CTF_PREFERENCES + "\u2026");
         return;
     }
     
@@ -165,9 +165,8 @@ function doCommand(event) {
             switchOn();
             break;
         case "settings":
-            var newTab = safari.application.activeBrowserWindow.activeTab;
-            if(newTab.url) newTab = safari.application.activeBrowserWindow.openTab("foreground");
-            newTab.url = safari.extension.baseURI + "settings.html";
+            if(!safari.application.activeBrowserWindow.activeTab.url) safari.application.activeBrowserWindow.activeTab.url = safari.extension.baseURI + "settings.html";
+            else safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("showSettings", "");
             break;
         default:
             safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("loadContent", {"instance": event.userInfo.instance, "elementID": event.userInfo.elementID, "source": event.userInfo.source, "command": event.command});
@@ -264,4 +263,25 @@ function killPlugin(data, tab) {
 safari.application.addEventListener("message", respondToMessage, false);
 safari.application.addEventListener("contextmenu", handleContextMenu, false);
 safari.application.addEventListener("command", doCommand, false);
+
+// UPDATE
+if(safari.extension.settings.version < 10) {
+    alert("ClickToFlash 2.2 Release Notes\n\n--- New Features ---\n\n\u2022 The extension\u2019s settings are now on their own HTML page accessible through the shortcut menu\n\u2022 Perfected plug-in detection following WebKit\u2019s internal mechanism\n\u2022 New blacklists to permanently hide plug-ins\n\u2022 Customizable keyboard and mouse shortcuts for media playback and other actions\n\u2022 HTML5 replacements for Facebook videos\n\u2022 Revamped playlist controls\n\u2022 Safari\u2019s hidden volume slider for HTML5 media elements can be used\n\u2022 The title of the video can be shown in the controls\n\u2022 Contains English and French localizations\n\n--- Bugs Fixed ---\n\n\u2022 Fixed HTML5 video aspect ratio issues using shadow DOM styling\n\u2022 Fixed Megavideo and Veoh HTML5 replacements\n\u2022 The \u2018Show text only\u2019 sIFR setting could cause web pages to display incorrectly");
+    
+    // Clean deprecated settings
+    function clearSettings() {
+        for(var i = 0; i < arguments.length; i++) {
+            safari.extension.settings.removeItem(arguments[i]);
+        }
+    }
+    clearSettings("replacePlugins", "useSourceSelector", "mediaAutoload", "initialBehavior");
+}
+if(!safari.extension.settings.version || safari.extension.settings.version < 10) {
+    var newTab;
+    if(safari.application.activeBrowserWindow) newTab = safari.application.activeBrowserWindow.openTab("foreground");
+    else newTab = safari.application.openBrowserWindow().activeTab;
+    newTab.url = safari.extension.baseURI + "settings.html";
+    alert("Welcome to ClickToFlash 2.2!\n\nClickToFlash gives you control over Flash content embedded in web pages. Under this dialog is the extension\u2019s preference pane which you can use to\n\n\u2022 Manage the extension\u2019s whitelists and blacklists\n\u2022 Select the video services for which you want ClickToFlash to provide HTML5 video replacements\n\u2022 Configure ClickToFlash\u2019s HTML5 media player\n\u2022 Choose which commands should appear in the shortcut menu\n\u2022 Configure keyboard and mouse shortcuts for various tasks\n\u2022 And more!\n\nTo access this preference pane from any page, right-click and select “ClickToFlash Preferences\u2026”, or use the shortcut specified in the “Keyboard shortcuts” section of the preferences (currently \u2325,).")
+}
+safari.extension.settings.version = 10;
 
