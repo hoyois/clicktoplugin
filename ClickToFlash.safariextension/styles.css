@@ -1,39 +1,441 @@
 /* ClickToFlash/ClickToPlugin CSS stylesheet */
 
-/* Reset author CSS */
-.CTFplaceholder *, .CTFmediaPlayer * {
-    border: 0 !important;
-    border-radius: 0 !important;
-    border-spacing: 0 !important;
-    text-align: left !important;
-    text-indent: 0 !important;
-    text-decoration: none !important;
-    text-transform: none !important;
-    text-shadow: none !important;
-    letter-spacing: normal !important;
-    margin: 0 !important;
+/******************************
+CSS Reset (specificity 0,0,1,0)
+******************************/
+
+/*
+Not reset here:
+-webkit-box-* (flex boxes)
+-webkit-transition-property
+background
+color
+display
+font-family
+font-size
+height
+left
+opacity
+position
+width
+*/
+
+/*
+Should pseudo-elements be reset as well? e.g.
+.CTFplaceholder ::before {content: none !important;}
+etc.
+*/
+
+/*
+In the WebKit nightlies the universal selector seems to select pseudo-elements as well.
+If this is the correct behavior (??), * should not be used.
+*/
+
+.CTFplaceholder,
+.CTFplaceholder *,
+.CTFmediaPlayer,
+.CTFmediaPlayer * {
+    -webkit-animation-name: none !important;
+    -webkit-appearance: none !important;
+    -webkit-box-reflect: none !important;
+    -webkit-box-shadow: none !important;
+    -webkit-box-sizing: content-box !important;
+    -webkit-mask-image: none !important;
+    -webkit-perspective: none !important;
+    -webkit-transform: none !important;
+    -webkit-user-select: none !important; /* not default */
+    border: none !important;
+    /* This is incorrectly computed as rect(0px,0px,0px,0px) on video elements, which screws things up */
+    /* clip: auto !important; */
+    cursor: default !important; /* not default */
+    outline: none !important;
     padding: 0 !important;
-    float: none !important;
-    -webkit-font-smoothing: subpixel-antialiased;
+    pointer-events: auto !important;
+    zoom: normal !important;
 }
 
-.CTFplaceholder *:not(.CTFsourceSelector), .CTFmediaPlayer *:not(.CTFsourceSelector) {
-    top: auto !important;
-    right: auto !important;
+.CTFplaceholder *,
+.CTFmediaPlayer * {
+    -webkit-font-smoothing: subpixel-antialiased !important;
+    -webkit-marquee-style: none !important;
+    -webkit-text-stroke-width: 0 !important;
+    border-radius: 0 !important; /* WebKit not following the spec? */
     bottom: auto !important;
+    clear: none !important;
+    direction: ltr !important;
+    float: none !important;
+    font-stretch: normal !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    font-weight: normal !important;
+    letter-spacing: normal !important;
+    line-height: normal !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    right: auto !important;
+    text-align: left !important;
+    text-decoration: none !important;
+    text-indent: 0 !important;
+    text-overflow: clip !important;
+    text-rendering: optimizelegibility !important; /* not default */
+    text-shadow: none !important;
+    text-transform: none !important;
+    top: auto !important;
+    visibility: inherit !important; /* not default */
+    white-space: nowrap !important; /* not default */
+    word-spacing: normal !important;
+    z-index: auto !important;
+}
+
+/******************
+Placeholder element
+******************/
+
+.CTFplaceholder {
+    display: inline-block !important;
+    background: none !important;
+    overflow: hidden !important;
+    visibility: visible !important;
+}
+
+.CTFplaceholder * {
+    -webkit-transition-property: none !important;
+    width: auto !important;
+    height: auto !important;
     left: auto !important;
 }
 
-.CTFplaceholder div, .CTFmediaPlayer div {
+.CTFplaceholder .CTFplaceholderContainer {
+    position: relative !important;
+    display: -webkit-box !important;
+    -webkit-box-align: center !important;
+    -webkit-box-direction: normal !important;
+    -webkit-box-orient: horizontal !important;
+    -webkit-box-pack: center !important;
+    -webkit-box-sizing: border-box !important;
+    -webkit-transition-property: none !important;
+    background-attachment: scroll !important;
+    background-clip: padding-box !important;
+    background-color: transparent !important;
+    background-origin: padding-box !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+    border: 1px solid rgba(180, 180, 180, 1) !important;
+    height: inherit !important;
+    width: inherit !important;
+}
+
+.CTFplaceholder.CTFnoimage .CTFplaceholderContainer {
+    background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(245, 245, 245, 1)), to(rgba(210, 210, 210, 1))) !important;
+}
+
+.CTFplaceholder.CTFnoimage:active .CTFplaceholderContainer {
+    background-image: -webkit-gradient(linear, left bottom, left top, from(rgba(235, 235, 235, 1)), to(rgba(220, 220, 220, 1))) !important;
+}
+
+.CTFplaceholder .CTFplaceholderContainer * {
+    background: none !important;
+    opacity: 1 !important;
+}
+
+.CTFplaceholder .CTFlogoContainer {
+    position: relative !important;
     display: block !important;
+    -webkit-box-flex: 0 !important;
+    /* Using float: none can change the vertical alignment of inline placeholders.
+    This is a bug since float must compute to initial on flexbox items. */
+    float: left !important;
+}
+
+.CTFplaceholder .CTFlogo {
+    position: static !important;
+    display: block !important;
+    -webkit-box-shadow: 0 0 2px rgba(0, 0, 0, 1), inset 0 0 2px rgba(0, 0, 0, 1), 0 0 6px rgba(0, 0, 0, 0.6), inset 0 0 6px rgba(0, 0, 0, 0.6) !important;
+    border: 3px solid rgba(240, 240, 240, 1) !important;
+    border-radius: 7px !important;
+    color: rgba(240, 240, 240, 1) !important;
+    font: -webkit-control !important;
+    font-size: 20px !important;
+    padding: 3px 5px 3px 5px !important;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 1), 0 0 6px rgba(0, 0, 0, 0.6) !important;
+}
+
+.CTFplaceholder.CTFnoimage .CTFlogo {
+    -webkit-box-shadow: none !important;
+    border: 3px solid rgba(0, 0, 0, 0.25) !important;
+    color: rgba(0, 0, 0, 0.35) !important;
+    text-shadow: none !important;
+}
+
+.CTFplaceholder .CTFlogo.CTFinset {
+    display: none !important;
+}
+
+.CTFplaceholder.CTFnoimage .CTFlogo.CTFinset {
+    position: absolute !important;
+    display: block !important;
+    border-color: rgba(255, 255, 255, 0.45) !important;
+    color: rgba(255, 255, 255, 0.45) !important;
+    top: 1px !important;
+}
+
+.CTFplaceholder .CTFlogoContainer.CTFmini .CTFlogo,
+.CTFplaceholder .CTFlogoContainer.CTFhidden .CTFlogo.CTFtmp {
+    border-radius: 4px !important;
+    border-width: 2px !important;
+    font-size: 10px !important;
+    padding: 1px 2px 1px 2px !important;
+}
+
+.CTFplaceholder.CTFnoimage .CTFlogoContainer.CTFmini .CTFlogo {
+    border-color: rgba(50, 50, 50, 0.25) !important;
+    color: rgba(50, 50, 50, 0.4) !important;
+}
+
+.CTFplaceholder.CTFnoimage .CTFlogoContainer.CTFmini .CTFlogo.CTFinset {
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    color: transparent !important;
+}
+
+/***********
+Media player
+***********/
+
+@font-face {
+    font-family: QuickTimeMediaControls;
+    src: url('QuickTimeMediaControls.ttf');
+}
+
+.CTFmediaPlayer * {
+    background: none !important;
+}
+
+.CTFmediaPlayer {
+    display: inline-block !important;
+    background-attachment: scroll !important;
+    background-clip: border-box !important;
+    background-color: transparent !important;
+    background-origin: padding-box !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+    visibility: visible !important;
+}
+
+.CTFmediaPlayer .CTFmediaElement {
+    position: absolute !important;
+    display: block !important;
+    -webkit-transition-property: none !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    margin: auto !important;
+    opacity: 1 !important;
+    right: 0 !important;
+    top: 0 !important;
+}
+
+.CTFmediaPlayer .CTFtrackInfo {
+    position: absolute !important;
+    -webkit-appearance: media-controls-background !important;
+    -webkit-box-align: center !important;
+    -webkit-box-direction: normal !important;
+    -webkit-box-orient: horizontal !important;
+    -webkit-box-pack: start !important;
+    -webkit-box-sizing: border-box !important;
+    -webkit-transition-property: none !important;
+    bottom: 0 !important;
+    height: 25px !important;
+    opacity: 1 !important;
+    padding: 0 7px !important;
+    pointer-events: none !important;
+    right: 0 !important;
+}
+
+.CTFmediaPlayer .CTFtrackStatus,
+.CTFmediaPlayer .CTFtrackTitle {
+    position: static !important;
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 1 !important;
+    -webkit-transition-property: none !important;
+    color: white !important;
+    font: -webkit-small-control !important;
+    font-size: 10px !important;
+    height: auto !important;
+    left: auto !important;
+    opacity: 1 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    text-shadow: black 0 1px 1px !important;
+    white-space: pre-wrap !important;
+    width: auto !important;
+}
+
+.CTFmediaPlayer .CTFtrackStatus {
+    -webkit-box-flex: 0 !important;
+}
+
+.CTFmediaPlayer .CTFtrackTitle {
+    -webkit-box-flex: 1 !important;
+}
+
+.CTFmediaPlayer .CTFplaylistControls {
+    position: absolute !important;
+    -webkit-box-align: center !important;
+    -webkit-box-direction: normal !important;
+    -webkit-box-orient: horizontal !important;
+    -webkit-box-pack: start !important;
+    bottom: 0 !important;
+    height: 25px !important;
+    pointer-events: none !important;
+    width: intrinsic !important;
+}
+
+.CTFmediaPlayer .CTFprevButton,
+.CTFmediaPlayer .CTFnextButton {
+    position: static !important;
+    display: -webkit-box !important;
+    -webkit-box-flex: 0 !important;
+    -webkit-font-smoothing: antialiased !important;
+    -webkit-transition-property: none !important;
+    color: #FAFAFA !important;
+    font-family: QuickTimeMediaControls !important;
+    font-size: 25px !important;
+    height: 25px !important;
+    left: auto !important;
+    opacity: .87 !important;
+    text-shadow: black 0 1px 1px !important;
+    width: 25px !important;
+}
+
+.CTFmediaPlayer .CTFnextButton {
+    text-align: right !important;
+    margin-left: 28px !important;
+}
+
+.CTFmediaPlayer .CTFprevButton:active,
+.CTFmediaPlayer .CTFnextButton:active {
+    text-shadow: #555 0 1px 1px, white 0 0 10px !important;
 }
 
 /**************
-Generic classes
+Source selector
 **************/
 
-.CTFnodisplay, .CTFplaceholder .CTFnodisplay, .CTFmediaPlayer .CTFnodisplay {
-    display: none !important;
+.CTFsourceSelector * {
+    -webkit-transition-property: none !important;
+    background: none !important;
+    font: -webkit-small-control !important;
+    font-size: 10px !important;
+    left: auto !important;
+    height: auto !important;
+    width: auto !important;
+    text-shadow: black 0 1px 1px !important;
+}
+
+.CTFsourceSelector {
+    position: absolute !important;
+    display: block !important;
+    -webkit-box-shadow: rgba(0, 0, 0, .5) 0 1px 2px !important;
+    -webkit-transition-delay: 0s !important;
+    -webkit-transition-duration: .2s !important;
+    -webkit-transition-timing-function: ease-in !important;
+    background-attachment: scroll !important;
+    background-clip: border-box !important;
+    background-color: transparent !important;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(59, 59, 59, 0.9)), to(rgba(19, 19, 19, 0.9)), color-stop(.25, rgba(39, 39, 39, 0.9)), color-stop(.265, rgba(25, 25, 25, 0.9))) !important;
+    background-origin: padding-box !important;
+    background-position: center !important;
+    background-repeat: repeat !important;
+    background-size: contain !important;
+    border: 1px solid rgba(0, 0, 0, .6) !important;
+    border-radius: 5px !important;
+    height: auto !important;
+    left: 10px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    top: 10px !important;
+    width: auto !important;
+    z-index: 2 !important;
+}
+
+.CTFsourceSelector:hover {
+    -webkit-transition-delay: 0s !important;
+    -webkit-transition-duration: .05s !important;
+    -webkit-transition-timing-function: linear !important;
+    opacity: 1 !important;
+}
+
+.CTFsourceSelector .CTFsourceList {
+    position: static !important;
+    display: block !important;
+    border-radius: 5px !important;
+    border-top: 1px solid #555 !important;
+    opacity: 1 !important;
+    padding: 2px 5px !important;
+    pointer-events: auto !important;
+}
+
+.CTFsourceSelector .CTFsourceItem {
+    position: static !important;
+    display: list-item !important;
+    color: #ADADAD !important;
+    cursor: pointer !important;
+    list-style: none !important;
+    margin: 5px !important;
+    opacity: 1 !important;
+}
+
+.CTFsourceSelector .CTFsourceItem:hover,
+.CTFsourceSelector .CTFcurrentSource {
+    color: white !important;  
+}
+
+.CTFsourceSelector .CTFsourceItem:active {
+    text-shadow: white 0 0 7px !important;  
+}
+
+.CTFmediaPlayer .CTFcurrentSource:active {
+    text-shadow: none !important;  
+}
+
+.CTFmediaPlayer .CTFcurrentSource {
+    cursor: default !important;
+}
+
+.CTFsourceSelector .CTFsourceLink {
+    position: static !important;
+    display: inline !important;
+    color: inherit !important;
+    cursor: inherit !important;
+    opacity: 1 !important;
+    text-shadow: inherit !important;
+}
+
+/* Should use CSS3 ::marker here */
+.CTFsourceSelector .CTFsourceItem::before {
+    content: none !important;
+}
+
+.CTFmediaPlayer .CTFcurrentSource::before {
+    display: inline-block !important;
+    color: inherit !important;
+    content: "\2022" !important;
+    margin-left: -7px !important;
+    opacity: 1 !important;
+    width: 7px !important;
+}
+
+/*************************
+Invisible QuickTime object
+*************************/
+
+.CTFplaceholder .CTFQTObject,
+.CTFmediaPlayer .CTFQTObject {
+    position: absolute !important;
+    height: 0px !important;
+    width: 0px !important;
 }
 
 /************
@@ -44,397 +446,16 @@ Stack element
     display: none !important;
 }
 
-/******************
-Placeholder element
-******************/
-
-.CTFplaceholder * {
-    background: none !important;
-    width: auto !important;
-    height: auto !important;
-}
-
-.CTFplaceholder {
-    display: inline-block !important;
-    border: 1px solid rgba(180, 180, 180, 1) !important;
-    padding: 0 !important;
-    -webkit-user-select: none !important;
-    -webkit-box-sizing: border-box !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    background-origin: border-box !important;
-    background-size: contain !important;
-    overflow: hidden !important;
-}
-
-/* For pixel-perfect layout, we still need: */
-.CTFplaceholder[style*="width: 0px"], .CTFplaceholder[style*="height: 0px"] {
-    border-style: none !important;
-}
-
-.CTFplaceholder[style*="width: 1px"] {
-    border-left-style: none !important;
-}
-
-.CTFplaceholder[style*="height: 1px"] {
-    border-top-style: none !important;
-}
-
-.CTFplaceholder.CTFnoimage {
-    background: -webkit-gradient(linear, left top, left bottom, from(rgba(245, 245, 245, 1)), to(rgba(210, 210, 210, 1))) !important;
-}
-
-.CTFplaceholder.CTFnoimage:active {
-    background: -webkit-gradient(linear, left bottom, left top, from(rgba(235, 235, 235, 1)), to(rgba(220, 220, 220, 1))) !important;
-}
-
-.CTFplaceholder .CTFplaceholderContainer {
-    position: relative !important;
-    width: inherit !important;
-    height: inherit !important;
-    margin: -1px !important;
-    overflow: visible !important;
-}
-
-.CTFplaceholder .CTFlogoVerticalPosition {
-    display: table-cell !important;
-    vertical-align: middle !important;
-    width: inherit !important;
-    height: inherit !important;
-}
-
-.CTFplaceholder .CTFlogoHorizontalPosition {
-    position: relative !important;
-    float: left !important;
-    left: 50% !important;
-    overflow: visible !important;
-}
-
-.CTFplaceholder .CTFlogoContainer {
-    position: relative !important;
-    float: left !important;
-    left: -50% !important;
-    overflow: visible !important;
-}
-
-.CTFplaceholder .CTFlogoContainer.CTFhidden {
-    visibility: hidden !important;
-}
-
-.CTFplaceholder .CTFlogo {
-    position: relative !important;
-    border: 4px solid rgba(240, 240, 240, 1) !important;
-    border-radius: 8px !important;
-    color: rgba(240, 240, 240, 1) !important;
-    text-shadow: 0 0 2px rgba(0, 0, 0, 1), 0 0 6px rgba(0, 0, 0, 0.6) !important;
-    -webkit-box-shadow: 0 0 2px rgba(0, 0, 0, 1), inset 0 0 2px rgba(0, 0, 0, 1), 0 0 6px rgba(0, 0, 0, 0.6), inset 0 0 6px rgba(0, 0, 0, 0.6) !important;
-    -webkit-user-select: none !important;
-    padding: 4px 5px 5px 5px !important;
-    line-height: 1 !important;
-    font-family: "Helvetica Neue", Helvetica, sans-serif !important;
-    font-size: 20px !important;
-    font-style: normal !important;
-    font-weight: bold !important;
-    white-space: nowrap !important;
-}
-
-.CTFplaceholder.CTFnoimage .CTFlogo {
-    color: rgba(0, 0, 0, 0.35) !important;
-    border: 4px solid rgba(0, 0, 0, 0.25) !important;
-    text-shadow: none !important;
-    -webkit-box-shadow: none !important;
-}
-
-.CTFplaceholder .CTFlogo.CTFinset {
-    position: absolute !important;
-    top: 1px !important;
-    color: rgba(175, 175, 175, 0.3) !important;
-    border-color: rgba(175, 175, 175, 0.3) !important;
-    text-shadow: none !important;
-    -webkit-box-shadow: none !important;
-}
-
-.CTFplaceholder.CTFnoimage .CTFlogo.CTFinset {
-    color: rgba(255, 255, 255, 0.45) !important;
-    border-color: rgba(255, 255, 255, 0.45) !important;
-}
-
-.CTFplaceholder .CTFlogoContainer.CTFmini .CTFlogo,
-.CTFplaceholder .CTFlogoContainer.CTFhidden .CTFlogo.CTFtmp {
-    border-width: 2px !important;
-    border-radius: 4px !important;
-    font-size: 10px !important;
-    padding: 2px 2px 3px 2px !important;
-}
-
-.CTFplaceholder.CTFnoimage .CTFlogoContainer.CTFmini .CTFlogo {
-    border-color: rgba(50, 50, 50, 0.2) !important;
-    color: rgba(50, 50, 50, 0.4) !important;
-}
-
-.CTFplaceholder .CTFlogoContainer.CTFhidden .CTFlogo.CTFtmp {
-    position: absolute !important;
-}
-
-.CTFplaceholder.CTFnoimage .CTFlogoContainer.CTFmini .CTFlogo.CTFinset {
-    border-color: rgba(255, 255, 255, 0.25) !important;
-    color: rgba(255, 255, 255, 0.25) !important;
-}
-
-/***********
-Media player
-***********/
-
-.CTFmediaPlayer * {
-    color: white !important;
-    text-rendering: auto !important;
-    font-family: "Lucida Grande", Helvetica, sans-serif !important;
-    font-size: 10px !important;
-    font-style: normal !important;
-    font-weight: normal !important;
-}
-
-.CTFmediaPlayer {
-    display: inline-block !important;
-    position: relative !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-.CTFmediaPlayer .CTFvideoElement {
-    display: block !important;
-    position: absolute !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    margin: 0px auto 0px auto !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    background-origin: border-box !important;
-    background-size: contain !important;
-    z-index: 1 !important;
-}
-
-.CTFmediaPlayer .CTFplaylistControls {
-    position: absolute !important;
-    bottom: 24px !important;
-    left: 0 !important;
-    right: 0 !important;
-    margin: 0px auto 0px auto !important;
-    height: 24px !important;
-    z-index: 2 !important;
-    -webkit-user-select: none !important;
-    background: none !important;
-    background-image: url('controls_background.png') !important;
-    background-repeat: repeat-x !important;
-    pointer-events: none !important;
-}
-
-.CTFmediaPlayer .CTFplaylistControls * {
-    background: none !important;
-    text-shadow: black 0 1px 1px !important;
-}
-
-/* Left playlist controls */
-.CTFmediaPlayer .CTFplaylistControlsLeft {
-    position: absolute !important;
-    top: 0px !important;
-    left: 0px !important;
-    height: inherit !important;
-}
-
-.CTFmediaPlayer .CTFplaylistControlsLeft {
-    position: absolute !important;
-    top: 0px !important;
-    left: 0px !important;
-    height: inherit !important;
-}
-
-.CTFmediaPlayer .CTFtrackInfo {
-    display: table-cell !important;
-    vertical-align: middle !important;
-    height: inherit !important;
-    padding: 0 5px 0 7px !important;
-}
-
-.CTFmediaPlayer .CTFtrackInfo p {
-    display: block !important;
-    line-height: normal !important;
-    text-align: left !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-
-/* Right playlist controls */
-.CTFmediaPlayer .CTFplaylistControlsRight {
-    position: absolute !important;
-    top: 0px !important;
-    right: 4px !important;
-    height: inherit !important;
-}
-
-.CTFmediaPlayer .CTFprevButton {
-    display: table-cell !important;
-    vertical-align: middle !important;
-    height: inherit !important;
-    width: 37px !important;
-    background-image: url('prev.png') !important;
-    background-repeat: no-repeat !important;
-    background-position: center center !important;
-    pointer-events: auto !important;
-}
-
-.CTFmediaPlayer .CTFprevButton:active {
-    background-image: url('prev_active.png') !important;
-}
-
-.CTFmediaPlayer .CTFtrackSelect {
-    display: table-cell !important;
-    vertical-align: middle !important;
-    height: inherit !important;
-}
-
-.CTFmediaPlayer .CTFnextButton {
-    display: table-cell !important;
-    vertical-align: middle !important;
-    height: inherit !important;
-    width: 37px !important;
-    background-image: url('next.png') !important;
-    background-repeat: no-repeat !important;
-    background-position: center center !important;
-    pointer-events: auto !important;
-}
-
-.CTFmediaPlayer .CTFnextButton:active {
-    background-image: url('next_active.png') !important;
-}
-
-.CTFmediaPlayer .CTFtrackSelect input {
-    display: inline-block !important;
-    border: 1px solid rgba(0, 0, 0, 1) !important;
-    height: 12px !important;
-    -webkit-box-sizing: content-box !important;
-    line-height: 1 !important;
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    text-align: right !important;
-    pointer-events: auto !important;
-}
-
-.CTFmediaPlayer .CTFtrackSelect span {
-    display: inline !important;
-    line-height: 1 !important;
-}
-
 /**************
-Source switcher
+Generic classes
 **************/
 
-.CTFsourceSelector * {
-    width: auto !important;
-    height: auto !important;
-    background: none !important;
-    text-rendering: auto !important;
-    font-family: "Lucida Grande", Helvetica, sans-serif !important;
-    font-size: 10px !important;
-    font-style: normal !important;
-    font-weight: normal !important;
-    list-style: none !important;
-    text-shadow: black 0 1px 1px !important;
-    line-height: normal !important;
-    overflow: visible !important;
-}
-
-.CTFsourceSelector {
-    display: block !important;
-    position: absolute !important;
-    z-index: 2 !important;
-    -webkit-user-select: none !important;
-    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(59, 59, 59, 0.9)), to(rgba(19, 19, 19, 0.9)), color-stop(.25, rgba(39, 39, 39, 0.9)), color-stop(.265, rgba(25, 25, 25, 0.9))) !important;
-    pointer-events: none !important;
-    opacity: 0 !important;
-    border-radius: 5px !important;
-    border: 1px solid rgba(0, 0, 0, .6) !important;
-    -webkit-box-shadow: rgba(0, 0, 0, .5) 0 1px 2px !important;
-    -webkit-transition-duration: .2s !important;
-    -webkit-transition-timing-function: linear !important;
-}
-
-.CTFsourceSelector.CTFhidden {
-    visibility: hidden !important;
-}
-
-.CTFsourceSelector:hover {
-    opacity: 1 !important;
-    -webkit-transition-duration: .05s !important;
-    -webkit-transition-timing-function: linear !important;
-}
-
-.CTFsourceSelector .CTFsourceList {
-    display: block !important;
-    pointer-events: auto !important;
-    margin: 0 !important;
-    padding: 2px 5px !important;
-    border-top: 1px solid #555 !important;
-    border-radius: 5px !important;
-}
-
-.CTFsourceSelector li {
-    display: list-item !important;
-    position: static !important;
-    cursor: pointer !important;
-    margin: 5px !important;
-    padding: 0 !important;
-    color: #ADADAD !important;
-    white-space: nowrap !important;
-}
-
-.CTFsourceSelector li.CTFcurrentSource {
-    color: white !important;
-}
-
-.CTFmediaPlayer li.CTFcurrentSource {
-    cursor: default !important;
-}
-
-.CTFsourceSelector li a {
-    color: inherit !important;
-    cursor: inherit !important;
-    white-space: inherit !important;
-}
-
-.CTFsourceSelector li:hover {
-    color: white !important;  
-}
-
-.CTFsourceSelector li:active,
-.CTFsourceSelector li:active a {
-    text-shadow: white 0 0 7px !important;  
-}
-
-.CTFmediaPlayer li.CTFcurrentSource:active a {
-    text-shadow: none !important;  
-}
-
-.CTFsourceSelector li::before {
+.CTFnodisplay, .CTFplaceholder .CTFnodisplay, .CTFmediaPlayer .CTFnodisplay {
     display: none !important;
 }
 
-.CTFmediaPlayer li.CTFcurrentSource a::before {
-    content: "\2022" !important;
-    display: inline-block !important;
-    width: 7px !important;
-    margin-left: -7px !important;
+.CTFhidden, .CTFplaceholder .CTFhidden, .CTFmediaPlayer .CTFhidden {
+    visibility: hidden !important;
 }
 
-/*************************
-Invisible QuickTime object
-*************************/
-
-.CTFplaceholder .CTFQTObject,
-.CTFmediaPlayer .CTFQTObject {
-    position: absolute !important;
-    width: 0px !important;
-    height: 0px !important;
-}
 

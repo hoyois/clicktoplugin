@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="settings.css">
+    <script type="text/javascript" src="localization.js"></script>
+    <!--<script defer type="text/javascript" src="settings.js"></script>-->
+</head>
+<body><div id="main" class="hidden init">
+    <nav><ul>
+        <li><span class="tab"><span class="string" title="WHITELISTS_TAB"></span></span></li>
+        <li><span class="tab"><span class="string" title="KILLERS_TAB"></span></span></li>
+        <li><span class="tab"><span class="string" title="MEDIA_TAB"></span></span></li>
+        <li><span class="tab"><span class="string" title="CONTEXT_MENU_TAB"></span></span></li>
+        <li><span class="tab"><span class="string" title="KEYBOARD_SHORTCUTS_TAB"></span></span></li>
+        <li><span class="tab"><span class="string" title="MISC_TAB"></span></span></li>
+    </ul></nav>
+    <section>
+        <menu>
+                <li><span class="left textarea"><label for="locationsWhitelist"><span class="string" title="ALLOW_LOCATIONS"></span>:</label></span><span class="right"><textarea id="locationsWhitelist" class="setting" placeholder="www.example.com/path&#xA;@^http://[a-z]*\.reg(ex)?\.com/"></textarea></span></li>
+                <li><span class="left textarea"><label for="sourcesWhitelist"><span class="string" title="ALLOW_SOURCES"></span>:</label></span><span class="right"><textarea id="sourcesWhitelist" class="setting" placeholder="example.swf"></textarea></span></li>
+                <li><span class="left"></span><span class="right"><input id="invertWhitelists" class="setting" type="checkbox"><label for="invertWhitelists"><span class="string" title="INVERT_WHITELISTS"></span></label></span></li>
+                <li class="glue"></li>
+                <li><span class="left textarea"><label for="locationsBlacklist"><span class="string" title="HIDE_LOCATIONS"></span>:</label></span><span class="right"><textarea id="locationsBlacklist" class="setting"></textarea></span></li>
+                <li><span class="left textarea"><label for="sourcesBlacklist"><span class="string" title="HIDE_SOURCES"></span>:</label></span><span class="right"><textarea id="sourcesBlacklist" class="setting"></textarea></span></li>
+                <li><span class="left"></span><span class="right"><input id="invertBlacklists" class="setting" type="checkbox"><label for="invertBlacklists"><span class="string" title="INVERT_BLACKLISTS"></span></label></span></li>
+        </menu>
+    </section>
+    <section>
+        <menu>
+                <li><span class="left"><span class="string" title="ENABLE_THESE_KILLERS"></span>:</span><span class="right"><input id="killer5" class="killer" type="checkbox"><label for="killer5">Blip.tv</label></span></li>
+                <li><span class="left"><input id="killers_all" type="button" value="Select All"><input id="killers_toggle" type="button" value="Toggle"></span><span class="right"><input id="killer4" class="killer" type="checkbox"><label for="killer4">Break</label></span></li>
+                <li><span class="left"></span><span class="right"><input id="killer10" class="killer" type="checkbox"><label for="killer10">Broadcast Interactive Media</label></span></li>
+                <li><span class="left"></span><span class="right"><input id="killer2" class="killer" type="checkbox"><label for="killer2">Dailymotion</label></span></li>
+                <li><span class="left"></span><span class="right"><input id="killer3" class="killer" type="checkbox"><label for="killer3">Facebook</label></span></li>
+                <li><span class="left"></span><span class="right"><input id="killer11" class="killer" type="checkbox"><label for="killer11">Generic Flash</label></span></li>
+                <li><span class="left"></span><span class="right"><input id="killer9" class="killer" type="checkbox"><label for="killer9">Megavideo</label></span></li>
+                <li><span class="left"></span><span class="right"><input id="killer6" class="killer" type="checkbox"><label for="killer6">Metacafe</label></span></li>
+                <li><span class="left"></span><span class="right"><input id="killer7" class="killer" type="checkbox"><label for="killer7">Tumblr Audio</label></span></li>
+                <li><span class="left"></span><span class="right"><input id="killer8" class="killer" type="checkbox"><label for="killer8">Veoh</label></span></li>
+                <li><span class="left"></span><span class="right"><input id="killer1" class="killer" type="checkbox"><label for="killer1">Vimeo</label></span></li>
+                <li><span class="left"></span><span class="right"><input id="killer0" class="killer" type="checkbox"><label for="killer0">YouTube</label></span></li>
+                <li class="glue"></li>
+                <li><span class="left"></span><span class="right"><input id="useFallbackMedia" class="setting" type="checkbox"><label for="useFallbackMedia"><span class="string" title="USE_FALLBACK_MEDIA"></span></label></span></li>
+        </menu>
+    </section>
+    <section>
+        <menu>
+            <li><span class="left"><label for="defaultPlayer"><span class="string" title="DEFAULT_PLAYER"></span>:</label></span><span class="right"><select id="defaultPlayer" class="setting">
+                <option value="html5" title="HTML5_PLAYER"></option>
+                <option value="qtp" title="QUICKTIME_PLAYER"></option>
+                <option value="plugin" title="FLASH_PLAYER"></option>
+            </select></span></li>
+            <li><span class="left"></span><span class="right"><input id="mediaAutoload" class="setting" type="checkbox"><label for="mediaAutoload"><span class="string" title="AUTOLOAD_MEDIA_PLAYER"></span></label></span></li>
+            <li><span class="left"></span><span class="right sub"><input id="preload" class="setting" type="checkbox"><label for="preload"><span class="string" title="START_BUFFERING"></span></label></span></li>
+            <li><span class="left"></span><span class="right"><input id="usePlaylists" class="setting" type="checkbox"><label for="usePlaylists"><span class="string" title="USE_PLAYLISTS"></span></label></span></li>
+            <li class="glue"></li>
+            <li><span class="left"></span><span class="right"><input id="showPoster" class="setting" type="checkbox"><label for="showPoster"><span class="string" title="SHOW_POSTER"></span></label></span></li>
+            <li><span class="left"></span><span class="right"><input id="showMediaTooltip" class="setting" type="checkbox"><label for="showMediaTooltip"><span class="string" title="SHOW_MEDIA_TOOLTIP"></span></label></span></li>
+            <li class="glue"></li>
+                <li><span class="left"></span><span class="right"><input id="showSourceSelector" class="setting" type="checkbox"><label for="showSourceSelector"><span class="string" title="SHOW_SOURCE_SELECTOR"></span></label></span></li>
+                <li><span class="left"></span><span class="right sub"><input id="showPluginSourceItem" class="setting" type="checkbox"><label for="showPluginSourceItem"><span class="string" title="SHOW_FLASH_SOURCE"></span></label></span></li>
+                <li><span class="left"></span><span class="right sub"><input id="showQTPSourceItem" class="setting" type="checkbox"><label for="showQTPSourceItem"><span class="string" title="SHOW_QTP_SOURCE"></span></label></span></li>
+                <li><span class="left"></span><span class="right"><input id="hideRewindButton" class="setting" type="checkbox"><label for="hideRewindButton"><span class="string" title="HIDE_REWIND_BUTTON"></span></label></span></li>
+                <li><span class="left"></span><span class="right"><input id="showVolumeSlider" class="setting" type="checkbox"><label for="showVolumeSlider"><span class="string" title="SHOW_WEBKIT_VOLUME_SLIDER"></span></label></span></li>
+                <li><span class="left"><label for="volume"><span class="string" title="SOUND_VOLUME"></span>:</label></span><span class="right"><input id="volume" class="setting" type="range" min="0" max="100" step="1"></span></li>
+                <li><span class="left"><label for="maxResolution"><span class="string" title="MAX_RESOLUTION"></span>:</label></span><span class="right"><select id="maxResolution" class="setting">
+                    <option value="360">360p</option>
+                    <option value="480">480p</option>
+                    <option value="720">720p</option>
+                    <option value="1080">1080p</option>
+                    <option value="infinity">4K</option>
+                </select></span></li>
+                <li><span class="left"><label for="codecsPolicy"><span class="string" title="NONNATIVE_FORMATS_POLICY"></span>:</label></span><span class="right"><select id="codecsPolicy" class="setting">
+                    <option value="1" title="NONNATIVE_IGNORE"></option>
+                    <option value="2" title="NONNATIVE_LAST_RESORT"></option>
+                    <option value="3" title="NONNATIVE_USE_FREELY"></option>
+                </select></span></li>
+                <li><span class="left textarea"><label for="mediaWhitelist"><span class="string" title="AUTOPLAY_LOCATIONS"></span>:</label></span><span class="right"><textarea id="mediaWhitelist" class="setting"></textarea></span></li>
+        </menu>
+    </section>
+    <section>
+        <menu>
+                <li><span class="left"><span class="string" title="SHOW_IN_CONTEXT_MENU"></span>:</span><span class="right"><input id="disableEnableContext" class="setting" type="checkbox"><label for="disableEnableContext"><span class="string" title="DISABLE_ENABLE_CONTEXT"></span></label></span></li>
+                <li><span class="left"></span><span class="right"><input id="addToWhitelistContext" class="setting" type="checkbox"><label for="addToWhitelistContext"><span class="string" title="ALWAYS_ALLOW_CONTEXT"></span></label></span></li>
+                <li><span class="left"></span><span class="right"><input id="addToBlacklistContext" class="setting" type="checkbox"><label for="addToBlacklistContext"><span class="string" title="ALWAYS_HIDE_CONTEXT"></span></label></span></li>
+                <li><span class="left"></span><span class="right"><input id="loadAllContext" class="setting" type="checkbox"><label for="loadAllContext"><span class="string" title="LOAD_ALL_CONTEXT"></span></label></span></li>
+                <li><span class="left"></span><span class="right"><input id="loadInvisibleContext" class="setting" type="checkbox"><label for="loadInvisibleContext"><span class="string" title="LOAD_INVISIBLE_CONTEXT"></span></label></span></li>
+                <li><span class="left"></span><span class="right"><input id="downloadContext" class="setting" type="checkbox"><label for="downloadContext"><span class="string" title="DOWNLOAD_CONTEXT"></span></label></span></li>
+                <li><span class="left"></span><span class="right"><input id="viewOnSiteContext" class="setting" type="checkbox"><label for="viewOnSiteContext"><span class="string" title="VIEW_ON_SITE_CONTEXT"></span></label></span></li>
+                <li><span class="left"></span><span class="right"><input id="viewInQTPContext" class="setting" type="checkbox"><label for="viewInQTPContext"><span class="string" title="VIEW_IN_QTP_CONTEXT"></span></label></span></li>
+        </menu>
+    </section>
+    <section>
+        <menu>
+                <li><span class="left"><label for="loadAllShortcut"><span class="string" title="LOAD_ALL_SHORTCUT"></span>:</label></span><span class="right"><input id="loadAllShortcut" class="keyboard global" type="text"><span class="mouse disabled"></span><input class="shortcut_clear" type="button"></span></li>
+                <li><span class="left"><label for="hideAllShortcut"><span class="string" title="HIDE_ALL_SHORTCUT"></span>:</label></span><span class="right"><input id="hideAllShortcut" class="keyboard global" type="text"><span class="mouse disabled"></span><input class="shortcut_clear" type="button"></span></li>
+                <li><span class="left"><label for="hidePluginShortcut"><span class="string" title="HIDE_FLASH_SHORTCUT"></span>:</label></span><span class="right"><input id="hidePluginShortcut" class="keyboard global" type="text" disabled><span class="mouse"></span><input class="shortcut_clear" type="button"></span></li>
+                <li class="glue"></li>
+                <li><span class="left"><label for="playPauseShortcut"><span class="string" title="PLAY_PAUSE_SHORTCUT"></span>:</label></span><span class="right"><input id="playPauseShortcut" class="keyboard media" type="text"><span class="mouse"></span><input class="shortcut_clear" type="button"></span></li>
+                <li><span class="left"><label for="enterFullscreenShortcut"><span class="string" title="ENTER_FULLSCREEN_SHORTCUT"></span>:</label></span><span class="right"><input id="enterFullscreenShortcut" class="keyboard media" type="text"><span class="mouse"></span><input class="shortcut_clear" type="button"></span></li>
+                <li><span class="left"><label for="volumeUpShortcut"><span class="string" title="VOLUME_UP_SHORTCUT"></span>:</label></span><span class="right"><input id="volumeUpShortcut" class="keyboard media" type="text"><span class="mouse"></span><input class="shortcut_clear" type="button"></span></li>
+                <li><span class="left"><label for="volumeDownShortcut"><span class="string" title="VOLUME_DOWN_SHORTCUT"></span>:</label></span><span class="right"><input id="volumeDownShortcut" class="keyboard media" type="text"><span class="mouse"></span><input class="shortcut_clear" type="button"></span></li>
+                <li><span class="left"><label for="prevTrackShortcut"><span class="string" title="PREV_TRACK_SHORTCUT"></span>:</label></span><span class="right"><input id="prevTrackShortcut" class="keyboard media" type="text"><span class="mouse"></span><input class="shortcut_clear" type="button"></span></li>
+                <li><span class="left"><label for="nextTrackShortcut"><span class="string" title="NEXT_TRACK_SHORTCUT"></span>:</label></span><span class="right"><input id="nextTrackShortcut" class="keyboard media" type="text"><span class="mouse"></span><input class="shortcut_clear" type="button"></span></li>
+                <li><span class="left"><label for="showTitleShortcut"><span class="string" title="SHOW_TITLE_SHORTCUT"></span>:</label></span><span class="right"><input id="showTitleShortcut" class="keyboard media" type="text"><span class="mouse"></span><input class="shortcut_clear" type="button"></span></li>
+                <li><span class="left"><label for="toggleLoopingShortcut"><span class="string" title="TOGGLE_LOOPING_SHORTCUT"></span>:</label></span><span class="right"><input id="toggleLoopingShortcut" class="keyboard media" type="text"><span class="mouse"></span><input class="shortcut_clear" type="button"></span></li>
+        </menu>
+    </section>
+    <section>
+    <menu>
+            <li><span class="left"><label for="opacity"><span class="string" title="PLACEHOLDER_OPACITY"></span>:</label></span><span class="right"><input id="opacity" class="setting" type="range" min="0" max="100" step="1"></span></li>
+            <li><span class="left"></span><span class="right"><input id="showTooltip" class="setting" type="checkbox"><label for="showTooltip"><span class="string" title="SHOW_TOOLTIP"></span></label></span></li>
+            <li class="glue"></li>
+            <li><span class="left"><label for="sIFRPolicy"><span class="string" title="SIFR_POLICY"></span>:</label></span><span class="right"><select id="sIFRPolicy" class="setting">
+                <option value="textonly" title="SIFR_TEXT_ONLY"></option>
+                <option value="normal" title="SIFR_NORMAL"></option>
+                <option value="autoload" title="SIFR_AUTOLOAD"></option>
+            </select></span></li>
+            <li><span class="left"><label for="maxInvisibleSize"><span class="string" title="MAX_INVISIBLE_SIZE"></span>:</label></span><span class="right"><input id="maxInvisibleSize" class="setting" type="number" min="1" step="1" size="3"><span class="string" title="PIXELS_UNIT"></span></span></li>
+            <li><span class="left"></span><span class="right"><input id="loadInvisible" class="setting" type="checkbox"><label for="loadInvisible"><span class="string" title="ALLOW_INVISIBLE_FLASH"></span></label></span></li>
+            <li><span class="left"></span><span class="right"><input id="debug" class="setting" type="checkbox"><label for="debug"><span class="string" title="DEBUG_MODE"></span></label></span></li>
+    </menu>
+    </section>
+    <script type="text/javascript" src="settings.js"></script>
+</div></body>
+</html>

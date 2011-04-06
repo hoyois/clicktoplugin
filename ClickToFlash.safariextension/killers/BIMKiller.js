@@ -1,13 +1,11 @@
 function BIMKiller() {}
 
 BIMKiller.prototype.canKill = function(data) {
-    return (/bimVideoPlayer[^\/.]*\.swf$/.test(data.src) && hasFlashVariable(data.params, "mediaXML"));
+    return (/bimVideoPlayer[^\/.]*\.swf$/.test(data.src) && /(?:^|&)mediaXML=/.test(data.params));
 };
 
-BIMKiller.prototype.processElement = function(data, callback) {
-    var url = decodeURIComponent(getFlashVariable(data.params, "mediaXML"));
-    if(!url) return;
-    
+BIMKiller.prototype.process = function(data, callback) {
+    var url = decodeURIComponent(parseFlashVariables(data.params).mediaXML);
     var title, posterURL, videoURL;
     
     var xhr = new XMLHttpRequest();

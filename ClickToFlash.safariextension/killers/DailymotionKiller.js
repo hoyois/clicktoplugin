@@ -1,20 +1,21 @@
 function DailymotionKiller() {}
 
 DailymotionKiller.prototype.canKill = function(data) {
-    return (data.src.indexOf("/dmplayerv4/") != -1 || data.src.indexOf("www.dailymotion.com") != -1);
+    return (data.src.indexOf("/dmplayerv4/") !== -1 || data.src.indexOf("www.dailymotion.com") !== -1);
 };
 
-DailymotionKiller.prototype.processElement = function(data, callback) {
+DailymotionKiller.prototype.process = function(data, callback) {
     if(data.params) {
-        this.processElementFromSequence(decodeURIComponent(getFlashVariable(data.params, "sequence")), callback);
+        var sequence = parseFlashVariables(data.params).sequence;
+        if(sequence) this.processFromSequence(decodeURIComponent(sequence), callback);
         return;
     }
     // The vid has no flashvars... It has to be an embed
-    var matches = data.src.match(/\/swf\/([^&]+)(?:&|$)/);
-    if(matches) this.processElementFromVideoID(matches[1], callback);
+    var matches = data.src.match(/\/swf\/([^&]+)/);
+    if(matches) this.processFromVideoID(matches[1], callback);
 };
 
-DailymotionKiller.prototype.processElementFromSequence = function(sequence, callback) {
+DailymotionKiller.prototype.processFromSequence = function(sequence, callback) {
     // NOTE: sequence.replace(/\\'/g, "'") is JSON but it's so messy that regexp search is easier
     var posterURL, matches;
     var sources = new Array();
@@ -22,19 +23,17 @@ DailymotionKiller.prototype.processElementFromSequence = function(sequence, call
     // hdURL (720p)
     matches = sequence.match(/\"hdURL\":\"([^"]*)\"/);
     if(matches) {
-        sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "720p MP4", "resolution": 720, "isNative": true});
+        sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "720p MP4", "resolution": 720, "isNative": true, "mediaType": "video"});
     }
-    // hqURL (<=480p)
+    // hqURL
     matches = sequence.match(/\"hqURL\":\"([^"]*)\"/);
     if(matches) {
-        sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "SD MP4", "resolution": 360, "isNative": true});
+        sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "SD MP4", "resolution": 360, "isNative": true, "mediaType": "video"});
     }
-    // sdURL (FLV only)
-    if(canPlayFLV) {
-        matches = sequence.match(/\"sdURL\":\"([^"]*)\"/);
-        if(matches) {
-            sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "LD FLV", "resolution": 240, "isNative": false});
-        }
+    // sdURL
+    matches = sequence.match(/\"sdURL\":\"([^"]*)\"/);
+    if(matches) {
+        sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "LD MP4", "resolution": 240, "isNative": true, "mediaType": "video"});
     }
     
     matches = sequence.match(/\"backgroundImageURL\":\"([^"]*)\"/);
@@ -45,15 +44,15 @@ DailymotionKiller.prototype.processElementFromSequence = function(sequence, call
     if(matches) title = unescape(matches[1].replace(/\+/g, " ").replace(/\\u/g, "%u").replace(/\\["'\/\\]/g, function(s){return s.charAt(1);}));
     
     var videoData = {
-        "playlist": [{"mediaType": "video", "title": title, "posterURL": posterURL, "sources": sources}]
+        "playlist": [{"title": title, "posterURL": posterURL, "sources": sources}]
     };
     callback(videoData);
 };
 
-DailymotionKiller.prototype.processElementFromVideoID = function(videoID, callback) {
+DailymotionKiller.prototype.processFromVideoID = function(videoID, callback) {
     var sequenceMatch = /addVariable\(\"sequence\",\s*\"([^"]*)\"/;
     var _this = this;
-    var xhr = new XMLHttpRequest ();
+    var xhr = new XMLHttpRequest();
     xhr.open("GET", "http://www.dailymotion.com/video/" + videoID, true);
     xhr.onload = function() {
         var matches = xhr.responseText.match(sequenceMatch);
@@ -62,7 +61,7 @@ DailymotionKiller.prototype.processElementFromVideoID = function(videoID, callba
                 videoData.playlist[0].siteInfo = {"name": "Dailymotion", "url": "http://www.dailymotion.com/video/" + videoID};
                 callback(videoData);
             }
-            _this.processElementFromSequence(decodeURIComponent(matches[1]), callbackForEmbed);
+            _this.processFromSequence(decodeURIComponent(matches[1]), callbackForEmbed);
         }
     };
     xhr.send(null);

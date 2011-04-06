@@ -26,29 +26,30 @@ function makeAbsoluteURL(url, base) {
     return base + url;
 }
 
-function unescapeHTML(text){
+function extractDomain(url) {
+    return url.match(/\/\/([^\/]+)\//)[1];
+}
+
+function unescapeHTML(text) {
     var e = document.createElement("div");
     e.innerHTML = text;
     return e.firstChild.nodeValue;
 }
 
-function hasFlashVariable(flashvars, key) {
-    var s = "(?:^|&)" + key + "=";
-    s = new RegExp(s);
-    return s.test(flashvars);
+function parseUnicode(text) {
+    return text.replace(/\\u([0-9a-fA-F]{4})/g, function(s,c) {return String.fromCharCode(parseInt(c, 16));});
 }
 
-function getFlashVariable(flashvars, key) {
-    if (!flashvars) return "";
-    var flashVarsArray = flashvars.split("&");
-    for (var i = 0; i < flashVarsArray.length; i++) {
-        var keyValuePair = flashVarsArray[i].split("=");
-        if (keyValuePair[0] == key) {
-            return keyValuePair[1];
-        }
+function parseWithRegExp(string, regex, process) { // regex needs 'g' flag
+    if(process === undefined) process = function(s) {return s;};
+    var match;
+    var obj = new Object();
+    while((match = regex.exec(string)) !== null) {
+        obj[match[1]] = process(match[2]);
     }
-    return "";
+    return obj;
 }
+function parseFlashVariables(s) {return parseWithRegExp(s, /([^&=]*)=([^&]*)/g);}
 
 function extractExt(url) {
     url = url.split(/[?#]/)[0];
@@ -69,13 +70,13 @@ function canPlayTypeWithHTML5(MIMEType) {
 const canPlayFLV = canPlayTypeWithHTML5("video/x-flv");
 const canPlayWM = canPlayTypeWithHTML5("video/x-ms-wmv");
 const canPlayDivX = canPlayFLV; // 'video/divx' always returns "", probably a Perian oversight
+//const canPlayWebM = canPlayFLV; // same as above (needs Perian 2.2)
 const canPlayOGG = canPlayTypeWithHTML5("video/ogg"); // OK with Xiph component
-//const canPlayWebM = canPlayTypeWithHTML5("video/webm"); // still can't with alpha version of QuickTime WebM component
 
 // and certainly not this this one! but it does the job reasonably well
 function canPlaySrcWithHTML5(url) {
     url = extractExt(url);
-    if (/^(?:mp4|mpe?g|mov|m4v)$/i.test(url)) return {"type": "video", "isNative": true};
+    if(/^(?:mp4|mpe?g|mov|m4v)$/i.test(url)) return {"type": "video", "isNative": true};
     if(canPlayFLV && /^flv$/i.test(url)) return {"type": "video", "isNative": false};
     if(canPlayWM && /^(?:wm[vp]?|asf)$/i.test(url)) return {"type": "video", "isNative": false};
     if(canPlayDivX && /^divx$/i.test(url)) return {"type": "video", "isNative": false};
@@ -87,7 +88,6 @@ function canPlaySrcWithHTML5(url) {
 }
 
 function chooseDefaultSource(sourceArray) {
-    if(safari.extension.settings.maxResolution === "plugin") return undefined;
     var defaultSource;
     var hasNativeSource = false;
     var resolutionMap = new Array();
@@ -115,13 +115,23 @@ function chooseDefaultSource(sourceArray) {
     return defaultSource;
 }
 
-function makeLabel(source, mediaType) {
-    if(!source) return false;
-    if(mediaType === "audio") return "Audio";
+function makeLabel(source) {
+    if(!source) return false; // the injected script will take care of the label
+    if(safari.extension.settings.defaultPlayer === "plugin") return false;
+    if(safari.extension.settings.defaultPlayer === "qtp") return "QTP";
+    if(source.mediaType === "audio") return "Audio";
     var prefix = "";
-    if(source.resolution >= 720) prefix = "HD&nbsp;";
-    if(source.resolution >= 2304) prefix = "4K&nbsp;";
+    if(source.resolution >= 720) prefix = "HD ";
+    if(source.resolution >= 2304) prefix = "4K ";
     return prefix + (source.isNative ? "H.264" : "Video"); // right...
+}
+
+const nativeExts = ["svg", "png", "tif", "tiff", "gif", "jpg", "jpeg", "jp2", "ico", "html", "xml", "pdf"];
+function isNativeExt(ext) {
+    for(var i = 0; i < 12; i++) {
+        if(ext === nativeExts[i]) return true;
+    }
+    return false;
 }
 
 function getMIMEType(resourceURL, handleMIMEType) {
@@ -172,7 +182,7 @@ function parseXSPFPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlay
                 list = x[I].getElementsByTagName("annotation");
                 if(list.length > 0) title = list[0].firstChild.nodeValue;
             }
-            playlist.push({"mediaType": mediaType.type, "sources": [{"url": mediaURL, "isNative": mediaType.isNative}], "posterURL": posterURL, "title": title});
+            playlist.push({"sources": [{"url": mediaURL, "isNative": mediaType.isNative, "mediaType": mediaType.type}], "posterURL": posterURL, "title": title});
         }
         var playlistData = {
             "playlist": playlist,
@@ -188,16 +198,15 @@ function matchList(list, string) {
     var s;
     for(var i = 0; i < list.length; i++) {
         s = list[i];
-        if(!s) continue;
-        if(/^\(.*\)$/.test(s)) { // if s is enclosed in parenthesis, interpret as regexp
-            try{
-                s = new RegExp(s);
-            } catch (err) { // invalid regexp, just ignore
+        if(s.charAt(0) === "@") { // if s starts with '@', interpret as regexp
+            try {
+                s = new RegExp(s.substr(1));
+            } catch(err) { // invalid regexp, just ignore
                 continue;
             }
             if(s.test(string)) return true;
         } else { // otherwise, regular string match
-            if(string.indexOf(s) != -1) return true;
+            if(string.indexOf(s) !== -1) return true;
         }
     }
     return false;

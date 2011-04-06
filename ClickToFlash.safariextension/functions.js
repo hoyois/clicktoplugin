@@ -1,3 +1,5 @@
+if(window.location.href !== "about:blank") {
+
 function downloadURL(url) {
     var downloadLink = document.createElement("a");
     downloadLink.href = url;
@@ -8,8 +10,52 @@ function downloadURL(url) {
     downloadLink.dispatchEvent(event);
 }
 
-function getTypeOf(element) {
-    switch (element.nodeName) {
+function disableSIFR(element) {
+    var sIFRElement = element.parentNode;
+    if(!sIFRElement) return;
+    var regex = /\bsIFR-(?:hasFlash|active)\b/g;
+    document.documentElement.className = document.documentElement.className.replace(regex, "");
+    document.body.className = document.body.className.replace(regex, "");
+    var sIFRAlternate = sIFRElement.getElementsByClassName("sIFR-alternate")[0];
+    if(sIFRAlternate) sIFRElement.innerHTML = sIFRAlternate.innerHTML;
+    sIFRElement.className = sIFRElement.className.replace(/\bsIFR-replaced\b/, "");
+}
+
+function applyCSS(element, style, properties) {
+    for(var x in properties) {
+        element.style.setProperty(properties[x], style.getPropertyValue(properties[x]), "important");
+    }
+}
+
+function simplifyWheelDelta(x, y) {
+    if(x > y && y > -x) return "left";
+    if(x > y) return "down";
+    if(-x > y) return "right";
+    return "up";
+}
+
+function testShortcut(event, shortcut) {
+    for(var x in shortcut) {
+        if(x === "direction") {
+            if(simplifyWheelDelta(event.wheelDeltaX, event.wheelDeltaY) !== shortcut.direction) return false;
+            else continue;
+        }
+        if(event[x] !== shortcut[x]) return false;
+    }
+    event.preventDefault();
+    event.stopPropagation(); // immediate?
+    return true;
+}
+
+function removeHTMLNode(node) {
+    while(node.parentNode.childNodes.length === 1) {
+        node = node.parentNode;
+    }
+    node.parentNode.removeChild(node);
+}
+
+function getType(element) {
+    switch(element.nodeName) {
         case "EMBED":
             return element.type;
             break;
@@ -25,50 +71,27 @@ function getTypeOf(element) {
                     }
                 } catch(err) {}
             }
-            return "";
             break;
     }
 }
 
 function getParams(element) {
-    switch (element.nodeName) {
-        case "EMBED":
-            return (element.hasAttribute("flashvars") ? element.getAttribute("flashvars") : ""); // fixing Safari's buggy JS
-            break
-        case "OBJECT":
-            var paramElements = element.getElementsByTagName("param");
-            for (var i = paramElements.length - 1; i >= 0; i--) {
-                try {
-                    if(paramElements[i].getAttribute("name").toLowerCase() === "flashvars") {
-                        return paramElements[i].getAttribute("value");
-                    }
-                } catch(err) {}
-            }
-            return "";
-            break;
-    }
-}
-
-function isFlash(element, url) {
-    url = url.split(/[?#]/)[0];
-    url = url.substring(url.lastIndexOf(".") + 1);
-    if(url === "swf" || url === "spl") return "probably";
-    if(element.hasAttribute("classid")) {
-        if(element.getAttribute("classid").toLowerCase() === "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000") return "probably";
-        else return "";
-    }
-    var type = getTypeOf(element);
-    if(type === "application/x-shockwave-flash" || type === "application/futuresplash") return "probably";
-    if(type) return "";
-    
-    if(!url) return ""; // no source and no type -> cannot launch a plugin
-    // A source might point to a Flash movie through server-side scripting.
-    // To be sure not to let Flash through one would have at this point to make
-    // an asynchronous AJAX request and clone the blocked element later on...
-    // but this situation never occurs in practice anyway, so it's not worth it.
-    // We'll just block if source has no extension or is a common server-side script.
-    if(!(/^[a-zA-Z0-9]+$/.test(url)) || /^(?:php|aspx?)$/.test(url)) return "maybe";
-    return "";
+        switch (element.nodeName) {
+            case "EMBED":
+                return (element.hasAttribute("flashvars") ? element.getAttribute("flashvars") : ""); // fixing Safari's buggy JS
+                break
+            case "OBJECT":
+                var paramElements = element.getElementsByTagName("param");
+                for (var i = paramElements.length - 1; i >= 0; i--) {
+                    try{ // see NOTE 1
+                        if(paramElements[i].getAttribute("name").toLowerCase() === "flashvars") {
+                            return paramElements[i].getAttribute("value");
+                        }
+                    } catch(err) {}
+                }
+                return "";
+                break;
+        }
 }
 
 // Debugging functions
@@ -76,3 +99,4 @@ function HTMLToString(element) {
     return (new XMLSerializer()).serializeToString(element);
 };
 
+}
