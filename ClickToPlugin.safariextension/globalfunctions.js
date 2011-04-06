@@ -128,16 +128,16 @@ function makeLabel(source) {
 }
 
 // native MIME types that might realistically appear in <object> tags
-const nativeTypes = ["image/svg+xml", "image/png", "image/tiff", "image/gif", "image/jpeg", "image/jp2", "image/x-icon", "text/html", "text/xml", "application/pdf"];
-const nativeExts = ["svg", "png", "tif", "tiff", "gif", "jpg", "jpeg", "jp2", "ico", "html", "xml", "pdf"];
+const nativeTypes = ["image/svg+xml", "image/png", "image/tiff", "image/gif", "image/jpeg", "image/jp2", "image/x-icon", "text/html", "text/xml"];
+const nativeExts = ["svg", "png", "tif", "tiff", "gif", "jpg", "jpeg", "jp2", "ico", "html", "xml"];
 function isNativeType(MIMEType) {
-    for(var i = 0; i < 10; i++) {
+    for(var i = 0; i < 9; i++) {
         if(MIMEType === nativeTypes[i]) return true;
     }
     return false;
 }
 function isNativeExt(ext) {
-    for(var i = 0; i < 12; i++) {
+    for(var i = 0; i < 11; i++) {
         if(ext === nativeExts[i]) return true;
     }
     return false;

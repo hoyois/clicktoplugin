@@ -188,6 +188,10 @@ Placeholder element
     padding: 1px 2px 1px 2px !important;
 }
 
+.CTFplaceholder .CTFlogoContainer.CTFhidden .CTFlogo.CTFtmp {
+    position: absolute !important;
+}
+
 .CTFplaceholder.CTFnoimage .CTFlogoContainer.CTFmini .CTFlogo {
     border-color: rgba(50, 50, 50, 0.25) !important;
     color: rgba(50, 50, 50, 0.4) !important;
@@ -472,7 +476,7 @@ Settings pane
     right: 0 !important;
     top: 0 !important;
     width: 100% !important;
-    z-index: 10000 !important;
+    z-index: 1000000 !important;
     zoom: normal !important;
 }
 

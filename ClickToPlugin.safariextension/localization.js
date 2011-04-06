@@ -192,7 +192,7 @@ const STRINGS = {
         "fr-fr": "Volume sonore initial "
     },
     SHOW_IN_CONTEXT_MENU: {
-        "en-us": "Show these options in the shortcut menu",
+        "en-us": "Show these commands in the shortcut menu",
         "fr-fr": "Afficher ces options dans le menu contextuel "
     },
     DISABLE_ENABLE_CONTEXT: {
@@ -232,7 +232,7 @@ const STRINGS = {
         "fr-fr": "Ouvrir avec QuickTime Player"
     },
     SETTINGS_SHORTCUT: {
-        "en-us": "Open preferences",
+        "en-us": "Open preference pane",
         "fr-fr": "Ouvrir les préférences "
     },
     LOAD_ALL_SHORTCUT: {
@@ -264,7 +264,7 @@ const STRINGS = {
         "fr-fr": "Diminuer le volume "
     },
     TOGGLE_LOOPING_SHORTCUT: {
-        "en-us": "Toggle looping",
+        "en-us": "Toggle repeat",
         "fr-fr": "Activer/désactiver la répétition "
     },
     PREV_TRACK_SHORTCUT: {
