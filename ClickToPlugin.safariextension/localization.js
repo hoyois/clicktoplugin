@@ -231,6 +231,10 @@ const STRINGS = {
         "en-us": "View in QuickTime Player",
         "fr-fr": "Ouvrir avec QuickTime Player"
     },
+    SETTINGS_SHORTCUT: {
+        "en-us": "Open preferences",
+        "fr-fr": "Ouvrir les préférences "
+    },
     LOAD_ALL_SHORTCUT: {
         "en-us": "Load all plug-ins in frontmost tab",
         "fr-fr": "Débloquer tous les plugins "

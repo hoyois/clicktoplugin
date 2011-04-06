@@ -13,7 +13,7 @@ if(safari.extension.settings.version < 10) {
 safari.extension.settings.version = 10;
 
 // SETTINGS
-const allSettings = ["allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "useFallbackMedia", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "preload", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "codecsPolicy", "volume", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+const allSettings = ["defaultTab", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "useFallbackMedia", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "preload", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "codecsPolicy", "volume", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
 
 const injectedSettings = ["enabledKillers", "useFallbackMedia", "showSourceSelector", "preload", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "volume", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
 
@@ -33,6 +33,9 @@ function respondToMessage(event) {
         case "canLoad":
             event.message = respondToCanLoad(event.message);
             break;
+        case "getSettingsShortcut":
+            if(safari.extension.settings.settingsShortcut) event.target.page.dispatchMessage("settingsShortcut", safari.extension.settings.settingsShortcut);
+            break;
         case "killPlugin":
             killPlugin(event.message, event.target);
             break;
@@ -47,6 +50,12 @@ function respondToMessage(event) {
             break;
         case "changeSetting":
             safari.extension.settings[event.message.setting] = event.message.value;
+            break;
+        case "hideSettings":
+            event.target.page.dispatchMessage("hideSettings", "");
+            break;
+        case "showSettings":
+            event.target.page.dispatchMessage("showSettings", "");
             break;
     }
 }
@@ -149,7 +158,6 @@ function checkMIMEType(data, tab) {
 
 // CONTEXT MENU
 function handleContextMenu(event) {
-    if(event.target.url.substring(0,50) === "safari-extension://com.hoyois.safari.clicktoplugin") return;
     var s = safari.extension.settings;
     
     try {
@@ -159,6 +167,7 @@ function handleContextMenu(event) {
         else event.contextMenu.appendContextMenuItem("settings", CTP_PREFERENCES + "\u2026");
         return;
     }
+    if(u.location === safari.extension.baseURI + "settings.html") return;
     
     if(u.elementID === undefined) { // Generic menu
         if(s.disableEnableContext) event.contextMenu.appendContextMenuItem("switchOff", TURN_CTP_OFF);
@@ -211,9 +220,8 @@ function doCommand(event) {
             switchOn();
             break;
         case "settings":
-            var newTab = safari.application.activeBrowserWindow.activeTab;
-            if(newTab.url) newTab = safari.application.activeBrowserWindow.openTab("foreground");
-            newTab.url = safari.extension.baseURI + "settings.html";
+            if(!safari.application.activeBrowserWindow.activeTab.url) safari.application.activeBrowserWindow.activeTab.url = safari.extension.baseURI + "settings.html";
+            else safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("showSettings", "");
             break;
         default:
             safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("loadContent", {"instance": event.userInfo.instance, "elementID": event.userInfo.elementID, "source": event.userInfo.source, "command": event.command});

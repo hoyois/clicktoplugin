@@ -1,5 +1,28 @@
 if(window.location.href !== "about:blank") { // rdar://9238075
 
+function handleSettings(event) {
+    if(window.location.href === safari.extension.baseURI + "settings.html") return;
+    if(event.name === "settingsShortcut") {
+        document.addEventListener(event.message.type, function(e) {
+            if(testShortcut(e, event.message)) safari.self.tab.dispatchMessage("showSettings", "");
+        }, false);
+    } else if(window === window.top) {
+        if(event.name === "showSettings") {
+            var iframe = document.createElement("iframe");
+            iframe.id = "CTFsettingsPane";
+            iframe.src = safari.extension.baseURI + "settings.html";
+            document.body.appendChild(iframe);
+        }
+        else if(event.name === "hideSettings") {
+            document.body.removeChild(document.getElementById("CTFsettingsPane"));
+            window.focus();
+        }
+    }
+}
+
+safari.self.addEventListener("message", handleSettings, false);
+if(window === window.top) safari.self.tab.dispatchMessage("getSettingsShortcut", "");
+
 /*************************
 ClickToPlugin global scope
 *************************/

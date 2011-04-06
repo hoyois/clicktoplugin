@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <array>
+    <dict>
+		<key>DefaultValue</key>
+		<integer>1</integer>
+		<key>Key</key>
+		<string>defaultTab</string>
+	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<array></array>
@@ -206,6 +212,25 @@
 		<false/>
 		<key>Key</key>
 		<string>viewInQTPContext</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<dict>
+		    <key>type</key>
+		    <string>keydown</string>
+		    <key>shiftKey</key>
+		    <false/>
+		    <key>ctrlKey</key>
+		    <false/>
+		    <key>altKey</key>
+		    <true/>
+		    <key>metaKey</key>
+		    <false/>
+		    <key>keyIdentifier</key>
+		    <string>U+002C</string>
+		</dict>
+		<key>Key</key>
+		<string>settingsShortcut</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
