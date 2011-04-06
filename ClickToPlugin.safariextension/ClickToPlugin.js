@@ -1,4 +1,4 @@
-if(window.location.href !== "about:blank") {
+if(window.location.href !== "about:blank") { // rdar://9238075
 
 /*************************
 ClickToPlugin global scope
@@ -507,9 +507,6 @@ function clickPlaceholder(elementID) {
             case "plugin":
                 loadPlugin(elementID);
                 break;
-            /*case "download":
-                downloadMedia(elementID);
-                break;*/
         }
     } else loadPlugin(elementID);
 }

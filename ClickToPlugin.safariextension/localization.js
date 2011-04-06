@@ -151,23 +151,6 @@ const STRINGS = {
         "en-us": "Start buffering once loaded",
         "fr-fr": "Commencer le téléchargement automatiquement"
     },
-    INITIAL_BEHAVIOR: {
-        "en-us": "Initial behavior",
-        "en-gb": "Initial behaviour",
-        "fr-fr": "Action initiale"
-    },
-    INITIAL_NO_BUFFER: {
-        "en-us": "Do not buffer",
-        "fr-fr": "Aucune"
-    },
-    INITIAL_BUFFER: {
-        "en-us": "Start buffering",
-        "fr-fr": "Commencer le téléchargement"
-    },
-    INITIAL_AUTOPLAY: {
-        "en-us": "Start buffering and play automatically",
-        "fr-fr": "Commencer la lecture automatiquement"
-    },
     MAX_RESOLUTION: {
         "en-us": "Default resolution",
         "fr-fr": "Résolution par défaut "
