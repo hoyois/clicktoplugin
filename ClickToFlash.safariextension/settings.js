@@ -29,9 +29,7 @@ for(var i = 0; i < clearShortcutButtons.length; i++) {
 // Bind tabs to sections
 var tabs = nav.children;
 var sections = document.getElementsByTagName("section");
-var currentSection = 0;
-tabs[0].className = "selected";
-sections[0].className = "selected";
+var currentTab = 0;
 
 main.addEventListener("webkitTransitionEnd", function(event) {
     event.target.className = "";
@@ -40,25 +38,26 @@ main.addEventListener("webkitTransitionEnd", function(event) {
 }, false);
 
 function switchToTab(i) {
-    var oldHeight = sections[currentSection].offsetHeight + 20;
+    var oldHeight = sections[currentTab].offsetHeight + 20;
     main.style.height = oldHeight + "px";
-    tabs[currentSection].className = "";
+    tabs[currentTab].className = "";
     tabs[i].className = "selected";
     main.className = "hidden";
-    sections[currentSection].className = "";
+    sections[currentTab].className = "";
     sections[i].className = "selected";
-    currentSection = i;
+    currentTab = i;
     var newHeight = sections[i].offsetHeight + 20;
     main.style.WebkitTransitionProperty = "height";
     var heightDelta = newHeight - oldHeight;
     if(heightDelta < 0) heightDelta = -heightDelta;    
     main.style.WebkitTransitionDuration = (.001*heightDelta) + "s";
     main.style.height = newHeight + "px";
+    changeSetting("defaultTab", i);
 }
 
 function bindTab(i) {
     tabs[i].firstChild.addEventListener("click", function(event) {
-        if(currentSection !== i) switchToTab(i);
+        if(currentTab !== i) switchToTab(i);
     }, false);
 }
 for(var i = 0; i < tabs.length; i++) {
@@ -292,9 +291,13 @@ function showShortcut(shortcut) {
 function loadSettings(event) {
     if(event.name !== "settings") return;
     var settings = event.message;
+    tabs[settings.defaultTab].className = "selected";
+    sections[settings.defaultTab].className = "selected";
+    currentTab = settings.defaultTab;
     for(var i = 0; i < settings.enabledKillers.length; i++) {
         document.getElementById("killer" + settings.enabledKillers[i]).checked = true;
     }
+    delete settings.defaultTab;
     delete settings.enabledKillers;
     for(var id in settings) {
         var input = document.getElementById(id);
@@ -341,16 +344,28 @@ function loadSettings(event) {
         document.getElementById("showMediaTooltip").disabled = true;
     } else document.getElementById("preload").disabled = true;
     
+    if(settings.settingsShortcut) {
+        document.addEventListener(settings.settingsShortcut.type, function(event) {
+            for(var x in settings.settingsShortcut) {
+                if(event[x] !== settings.settingsShortcut[x]) return;
+            }
+            event.preventDefault();
+            safari.self.tab.dispatchMessage("hideSettings", "");
+        }, false);
+    }
+    
+    window.focus();
+    
     // Show settings pane
     main.className = "";
 }
 
 safari.self.addEventListener("message", loadSettings, false);
 
-safari.self.tab.dispatchMessage("getSettings", "");
+main.addEventListener("click", function(event) {event.stopPropagation();}, false);
 
-window.addEventListener("focus", function(event) {
-    safari.self.tab.dispatchMessage("getSettings", "");
+document.body.addEventListener("click", function(event) {
+    safari.self.tab.dispatchMessage("hideSettings", "");
 }, false);
 
-
+safari.self.tab.dispatchMessage("getSettings", "");
