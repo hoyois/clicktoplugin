@@ -10,7 +10,7 @@ FacebookKiller.prototype.process = function(data, callback) {
     else this.processFromFlashVars(flashvars, callback);
 };
 
-FacebookKiller.prototype.processFromFlashVars = function(flashvars, callback) {try{
+FacebookKiller.prototype.processFromFlashVars = function(flashvars, callback) {
     var sources = new Array();
     var isHD = flashvars.video_has_high_def === "1";
     if(flashvars.highqual_src) {
@@ -26,7 +26,7 @@ FacebookKiller.prototype.processFromFlashVars = function(flashvars, callback) {t
     var videoData = {
         "playlist": [{"title": title, "posterURL": posterURL, "sources": sources}]
     };
-    callback(videoData);}catch(e){alert(e)}
+    callback(videoData);
 };
 
 FacebookKiller.prototype.processFromHref = function(url, callback) {
