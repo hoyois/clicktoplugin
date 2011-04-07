@@ -466,7 +466,6 @@ Settings pane
     -webkit-user-select: none !important; /* not default */
     border: none !important;
     bottom: 0 !important;
-    clip: auto !important;
     height: 100% !important;
     left: 0 !important;
     margin: 0 !important;
