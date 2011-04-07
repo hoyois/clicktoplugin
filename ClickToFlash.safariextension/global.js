@@ -266,7 +266,7 @@ safari.application.addEventListener("command", doCommand, false);
 
 // UPDATE
 if(safari.extension.settings.version < 10) {
-    alert("ClickToFlash 2.2 Release Notes\n\n--- New Features ---\n\n\u2022 The extension\u2019s settings are now on their own HTML page accessible through the shortcut menu\n\u2022 Perfected plug-in detection following WebKit\u2019s internal mechanism\n\u2022 New blacklists to permanently hide plug-ins\n\u2022 Customizable keyboard and mouse shortcuts for media playback and other actions\n\u2022 HTML5 replacements for Facebook videos\n\u2022 Revamped playlist controls\n\u2022 Safari\u2019s hidden volume slider for HTML5 media elements can be used\n\u2022 The title of the video can be shown in the controls\n\u2022 Contains English and French localizations\n\n--- Bugs Fixed ---\n\n\u2022 Fixed HTML5 video aspect ratio issues using shadow DOM styling\n\u2022 Fixed Megavideo and Veoh HTML5 replacements\n\u2022 The \u2018Show text only\u2019 sIFR setting could cause web pages to display incorrectly");
+    alert("ClickToFlash 2.2 Release Notes\n\n--- New Features ---\n\n\u2022 The extension\u2019s settings are now on their own HTML page accessible through the shortcut menu\n\u2022 Perfected plug-in detection following WebKit\u2019s internal mechanism\n\u2022 New blacklists to permanently hide Flash objects\n\u2022 Customizable keyboard and mouse shortcuts for media playback and other actions\n\u2022 HTML5 replacements for Facebook videos\n\u2022 Revamped playlist controls\n\u2022 Safari\u2019s hidden volume slider for HTML5 media elements can be used\n\u2022 The title of the video can be shown in the controls\n\u2022 Contains English and French localizations\n\n--- Bugs Fixed ---\n\n\u2022 Fixed HTML5 video aspect ratio issues using shadow DOM styling\n\u2022 Fixed Megavideo and Veoh HTML5 replacements\n\u2022 The \u2018Show text only\u2019 sIFR setting could cause web pages to display incorrectly");
     
     // Clean deprecated settings
     function clearSettings() {
@@ -274,7 +274,9 @@ if(safari.extension.settings.version < 10) {
             safari.extension.settings.removeItem(arguments[i]);
         }
     }
-    clearSettings("replacePlugins", "useSourceSelector", "mediaAutoload", "initialBehavior");
+    clearSettings("replacePlugins", "locationsWhitelist", "sourcesWhitelist", "useSourceSelector", "mediaAutoload", "mediaWhitelist", "initialBehavior");
+} else if(safari.extension.settings.version === 10) {
+    alert("ClickToFlash 2.2.1 Release Notes\n\n--- Bugs Fixed ---\n\n\u2022 Fix for Facebook's ever changing video player URL");
 }
 if(!safari.extension.settings.version || safari.extension.settings.version < 10) {
     var newTab;
@@ -283,5 +285,5 @@ if(!safari.extension.settings.version || safari.extension.settings.version < 10)
     newTab.url = safari.extension.baseURI + "settings.html";
     alert("Welcome to ClickToFlash 2.2!\n\nClickToFlash gives you control over Flash content embedded in web pages. Under this dialog is the extension\u2019s preference pane which you can use to\n\n\u2022 Manage the extension\u2019s whitelists and blacklists\n\u2022 Select the video services for which you want ClickToFlash to provide HTML5 video replacements\n\u2022 Configure ClickToFlash\u2019s HTML5 media player\n\u2022 Choose which commands should appear in the shortcut menu\n\u2022 Configure keyboard and mouse shortcuts for various tasks\n\u2022 And more!\n\nTo access this preference pane from any page, right-click and select “ClickToFlash Preferences\u2026”, or use the shortcut specified in the “Keyboard shortcuts” section of the preferences (currently \u2325,).")
 }
-safari.extension.settings.version = 10;
+safari.extension.settings.version = 11;
 
