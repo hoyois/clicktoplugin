@@ -24,6 +24,7 @@ html body div#main {
     top: 10%;
     margin: auto !important;
     width: intrinsic;
+    max-width: 90%;
 }
 
 #main.init {
