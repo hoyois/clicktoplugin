@@ -6,7 +6,7 @@ function handleSettings(event) {
         document.addEventListener(event.message.type, function(e) {
             if(testShortcut(e, event.message)) safari.self.tab.dispatchMessage("showSettings", "");
         }, false);
-    } else if(window === window.top) {
+    } else if(window === window.top && document.body.nodeName === "BODY") {
         if(event.name === "showSettings") {
             var iframe = document.createElement("iframe");
             iframe.id = "CTFsettingsPane";

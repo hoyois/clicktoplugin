@@ -1,16 +1,16 @@
 function FacebookKiller() {}
 
 FacebookKiller.prototype.canKill = function(data) {
-    return /^https?:\/\/s-static\.ak\.facebook\.com\/rsrc\.php\/v1\/yF\/r\/[0-9a-zA-Z_]*\.swf/.test(data.src);
+    return /^https?:\/\/s-static\.ak\.facebook\.com\/rsrc\.php\/v[1-9]\/[a-zA-Z0-9]{2}\/r\/[0-9a-zA-Z_-]*\.swf/.test(data.src);
 };
 
 FacebookKiller.prototype.process = function(data, callback) {
     var flashvars = parseFlashVariables(data.params);
     if(flashvars.video_href) this.processFromHref(decodeURIComponent(flashvars.video_href), callback);
-    else this.processFromFlashVars(flashvars, false, callback);
+    else this.processFromFlashVars(flashvars, callback);
 };
 
-FacebookKiller.prototype.processFromFlashVars = function(flashvars, callback) {
+FacebookKiller.prototype.processFromFlashVars = function(flashvars, callback) {try{
     var sources = new Array();
     var isHD = flashvars.video_has_high_def === "1";
     if(flashvars.highqual_src) {
@@ -24,9 +24,9 @@ FacebookKiller.prototype.processFromFlashVars = function(flashvars, callback) {
     if(flashvars.thumb_url) posterURL = decodeURIComponent(flashvars.thumb_url);
     if(flashvars.video_title) title = decodeURIComponent(flashvars.video_title).replace(/\+/g, " ");
     var videoData = {
-        "playlist": [{"title": title, "posterURL": posterURL, "sources": sources, "siteInfo": siteInfo}]
+        "playlist": [{"title": title, "posterURL": posterURL, "sources": sources}]
     };
-    callback(videoData);
+    callback(videoData);}catch(e){alert(e)}
 };
 
 FacebookKiller.prototype.processFromHref = function(url, callback) {
