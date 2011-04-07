@@ -245,6 +245,7 @@ for(var i = 0; i < keyboardInputs.length; i++) {
 }
 function handleKeyboardEvent(event) {
     event.preventDefault();
+    event.stopPropagation();
     if(event.keyIdentifier === "Shift" || event.keyIdentifier === "Control" || event.keyIdentifier === "Alt" || event.keyIdentifier === "Meta") return;
     registerShortcut({"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "keyIdentifier": event.keyIdentifier}, event.target);
 }

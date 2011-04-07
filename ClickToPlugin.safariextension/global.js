@@ -326,7 +326,9 @@ if(safari.extension.settings.version < 10) {
             safari.extension.settings.removeItem(arguments[i]);
         }
     }
-    clearSettings("pluginsWhitelist", "invertPluginsWhitelist", "replacePlugins", "useSourceSelector", "mediaAutoload", "initialBehavior");
+    clearSettings("pluginsWhitelist", "invertPluginsWhitelist", "locationsWhitelist", "sourcesWhitelist", "replacePlugins", "useSourceSelector", "mediaAutoload", "mediaWhitelist", "initialBehavior");
+} else if(safari.extension.settings.version === 10) {
+    alert("ClickToPlugin 2.2.1 Release Notes\n\n--- Bugs Fixed ---\n\n\u2022 Fix for Facebook's ever changing video player URL");
 }
 if(!safari.extension.settings.version || safari.extension.settings.version < 10) {
     var newTab;
@@ -335,5 +337,5 @@ if(!safari.extension.settings.version || safari.extension.settings.version < 10)
     newTab.url = safari.extension.baseURI + "settings.html";
     alert("Welcome to ClickToPlugin 2.2!\n\nClickToPlugin gives you control over plug-ins embedded in web pages. Under this dialog is the extension\u2019s preference pane which you can use to\n\n\u2022 Specify plug-ins that you never want blocked\n\u2022 Manage the extension\u2019s whitelists and blacklists\n\u2022 Select the video services for which you want ClickToPlugin to provide HTML5 video replacements\n\u2022 Configure ClickToPlugin\u2019s HTML5 media player\n\u2022 Choose which commands should appear in the shortcut menu\n\u2022 Configure keyboard and mouse shortcuts for various tasks\n\u2022 And more!\n\nTo access this preference pane from any page, right-click and select “ClickToPlugin Preferences\u2026”, or use the shortcut specified in the “Keyboard shortcuts” section of the preferences (currently \u2325,).")
 }
-safari.extension.settings.version = 10;
+safari.extension.settings.version = 11;
 
