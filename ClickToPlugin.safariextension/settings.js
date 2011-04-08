@@ -151,7 +151,7 @@ function resizeTextArea(textarea) {
     var width = auxDiv.offsetWidth + 16;
     if(height > 175) height = 175;
     if(height < 47) height = 47;
-    if(width > document.body.offsetWidth - 345) width = document.body.offsetWidth - 345;
+    if(width > document.body.offsetWidth*.9 - 345) width = document.body.offsetWidth*.9 - 345;
     if(width < 300) width = 300
     textarea.style.minHeight = height + "px";
     textarea.style.minWidth = width + "px";
