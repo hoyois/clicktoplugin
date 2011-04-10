@@ -35,8 +35,8 @@ BlipKiller.prototype.process = function(data, callback) {
             else if((ext === "FLV" && canPlayFLV) || (ext === "WMV" && canPlayWM)) isNative = false;
             else continue;
             
-            format = json.additionalMedia[i].role + " (" + json.additionalMedia[i].width + "x" + json.additionalMedia[i].height + ") " + ext;
-            sources.push({"url": json.additionalMedia[i].url, "format": format, "isNative": isNative, "mediaType": mediaType, "resolution": parseInt(json.additionalMedia[i].height)});
+            format = json.additionalMedia[i].role + " (" + json.additionalMedia[i].media_width + "x" + json.additionalMedia[i].media_height + ") " + ext;
+            sources.push({"url": json.additionalMedia[i].url, "format": format, "isNative": isNative, "mediaType": mediaType, "resolution": parseInt(json.additionalMedia[i].media_height)});
         }
         
         var videoData = {

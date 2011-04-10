@@ -1,5 +1,5 @@
 // SETTINGS
-const allSettings = ["defaultTab", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "useFallbackMedia", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "preload", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "codecsPolicy", "volume", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+const allSettings = ["defaultTab", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "useFallbackMedia", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "preload", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "codecsPolicy", "volume", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
 
 /* Hidden settings:
 settingsContext: true
@@ -41,6 +41,9 @@ function respondToMessage(event) {
             break;
         case "showSettings":
             event.target.page.dispatchMessage("showSettings", "");
+            break;
+        case "openSettings":
+            showSettings(safari.application.activeBrowserWindow.openTab("foreground"));
             break;
         case "changeSetting":
             safari.extension.settings[event.message.setting] = event.message.value;
@@ -216,13 +219,17 @@ function doCommand(event) {
             switchOn();
             break;
         case "settings":
-            if(!safari.application.activeBrowserWindow.activeTab.url) safari.application.activeBrowserWindow.activeTab.url = safari.extension.baseURI + "settings.html";
-            else safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("showSettings", "");
+            showSettings(safari.application.activeBrowserWindow.activeTab);
             break;
         default:
             safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("loadContent", {"instance": event.userInfo.instance, "elementID": event.userInfo.elementID, "source": event.userInfo.source, "command": event.command});
             break;
     }
+}
+
+function showSettings(tab) {
+    if(!tab.url) tab.url = safari.extension.baseURI + "settings.html";
+    else tab.page.dispatchMessage("showSettings", "");
 }
 
 function switchOff() {
@@ -231,6 +238,7 @@ function switchOff() {
 }
 
 function switchOn() {
+    safari.extension.removeContentScripts();
     safari.extension.addContentScriptFromURL(safari.extension.baseURI + "functions.js");
     safari.extension.addContentScriptFromURL(safari.extension.baseURI + "sourceSelector.js");
     safari.extension.addContentScriptFromURL(safari.extension.baseURI + "mediaPlayer.js");

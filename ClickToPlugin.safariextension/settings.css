@@ -12,22 +12,28 @@ html, body {
 
 body {
     margin: 0px;
-    overflow: hidden;
 }
 
-html body div#main {
+div#container {
     position: relative;
     -webkit-box-shadow: 0 8px 20px 5px rgba(0, 0, 0, .3);
     -webkit-transition-timing-function: linear;
     background-color: #EDEDED;
     border: 1px solid #9B9B9B;
     top: 10%;
-    margin: auto !important;
+    margin: auto;
     width: intrinsic;
-    max-width: 90%;
 }
 
-#main.init {
+div#main {
+    overflow: auto;
+}
+
+div#main::-webkit-scrollbar {
+    display: none;
+}
+
+#container.init {
     visibility: hidden;
 }
 
@@ -97,7 +103,13 @@ section {
 
 section.selected {
     height: auto;
+    max-height: intrinsic;
+    overflow: auto;
     visibility: visible;
+}
+
+section::-webkit-scrollbar {
+    display: none;
 }
 
 .hidden section.selected {
@@ -106,6 +118,15 @@ section.selected {
 
 menu {
     margin: 15px;
+}
+
+/*menu {
+    max-height: min-intrinsic;
+    overflow: auto;
+}*/
+
+menu::-webkit-scrollbar {
+    display: none;
 }
 
 menu li {
