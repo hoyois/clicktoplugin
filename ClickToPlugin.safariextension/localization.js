@@ -195,6 +195,10 @@ const STRINGS = {
         "en-us": "Show these commands in the shortcut menu",
         "fr-fr": "Afficher ces options dans le menu contextuel "
     },
+    SETTINGS_CONTEXT: {
+        "en-us": "ClickToPlugin Preferences",
+        "fr-fr": "Préférences ClickToPlugin"
+    },
     DISABLE_ENABLE_CONTEXT: {
         "en-us": "Disable/Enable ClickToPlugin",
         "fr-fr": "Désactiver/Activer ClickToPlugin"

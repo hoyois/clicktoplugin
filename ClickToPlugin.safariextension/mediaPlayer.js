@@ -79,7 +79,7 @@ mediaPlayer.prototype.createMediaElement = function(width, height, style, contex
     var zIndex = style.getPropertyValue("z-index");
     if(zIndex === "auto" || parseInt(zIndex) < 1) this.containerElement.style.setProperty("z-index", "1", "important");
     else this.containerElement.style.setProperty("z-index", zIndex, "important");
-    applyCSS(this.containerElement, style, ["position", "top", "right", "bottom", "left", "clear", "float", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-top-collapse", "-webkit-margin-right-collapse", "-webkit-margin-bottom-collapse", "-webkit-margin-left-collapse"]);
+    applyCSS(this.containerElement, style, ["position", "top", "right", "bottom", "left", "clear", "float", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-top-collapse", "-webkit-margin-bottom-collapse"]);
     
     // Set volume
     this.mediaElement.volume = settings.volume;

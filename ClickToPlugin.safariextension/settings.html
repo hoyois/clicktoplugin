@@ -6,7 +6,7 @@
     <script type="text/javascript" src="localization.js"></script>
     <!--<script defer type="text/javascript" src="settings.js"></script>-->
 </head>
-<body><div id="main" class="hidden init">
+<body><div id="container" class="hidden init">
     <nav><ul>
         <li><span class="tab"><span class="string" title="PLUGINS_TAB"></span></span></li>
         <li><span class="tab"><span class="string" title="WHITELISTS_TAB"></span></span></li>
@@ -16,6 +16,7 @@
         <li><span class="tab"><span class="string" title="KEYBOARD_SHORTCUTS_TAB"></span></span></li>
         <li><span class="tab"><span class="string" title="MISC_TAB"></span></span></li>
     </ul></nav>
+    <div id="main">
     <section>
         <menu>
         </menu>
@@ -99,6 +100,7 @@
             <li><span class="left"></span><span class="right"><input id="viewOnSiteContext" class="setting" type="checkbox"><label for="viewOnSiteContext"><span class="string" title="VIEW_ON_SITE_CONTEXT"></span></label></span></li>
             <li><span class="left"></span><span class="right"><input id="viewInQTPContext" class="setting" type="checkbox"><label for="viewInQTPContext"><span class="string" title="VIEW_IN_QTP_CONTEXT"></span></label></span></li>
             <li class="glue"></li>
+            <li><span class="left"></span><span class="right"><input id="settingsContext" class="setting" type="checkbox"><label for="settingsContext"><span class="string" title="SETTINGS_CONTEXT"></span></label></span></li>
             <li><span class="left"></span><span class="right"><input id="disableEnableContext" class="setting" type="checkbox"><label for="disableEnableContext"><span class="string" title="DISABLE_ENABLE_CONTEXT"></span></label></span></li>
         </menu>
     </section>
@@ -136,5 +138,5 @@
     </menu>
     </section>
     <script type="text/javascript" src="settings.js"></script>
-</div></body>
+</div></div></body>
 </html>
