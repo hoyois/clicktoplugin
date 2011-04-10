@@ -103,13 +103,7 @@ section {
 
 section.selected {
     height: auto;
-    max-height: intrinsic;
-    overflow: auto;
     visibility: visible;
-}
-
-section::-webkit-scrollbar {
-    display: none;
 }
 
 .hidden section.selected {
@@ -118,15 +112,6 @@ section::-webkit-scrollbar {
 
 menu {
     margin: 15px;
-}
-
-/*menu {
-    max-height: min-intrinsic;
-    overflow: auto;
-}*/
-
-menu::-webkit-scrollbar {
-    display: none;
 }
 
 menu li {
