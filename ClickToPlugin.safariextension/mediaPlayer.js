@@ -233,7 +233,7 @@ mediaPlayer.prototype.initializeSourceSelector = function() {
     var _this = this;
     this.sourceSelector = new sourceSelector(this.contextInfo.plugin,
         function(event) {restorePlugin(_this.contextInfo.elementID);},
-        function(event) {_this.mediaElement.pause(); viewInQuickTimePlayer(_this.contextInfo.elementID);},
+        function(event) {viewInQuickTimePlayer(_this.contextInfo.elementID);},
         function(event, source) {_this.switchSource(source);},
         function(event, source) {_this.setContextInfo(event, _this.contextInfo, source);}
     );

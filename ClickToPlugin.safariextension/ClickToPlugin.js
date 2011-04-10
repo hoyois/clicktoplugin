@@ -451,6 +451,7 @@ function viewInQuickTimePlayer(elementID, source) {
         element = placeholderElements[elementID];
     } else {
         element = mediaPlayers[elementID].containerElement;
+        mediaPlayers[elementID].mediaElement.pause();
     }
     if(source === undefined) {
         source = mediaPlayers[elementID].currentSource;

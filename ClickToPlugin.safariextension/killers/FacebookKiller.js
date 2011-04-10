@@ -2,13 +2,19 @@ function FacebookKiller() {}
 
 FacebookKiller.prototype.canKill = function(data) {
     if(data.plugin !== "Flash") return false;
-    return /^https?:\/\/s-static\.ak\.facebook\.com\/rsrc\.php\/v[1-9]\/[a-zA-Z0-9]{2}\/r\/[0-9a-zA-Z_-]*\.swf/.test(data.src);
+    return /^https?:\/\/s-static\.ak\.facebook\.com\/rsrc\.php\/v[1-9]\/[a-zA-Z0-9]{2}\/r\/[0-9a-zA-Z_-]*\.swf/.test(data.src) || data.src.indexOf("www.facebook.com/v/") !== -1;
 };
 
 FacebookKiller.prototype.process = function(data, callback) {
-    var flashvars = parseFlashVariables(data.params);
-    if(flashvars.video_href) this.processFromHref(decodeURIComponent(flashvars.video_href), callback);
-    else this.processFromFlashVars(flashvars, callback);
+    if(data.params) {
+        var flashvars = parseFlashVariables(data.params);
+        if(flashvars.video_href && flashvars.video_id) this.processFromVideoID(flashvars.video_id, callback);
+        else this.processFromFlashVars(flashvars, callback);
+        return;
+    }
+    // Embedded video
+    var match = data.src.match(/\.com\/v\/([^&?]+)/);
+    if(match) this.processFromVideoID(match[1], callback);
 };
 
 FacebookKiller.prototype.processFromFlashVars = function(flashvars, callback) {
@@ -30,9 +36,10 @@ FacebookKiller.prototype.processFromFlashVars = function(flashvars, callback) {
     callback(videoData);
 };
 
-FacebookKiller.prototype.processFromHref = function(url, callback) {
+FacebookKiller.prototype.processFromVideoID = function(videoID, callback) {
     var _this = this;
     var xhr = new XMLHttpRequest();
+    var url = "https://www.facebook.com/video/video.php?v=" + videoID;
     xhr.open("GET", url, true);
     xhr.onload = function() {
         var callbackForEmbed = function(videoData) {
