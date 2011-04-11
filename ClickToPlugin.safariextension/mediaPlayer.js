@@ -49,7 +49,7 @@ mediaPlayer.prototype.handleMediaData = function(mediaData) {
         this.playlistLength = mediaData.playlistLength ? mediaData.playlistLength : mediaData.playlist.length;
         this.currentSource = mediaData.playlist[0].defaultSource;
         this.startTrack = mediaData.startTrack ? mediaData.startTrack : 0;
-        this.playlistControls = !mediaData.noPlaylistControls && this.playlistLength > 1;
+        this.playlistControls = !mediaData.noPlaylistControls && this.playlistLength > 1 && this.currentSource !== undefined;
     }
 };
 
@@ -283,6 +283,21 @@ mediaPlayer.prototype.jumpTrack = function(diff) {
     this.loadTrack(this.currentTrack + diff, true);
 };
 
+mediaPlayer.prototype.setPoster = function() {
+    if(this.playlist[this.currentTrack].posterURL) {
+        if(this.playlist[this.currentTrack].sources[this.currentSource].mediaType === "video") {
+            this.mediaElement.poster = this.playlist[this.currentTrack].posterURL;
+            this.containerElement.style.backgroundImage = "none !important";
+        } else {
+            if(this.mediaElement.hasAttribute("poster")) this.mediaElement.removeAttribute("poster");
+            this.containerElement.style.backgroundImage = "url('" + this.playlist[this.currentTrack].posterURL + "') !important";
+        }
+    } else {
+        if(this.mediaElement.hasAttribute("poster")) this.mediaElement.removeAttribute("poster");
+        this.containerElement.style.backgroundImage = "none !important";
+    }
+};
+
 mediaPlayer.prototype.loadTrack = function(track, autoplay, source) {
     track = track % this.playlist.length;
     if(track < 0) track += this.playlist.length; // weird JS behavior
@@ -291,20 +306,9 @@ mediaPlayer.prototype.loadTrack = function(track, autoplay, source) {
     this.resetAspectRatio();
     this.mediaElement.src = this.playlist[track].sources[source].url;
     // If src is not set before poster, poster is not shown. Webkit bug?
-    if(this.playlist[track].posterURL) {
-        if(this.playlist[track].sources[source].mediaType === "video") {
-            this.mediaElement.poster = this.playlist[track].posterURL;
-            this.containerElement.style.backgroundImage = "none !important";
-        } else {
-            if(this.mediaElement.hasAttribute("poster")) this.mediaElement.removeAttribute("poster");
-            this.containerElement.style.backgroundImage = "url('" + this.playlist[track].posterURL + "') !important";
-        }
-    }  else {
-        if(this.mediaElement.hasAttribute("poster")) this.mediaElement.removeAttribute("poster");
-        this.containerElement.style.backgroundImage = "none !important";
-    }
     this.currentTrack = track;
     this.currentSource = source;
+    this.setPoster();
     if(autoplay) {
         this.mediaElement.setAttribute("preload", "auto");
         this.mediaElement.setAttribute("autoplay", "");
@@ -336,9 +340,12 @@ mediaPlayer.prototype.switchSource = function(source) {
     this.sourceSelector.setCurrentSource(source);
     
     var currentTime = this.mediaElement.currentTime;
-    this.mediaElement.setAttribute("autoplay", "");
+    this.resetAspectRatio();
     this.mediaElement.src = this.playlist[this.currentTrack].sources[source].url;
     this.currentSource = source;
+    this.setPoster();
+    this.mediaElement.setAttribute("preload", "auto");
+    this.mediaElement.setAttribute("autoplay", "");
     this.showControls(false);
     if(this.trackInfo) {
         this.trackInfo.firstChild.textContent = "Loading\u2026\u2002";

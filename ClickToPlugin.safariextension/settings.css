@@ -1,4 +1,5 @@
 * {
+    -webkit-font-smoothing: subpixel-antialiased; /* for the nightlies */
     -webkit-user-select: none;
     cursor: default;
     font: -webkit-control;

@@ -71,6 +71,7 @@ for(var i = 0; i < tabs.length; i++) {
     bindTab(i);
 }
 
+main.style.maxHeight = (.85*document.body.offsetHeight - 20) + "px";
 nav.style.minWidth = (nav.offsetWidth + 10) + "px";
 
 // Remove volume slider setting in WebKit nightlies
@@ -450,18 +451,10 @@ function loadSettings(event) {
     container.className = "";
 }
 
-safari.self.addEventListener("message", loadSettings, false);
-
 container.addEventListener("click", function(event) {event.stopPropagation();}, false);
-
 document.body.addEventListener("click", function(event) {
     safari.self.tab.dispatchMessage("hideSettings", "");
 }, false);
 
-main.style.maxHeight = (.85*document.body.offsetHeight - 20) + "px";
-/*window.addEventListener("resize", function(event) {
-    main.style.maxHeight = (.85*document.body.offsetHeight - 20) + "px";
-    for(var i = 0; i < textareas.length; i++) resizeTextArea(textareas[i]);
-}, false);*/
-
+safari.self.addEventListener("message", loadSettings, false);
 safari.self.tab.dispatchMessage("getSettings", "");

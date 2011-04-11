@@ -428,7 +428,7 @@ function loadMedia(elementID, autoplay, source) {
     // Replace placeholder and load first track
     placeholderElements[elementID].parentNode.replaceChild(mediaPlayers[elementID].containerElement, placeholderElements[elementID]);
     mediaPlayers[elementID].initializeShadowDOM(); // this can only be done after insertion
-    mediaPlayers[elementID].containerElement.focus();
+    if(autoplay) mediaPlayers[elementID].containerElement.focus();
     mediaPlayers[elementID].loadTrack(0, autoplay, source);
     delete placeholderElements[elementID];
 }
