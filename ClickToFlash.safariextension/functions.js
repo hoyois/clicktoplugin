@@ -55,11 +55,11 @@ function removeHTMLNode(node) {
 }
 
 function getType(element) {
-    switch(element.nodeName) {
-        case "EMBED":
+    switch(element.nodeName.toLowerCase()) {
+        case "embed":
             return element.type;
             break;
-        case "OBJECT":
+        case "object":
             var embedChild = element.getElementsByTagName("embed")[0];
             if(embedChild && embedChild.type) return embedChild.type;
             if(element.type) return element.type;
@@ -76,11 +76,11 @@ function getType(element) {
 }
 
 function getParams(element) {
-        switch (element.nodeName) {
-            case "EMBED":
+        switch (element.nodeName.toLowerCase()) {
+            case "embed":
                 return (element.hasAttribute("flashvars") ? element.getAttribute("flashvars") : ""); // fixing Safari's buggy JS
                 break
-            case "OBJECT":
+            case "object":
                 var paramElements = element.getElementsByTagName("param");
                 for (var i = paramElements.length - 1; i >= 0; i--) {
                     try{ // see NOTE 1

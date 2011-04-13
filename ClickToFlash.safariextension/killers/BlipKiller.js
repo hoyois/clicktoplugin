@@ -26,7 +26,7 @@ BlipKiller.prototype.process = function(data, callback) {
     xhr.onload = function() {
         var json = JSON.parse(xhr.responseText.replace(/\\'/g, "'")); // correct Blip.tv's invalid JSON
         
-        var ext, format, isNative, mediaType = "video";
+        var ext, format, height, width, isNative, mediaType = "video";
         for(var i = 0; i < json.additionalMedia.length; i++) {
             ext = json.additionalMedia[i].url.substr(json.additionalMedia[i].url.lastIndexOf(".") + 1).toUpperCase();
             if(ext === "MP4" || ext === "M4V" || ext === "MOV" || ext === "MPG" || ext === "MPEG") isNative = true;
@@ -34,8 +34,14 @@ BlipKiller.prototype.process = function(data, callback) {
             else if((ext === "FLV" && canPlayFLV) || (ext === "WMV" && canPlayWM)) isNative = false;
             else continue;
             
-            format = json.additionalMedia[i].role + " (" + json.additionalMedia[i].width + "x" + json.additionalMedia[i].height + ") " + ext;
-            sources.push({"url": json.additionalMedia[i].url, "format": format, "isNative": isNative, "mediaType": mediaType, "resolution": parseInt(json.additionalMedia[i].height)});
+            format = json.additionalMedia[i].role;
+            height = json.additionalMedia[i].media_height;
+            if(!height) height = json.additionalMedia[i].height;
+            width = json.additionalMedia[i].media_width;
+            if(!width) width = json.additionalMedia[i].width;
+            if(mediaType === "video") format += " (" + width + "x" + height + ")";
+            format += " " + ext;
+            sources.push({"url": json.additionalMedia[i].url, "format": format, "isNative": isNative, "mediaType": mediaType, "resolution": parseInt(height)});
         }
         
         var videoData = {

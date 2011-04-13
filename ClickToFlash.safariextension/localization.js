@@ -126,9 +126,22 @@ const STRINGS = {
         "en-us": "Autoplay on these sites",
         "fr-fr": "Lancer la lecture automatiquement sur ces sites "
     },
-    START_BUFFERING: {
-        "en-us": "Start buffering once loaded",
-        "fr-fr": "Commencer le téléchargement automatiquement"
+    INITIAL_BEHAVIOR: {
+        "en-us": "Initial behavior",
+        "en-gb": "Initial behaviour",
+        "fr-fr": "Action initiale"
+    },
+    INITIAL_NO_BUFFER: {
+        "en-us": "Do not buffer",
+        "fr-fr": "Aucune"
+    },
+    INITIAL_BUFFER: {
+        "en-us": "Start buffering",
+        "fr-fr": "Commencer le téléchargement"
+    },
+    INITIAL_AUTOPLAY: {
+        "en-us": "Start buffering and play automatically",
+        "fr-fr": "Commencer la lecture automatiquement"
     },
     MAX_RESOLUTION: {
         "en-us": "Default resolution",
@@ -167,12 +180,16 @@ const STRINGS = {
         "fr-fr": "Utiliser sans restrictions"
     },
     SOUND_VOLUME: {
-        "en-us": "Initial sound volume",
-        "fr-fr": "Volume sonore initial "
+        "en-us": "Sound volume",
+        "fr-fr": "Volume sonore "
     },
     SHOW_IN_CONTEXT_MENU: {
         "en-us": "Show these commands in the shortcut menu",
         "fr-fr": "Afficher ces options dans le menu contextuel "
+    },
+    SETTINGS_CONTEXT: {
+        "en-us": "ClickToFlash Preferences",
+        "fr-fr": "Préférences ClickToFlash"
     },
     DISABLE_ENABLE_CONTEXT: {
         "en-us": "Disable/Enable ClickToFlash",
