@@ -1,4 +1,3 @@
-
 var container = document.getElementById("container");
 var main = document.getElementById("main");
 var nav = document.getElementsByTagName("nav")[0].children[0];
@@ -186,12 +185,6 @@ for(var i = 0; i < textareas.length; i++) {
     textareas[i].addEventListener("focus", handleTextAreaInput, false);
 }
 
-function parseTextList(text) {
-    var s = text.replace(/\n+/g, "\n").replace(/^\n/, "").replace(/\n$/, "");
-    if(!s) return [];
-    else return s.split("\n");
-}
-
 // Bind 'change' events
 function changeSetting(setting, value) {
     safari.self.tab.dispatchMessage("changeSetting", {"setting": setting, "value": value});
@@ -201,6 +194,11 @@ for(var i = 0; i < inputs.length; i++) {
     bindChangeEvent(inputs[i]);
 }
 
+function parseTextList(text) {
+    var s = text.replace(/\n+/g, "\n").replace(/^\n/, "").replace(/\n$/, "");
+    if(!s) return [];
+    else return s.split("\n");
+}
 function bindChangeEvent(input) {
     var parseValue;
     var eventType = "change";

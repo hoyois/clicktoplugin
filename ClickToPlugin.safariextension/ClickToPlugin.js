@@ -528,7 +528,6 @@ function clickPlaceholder(elementID) {
         switch(settings.defaultPlayer) {
             case "html5": 
                 loadMedia(elementID, 2);
-                mediaPlayers[elementID].containerElement.focus();
                 break;
             case "qtp":
                 viewInQuickTimePlayer(elementID);
