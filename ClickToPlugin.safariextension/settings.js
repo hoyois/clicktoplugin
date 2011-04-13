@@ -74,8 +74,8 @@ for(var i = 0; i < tabs.length; i++) {
 main.style.maxHeight = (.85*document.body.offsetHeight - 20) + "px";
 nav.style.minWidth = (nav.offsetWidth + 10) + "px";
 
-// Remove volume slider setting in WebKit nightlies
-if(/\+/.test(navigator.appVersion)) {
+// Remove volume slider setting in WebKit nightlies and 5.1
+if(/\+|Version\/5\.1/.test(navigator.appVersion)) {
     document.getElementById("showVolumeSlider").parentNode.parentNode.style.display = "none";
 }
 
@@ -278,9 +278,9 @@ function handleWheelEvent(event) {
     registerShortcut({"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "direction": simplifyWheelDelta(event.wheelDeltaX, event.wheelDeltaY)}, event.target.previousSibling);
 }
 function registerShortcut(shortcut, input) {
-    input.value = showShortcut(shortcut)
+    input.value = showShortcut(shortcut);
     changeSetting(input.id, shortcut);
-    if(input.id = "settingsShortcut") document.getElementById("settingsContext").disabled = false;
+    if(input.id === "settingsShortcut") document.getElementById("settingsContext").disabled = false;
 }
 
 function simplifyWheelDelta(x, y) {
@@ -318,7 +318,6 @@ document.getElementById("defaultPlayer").addEventListener("change", function(eve
     }
 }, false);
 document.getElementById("mediaAutoload").addEventListener("change", function(event) {
-    document.getElementById("preload").disabled = event.target.value === "";
     document.getElementById("showPoster").disabled = event.target.value === "on";
     document.getElementById("showMediaTooltip").disabled = event.target.value === "on";
 }, false);
@@ -423,7 +422,7 @@ function loadSettings(event) {
     if(settings.mediaAutoload) {
         document.getElementById("showPoster").disabled = true;
         document.getElementById("showMediaTooltip").disabled = true;
-    } else document.getElementById("preload").disabled = true;
+    }
     if(!settings.settingsShortcut) document.getElementById("settingsContext").disabled = true;
     
     // Intercept Cmd+W & pref-pane shortcut to close the pref pane
