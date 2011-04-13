@@ -121,9 +121,9 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<false/>
+		<string>autoplay</string>
 		<key>Key</key>
-		<string>preload</string>
+		<string>initialBehavior</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>

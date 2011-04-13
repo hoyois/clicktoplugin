@@ -207,7 +207,7 @@ Media player
 ***********/
 
 @font-face {
-    font-family: QuickTimeMediaControls;
+    font-family: CTFQuickTimeMediaControls;
     src: url('QuickTimeMediaControls.ttf');
 }
 
@@ -304,7 +304,7 @@ Media player
     -webkit-font-smoothing: antialiased !important;
     -webkit-transition-property: none !important;
     color: #FAFAFA !important;
-    font-family: QuickTimeMediaControls !important;
+    font-family: CTFQuickTimeMediaControls !important;
     font-size: 25px !important;
     height: 25px !important;
     left: auto !important;

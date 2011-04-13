@@ -6,7 +6,7 @@
     <script type="text/javascript" src="localization.js"></script>
     <!--<script defer type="text/javascript" src="settings.js"></script>-->
 </head>
-<body><div id="main" class="hidden init">
+<body><div id="container" class="hidden init">
     <nav><ul>
         <li><span class="tab"><span class="string" title="WHITELISTS_TAB"></span></span></li>
         <li><span class="tab"><span class="string" title="KILLERS_TAB"></span></span></li>
@@ -15,6 +15,11 @@
         <li><span class="tab"><span class="string" title="KEYBOARD_SHORTCUTS_TAB"></span></span></li>
         <li><span class="tab"><span class="string" title="MISC_TAB"></span></span></li>
     </ul></nav>
+    <div id="main">
+    <section>
+        <menu>
+        </menu>
+    </section>
     <section>
         <menu>
             <li><span class="left textarea"><label for="locationsWhitelist"><span class="string" title="ALLOW_LOCATIONS"></span>:</label></span><span class="right"><textarea id="locationsWhitelist" class="setting" placeholder="www.example.com/path&#xA;@^http://[a-z]*\.reg(ex)?\.com/"></textarea></span></li>
@@ -42,6 +47,8 @@
             <li><span class="left"></span><span class="right"><input id="killer0" class="killer" type="checkbox"><label for="killer0">YouTube</label></span></li>
             <li class="glue"></li>
             <li><span class="left"></span><span class="right"><input id="useFallbackMedia" class="setting" type="checkbox"><label for="useFallbackMedia"><span class="string" title="USE_FALLBACK_MEDIA"></span></label></span></li>
+            <li class="glue"></li>
+            <li><span class="left"></span><span class="right"><input id="usePlaylists" class="setting" type="checkbox"><label for="usePlaylists"><span class="string" title="USE_PLAYLISTS"></span></label></span></li>
         </menu>
     </section>
     <section>
@@ -52,18 +59,9 @@
                 <option value="plugin" title="FLASH_PLAYER"></option>
             </select></span></li>
             <li><span class="left"></span><span class="right"><input id="mediaAutoload" class="setting" type="checkbox"><label for="mediaAutoload"><span class="string" title="AUTOLOAD_MEDIA_PLAYER"></span></label></span></li>
-            <li><span class="left"></span><span class="right sub"><input id="preload" class="setting" type="checkbox"><label for="preload"><span class="string" title="START_BUFFERING"></span></label></span></li>
-            <li><span class="left"></span><span class="right"><input id="usePlaylists" class="setting" type="checkbox"><label for="usePlaylists"><span class="string" title="USE_PLAYLISTS"></span></label></span></li>
-            <li class="glue"></li>
             <li><span class="left"></span><span class="right"><input id="showPoster" class="setting" type="checkbox"><label for="showPoster"><span class="string" title="SHOW_POSTER"></span></label></span></li>
             <li><span class="left"></span><span class="right"><input id="showMediaTooltip" class="setting" type="checkbox"><label for="showMediaTooltip"><span class="string" title="SHOW_MEDIA_TOOLTIP"></span></label></span></li>
             <li class="glue"></li>
-            <li><span class="left"></span><span class="right"><input id="showSourceSelector" class="setting" type="checkbox"><label for="showSourceSelector"><span class="string" title="SHOW_SOURCE_SELECTOR"></span></label></span></li>
-            <li><span class="left"></span><span class="right sub"><input id="showPluginSourceItem" class="setting" type="checkbox"><label for="showPluginSourceItem"><span class="string" title="SHOW_FLASH_SOURCE"></span></label></span></li>
-            <li><span class="left"></span><span class="right sub"><input id="showQTPSourceItem" class="setting" type="checkbox"><label for="showQTPSourceItem"><span class="string" title="SHOW_QTP_SOURCE"></span></label></span></li>
-            <li><span class="left"></span><span class="right"><input id="hideRewindButton" class="setting" type="checkbox"><label for="hideRewindButton"><span class="string" title="HIDE_REWIND_BUTTON"></span></label></span></li>
-            <li><span class="left"></span><span class="right"><input id="showVolumeSlider" class="setting" type="checkbox"><label for="showVolumeSlider"><span class="string" title="SHOW_WEBKIT_VOLUME_SLIDER"></span></label></span></li>
-            <li><span class="left"><label for="volume"><span class="string" title="SOUND_VOLUME"></span>:</label></span><span class="right"><input id="volume" class="setting" type="range" min="0" max="100" step="1"></span></li>
             <li><span class="left"><label for="maxResolution"><span class="string" title="MAX_RESOLUTION"></span>:</label></span><span class="right"><select id="maxResolution" class="setting">
                 <option value="360">360p</option>
                 <option value="480">480p</option>
@@ -76,6 +74,18 @@
                 <option value="2" title="NONNATIVE_LAST_RESORT"></option>
                 <option value="3" title="NONNATIVE_USE_FREELY"></option>
             </select></span></li>
+            <li class="glue"></li>
+            <li><span class="left"></span><span class="right"><input id="showSourceSelector" class="setting" type="checkbox"><label for="showSourceSelector"><span class="string" title="SHOW_SOURCE_SELECTOR"></span></label></span></li>
+            <li><span class="left"></span><span class="right sub"><input id="showPluginSourceItem" class="setting" type="checkbox"><label for="showPluginSourceItem"><span class="string" title="SHOW_FLASH_SOURCE"></span></label></span></li>
+            <li><span class="left"></span><span class="right sub"><input id="showQTPSourceItem" class="setting" type="checkbox"><label for="showQTPSourceItem"><span class="string" title="SHOW_QTP_SOURCE"></span></label></span></li>
+            <li><span class="left"></span><span class="right"><input id="hideRewindButton" class="setting" type="checkbox"><label for="hideRewindButton"><span class="string" title="HIDE_REWIND_BUTTON"></span></label></span></li>
+            <li><span class="left"></span><span class="right"><input id="showVolumeSlider" class="setting" type="checkbox"><label for="showVolumeSlider"><span class="string" title="SHOW_WEBKIT_VOLUME_SLIDER"></span></label></span></li>
+            <li><span class="left"><label for="volume"><span class="string" title="SOUND_VOLUME"></span>:</label></span><span class="right"><input id="volume" class="setting" type="range" min="0" max="100" step="1"></span></li>
+            <li><span class="left"><label for="initialBehavior"><span class="string" title="INITIAL_BEHAVIOR"></span>:</label></span><span class="right"><select id="initialBehavior" class="setting">
+                <option value="none" title="INITIAL_NO_BUFFER"></option>
+                <option value="buffer" title="INITIAL_BUFFER"></option>
+                <option value="autoplay" title="INITIAL_AUTOPLAY"></option>
+            </select></span></li>
             <li><span class="left textarea"><label for="mediaWhitelist"><span class="string" title="AUTOPLAY_LOCATIONS"></span>:</label></span><span class="right"><textarea id="mediaWhitelist" class="setting"></textarea></span></li>
         </menu>
     </section>
@@ -87,9 +97,10 @@
             <li><span class="left"></span><span class="right"><input id="loadInvisibleContext" class="setting" type="checkbox"><label for="loadInvisibleContext"><span class="string" title="LOAD_INVISIBLE_CONTEXT"></span></label></span></li>
             <li class="glue"></li>
             <li><span class="left"></span><span class="right"><input id="downloadContext" class="setting" type="checkbox"><label for="downloadContext"><span class="string" title="DOWNLOAD_CONTEXT"></span></label></span></li>
-            <li><span class="left"></span><span class="right"><input id="viewOnSiteContext" class="setting" type="checkbox"><label for="viewOnSiteContext"><span class="string" title="VIEW_ON_SITE_CONTEXT"></span></label></span></li>
             <li><span class="left"></span><span class="right"><input id="viewInQTPContext" class="setting" type="checkbox"><label for="viewInQTPContext"><span class="string" title="VIEW_IN_QTP_CONTEXT"></span></label></span></li>
+            <li><span class="left"></span><span class="right"><input id="viewOnSiteContext" class="setting" type="checkbox"><label for="viewOnSiteContext"><span class="string" title="VIEW_ON_SITE_CONTEXT"></span></label></span></li>
             <li class="glue"></li>
+            <li><span class="left"></span><span class="right"><input id="settingsContext" class="setting" type="checkbox"><label for="settingsContext"><span class="string" title="SETTINGS_CONTEXT"></span></label></span></li>
             <li><span class="left"></span><span class="right"><input id="disableEnableContext" class="setting" type="checkbox"><label for="disableEnableContext"><span class="string" title="DISABLE_ENABLE_CONTEXT"></span></label></span></li>
         </menu>
     </section>
@@ -127,5 +138,5 @@
     </menu>
     </section>
     <script type="text/javascript" src="settings.js"></script>
-</div></body>
+</div></div></body>
 </html>

@@ -49,7 +49,7 @@ mediaPlayer.prototype.handleMediaData = function(mediaData) {
         this.playlistLength = mediaData.playlistLength ? mediaData.playlistLength : mediaData.playlist.length;
         this.currentSource = mediaData.playlist[0].defaultSource;
         this.startTrack = mediaData.startTrack ? mediaData.startTrack : 0;
-        this.playlistControls = !mediaData.noPlaylistControls && this.playlistLength > 1;
+        this.playlistControls = !mediaData.noPlaylistControls && this.playlistLength > 1 && this.currentSource !== undefined;
     }
 };
 
@@ -66,8 +66,18 @@ mediaPlayer.prototype.createMediaElement = function(width, height, style, contex
     this.mediaElement.className = "CTFmediaElement";
     this.mediaElement.id = "CTFmediaElement" + contextInfo.elementID;
     this.mediaElement.setAttribute("controls", "");
-    if(settings.preload) this.mediaElement.setAttribute("preload", "auto");
-    else this.mediaElement.setAttribute("preload", "none");
+    switch(settings.initialBehavior) {
+        case "none":
+            this.mediaElement.setAttribute("preload", "none");
+            break;
+        case "buffer":
+            this.mediaElement.setAttribute("preload", "auto");
+            break;
+        case "autoplay":
+            this.mediaElement.setAttribute("preload", "auto");
+            this.mediaElement.setAttribute("autoplay", "");
+            break;
+    }
     this.containerElement.appendChild(this.mediaElement);
     
     // Set dimensions
@@ -79,7 +89,7 @@ mediaPlayer.prototype.createMediaElement = function(width, height, style, contex
     var zIndex = style.getPropertyValue("z-index");
     if(zIndex === "auto" || parseInt(zIndex) < 1) this.containerElement.style.setProperty("z-index", "1", "important");
     else this.containerElement.style.setProperty("z-index", zIndex, "important");
-    applyCSS(this.containerElement, style, ["position", "top", "right", "bottom", "left", "clear", "float", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-top-collapse", "-webkit-margin-right-collapse", "-webkit-margin-bottom-collapse", "-webkit-margin-left-collapse"]);
+    applyCSS(this.containerElement, style, ["position", "top", "right", "bottom", "left", "clear", "float", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-top-collapse", "-webkit-margin-bottom-collapse"]);
     
     // Set volume
     this.mediaElement.volume = settings.volume;
@@ -150,7 +160,7 @@ mediaPlayer.prototype.initializeShadowDOM = function() {
     this.shadowDOM.controlsPanel.style.width = this.width + "px";
     
     // Volume slider
-    if(settings.showVolumeSlider && !/\+/.test(navigator.appVersion)) {
+    if(settings.showVolumeSlider) {
         this.shadowDOM.controlsPanel.style.overflow = "visible";
         this.shadowDOM.volumeSliderContainer.style.cssText = "display: block; -webkit-appearance: none; height: 80px; width: 15px;";
         this.shadowDOM.volumeSlider.style.cssText = "display: block; -webkit-appearance: slider-vertical; height: 80px; width: 15px;";
@@ -233,7 +243,7 @@ mediaPlayer.prototype.initializeSourceSelector = function() {
     var _this = this;
     this.sourceSelector = new sourceSelector(this.contextInfo.plugin,
         function(event) {restorePlugin(_this.contextInfo.elementID);},
-        function(event) {_this.mediaElement.pause(); viewInQuickTimePlayer(_this.contextInfo.elementID);},
+        function(event) {viewInQuickTimePlayer(_this.contextInfo.elementID);},
         function(event, source) {_this.switchSource(source);},
         function(event, source) {_this.setContextInfo(event, _this.contextInfo, source);}
     );
@@ -274,16 +284,31 @@ mediaPlayer.prototype.resetAspectRatio = function() {
 mediaPlayer.prototype.nextTrack = function() {
     if(!this.mediaElement.hasAttribute("loop")) {
         if(this.currentTrack + this.startTrack + 1 === this.playlistLength) return;
-        this.loadTrack(this.currentTrack + 1, true);
+        this.loadTrack(this.currentTrack + 1, 1);
     }
 };
 
 mediaPlayer.prototype.jumpTrack = function(diff) {
     if(this.playlist.length === 1) return;
-    this.loadTrack(this.currentTrack + diff, true);
+    this.loadTrack(this.currentTrack + diff, 3);
 };
 
-mediaPlayer.prototype.loadTrack = function(track, autoplay, source) {
+mediaPlayer.prototype.setPoster = function() {
+    if(this.playlist[this.currentTrack].posterURL) {
+        if(this.playlist[this.currentTrack].sources[this.currentSource].mediaType === "video") {
+            this.mediaElement.poster = this.playlist[this.currentTrack].posterURL;
+            this.containerElement.style.backgroundImage = "none !important";
+        } else {
+            if(this.mediaElement.hasAttribute("poster")) this.mediaElement.removeAttribute("poster");
+            this.containerElement.style.backgroundImage = "url('" + this.playlist[this.currentTrack].posterURL + "') !important";
+        }
+    } else {
+        if(this.mediaElement.hasAttribute("poster")) this.mediaElement.removeAttribute("poster");
+        this.containerElement.style.backgroundImage = "none !important";
+    }
+};
+
+mediaPlayer.prototype.loadTrack = function(track, init, source) { // init: two-digit binary number (focus/autoplay)
     track = track % this.playlist.length;
     if(track < 0) track += this.playlist.length; // weird JS behavior
     if(source === undefined) source = this.playlist[track].defaultSource;
@@ -291,24 +316,14 @@ mediaPlayer.prototype.loadTrack = function(track, autoplay, source) {
     this.resetAspectRatio();
     this.mediaElement.src = this.playlist[track].sources[source].url;
     // If src is not set before poster, poster is not shown. Webkit bug?
-    if(this.playlist[track].posterURL) {
-        if(this.playlist[track].sources[source].mediaType === "video") {
-            this.mediaElement.poster = this.playlist[track].posterURL;
-            this.containerElement.style.backgroundImage = "none !important";
-        } else {
-            if(this.mediaElement.hasAttribute("poster")) this.mediaElement.removeAttribute("poster");
-            this.containerElement.style.backgroundImage = "url('" + this.playlist[track].posterURL + "') !important";
-        }
-    }  else {
-        if(this.mediaElement.hasAttribute("poster")) this.mediaElement.removeAttribute("poster");
-        this.containerElement.style.backgroundImage = "none !important";
-    }
     this.currentTrack = track;
     this.currentSource = source;
-    if(autoplay) {
+    this.setPoster();
+    if(init === 1 || init === 3) {
         this.mediaElement.setAttribute("preload", "auto");
         this.mediaElement.setAttribute("autoplay", "");
     }
+    if(init === 2 || init === 3) this.containerElement.focus();
     
     var title = this.playlist[track].title;
     if(!title) title = "(no title)";
@@ -336,14 +351,18 @@ mediaPlayer.prototype.switchSource = function(source) {
     this.sourceSelector.setCurrentSource(source);
     
     var currentTime = this.mediaElement.currentTime;
-    this.mediaElement.setAttribute("autoplay", "");
+    this.resetAspectRatio();
     this.mediaElement.src = this.playlist[this.currentTrack].sources[source].url;
     this.currentSource = source;
+    this.setPoster();
+    this.mediaElement.setAttribute("preload", "auto");
+    this.mediaElement.setAttribute("autoplay", "");
     this.showControls(false);
     if(this.trackInfo) {
         this.trackInfo.firstChild.textContent = "Loading\u2026\u2002";
         this.showTrackInfo(true);
     }
+    this.containerElement.focus();
     
     var setInitialTime = function(event) {
         event.target.removeEventListener("loadedmetadata", setInitialTime, false);

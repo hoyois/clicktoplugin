@@ -1,4 +1,4 @@
-
+var container = document.getElementById("container");
 var main = document.getElementById("main");
 var nav = document.getElementsByTagName("nav")[0].children[0];
 var inputs = document.getElementsByClassName("setting");
@@ -31,27 +31,32 @@ var tabs = nav.children;
 var sections = document.getElementsByTagName("section");
 var currentTab = 0;
 
-main.addEventListener("webkitTransitionEnd", function(event) {
+container.addEventListener("webkitTransitionEnd", function(event) {
     event.target.className = "";
     event.target.style.WebkitTransitionProperty = "none";
     event.target.style.height = "intrinsic";
 }, false);
 
 function switchToTab(i) {
-    var oldHeight = sections[currentTab].offsetHeight + 20;
-    main.style.height = oldHeight + "px";
+    var oldHeight = main.offsetHeight + 20;
+    container.style.height = oldHeight + "px";
     tabs[currentTab].className = "";
     tabs[i].className = "selected";
-    main.className = "hidden";
+    container.className = "hidden";
     sections[currentTab].className = "";
     sections[i].className = "selected";
     currentTab = i;
-    var newHeight = sections[i].offsetHeight + 20;
-    main.style.WebkitTransitionProperty = "height";
+    var newHeight = main.offsetHeight + 20;
     var heightDelta = newHeight - oldHeight;
-    if(heightDelta < 0) heightDelta = -heightDelta;    
-    main.style.WebkitTransitionDuration = (.001*heightDelta) + "s";
-    main.style.height = newHeight + "px";
+    if(heightDelta < 0) heightDelta = -heightDelta;
+    if(heightDelta === 0) {
+        container.className = "";
+        container.style.height = "intrinsic";
+    } else {
+        container.style.WebkitTransitionProperty = "height";
+        container.style.WebkitTransitionDuration = (.001*heightDelta) + "s";
+        container.style.height = newHeight + "px";
+    }
     changeSetting("defaultTab", i);
 }
 
@@ -64,10 +69,11 @@ for(var i = 0; i < tabs.length; i++) {
     bindTab(i);
 }
 
+main.style.maxHeight = (.85*document.body.offsetHeight - 20) + "px";
 nav.style.minWidth = (nav.offsetWidth + 10) + "px";
 
-// Remove volume slider setting in WebKit nightlies
-if(/\+/.test(navigator.appVersion)) {
+// Remove volume slider setting in WebKit nightlies and 5.1
+if(/\+|Version\/5\.1/.test(navigator.appVersion)) {
     document.getElementById("showVolumeSlider").parentNode.parentNode.style.display = "none";
 }
 
@@ -125,7 +131,6 @@ for(var i = 0; i < textareas.length; i++) {
     textareas[i].addEventListener("focus", handleTextAreaInput, false);
 }
 
-
 // Bind 'change' events
 function changeSetting(setting, value) {
     safari.self.tab.dispatchMessage("changeSetting", {"setting": setting, "value": value});
@@ -135,16 +140,17 @@ for(var i = 0; i < inputs.length; i++) {
     bindChangeEvent(inputs[i]);
 }
 
+function parseTextList(text) {
+    var s = text.replace(/\n+/g, "\n").replace(/^\n/, "").replace(/\n$/, "");
+    if(!s) return [];
+    else return s.split("\n");
+}
 function bindChangeEvent(input) {
     var parseValue;
     var eventType = "change";
     switch(input.nodeName) {
         case "TEXTAREA":
-            parseValue = function(value) {
-                var s = value.replace(/\n+/g, "\n").replace(/^\n/, "").replace(/\n$/, "");
-                if(!s) return [];
-                else return s.split("\n");
-            }
+            parseValue = parseTextList;
             break;
         case "SELECT":
             parseValue = function(value) {if(isNaN(parseInt(value))) return value; else return parseInt(value);}
@@ -178,11 +184,17 @@ for(var i = 0; i < killerInputs.length; i++) {
 // Shortcuts input
 for(var i = 0; i < keyboardInputs.length; i++) {
     keyboardInputs[i].addEventListener("keydown", handleKeyboardEvent, false);
-    clearShortcutButtons[i].addEventListener("click", function(event) {
-        var textField = event.target.previousSibling.previousSibling;
-        textField.value = "";
-        changeSetting(textField.id, null);
-    }, false);
+    clearShortcutButtons[i].addEventListener("click", clearShortcut, false);
+}
+function clearShortcut(event) {
+    var textField = event.target.previousSibling.previousSibling;
+    textField.value = "";
+    changeSetting(textField.id, null);
+    if(textField.id === "settingsShortcut") {
+        document.getElementById("settingsContext").disabled = true;
+        document.getElementById("settingsContext").checked = true;
+        changeSetting("settingsContext", true);
+    }
 }
 function handleKeyboardEvent(event) {
     event.preventDefault();
@@ -205,8 +217,9 @@ function handleWheelEvent(event) {
     registerShortcut({"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "direction": simplifyWheelDelta(event.wheelDeltaX, event.wheelDeltaY)}, event.target.previousSibling);
 }
 function registerShortcut(shortcut, input) {
-    input.value = showShortcut(shortcut)
+    input.value = showShortcut(shortcut);
     changeSetting(input.id, shortcut);
+    if(input.id === "settingsShortcut") document.getElementById("settingsContext").disabled = false;
 }
 
 function simplifyWheelDelta(x, y) {
@@ -238,12 +251,12 @@ document.getElementById("defaultPlayer").addEventListener("change", function(eve
     } else {
         document.getElementById("mediaAutoload").disabled = true;
         document.getElementById("mediaAutoload").checked = false;
+        changeSetting("mediaAutoload", false);
         document.getElementById("showPoster").disabled = false;
         document.getElementById("showMediaTooltip").disabled = false;
     }
 }, false);
 document.getElementById("mediaAutoload").addEventListener("change", function(event) {
-    document.getElementById("preload").disabled = event.target.value === "";
     document.getElementById("showPoster").disabled = event.target.value === "on";
     document.getElementById("showMediaTooltip").disabled = event.target.value === "on";
 }, false);
@@ -343,30 +356,38 @@ function loadSettings(event) {
     if(settings.mediaAutoload) {
         document.getElementById("showPoster").disabled = true;
         document.getElementById("showMediaTooltip").disabled = true;
-    } else document.getElementById("preload").disabled = true;
+    }
+    if(!settings.settingsShortcut) document.getElementById("settingsContext").disabled = true;
     
-    if(settings.settingsShortcut) {
-        document.addEventListener(settings.settingsShortcut.type, function(event) {
-            for(var x in settings.settingsShortcut) {
-                if(event[x] !== settings.settingsShortcut[x]) return;
+    // Intercept Cmd+W & pref-pane shortcut to close the pref pane
+    if(window !== window.top) {
+        document.addEventListener("keydown", function(event) {
+            if((event.keyIdentifier === "U+0057" && event.metaKey === true && event.altKey === false && event.ctrlKey === false && event.shiftKey === false) || (settings.settingsShortcut && event.keyIdentifier === settings.settingsShortcut.keyIdentifier && event.metaKey === settings.settingsShortcut.metaKey && event.altKey === settings.settingsShortcut.altKey && event.ctrlKey === settings.settingsShortcut.ctrlKey && event.shiftKey === settings.settingsShortcut.shiftKey)) {
+                event.preventDefault();
+                if(event.target.nodeName === "TEXTAREA") {
+                    var e = document.createEvent("HTMLEvents");
+                    e.initEvent("change", false, false);
+                    event.target.dispatchEvent(e);
+                } else if(event.target.nodeName === "INPUT" && event.target.type === "number") {
+                    var e = document.createEvent("HTMLEvents");
+                    e.initEvent("blur", false, false);
+                    event.target.dispatchEvent(e);
+                }
+                safari.self.tab.dispatchMessage("hideSettings", "");
             }
-            event.preventDefault();
-            safari.self.tab.dispatchMessage("hideSettings", "");
         }, false);
     }
     
     window.focus();
     
     // Show settings pane
-    main.className = "";
+    container.className = "";
 }
 
-safari.self.addEventListener("message", loadSettings, false);
-
-main.addEventListener("click", function(event) {event.stopPropagation();}, false);
-
+container.addEventListener("click", function(event) {event.stopPropagation();}, false);
 document.body.addEventListener("click", function(event) {
     safari.self.tab.dispatchMessage("hideSettings", "");
 }, false);
 
+safari.self.addEventListener("message", loadSettings, false);
 safari.self.tab.dispatchMessage("getSettings", "");

@@ -81,7 +81,7 @@ function canPlaySrcWithHTML5(url) {
     if(canPlayWM && /^(?:wm[vp]?|asf)$/i.test(url)) return {"type": "video", "isNative": false};
     if(canPlayDivX && /^divx$/i.test(url)) return {"type": "video", "isNative": false};
     if(canPlayOGG && /^ogg$/i.test(url)) return {"type": "video", "isNative": false};
-    if(/^(?:mp3|wav|midi?|aif[fc]?|aac|m4a)$/i.test(url)) return {"type": "audio", "isNative": true};
+    if(/^(?:mp3|wav|aif[fc]?|aac|m4a)$/i.test(url)) return {"type": "audio", "isNative": true}; // midi not in QTX
     if(canPlayFLV && /^fla$/i.test(url)) return {"type": "audio", "isNative": false};
     if(canPlayWM && /^wma$/i.test(url)) return {"type": "audio", "isNative": false};
     return false;
@@ -137,12 +137,12 @@ function isNativeExt(ext) {
 function getMIMEType(resourceURL, handleMIMEType) {
     var xhr = new XMLHttpRequest();
     xhr.open('HEAD', resourceURL, true);
-    var gotContentType = false;
+    var MIMEType = false;
     xhr.onreadystatechange = function () {
-        if(!gotContentType && xhr.getResponseHeader('Content-Type')) {
-            gotContentType = true;
-            handleMIMEType(xhr.getResponseHeader('Content-Type'));
+        if(!MIMEType && xhr.getResponseHeader('Content-Type')) {
+            MIMEType = xhr.getResponseHeader('Content-Type');
             xhr.abort();
+            handleMIMEType(MIMEType);
         }
     };
     xhr.send(null);
