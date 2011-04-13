@@ -1,8 +1,7 @@
 // SETTINGS
-const allSettings = ["defaultTab", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "useFallbackMedia", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "codecsPolicy", "volume", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+const allSettings = ["defaultTab", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "useFallbackMedia", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "codecsPolicy", "volume", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
 
 /* Hidden settings:
-settingsContext: true
 zeroIsInvisible: undefined
 */
 
@@ -275,5 +274,13 @@ function clearSettings() {
 }
 if(safari.extension.settings.version < 10) clearSettings("replacePlugins", "useSourceSelector");
 else if(safari.extension.settings.version < 15) clearSettings("preload");
-safari.extension.settings.version = 15;
+if(safari.extension.settings.version < 16) { // screwed up once again!
+    function updateWhitelists() {
+        for(var i = 0; i < arguments.length; i++) {
+            if(typeof safari.extension.settings[arguments[i]] === "string") safari.extension.settings[arguments[i]] = safari.extension.settings[arguments[i]].split(/\s+/);
+        }
+    }
+    updateWhitelists("locationsWhitelist", "sourcesWhitelists", "mediaWhitelist");
+}
+safari.extension.settings.version = 16;
 

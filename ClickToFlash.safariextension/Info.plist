@@ -11,9 +11,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.2.3</string>
+	<string>2.2.4</string>
 	<key>CFBundleVersion</key>
-	<string>15</string>
+	<string>16</string>
 	<key>Chrome</key>
 	<dict>
 		<key>Global Page</key>
@@ -53,6 +53,6 @@
 	<key>Update Manifest URL</key>
 	<string>http://hoyois.github.com/safariextensions/updates.plist</string>
 	<key>Website</key>
-	<string>http://hoyois.github.com/safariextensions/clicktoflash/</string>
+	<string>http://hoyois.github.com/safariextensions/clicktoplugin/</string>
 </dict>
 </plist>
