@@ -1,12 +1,12 @@
 // SETTINGS
-const allSettings = ["defaultTab", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "useFallbackMedia", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "preload", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "codecsPolicy", "volume", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+const allSettings = ["defaultTab", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "useFallbackMedia", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "codecsPolicy", "volume", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
 
 /* Hidden settings:
 settingsContext: true
 zeroIsInvisible: undefined
 */
 
-const injectedSettings = ["enabledKillers", "useFallbackMedia", "showSourceSelector", "preload", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "volume", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+const injectedSettings = ["enabledKillers", "useFallbackMedia", "showSourceSelector", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showVolumeSlider", "hideRewindButton", "volume", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
 
 function getSettings(array) {
     var s = new Object();
@@ -15,6 +15,8 @@ function getSettings(array) {
     }
     return s;
 }
+
+if(/\+|Version\/5\.1/.test(navigator.appVersion)) safari.extension.settings.showVolumeSlider = false;
 
 // CORE
 var CTP_instance = 0; // incremented by one whenever a ClickToPlugin instance with content is created
@@ -302,15 +304,8 @@ function killPlugin(data, tab) {
             }
         }
         
-        mediaData.autoplay = true;
-        if(!mediaData.loadAfter && defaultSource !== undefined) {
-            if(matchList(safari.extension.settings.mediaWhitelist, data.location) && safari.extension.settings.defaultPlayer === "html5") {
-                mediaData.autoload = true;
-            } else if(safari.extension.settings.mediaAutoload) {
-                mediaData.autoload = true;
-                mediaData.autoplay = false;
-            }
-        }
+        mediaData.autoplay = matchList(safari.extension.settings.mediaWhitelist, data.location);
+        mediaData.autoload = defaultSource !== undefined && safari.extension.settings.defaultPlayer === "html5" && (mediaData.autoplay || safari.extension.settings.mediaAutoload);
         
         tab.page.dispatchMessage("mediaData", mediaData);
     };
@@ -325,24 +320,12 @@ safari.application.addEventListener("contextmenu", handleContextMenu, false);
 safari.application.addEventListener("command", doCommand, false);
 
 // UPDATE
-if(safari.extension.settings.version < 10) {
-    // Clean deprecated settings
-    function clearSettings() {
-        for(var i = 0; i < arguments.length; i++) {
-            safari.extension.settings.removeItem(arguments[i]);
-        }
+function clearSettings() {
+    for(var i = 0; i < arguments.length; i++) {
+        safari.extension.settings.removeItem(arguments[i]);
     }
-    clearSettings("pluginsWhitelist", "invertPluginsWhitelist", "replacePlugins", "useSourceSelector", "initialBehavior");
 }
-if(true || safari.extension.settings.version < 15) {
-    alert("ClickToPlugin 2.2.3 Release Notes\n\n--- New Features ---\n\n\u2022 Support for embedded Facebook videos\n\u2022 The hidden setting for the “ClickToPlugin Preferences” shortcut menu item can now be set in the preference window\n\u2022 The preference window works on HTML4 frameset documents by opening in a new tab\n\n--- Bugs Fixed ---\n\n\u2022 Some parts of the extension would not work as expected on documents with MIME type application/xhtml+xml\n\u2022 The preference window would become inaccessible when previously whitelisted plugins were uninstalled\n\u2022 The preference window is scrollable if it overflows the enclosing window\n\u2022 Adapted Blip.tv HTML5 replacements to site changes");
-}
-if(!safari.extension.settings.version || safari.extension.settings.version < 10) {
-    var newTab;
-    if(safari.application.activeBrowserWindow) newTab = safari.application.activeBrowserWindow.openTab("foreground");
-    else newTab = safari.application.openBrowserWindow().activeTab;
-    newTab.url = safari.extension.baseURI + "settings.html";
-    alert("Welcome to ClickToPlugin 2.2!\n\nClickToPlugin gives you control over plug-ins embedded in web pages. Under this dialog is the extension\u2019s preference window which you can use to\n\n\u2022 Specify plug-ins that you never want blocked\n\u2022 Manage the extension\u2019s whitelists and blacklists\n\u2022 Select the video services for which you want ClickToPlugin to provide HTML5 video replacements\n\u2022 Configure ClickToPlugin\u2019s HTML5 media player\n\u2022 Choose which commands should appear in the shortcut menu\n\u2022 Configure keyboard and mouse shortcuts for various tasks\n\u2022 And more!\n\nTo access this preference window from any page, right-click and select “ClickToPlugin Preferences\u2026”, or use the shortcut specified in the “Keyboard shortcuts” section of the preferences (currently \u2325,).");
-}
+if(safari.extension.settings.version < 10) clearSettings("pluginsWhitelist", "invertPluginsWhitelist", "replacePlugins", "useSourceSelector");
+else if(safari.extension.settings.version < 15) clearSettings("preload");
 safari.extension.settings.version = 15;
 

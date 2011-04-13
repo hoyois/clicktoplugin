@@ -66,8 +66,18 @@ mediaPlayer.prototype.createMediaElement = function(width, height, style, contex
     this.mediaElement.className = "CTFmediaElement";
     this.mediaElement.id = "CTFmediaElement" + contextInfo.elementID;
     this.mediaElement.setAttribute("controls", "");
-    if(settings.preload) this.mediaElement.setAttribute("preload", "auto");
-    else this.mediaElement.setAttribute("preload", "none");
+    switch(settings.initialBehavior) {
+        case "none":
+            this.mediaElement.setAttribute("preload", "none");
+            break;
+        case "buffer":
+            this.mediaElement.setAttribute("preload", "auto");
+            break;
+        case "autoplay":
+            this.mediaElement.setAttribute("preload", "auto");
+            this.mediaElement.setAttribute("autoplay", "");
+            break;
+    }
     this.containerElement.appendChild(this.mediaElement);
     
     // Set dimensions
@@ -150,7 +160,7 @@ mediaPlayer.prototype.initializeShadowDOM = function() {
     this.shadowDOM.controlsPanel.style.width = this.width + "px";
     
     // Volume slider
-    if(settings.showVolumeSlider && !/\+/.test(navigator.appVersion)) {
+    if(settings.showVolumeSlider) {
         this.shadowDOM.controlsPanel.style.overflow = "visible";
         this.shadowDOM.volumeSliderContainer.style.cssText = "display: block; -webkit-appearance: none; height: 80px; width: 15px;";
         this.shadowDOM.volumeSlider.style.cssText = "display: block; -webkit-appearance: slider-vertical; height: 80px; width: 15px;";
@@ -274,13 +284,13 @@ mediaPlayer.prototype.resetAspectRatio = function() {
 mediaPlayer.prototype.nextTrack = function() {
     if(!this.mediaElement.hasAttribute("loop")) {
         if(this.currentTrack + this.startTrack + 1 === this.playlistLength) return;
-        this.loadTrack(this.currentTrack + 1, true);
+        this.loadTrack(this.currentTrack + 1, 1);
     }
 };
 
 mediaPlayer.prototype.jumpTrack = function(diff) {
     if(this.playlist.length === 1) return;
-    this.loadTrack(this.currentTrack + diff, true);
+    this.loadTrack(this.currentTrack + diff, 3);
 };
 
 mediaPlayer.prototype.setPoster = function() {
@@ -298,7 +308,7 @@ mediaPlayer.prototype.setPoster = function() {
     }
 };
 
-mediaPlayer.prototype.loadTrack = function(track, autoplay, source) {
+mediaPlayer.prototype.loadTrack = function(track, init, source) { // init: two-digit binary number (focus/autoplay)
     track = track % this.playlist.length;
     if(track < 0) track += this.playlist.length; // weird JS behavior
     if(source === undefined) source = this.playlist[track].defaultSource;
@@ -309,10 +319,11 @@ mediaPlayer.prototype.loadTrack = function(track, autoplay, source) {
     this.currentTrack = track;
     this.currentSource = source;
     this.setPoster();
-    if(autoplay) {
+    if(init === 1 || init === 3) {
         this.mediaElement.setAttribute("preload", "auto");
         this.mediaElement.setAttribute("autoplay", "");
     }
+    if(init === 2 || init === 3) this.containerElement.focus();
     
     var title = this.playlist[track].title;
     if(!title) title = "(no title)";
@@ -351,6 +362,7 @@ mediaPlayer.prototype.switchSource = function(source) {
         this.trackInfo.firstChild.textContent = "Loading\u2026\u2002";
         this.showTrackInfo(true);
     }
+    this.containerElement.focus();
     
     var setInitialTime = function(event) {
         event.target.removeEventListener("loadedmetadata", setInitialTime, false);

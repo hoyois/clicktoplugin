@@ -275,30 +275,28 @@ function handleBeforeLoadEvent(event) {
     }
 
     // Look for video replacements
-    if(settings.enabledKillers.length > 0) {
-        var elementData = false;
-        if(settings.useFallbackMedia) elementData = directKill(elementID);
-        if(!elementData) { // send to the killers
-            // Need to pass the base URL to the killers so that they can resolve URLs, eg. for AJAX requests.
-            // According to RFC1808, the base URL is given by the <base> tag if present,
-            // else by the 'Content-Base' HTTP header if present, else by the current URL.
-            // Fortunately the magical anchor trick takes care of all this for us!!
-            var tmpAnchor = document.createElement("a");
-            tmpAnchor.href = "./";
-            elementData = {
-                "instance": instance,
-                "elementID": elementID,
-                "plugin": data.plugin ? data.plugin : "Flash",
-                "src": data.src,
-                "location": window.location.href,
-                "title": document.title,
-                "baseURL": tmpAnchor.href,
-                "href": data.href,
-                "params": getParams(element, data.plugin)
-            };
-        }
-        safari.self.tab.dispatchMessage("killPlugin", elementData);
+    var elementData = false;
+    if(settings.useFallbackMedia && element.nodeName.toLowerCase() === "object") elementData = directKill(elementID);
+    if(!elementData && settings.enabledKillers.length > 0) { // send to the killers
+        // Need to pass the base URL to the killers so that they can resolve URLs, eg. for AJAX requests.
+        // According to RFC1808, the base URL is given by the <base> tag if present,
+        // else by the 'Content-Base' HTTP header if present, else by the current URL.
+        // Fortunately the magical anchor trick takes care of all this for us!!
+        var tmpAnchor = document.createElement("a");
+        tmpAnchor.href = "./";
+        elementData = {
+            "instance": instance,
+            "elementID": elementID,
+            "plugin": data.plugin ? data.plugin : "Flash",
+            "src": data.src,
+            "location": window.location.href,
+            "title": document.title,
+            "baseURL": tmpAnchor.href,
+            "href": data.href,
+            "params": getParams(element, data.plugin)
+        };
     }
+    if(elementData) safari.self.tab.dispatchMessage("killPlugin", elementData);
 }
 
 function loadPlugin(elementID) {
@@ -368,7 +366,7 @@ function prepMedia(mediaData) {
 
     // Check if we should load video at once
     if(mediaData.autoload) {
-        loadMedia(elementID, mediaData.autoplay);
+        loadMedia(elementID, mediaData.autoplay ? 3 : 0);
         return;
     }
     if(settings.showPoster && mediaData.playlist[0].posterURL) {
@@ -394,7 +392,7 @@ function initializeSourceSelector(elementID, sources, defaultSource) {
     var selector = new sourceSelector(blockedData[elementID].plugin,
         function(event) {loadPlugin(elementID);},
         defaultSource === undefined ? undefined : function(event) {viewInQuickTimePlayer(elementID, defaultSource);},
-        function(event, source) {loadMedia(elementID, true, source);},
+        function(event, source) {loadMedia(elementID, 2, source);},
         function(event, source) {
             var contextInfo = {
                 "instance": instance,
@@ -413,7 +411,7 @@ function initializeSourceSelector(elementID, sources, defaultSource) {
     return selector.unhide(blockedData[elementID].width, blockedData[elementID].height);
 }
 
-function loadMedia(elementID, autoplay, source) {
+function loadMedia(elementID, init, source) {
     if(source === undefined) source = mediaPlayers[elementID].currentSource;
     
     var contextInfo = {
@@ -428,8 +426,7 @@ function loadMedia(elementID, autoplay, source) {
     // Replace placeholder and load first track
     placeholderElements[elementID].parentNode.replaceChild(mediaPlayers[elementID].containerElement, placeholderElements[elementID]);
     mediaPlayers[elementID].initializeShadowDOM(); // this can only be done after insertion
-    if(autoplay) mediaPlayers[elementID].containerElement.focus();
-    mediaPlayers[elementID].loadTrack(0, autoplay, source);
+    mediaPlayers[elementID].loadTrack(0, init, source);
     delete placeholderElements[elementID];
 }
 
@@ -530,7 +527,8 @@ function clickPlaceholder(elementID) {
     if(mediaPlayers[elementID] && mediaPlayers[elementID].startTrack !== undefined && mediaPlayers[elementID].currentSource !== undefined) {
         switch(settings.defaultPlayer) {
             case "html5": 
-                loadMedia(elementID, true);
+                loadMedia(elementID, 2);
+                mediaPlayers[elementID].containerElement.focus();
                 break;
             case "qtp":
                 viewInQuickTimePlayer(elementID);
