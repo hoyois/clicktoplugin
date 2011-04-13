@@ -18,10 +18,6 @@
     <div id="main">
     <section>
         <menu>
-        </menu>
-    </section>
-    <section>
-        <menu>
             <li><span class="left textarea"><label for="locationsWhitelist"><span class="string" title="ALLOW_LOCATIONS"></span>:</label></span><span class="right"><textarea id="locationsWhitelist" class="setting" placeholder="www.example.com/path&#xA;@^http://[a-z]*\.reg(ex)?\.com/"></textarea></span></li>
             <li><span class="left textarea"><label for="sourcesWhitelist"><span class="string" title="ALLOW_SOURCES"></span>:</label></span><span class="right"><textarea id="sourcesWhitelist" class="setting" placeholder="example.swf"></textarea></span></li>
             <li><span class="left"></span><span class="right"><input id="invertWhitelists" class="setting" type="checkbox"><label for="invertWhitelists"><span class="string" title="INVERT_WHITELISTS"></span></label></span></li>
@@ -58,9 +54,6 @@
                 <option value="qtp" title="QUICKTIME_PLAYER"></option>
                 <option value="plugin" title="FLASH_PLAYER"></option>
             </select></span></li>
-            <li><span class="left"></span><span class="right"><input id="mediaAutoload" class="setting" type="checkbox"><label for="mediaAutoload"><span class="string" title="AUTOLOAD_MEDIA_PLAYER"></span></label></span></li>
-            <li><span class="left"></span><span class="right"><input id="showPoster" class="setting" type="checkbox"><label for="showPoster"><span class="string" title="SHOW_POSTER"></span></label></span></li>
-            <li><span class="left"></span><span class="right"><input id="showMediaTooltip" class="setting" type="checkbox"><label for="showMediaTooltip"><span class="string" title="SHOW_MEDIA_TOOLTIP"></span></label></span></li>
             <li class="glue"></li>
             <li><span class="left"><label for="maxResolution"><span class="string" title="MAX_RESOLUTION"></span>:</label></span><span class="right"><select id="maxResolution" class="setting">
                 <option value="360">360p</option>
@@ -75,17 +68,23 @@
                 <option value="3" title="NONNATIVE_USE_FREELY"></option>
             </select></span></li>
             <li class="glue"></li>
+            <li><span class="left"></span><span class="right"><input id="mediaAutoload" class="setting" type="checkbox"><label for="mediaAutoload"><span class="string" title="AUTOLOAD_MEDIA_PLAYER"></span></label></span></li>
+            <li><span class="left"><label for="initialBehavior"><span class="string" title="INITIAL_BEHAVIOR"></span>:</label></span><span class="right"><select id="initialBehavior" class="setting">
+                <option value="none" title="INITIAL_NO_BUFFER"></option>
+                <option value="buffer" title="INITIAL_BUFFER"></option>
+                <option value="autoplay" title="INITIAL_AUTOPLAY"></option>
+            </select></span></li>
+            <li class="glue"></li>
+            <li><span class="left"></span><span class="right"><input id="showPoster" class="setting" type="checkbox"><label for="showPoster"><span class="string" title="SHOW_POSTER"></span></label></span></li>
+            <li><span class="left"></span><span class="right"><input id="showMediaTooltip" class="setting" type="checkbox"><label for="showMediaTooltip"><span class="string" title="SHOW_MEDIA_TOOLTIP"></span></label></span></li>
+            <li class="glue"></li>
             <li><span class="left"></span><span class="right"><input id="showSourceSelector" class="setting" type="checkbox"><label for="showSourceSelector"><span class="string" title="SHOW_SOURCE_SELECTOR"></span></label></span></li>
             <li><span class="left"></span><span class="right sub"><input id="showPluginSourceItem" class="setting" type="checkbox"><label for="showPluginSourceItem"><span class="string" title="SHOW_FLASH_SOURCE"></span></label></span></li>
             <li><span class="left"></span><span class="right sub"><input id="showQTPSourceItem" class="setting" type="checkbox"><label for="showQTPSourceItem"><span class="string" title="SHOW_QTP_SOURCE"></span></label></span></li>
             <li><span class="left"></span><span class="right"><input id="hideRewindButton" class="setting" type="checkbox"><label for="hideRewindButton"><span class="string" title="HIDE_REWIND_BUTTON"></span></label></span></li>
             <li><span class="left"></span><span class="right"><input id="showVolumeSlider" class="setting" type="checkbox"><label for="showVolumeSlider"><span class="string" title="SHOW_WEBKIT_VOLUME_SLIDER"></span></label></span></li>
             <li><span class="left"><label for="volume"><span class="string" title="SOUND_VOLUME"></span>:</label></span><span class="right"><input id="volume" class="setting" type="range" min="0" max="100" step="1"></span></li>
-            <li><span class="left"><label for="initialBehavior"><span class="string" title="INITIAL_BEHAVIOR"></span>:</label></span><span class="right"><select id="initialBehavior" class="setting">
-                <option value="none" title="INITIAL_NO_BUFFER"></option>
-                <option value="buffer" title="INITIAL_BUFFER"></option>
-                <option value="autoplay" title="INITIAL_AUTOPLAY"></option>
-            </select></span></li>
+            <li class="glue"></li>
             <li><span class="left textarea"><label for="mediaWhitelist"><span class="string" title="AUTOPLAY_LOCATIONS"></span>:</label></span><span class="right"><textarea id="mediaWhitelist" class="setting"></textarea></span></li>
         </menu>
     </section>
