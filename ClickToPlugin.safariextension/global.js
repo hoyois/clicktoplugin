@@ -106,6 +106,7 @@ function blockOrAllow(data) {
         // For extensions in Info.plist (except css, pdf, xml, xbl), WebKit checks 
         // Content-Type header at this point and only continues if it matches no plugin.
         // This is a vulnerability: e.g. a .png file can be served as Flash and won't be blocked...
+        //if(!data.url) return true;
         var ext = extractExt(data.url);
         if(isNativeExt(ext)) return true;
         var x = getPluginAndTypeForExt(ext);
@@ -138,8 +139,8 @@ function blockOrAllow(data) {
 
 function isAllowed(plugin) {
     for(var i = 0; i < safari.extension.settings.allowedPlugins.length; i++) {
-        // like NaN, plugins are not equal to themselves... is this a bug??
-        if(plugin.name === navigator.plugins[safari.extension.settings.allowedPlugins[i]].name) return true;
+        // like NaN, plugins are not equal to themselves. But .filename is a unique ID
+        if(plugin.filename === safari.extension.settings.allowedPlugins[i]) return true;
     }
     return false;
 }
@@ -324,9 +325,7 @@ function clearSettings() {
         safari.extension.settings.removeItem(arguments[i]);
     }
 }
-if(safari.extension.settings.version < 10) {
-    clearSettings("pluginsWhitelist", "invertPluginsWhitelist", "replacePlugins", "useSourceSelector");
-}
+if(safari.extension.settings.version < 10) clearSettings("pluginsWhitelist", "invertPluginsWhitelist", "replacePlugins", "useSourceSelector");
 else if(safari.extension.settings.version < 15) clearSettings("preload");
 if(safari.extension.settings.version < 16) { // screwed up once again!
     function updateWhitelists() {

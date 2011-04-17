@@ -90,7 +90,9 @@ if(navigator.plugins.length === 0) {
         span.className = "right";
         span.title = PLUGIN_FILENAME + ": " + navigator.plugins[i].filename + "\n" + PLUGIN_DESCRIPTION + ": " + navigator.plugins[i].description;
         //var title = "";
-        span.innerHTML = "<input id=\"plugin" + i + "\" class=\"plugin\" type=\"checkbox\"><label for=\"plugin" + i + "\"></label></span>";
+        span.innerHTML = "<input class=\"plugin\" type=\"checkbox\"><label></label></span>";
+        span.childNodes[0].id = "plugin/" + navigator.plugins[i].filename;
+        span.childNodes[1].htmlFor = "plugin/" + navigator.plugins[i].filename;
         span.childNodes[1].textContent = navigator.plugins[i].name;
         pluginItems.push(span);
     }
@@ -102,7 +104,7 @@ if(navigator.plugins.length === 0) {
         return 0;
     };
     pluginItems.sort(alphabeticalSort);
-    for(var i = 0; i < navigator.plugins.length || i < 2; i++) {
+    for(var i = 0; i < pluginItems.length || i < 2; i++) {
         var li = document.createElement("li");
         var span = document.createElement("span");
         span.className = "left";
@@ -113,7 +115,7 @@ if(navigator.plugins.length === 0) {
             span.childNodes[1].value = TOGGLE_BUTTON;
         }
         li.appendChild(span);
-        if(i < navigator.plugins.length) li.appendChild(pluginItems[i]);
+        if(i < pluginItems.length) li.appendChild(pluginItems[i]);
         pluginList.appendChild(li);
     }
     
@@ -121,13 +123,13 @@ if(navigator.plugins.length === 0) {
         for(var i = 0; i < pluginInputs.length; i++) {
             pluginInputs[i].checked ^= true;
         }
-        changeSetting("allowedPlugins", checked(pluginInputs));
+        changeSetting("allowedPlugins", checkedPlugins());
     }, false);
     document.getElementById("plugins_reset").addEventListener("click", function() {
         for(var i = 0; i < pluginInputs.length; i++) {
             pluginInputs[i].checked = false;
         }
-        changeSetting("allowedPlugins", checked(pluginInputs));
+        changeSetting("allowedPlugins", []);
     }, false);
 }
 
@@ -136,13 +138,13 @@ document.getElementById("killers_toggle").addEventListener("click", function() {
     for(var i = 0; i < killerInputs.length; i++) {
         killerInputs[i].checked ^= true;
     }
-    changeSetting("enabledKillers", checked(killerInputs));
+    changeSetting("enabledKillers", checkedKillers());
 }, false);
 document.getElementById("killers_all").addEventListener("click", function() {
     for(var i = 0; i < killerInputs.length; i++) {
         killerInputs[i].checked = true;
     }
-    changeSetting("enabledKillers", checked(killerInputs));
+    changeSetting("enabledKillers", checkedKillers());
 }, false);
 
 
@@ -166,6 +168,7 @@ function resizeTextArea(textarea) {
 var textareas = document.getElementsByTagName("textarea");
 function handleTextAreaInput(event) {
     event.target.value = event.target.value.replace(/[\t ]+/g, "\n");
+    changeSetting(event.target.id, parseTextList(event.target.value));
     resizeTextArea(event.target);
 }
 for(var i = 0; i < textareas.length; i++) {
@@ -203,9 +206,8 @@ function bindChangeEvent(input) {
     var parseValue;
     var eventType = "change";
     switch(input.nodeName) {
-        case "TEXTAREA":
-            parseValue = parseTextList;
-            break;
+        case "TEXTAREA": // already taken care of
+            return;
         case "SELECT":
             parseValue = function(value) {if(isNaN(parseInt(value))) return value; else return parseInt(value);}
             break;
@@ -231,13 +233,28 @@ function bindChangeEvent(input) {
 }
 for(var i = 0; i < pluginInputs.length; i++) {
     pluginInputs[i].addEventListener("change", function(event) {
-        changeSetting("allowedPlugins", checked(pluginInputs));
+        changeSetting("allowedPlugins", checkedPlugins());
     }, false);
 }
 for(var i = 0; i < killerInputs.length; i++) {
     killerInputs[i].addEventListener("change", function(event) {
-        changeSetting("enabledKillers", checked(killerInputs));
+        changeSetting("enabledKillers", checkedKillers());
     }, false);
+}
+
+function checkedPlugins() {
+    var array = new Array();
+    for(var i = 0; i < pluginInputs.length; i++) {
+        if(pluginInputs[i].checked) array.push(pluginInputs[i].id.substr(7));
+    }
+    return array;
+}
+function checkedKillers() {
+    var array = new Array();
+    for(var i = 0; i < killerInputs.length; i++) {
+        if(killerInputs[i].checked) array.push(parseInt(killerInputs[i].id.substr(6)));
+    }
+    return array;
 }
 
 // Shortcuts input
@@ -286,14 +303,6 @@ function simplifyWheelDelta(x, y) {
     if(x > y) return "down";
     if(-x > y) return "right";
     return "up";
-}
-
-function checked(inputList) {
-    var array = new Array();
-    for(var i = 0; i < inputList.length; i++) {
-        if(inputList[i].checked) array.push(parseInt(inputList[i].id.substr(6)));
-    }
-    return array;
 }
 
 // Bind settings dependencies
@@ -368,9 +377,11 @@ function loadSettings(event) {
     sections[settings.defaultTab].className = "selected";
     currentTab = settings.defaultTab;
     for(var i = 0; i < settings.allowedPlugins.length; i++) {
-        if(settings.allowedPlugins[i] >= navigator.plugins.length) continue;
-        document.getElementById("plugin" + settings.allowedPlugins[i]).checked = true;
+        var input = document.getElementById("plugin/" + settings.allowedPlugins[i]);
+        if(input) input.checked = true;
+        else {settings.allowedPlugins.splice(i, 1); --i;}
     }
+    changeSetting("allowedPlugins", settings.allowedPlugins);
     for(var i = 0; i < settings.enabledKillers.length; i++) {
         document.getElementById("killer" + settings.enabledKillers[i]).checked = true;
     }
@@ -382,9 +393,6 @@ function loadSettings(event) {
         if(!input) continue; // to be removed
         switch(input.nodeName) {
             case "TEXTAREA":
-                var rows = settings[id].length;
-                if(rows < 2) rows = 2;
-                input.rows = rows;
                 input.value = settings[id].join("\n");
                 resizeTextArea(input);
                 break;
