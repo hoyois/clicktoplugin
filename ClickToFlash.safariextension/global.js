@@ -280,7 +280,7 @@ if(safari.extension.settings.version < 16) { // screwed up once again!
             if(typeof safari.extension.settings[arguments[i]] === "string") safari.extension.settings[arguments[i]] = safari.extension.settings[arguments[i]].split(/\s+/);
         }
     }
-    updateWhitelists("locationsWhitelist", "sourcesWhitelists", "mediaWhitelist");
+    updateWhitelists("locationsWhitelist", "sourcesWhitelist", "mediaWhitelist");
 }
-safari.extension.settings.version = 16;
+safari.extension.settings.version = 17;
 

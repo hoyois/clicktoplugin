@@ -1,6 +1,5 @@
 * {
     -webkit-font-smoothing: subpixel-antialiased; /* for the nightlies */
-    -webkit-user-select: none;
     cursor: default;
     font: -webkit-control;
     text-rendering: optimizelegibility;
@@ -13,6 +12,7 @@ html, body {
 
 body {
     margin: 0px;
+    -webkit-user-select: none;
 }
 
 div#container {
@@ -26,6 +26,10 @@ div#container {
     width: intrinsic;
 }
 
+#container.init {
+    visibility: hidden;
+}
+
 div#main {
     overflow: auto;
 }
@@ -34,9 +38,6 @@ div#main::-webkit-scrollbar {
     display: none;
 }
 
-#container.init {
-    visibility: hidden;
-}
 
 #aux {
     display: inline-block;
@@ -151,7 +152,6 @@ span.right.tip {
 
 textarea, input[type="text"], input[type="number"] {
     -webkit-appearance: textfield;
-    -webkit-user-select: text;
     margin-left: 0;
 }
 
@@ -163,8 +163,7 @@ input.keyboard {
 textarea {
      margin: 2px 0;
      vertical-align: top;
-     white-space: nowrap;
-     overflow: auto;
+     /* white-space: nowrap; */ /* This makes pasted line breaks invisible in .value! Only wrap="off" works. */
 }
 
 span.left.textarea {
