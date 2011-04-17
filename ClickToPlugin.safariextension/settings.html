@@ -7,7 +7,7 @@
     <!--<script defer type="text/javascript" src="settings.js"></script>-->
 </head>
 <body><div id="container" class="hidden init">
-    <nav><ul>
+    <nav><ul id="nav">
         <li><span class="tab"><span class="string" title="PLUGINS_TAB"></span></span></li>
         <li><span class="tab"><span class="string" title="WHITELISTS_TAB"></span></span></li>
         <li><span class="tab"><span class="string" title="KILLERS_TAB"></span></span></li>
@@ -23,12 +23,12 @@
     </section>
     <section>
         <menu>
-            <li><span class="left textarea"><label for="locationsWhitelist"><span class="string" title="ALLOW_LOCATIONS"></span>:</label></span><span class="right"><textarea id="locationsWhitelist" class="setting" wrap="off" placeholder="www.example.com/path&#xA;@^http://[a-z]*\.reg(ex)?\.com/"></textarea></span></li>
-            <li><span class="left textarea"><label for="sourcesWhitelist"><span class="string" title="ALLOW_SOURCES"></span>:</label></span><span class="right"><textarea id="sourcesWhitelist" class="setting" wrap="off" placeholder="example.swf"></textarea></span></li>
+            <li><span class="left textarea"><label for="locationsWhitelist"><span class="string" title="ALLOW_LOCATIONS"></span>:</label></span><span class="right"><textarea id="locationsWhitelist" wrap="off" placeholder="www.example.com/path&#xA;@^http://[a-z]*\.reg(ex)?\.com/"></textarea></span></li>
+            <li><span class="left textarea"><label for="sourcesWhitelist"><span class="string" title="ALLOW_SOURCES"></span>:</label></span><span class="right"><textarea id="sourcesWhitelist" wrap="off" placeholder="example.swf"></textarea></span></li>
             <li><span class="left"></span><span class="right"><input id="invertWhitelists" class="setting" type="checkbox"><label for="invertWhitelists"><span class="string" title="INVERT_WHITELISTS"></span></label></span></li>
             <li class="glue"></li>
-            <li><span class="left textarea"><label for="locationsBlacklist"><span class="string" title="HIDE_LOCATIONS"></span>:</label></span><span class="right"><textarea id="locationsBlacklist" class="setting" wrap="off"></textarea></span></li>
-            <li><span class="left textarea"><label for="sourcesBlacklist"><span class="string" title="HIDE_SOURCES"></span>:</label></span><span class="right"><textarea id="sourcesBlacklist" class="setting" wrap="off"></textarea></span></li>
+            <li><span class="left textarea"><label for="locationsBlacklist"><span class="string" title="HIDE_LOCATIONS"></span>:</label></span><span class="right"><textarea id="locationsBlacklist" wrap="off"></textarea></span></li>
+            <li><span class="left textarea"><label for="sourcesBlacklist"><span class="string" title="HIDE_SOURCES"></span>:</label></span><span class="right"><textarea id="sourcesBlacklist" wrap="off"></textarea></span></li>
             <li><span class="left"></span><span class="right"><input id="invertBlacklists" class="setting" type="checkbox"><label for="invertBlacklists"><span class="string" title="INVERT_BLACKLISTS"></span></label></span></li>
         </menu>
     </section>
@@ -94,7 +94,7 @@
             <li><span class="left"></span><span class="right"><input id="showVolumeSlider" class="setting" type="checkbox"><label for="showVolumeSlider"><span class="string" title="SHOW_WEBKIT_VOLUME_SLIDER"></span></label></span></li>
             <li><span class="left"><label for="volume"><span class="string" title="SOUND_VOLUME"></span>:</label></span><span class="right"><input id="volume" class="setting" type="range" min="0" max="100" step="1"></span></li>
             <li class="glue"></li>
-            <li><span class="left textarea"><label for="mediaWhitelist"><span class="string" title="AUTOPLAY_LOCATIONS"></span>:</label></span><span class="right"><textarea id="mediaWhitelist" class="setting" wrap="off"></textarea></span></li>
+            <li><span class="left textarea"><label for="mediaWhitelist"><span class="string" title="AUTOPLAY_LOCATIONS"></span>:</label></span><span class="right"><textarea id="mediaWhitelist" wrap="off"></textarea></span></li>
         </menu>
     </section>
     <section>
@@ -140,7 +140,7 @@
             <option value="normal" title="SIFR_NORMAL"></option>
             <option value="autoload" title="SIFR_AUTOLOAD"></option>
         </select></span></li>
-        <li><span class="left"><label for="maxInvisibleSize"><span class="string" title="MAX_INVISIBLE_SIZE"></span>:</label></span><span class="right"><input id="maxInvisibleSize" class="setting" type="number" min="1" step="1" size="3"><span class="string" title="PIXELS_UNIT"></span></span></li>
+        <li><span class="left"><label for="maxInvisibleSize"><span class="string" title="MAX_INVISIBLE_SIZE"></span>:</label></span><span class="right"><input id="maxInvisibleSize" class="number" type="number" min="1" step="1" size="3"><span class="string" title="PIXELS_UNIT"></span></span></li>
         <li><span class="left"></span><span class="right"><input id="loadInvisible" class="setting" type="checkbox"><label for="loadInvisible"><span class="string" title="ALLOW_INVISIBLE_PLUGINS"></span></label></span></li>
         <li><span class="left"></span><span class="right"><input id="debug" class="setting" type="checkbox"><label for="debug"><span class="string" title="DEBUG_MODE"></span></label></span></li>
     </menu>
