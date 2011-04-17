@@ -119,8 +119,10 @@ function getAttributes(element, url) {
             }
             // The following is not needed anymore in the latest Webkit:
             // enclosed embeds are FINALLY treated as fallback!
-            var embedChild = element.getElementsByTagName("embed")[0];
-            if(embedChild && embedChild.type) info.type = embedChild.type;
+            if(!/\+/.test(navigator.appVersion)) {
+                var embedChild = element.getElementsByTagName("embed")[0];
+                if(embedChild && embedChild.type) info.type = embedChild.type;
+            }
             break;
     }
     if(!info.src) {

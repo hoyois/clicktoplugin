@@ -58,7 +58,7 @@ mediaPlayer.prototype.createMediaElement = function(width, height, style, contex
     this.containerElement.className = "CTFmediaPlayer";
     this.containerElement.tabIndex = -1; // make focusable
     
-    var styleElement = document.createElement("style");
+    var styleElement = document.createElement("style"); // use scoped attribute when supported
     styleElement.type = "text/css";
     this.containerElement.appendChild(styleElement);
     
