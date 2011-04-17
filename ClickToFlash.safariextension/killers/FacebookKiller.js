@@ -1,7 +1,7 @@
 function FacebookKiller() {}
 
 FacebookKiller.prototype.canKill = function(data) {
-    return /^https?:\/\/s-static\.ak\.facebook\.com\/rsrc\.php\/v[1-9]\/[a-zA-Z0-9]{2}\/r\/[a-zA-Z0-9_-]*\.swf/.test(data.src) || data.src.indexOf("www.facebook.com/v/") !== -1;
+    return /^https?:\/\/(?:s-static\.ak\.facebook\.com|b\.static\.ak\.fbcdn\.net)\/rsrc\.php\/v[1-9]\/[a-zA-Z0-9]{2}\/r\/[a-zA-Z0-9_-]*\.swf/.test(data.src) || data.src.indexOf("www.facebook.com/v/") !== -1;
 };
 
 FacebookKiller.prototype.process = function(data, callback) {

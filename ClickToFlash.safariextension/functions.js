@@ -60,8 +60,10 @@ function getType(element) {
             return element.type;
             break;
         case "object":
-            var embedChild = element.getElementsByTagName("embed")[0];
-            if(embedChild && embedChild.type) return embedChild.type;
+            if(!/\+/.test(navigator.appVersion)) {
+                var embedChild = element.getElementsByTagName("embed")[0];
+                if(embedChild && embedChild.type) return embedChild.type;
+            }
             if(element.type) return element.type;
             var paramElements = element.getElementsByTagName("param");
             for (var i = 0; i < paramElements.length; i++) {
