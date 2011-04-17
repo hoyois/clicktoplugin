@@ -1,7 +1,8 @@
 var container = document.getElementById("container");
 var main = document.getElementById("main");
-var nav = document.getElementsByTagName("nav")[0].children[0];
+var nav = document.getElementById("nav");
 var inputs = document.getElementsByClassName("setting");
+var numberInputs = document.getElementsByClassName("number");
 var keyboardInputs = document.getElementsByClassName("keyboard");
 var mouseInputs = document.getElementsByClassName("mouse");
 var clearShortcutButtons = document.getElementsByClassName("shortcut_clear");
@@ -171,6 +172,11 @@ function handleTextAreaInput(event) {
     changeSetting(event.target.id, parseTextList(event.target.value));
     resizeTextArea(event.target);
 }
+function parseTextList(text) {
+    var s = text.replace(/\n+/g, "\n").replace(/^\n/, "").replace(/\n$/, "");
+    if(!s) return [];
+    else return s.split("\n");
+}
 for(var i = 0; i < textareas.length; i++) {
     textareas[i].addEventListener("keypress", function(event) {
         if(event.keyCode === 32) {
@@ -185,7 +191,7 @@ for(var i = 0; i < textareas.length; i++) {
     }, false);
     
     textareas[i].addEventListener("input", handleTextAreaInput, false);
-    textareas[i].addEventListener("focus", handleTextAreaInput, false);
+    textareas[i].addEventListener("focus", handleTextAreaInput, false); // not needed in nightlies
 }
 
 // Bind 'change' events
@@ -196,18 +202,10 @@ function changeSetting(setting, value) {
 for(var i = 0; i < inputs.length; i++) {
     bindChangeEvent(inputs[i]);
 }
-
-function parseTextList(text) {
-    var s = text.replace(/\n+/g, "\n").replace(/^\n/, "").replace(/\n$/, "");
-    if(!s) return [];
-    else return s.split("\n");
-}
 function bindChangeEvent(input) {
     var parseValue;
-    var eventType = "change";
+    var eventTypes = ["change"];
     switch(input.nodeName) {
-        case "TEXTAREA": // already taken care of
-            return;
         case "SELECT":
             parseValue = function(value) {if(isNaN(parseInt(value))) return value; else return parseInt(value);}
             break;
@@ -216,10 +214,6 @@ function bindChangeEvent(input) {
                 case "range":
                     parseValue = function(value) {return parseInt(value)*.01}
                     break;
-                case "number":
-                    parseValue = function(value) {return isNaN(parseInt(value)) ? 8 : parseInt(value);};
-                    eventType = "blur";
-                    break;
                 case "checkbox":
                     parseValue = function(value) {return value === "on";}
                     break;
@@ -227,7 +221,7 @@ function bindChangeEvent(input) {
             break;
     }
     
-    input.addEventListener(eventType, function(event) {
+    input.addEventListener("change", function(event) {
         changeSetting(event.target.id, parseValue(event.target.value));
     }, false);
 }
@@ -240,6 +234,15 @@ for(var i = 0; i < killerInputs.length; i++) {
     killerInputs[i].addEventListener("change", function(event) {
         changeSetting("enabledKillers", checkedKillers());
     }, false);
+}
+
+function handleNumberInputEvent(event) {
+    var value = event.target.value;
+    if(/\d+/.test(value)) changeSetting(event.target.id, parseInt(value));
+}
+for(var i = 0; i < numberInputs.length; i++) {
+    numberInputs[i].addEventListener("input", handleNumberInputEvent, false);
+    numberInputs[i].addEventListener("blur", handleNumberInputEvent, false); // not needed in nightlies
 }
 
 function checkedPlugins() {
@@ -436,15 +439,6 @@ function loadSettings(event) {
         document.addEventListener("keydown", function(event) {
             if((event.keyIdentifier === "U+0057" && event.metaKey === true && event.altKey === false && event.ctrlKey === false && event.shiftKey === false) || (settings.settingsShortcut && event.keyIdentifier === settings.settingsShortcut.keyIdentifier && event.metaKey === settings.settingsShortcut.metaKey && event.altKey === settings.settingsShortcut.altKey && event.ctrlKey === settings.settingsShortcut.ctrlKey && event.shiftKey === settings.settingsShortcut.shiftKey)) {
                 event.preventDefault();
-                if(event.target.nodeName === "TEXTAREA") {
-                    var e = document.createEvent("HTMLEvents");
-                    e.initEvent("change", false, false);
-                    event.target.dispatchEvent(e);
-                } else if(event.target.nodeName === "INPUT" && event.target.type === "number") {
-                    var e = document.createEvent("HTMLEvents");
-                    e.initEvent("blur", false, false);
-                    event.target.dispatchEvent(e);
-                }
                 safari.self.tab.dispatchMessage("hideSettings", "");
             }
         }, false);

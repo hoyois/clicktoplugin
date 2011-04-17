@@ -106,7 +106,7 @@ function blockOrAllow(data) {
         // For extensions in Info.plist (except css, pdf, xml, xbl), WebKit checks 
         // Content-Type header at this point and only continues if it matches no plugin.
         // This is a vulnerability: e.g. a .png file can be served as Flash and won't be blocked...
-        //if(!data.url) return true;
+        if(!data.url) return true;
         var ext = extractExt(data.url);
         if(isNativeExt(ext)) return true;
         var x = getPluginAndTypeForExt(ext);
@@ -335,5 +335,5 @@ if(safari.extension.settings.version < 16) { // screwed up once again!
     }
     updateWhitelists("locationsWhitelist", "sourcesWhitelist", "mediaWhitelist");
 }
-safari.extension.settings.version = 16;
+safari.extension.settings.version = 17;
 
