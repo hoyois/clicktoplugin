@@ -69,6 +69,7 @@
 			<integer>13</integer>
 			<integer>14</integer>
 			<integer>15</integer>
+			<integer>16</integer>
 		</array>
 		<key>Key</key>
 		<string>enabledKillers</string>
@@ -237,6 +238,25 @@
 		</dict>
 		<key>Key</key>
 		<string>settingsShortcut</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<dict>
+			<key>type</key>
+			<string>keydown</string>
+			<key>shiftKey</key>
+			<false/>
+			<key>ctrlKey</key>
+			<true/>
+			<key>altKey</key>
+			<false/>
+			<key>metaKey</key>
+			<true/>
+			<key>keyIdentifier</key>
+			<string>U+0057</string>
+		</dict>
+		<key>Key</key>
+		<string>addToWhitelistShortcut</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>

@@ -10,17 +10,17 @@ SLKiller.prototype.canKill = function(data) {
 SLKiller.prototype.process = function(data, callback) {
     var SLvars = parseSLVariables(data.params);
     var mediaURL = decodeURIComponent(SLvars[data.file]);
-    var mediaType = canPlaySrcWithHTML5(mediaURL);
+    var mediaInfo = getMediaInfo(mediaURL);
     
     var sources = new Array();
-    if(mediaType && (mediaType.isNative || canPlayWM)) sources.push({"url": mediaURL, "isNative": mediaType.isNative, "mediaType": mediaType});
+    if(mediaInfo && (mediaInfo.isNative || canPlayWM)) sources.push({"url": mediaURL, "isNative": mediaInfo.isNative, "mediaType": mediaInfo});
     
     var posterURL;
     if(SLvars.thumbnail) posterURL = decodeURIComponent(SLvars.thumbnail);
     
     var mediaData = {
         "playlist": [{"posterURL": posterURL, "sources": sources}],
-        "isAudio": mediaType.type === "audio"
+        "isAudio": mediaInfo.type === "audio"
     }
     callback(mediaData);
 };

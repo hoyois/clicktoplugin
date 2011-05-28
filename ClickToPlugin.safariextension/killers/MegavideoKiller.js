@@ -3,7 +3,7 @@ function MegavideoKiller() {}
 MegavideoKiller.prototype.canKill = function(data) {
     if(data.plugin !== "Flash") return false;
     if(!canPlayFLV) return false;
-    if(data.src === "http://wwwstatic.megavideo.com/mv_player2.swf") {data.onsite = true; return true;};
+    if(/^http:\/\/wwwstatic\.megavideo\.com\/mv_player[2-9]?\.swf/.test(data.src)) {data.onsite = true; return true;};
     if(data.src.indexOf("megavideo.com/v/") !== -1) {data.onsite = false; return true;}
     return false;
 };

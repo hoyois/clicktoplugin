@@ -83,6 +83,14 @@ const STRINGS = {
         "en-us": "Allow plug-ins from these sources",
         "fr-fr": "Autoriser les plugins provenant de "
     },
+    BLOCK_LOCATIONS: {
+        "en-us": "Block plug-ins on these sites",
+        "fr-fr": "Bloquer les plugins sur ces sites "
+    },
+    BLOCK_SOURCES: {
+        "en-us": "Block plug-ins from these sources",
+        "fr-fr": "Bloquer les plugins provenant de "
+    },
     INVERT_WHITELISTS: {
         "en-us": "Negate lists",
         "fr-fr": "Inverser"
@@ -94,6 +102,14 @@ const STRINGS = {
     HIDE_SOURCES: {
         "en-us": "Hide plug-ins from these sources",
         "fr-fr": "Masquer les plugins provenant de "
+    },
+    SHOW_LOCATIONS: {
+        "en-us": "Show plug-ins on these sites",
+        "fr-fr": "Afficher les plugins sur ces sites "
+    },
+    SHOW_SOURCES: {
+        "en-us": "Show plug-ins from these sources",
+        "fr-fr": "Afficher les plugins provenant de "
     },
     INVERT_BLACKLISTS: {
         "en-us": "Negate lists",
@@ -118,6 +134,10 @@ const STRINGS = {
     SHOW_QTP_SOURCE: {
         "en-us": "Include QuickTime Player",
         "fr-fr": "Inclure QuickTime Player"
+    },
+    SHOW_SITE_SOURCE: {
+        "en-us": "Include site",
+        "fr-fr": "Inclure le site"
     },
     USE_PLAYLISTS: {
         "en-us": "Use playlists",
@@ -251,6 +271,10 @@ const STRINGS = {
     SETTINGS_SHORTCUT: {
         "en-us": "Open preference pane",
         "fr-fr": "Ouvrir les préférences "
+    },
+    WHITELIST_SHORTCUT: {
+        "en-us": "Allow plug-ins on domain",
+        "fr-fr": "Autoriser les plugins sur ce domaine "
     },
     LOAD_ALL_SHORTCUT: {
         "en-us": "Load all plug-ins in frontmost tab",

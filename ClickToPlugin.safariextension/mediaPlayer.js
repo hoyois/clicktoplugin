@@ -57,6 +57,7 @@ mediaPlayer.prototype.createMediaElement = function(width, height, style, contex
     this.containerElement = document.createElement("div");
     this.containerElement.className = "CTFmediaPlayer";
     this.containerElement.tabIndex = -1; // make focusable
+    this.containerElement.addEventListener("click", function(event) {event.stopPropagation();}, false);
     
     var styleElement = document.createElement("style"); // use scoped attribute when supported
     styleElement.type = "text/css";
@@ -160,7 +161,7 @@ mediaPlayer.prototype.initializeShadowDOM = function() {
     this.shadowDOM.controlsPanel.style.width = this.width + "px";
     
     // Volume slider
-    if(settings.showVolumeSlider) {
+    if(settings.showVolumeSlider && !/\+|Version\/5\.1/.test(navigator.appVersion)) {
         this.shadowDOM.controlsPanel.style.overflow = "visible";
         this.shadowDOM.volumeSliderContainer.style.cssText = "display: block; -webkit-appearance: none; height: 80px; width: 15px;";
         this.shadowDOM.volumeSlider.style.cssText = "display: block; -webkit-appearance: slider-vertical; height: 80px; width: 15px;";

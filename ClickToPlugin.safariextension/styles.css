@@ -419,7 +419,7 @@ Source selector
 
 /* Should use CSS3 ::marker here */
 .CTFsourceSelector .CTFsourceItem::before {
-    content: none !important;
+    content: "" !important;
 }
 
 .CTFmediaPlayer .CTFcurrentSource::before {
@@ -475,7 +475,7 @@ Settings pane
     right: 0 !important;
     top: 0 !important;
     width: 100% !important;
-    z-index: 1000000 !important;
+    z-index: 1000000000 !important;
     zoom: normal !important;
 }
 

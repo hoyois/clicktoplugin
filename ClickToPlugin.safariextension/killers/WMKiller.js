@@ -5,13 +5,13 @@ WMKiller.prototype.canKill = function(data) {
 };
 
 WMKiller.prototype.process = function(data, callback) {
-    var mediaType = canPlaySrcWithHTML5(data.src);
-    if(!mediaType) return;
-    var sources = [{"url": data.src, "isNative": false, "mediaType": mediaType.type}];
+    var mediaInfo = getMediaInfo(data.src);
+    if(!mediaInfo) return;
+    var sources = [{"url": data.src, "isNative": false, "mediaType": mediaInfo.type}];
     
     var mediaData = {
         "playlist": [{"sources": sources}],
-        "isAudio": mediaType.type === "audio"
+        "isAudio": mediaInfo.type === "audio"
     };
     callback(mediaData);
 };
