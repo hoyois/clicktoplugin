@@ -10,10 +10,10 @@ QTKiller.prototype.process = function(data, callback) {
     var isAudio = true;
     var playlist = new Array();
     var addTrack = function(url) {
-        var mediaType = canPlaySrcWithHTML5(url);
-        if(!mediaType) return;
-        var source = {"url": url, "isNative": mediaType.isNative, "mediaType": mediaType.type};
-        if(mediaType.type === "video") isAudio = false;
+        var mediaInfo = getMediaInfo(url);
+        if(!mediaInfo) return;
+        var source = {"url": url, "isNative": mediaInfo.isNative, "mediaType": mediaInfo.type};
+        if(mediaInfo.type === "video") isAudio = false;
         playlist.push({"sources": [source]});
     };
     addTrack(data.src);

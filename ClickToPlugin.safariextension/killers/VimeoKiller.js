@@ -31,7 +31,7 @@ VimeoKiller.prototype.process = function(data, callback) {
         // Unfortunately it's impossible to get using XMLHttpRequest.
         
         var handleMIMEType = function(MIMEType) {
-            if(MIMEType.split(";")[0] === "video/x-flv") isNative = false;
+            if(MIMEType.split(";")[0] !== "video/mp4") isNative = false;
             if(xml.getElementsByTagName("isHD").length > 0 && xml.getElementsByTagName("isHD")[0].textContent === "1") {
                 var resolution = 720;
                 if(xml.getElementsByTagName("height")[0] && xml.getElementsByTagName("height")[0].textContent === "1080") resolution = 1080;

@@ -379,19 +379,19 @@ function prepMedia(mediaData) {
     else placeholderElements[elementID].removeAttribute("title");
     
     if(settings.showSourceSelector) {
-        var hasSourceSelector = initializeSourceSelector(elementID, mediaData.playlist[0].sources, mediaData.playlist[0].defaultSource);
+        var hasSourceSelector = initializeSourceSelector(elementID, mediaData.playlist[0]);
     }
     
     if(mediaData.badgeLabel) displayBadge(mediaData.badgeLabel, elementID);
     else if(hasSourceSelector) displayBadge(blockedData[elementID].plugin + "*", elementID);
 }
 
-function initializeSourceSelector(elementID, sources, defaultSource) {
-    if(sources.length === 0) return false;
+function initializeSourceSelector(elementID, media) {
+    if(media.sources.length === 0) return false;
     
     var selector = new sourceSelector(blockedData[elementID].plugin,
         function(event) {loadPlugin(elementID);},
-        defaultSource === undefined ? undefined : function(event) {viewInQuickTimePlayer(elementID, defaultSource);},
+        media.defaultSource === undefined ? undefined : function(event) {viewInQuickTimePlayer(elementID, media.defaultSource);},
         function(event, source) {loadMedia(elementID, 2, source);},
         function(event, source) {
             var contextInfo = {
@@ -404,8 +404,8 @@ function initializeSourceSelector(elementID, sources, defaultSource) {
         }
     );
     
-    selector.buildSourceList(sources);
-    selector.setCurrentSource(settings.defaultPlayer === "html5" ? defaultSource : settings.defaultPlayer);
+    selector.buildSourceList(media.sources);
+    selector.setCurrentSource(settings.defaultPlayer === "html5" ? media.defaultSource : settings.defaultPlayer);
     
     placeholderElements[elementID].appendChild(selector.containerElement);
     return selector.unhide(blockedData[elementID].width, blockedData[elementID].height);
@@ -540,6 +540,11 @@ function clickPlaceholder(elementID) {
 }
 
 function registerGlobalShortcuts() {
+    if(settings.addToWhitelistShortcut) {
+        document.addEventListener(settings.addToWhitelistShortcut.type, function(event) {
+            if(testShortcut(event, settings.addToWhitelistShortcut)) safari.self.tab.dispatchMessage("whitelist", window.location.href);
+        }, false);
+    }
     if(settings.loadAllShortcut) {
         document.addEventListener(settings.loadAllShortcut.type, function(event) {
             if(testShortcut(event, settings.loadAllShortcut)) safari.self.tab.dispatchMessage("loadAll", true);

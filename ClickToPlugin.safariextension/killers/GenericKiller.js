@@ -54,18 +54,18 @@ GenericKiller.prototype.process = function(data, callback) {
     sourceURL2 = flashvars["hd.file"];
     
     var sources = new Array();
-    var mediaType;
+    var mediaInfo;
     if(sourceURL2) {
-        mediaType = canPlaySrcWithHTML5(sourceURL2);
-        if(mediaType) sources.push({"url": makeAbsoluteURL(sourceURL2, baseURL), "format": "HD", "isNative": mediaType.isNative, "resolution": 720, "mediaType": mediaType.type});
+        mediaInfo = getMediaInfo(sourceURL2);
+        if(mediaInfo) sources.push({"url": makeAbsoluteURL(sourceURL2, baseURL), "format": "HD", "isNative": mediaInfo.isNative, "resolution": 720, "mediaType": mediaInfo.type});
     }
     
-    mediaType = canPlaySrcWithHTML5(sourceURL);
-    if(mediaType) sources.push({"url": makeAbsoluteURL(sourceURL, baseURL), "format": sources[0] ? "SD" : "", "isNative": mediaType.isNative, "mediaType": mediaType.type});
+    mediaInfo = getMediaInfo(sourceURL);
+    if(mediaInfo) sources.push({"url": makeAbsoluteURL(sourceURL, baseURL), "format": sources[0] ? "SD" : "", "isNative": mediaInfo.isNative, "mediaType": mediaInfo.type});
     
     var mediaData = {
         "playlist": [{"posterURL": posterURL, "sources": sources}],
-        "isAudio": mediaType.type === "audio"
+        "isAudio": mediaInfo.type === "audio"
     };
     callback(mediaData);
 };

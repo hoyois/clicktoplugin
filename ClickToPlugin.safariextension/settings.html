@@ -23,12 +23,12 @@
     </section>
     <section>
         <menu>
-            <li><span class="left textarea"><label for="locationsWhitelist"><span class="string" title="ALLOW_LOCATIONS"></span>:</label></span><span class="right"><textarea id="locationsWhitelist" wrap="off" placeholder="www.example.com/path&#xA;@^http://[a-z]*\.reg(ex)?\.com/"></textarea></span></li>
-            <li><span class="left textarea"><label for="sourcesWhitelist"><span class="string" title="ALLOW_SOURCES"></span>:</label></span><span class="right"><textarea id="sourcesWhitelist" wrap="off" placeholder="example.swf"></textarea></span></li>
+            <li><span class="left textarea"><label for="locationsWhitelist"></label></span><span class="right"><textarea id="locationsWhitelist" wrap="off" placeholder="www.example.com/path&#xA;@^http://[a-z]*\.reg(ex)?\.com/"></textarea></span></li>
+            <li><span class="left textarea"><label for="sourcesWhitelist"></label></span><span class="right"><textarea id="sourcesWhitelist" wrap="off" placeholder="example.swf"></textarea></span></li>
             <li><span class="left"></span><span class="right"><input id="invertWhitelists" class="setting" type="checkbox"><label for="invertWhitelists"><span class="string" title="INVERT_WHITELISTS"></span></label></span></li>
             <li class="glue"></li>
-            <li><span class="left textarea"><label for="locationsBlacklist"><span class="string" title="HIDE_LOCATIONS"></span>:</label></span><span class="right"><textarea id="locationsBlacklist" wrap="off"></textarea></span></li>
-            <li><span class="left textarea"><label for="sourcesBlacklist"><span class="string" title="HIDE_SOURCES"></span>:</label></span><span class="right"><textarea id="sourcesBlacklist" wrap="off"></textarea></span></li>
+            <li><span class="left textarea"><label for="locationsBlacklist"></label></span><span class="right"><textarea id="locationsBlacklist" wrap="off"></textarea></span></li>
+            <li><span class="left textarea"><label for="sourcesBlacklist"></label></span><span class="right"><textarea id="sourcesBlacklist" wrap="off"></textarea></span></li>
             <li><span class="left"></span><span class="right"><input id="invertBlacklists" class="setting" type="checkbox"><label for="invertBlacklists"><span class="string" title="INVERT_BLACKLISTS"></span></label></span></li>
         </menu>
     </section>
@@ -38,17 +38,18 @@
             <li><span class="left"><input id="killers_all" type="button" value="Select All"><input id="killers_toggle" type="button" value="Toggle"></span><span class="right"><input id="killer4" class="killer" type="checkbox"><label for="killer4">Break</label></span></li>
             <li><span class="left"></span><span class="right"><input id="killer10" class="killer" type="checkbox"><label for="killer10">Broadcast Interactive Media</label></span></li>
             <li><span class="left"></span><span class="right"><input id="killer2" class="killer" type="checkbox"><label for="killer2">Dailymotion</label></span></li>
-            <li><span class="left"></span><span class="right"><input id="killer15" class="killer" type="checkbox"><label for="killer15">DivX</label></span></li>
+            <li><span class="left"></span><span class="right"><input id="killer16" class="killer" type="checkbox"><label for="killer16">DivX</label></span></li>
             <li><span class="left"></span><span class="right"><input id="killer3" class="killer" type="checkbox"><label for="killer3">Facebook</label></span></li>
+            <li><span class="left"></span><span class="right"><input id="killer12" class="killer" type="checkbox"><label for="killer12">Flowplayer</label></span></li>
             <li><span class="left"></span><span class="right"><input id="killer11" class="killer" type="checkbox"><label for="killer11">Generic Flash</label></span></li>
-            <li><span class="left"></span><span class="right"><input id="killer12" class="killer" type="checkbox"><label for="killer12">Generic Silverlight</label></span></li>
+            <li><span class="left"></span><span class="right"><input id="killer13" class="killer" type="checkbox"><label for="killer13">Generic Silverlight</label></span></li>
             <li><span class="left"></span><span class="right"><input id="killer9" class="killer" type="checkbox"><label for="killer9">Megavideo</label></span></li>
             <li><span class="left"></span><span class="right"><input id="killer6" class="killer" type="checkbox"><label for="killer6">Metacafe</label></span></li>
-            <li><span class="left"></span><span class="right"><input id="killer13" class="killer" type="checkbox"><label for="killer13">QuickTime</label></span></li>
+            <li><span class="left"></span><span class="right"><input id="killer14" class="killer" type="checkbox"><label for="killer14">QuickTime</label></span></li>
             <li><span class="left"></span><span class="right"><input id="killer7" class="killer" type="checkbox"><label for="killer7">Tumblr Audio</label></span></li>
             <li><span class="left"></span><span class="right"><input id="killer8" class="killer" type="checkbox"><label for="killer8">Veoh</label></span></li>
             <li><span class="left"></span><span class="right"><input id="killer1" class="killer" type="checkbox"><label for="killer1">Vimeo</label></span></li>
-            <li><span class="left"></span><span class="right"><input id="killer14" class="killer" type="checkbox"><label for="killer14">Windows Media</label></span></li>
+            <li><span class="left"></span><span class="right"><input id="killer15" class="killer" type="checkbox"><label for="killer15">Windows Media</label></span></li>
             <li><span class="left"></span><span class="right"><input id="killer0" class="killer" type="checkbox"><label for="killer0">YouTube</label></span></li>
             <li class="glue"></li>
             <li><span class="left"></span><span class="right"><input id="useFallbackMedia" class="setting" type="checkbox"><label for="useFallbackMedia"><span class="string" title="USE_FALLBACK_MEDIA"></span></label></span></li>
@@ -114,6 +115,7 @@
     </section>
     <section>
         <menu>
+            <li><span class="left"><label for="addToWhitelistShortcut"><span class="string" title="WHITELIST_SHORTCUT"></span>:</label></span><span class="right"><input id="addToWhitelistShortcut" class="keyboard" type="text"><span class="mouse disabled"></span><input class="shortcut_clear" type="button"></span></li>
             <li><span class="left"><label for="loadAllShortcut"><span class="string" title="LOAD_ALL_SHORTCUT"></span>:</label></span><span class="right"><input id="loadAllShortcut" class="keyboard" type="text"><span class="mouse disabled"></span><input class="shortcut_clear" type="button"></span></li>
             <li><span class="left"><label for="hideAllShortcut"><span class="string" title="HIDE_ALL_SHORTCUT"></span>:</label></span><span class="right"><input id="hideAllShortcut" class="keyboard" type="text"><span class="mouse disabled"></span><input class="shortcut_clear" type="button"></span></li>
             <li><span class="left"><label for="hidePluginShortcut"><span class="string" title="HIDE_PLUGIN_SHORTCUT"></span>:</label></span><span class="right"><input id="hidePluginShortcut" class="keyboard" type="text" disabled><span class="mouse"></span><input class="shortcut_clear" type="button"></span></li>
