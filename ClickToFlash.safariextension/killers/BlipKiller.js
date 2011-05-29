@@ -1,30 +1,24 @@
 function BlipKiller() {}
 
 BlipKiller.prototype.canKill = function(data) {
-    return data.src.indexOf("blip.tv/") !== -1;
+    return data.src.indexOf("blip.tv/play/") !== -1;
 };
 
 BlipKiller.prototype.process = function(data, callback) {
-    var isEmbed, url;
-    var matches = data.location.match(/blip\.tv\/file\/([0-9]+)(?:[\/?]|$)/);
-    if(!matches) matches = data.location.match(/[;?]id=([0-9]+)(?:;|$)/);
-    if(matches) {
-        url = "http://www.blip.tv/file/" + matches[1] + "/?skin=json&version=2&no_wrap=1";
-    } else {
-        matches = data.src.match(/blip\.tv\/play\/([^%]*)/);
-        if(matches) {
-            url = "http://blip.tv/players/episode/" + matches[1] + "?skin=json&version=2&no_wrap=1";
-            isEmbed = true;
-        }
-        else return;
-    }
+    var isEmbed = true, url;
+    if(/^http:\/\/blip\.tv\//.test(data.location)) isEmbed =  false;
+    var match = data.src.match(/blip\.tv\/play\/(.*)/);
+    if(match) {
+        match = decodeURIComponent(match[1]).split(".")[0];
+        url = "http://blip.tv/players/episode/" + match + "?skin=json&version=2&no_wrap=1";
+    } else return;
     
     var sources = new Array();
     
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.onload = function() {
-        var json = JSON.parse(xhr.responseText.replace(/\\'/g, "'")); // correct Blip.tv's invalid JSON
+        var json = JSON.parse(xhr.responseText.replace(/\\'/g, "'"))[0]; // correct Blip.tv's invalid JSON
         
         var ext, format, height, width, isNative, mediaType = "video";
         for(var i = 0; i < json.additionalMedia.length; i++) {

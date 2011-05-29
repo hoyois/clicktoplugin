@@ -27,6 +27,25 @@ for(var i = 0; i < clearShortcutButtons.length; i++) {
     clearShortcutButtons[i].value = CLEAR_BUTTON;
 }
 
+function updateWhitelistLabels(invert) {
+    if(invert) {
+        document.getElementById("locationsWhitelist").parentNode.previousSibling.textContent = BLOCK_LOCATIONS + ":";
+        document.getElementById("sourcesWhitelist").parentNode.previousSibling.textContent = BLOCK_SOURCES + ":";
+    } else {
+        document.getElementById("locationsWhitelist").parentNode.previousSibling.textContent = ALLOW_LOCATIONS + ":";
+        document.getElementById("sourcesWhitelist").parentNode.previousSibling.textContent = ALLOW_SOURCES + ":";
+    }
+}
+function updateBlacklistLabels(invert) {
+    if(invert) {
+        document.getElementById("locationsBlacklist").parentNode.previousSibling.textContent = SHOW_LOCATIONS + ":";
+        document.getElementById("sourcesBlacklist").parentNode.previousSibling.textContent = SHOW_SOURCES + ":";
+    } else {
+        document.getElementById("locationsBlacklist").parentNode.previousSibling.textContent = HIDE_LOCATIONS + ":";
+        document.getElementById("sourcesBlacklist").parentNode.previousSibling.textContent = HIDE_SOURCES + ":";
+    }
+}
+
 // Bind tabs to sections
 var tabs = nav.children;
 var sections = document.getElementsByTagName("section");
@@ -174,6 +193,13 @@ for(var i = 0; i < killerInputs.length; i++) {
     }, false);
 }
 
+document.getElementById("invertWhitelists").addEventListener("change", function(event) {
+    updateWhitelistLabels(event.target.value === "on");
+}, false);
+document.getElementById("invertBlacklists").addEventListener("change", function(event) {
+    updateBlacklistLabels(event.target.value === "on");
+}, false);
+
 function handleNumberInput(event) {
     var value = event.target.value;
     if(/\d+/.test(value)) changeSetting(event.target.id, parseInt(value));
@@ -315,6 +341,8 @@ function loadSettings(event) {
     }
     delete settings.defaultTab;
     delete settings.enabledKillers;
+    updateWhitelistLabels(settings.invertWhitelists);
+    updateBlacklistLabels(settings.invertBlacklists);
     for(var id in settings) {
         var input = document.getElementById(id);
         if(!input) continue; // to be removed
