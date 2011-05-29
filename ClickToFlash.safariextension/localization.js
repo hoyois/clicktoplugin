@@ -56,11 +56,19 @@ const STRINGS = {
     
     ALLOW_LOCATIONS: {
         "en-us": "Allow Flash on these sites",
-        "fr-fr": "Autoriser Flash sur ces sites "
+        "fr-fr": "Autoriser le Flash sur ces sites "
     },
     ALLOW_SOURCES: {
         "en-us": "Allow Flash from these sources",
         "fr-fr": "Autoriser le Flash provenant de "
+    },
+    BLOCK_LOCATIONS: {
+        "en-us": "Block Flash on these sites",
+        "fr-fr": "Bloquer le Flash sur ces sites "
+    },
+    BLOCK_SOURCES: {
+        "en-us": "Block Flash from these sources",
+        "fr-fr": "Bloquer le Flash provenant de "
     },
     INVERT_WHITELISTS: {
         "en-us": "Negate lists",
@@ -68,11 +76,19 @@ const STRINGS = {
     },
     HIDE_LOCATIONS: {
         "en-us": "Hide Flash on these sites",
-        "fr-fr": "Masquer Flash sur ces sites "
+        "fr-fr": "Masquer le Flash sur ces sites "
     },
     HIDE_SOURCES: {
         "en-us": "Hide Flash from these sources",
         "fr-fr": "Masquer le Flash provenant de "
+    },
+    SHOW_LOCATIONS: {
+        "en-us": "Show Flash on these sites",
+        "fr-fr": "Afficher le Flash sur ces sites "
+    },
+    SHOW_SOURCES: {
+        "en-us": "Show Flash from these sources",
+        "fr-fr": "Afficher le Flash provenant de "
     },
     INVERT_BLACKLISTS: {
         "en-us": "Negate lists",
@@ -230,6 +246,10 @@ const STRINGS = {
     SETTINGS_SHORTCUT: {
         "en-us": "Open preference pane",
         "fr-fr": "Ouvrir les préférences "
+    },
+    WHITELIST_SHORTCUT: {
+        "en-us": "Allow Flash on domain",
+        "fr-fr": "Autoriser le Flash sur ce domaine "
     },
     LOAD_ALL_SHORTCUT: {
         "en-us": "Load all Flash in frontmost tab",

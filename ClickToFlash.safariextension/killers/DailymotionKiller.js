@@ -20,8 +20,8 @@ DailymotionKiller.prototype.processFromSequence = function(sequence, callback) {
     var posterURL, matches;
     var sources = new Array();
     
-    // hdURL (720p)
-    matches = sequence.match(/\"hdURL\":\"([^"]*)\"/);
+    // hd720URL (720p)
+    matches = sequence.match(/\"hd720URL\":\"([^"]*)\"/);
     if(matches) {
         sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "720p MP4", "resolution": 720, "isNative": true, "mediaType": "video"});
     }

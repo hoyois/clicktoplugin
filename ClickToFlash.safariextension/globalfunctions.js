@@ -74,7 +74,7 @@ const canPlayDivX = canPlayFLV; // 'video/divx' always returns "", probably a Pe
 const canPlayOGG = canPlayTypeWithHTML5("video/ogg"); // OK with Xiph component
 
 // and certainly not this this one! but it does the job reasonably well
-function canPlaySrcWithHTML5(url) {
+function getMediaInfo(url) {
     url = extractExt(url);
     if(/^(?:mp4|mpe?g|mov|m4v)$/i.test(url)) return {"type": "video", "isNative": true};
     if(canPlayFLV && /^flv$/i.test(url)) return {"type": "video", "isNative": false};
@@ -157,7 +157,7 @@ function parseXSPFPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlay
         var isAudio = true;
         var startTrack = track;
         if(!(track >= 0 && track < x.length)) track = 0;
-        var list, I, mediaType, mediaURL, posterURL, title;
+        var list, I, mediaInfo, mediaURL, posterURL, title;
         
         for(var i = 0; i < x.length; i++) {
             // what about <jwplayer:streamer> rtmp??
@@ -166,12 +166,12 @@ function parseXSPFPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlay
             if(list.length > 0) mediaURL = makeAbsoluteURL(list[0].firstChild.nodeValue, baseURL);
             else if(i === 0) return;
             else continue;
-            mediaType = canPlaySrcWithHTML5(mediaURL);
-            if(!mediaType) {
+            mediaInfo = getMediaInfo(mediaURL);
+            if(!mediaInfo) {
                 if(i === 0) return;
                 if(i >= x.length - track) --startTrack;
                 continue;
-            } else if(mediaType.type === "video") isAudio = false;
+            } else if(mediaInfo.type === "video") isAudio = false;
             
             list = x[I].getElementsByTagName("image");
             if(list.length > 0) posterURL = list[0].firstChild.nodeValue;
@@ -182,7 +182,7 @@ function parseXSPFPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlay
                 list = x[I].getElementsByTagName("annotation");
                 if(list.length > 0) title = list[0].firstChild.nodeValue;
             }
-            playlist.push({"sources": [{"url": mediaURL, "isNative": mediaType.isNative, "mediaType": mediaType.type}], "posterURL": posterURL, "title": title});
+            playlist.push({"sources": [{"url": mediaURL, "isNative": mediaInfo.isNative, "mediaType": mediaInfo.type}], "posterURL": posterURL, "title": title});
         }
         var playlistData = {
             "playlist": playlist,

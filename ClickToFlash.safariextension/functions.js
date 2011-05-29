@@ -60,7 +60,7 @@ function getType(element) {
             return element.type;
             break;
         case "object":
-            if(!/\+/.test(navigator.appVersion)) {
+            if(!/\+|Version\/5\.1/.test(navigator.appVersion)) {
                 var embedChild = element.getElementsByTagName("embed")[0];
                 if(embedChild && embedChild.type) return embedChild.type;
             }
