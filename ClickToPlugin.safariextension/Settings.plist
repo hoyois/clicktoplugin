@@ -69,7 +69,6 @@
 			<integer>13</integer>
 			<integer>14</integer>
 			<integer>15</integer>
-			<integer>16</integer>
 		</array>
 		<key>Key</key>
 		<string>enabledKillers</string>
