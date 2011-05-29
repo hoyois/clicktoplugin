@@ -16,7 +16,7 @@ FlowKiller.prototype.process = function(data, callback) {
     if(config.playList) config.playlist = config.playList;
     if(typeof config.playlist === "object") {
         for(var i = 0; i < config.playlist.length; i++) {
-            //var sources = new Array();
+            if(config.playlist[i].provider === "rtmp") continue;
             mediaURL = config.playlist[i].url;
             mediaInfo = getMediaInfo(mediaURL);
             if(mediaInfo) {
@@ -30,6 +30,7 @@ FlowKiller.prototype.process = function(data, callback) {
             }
         }
     } else if(config.clip) {
+        if(config.clip.provider === "rtmp") return;
         mediaURL = config.clip.url;
         if(!mediaURL) return;
         mediaInfo = getMediaInfo(mediaURL);
