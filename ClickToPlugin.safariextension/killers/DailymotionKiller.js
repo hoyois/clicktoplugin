@@ -37,7 +37,7 @@ DailymotionKiller.prototype.processFromSequence = function(sequence, callback) {
         sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "LD MP4", "resolution": 240, "isNative": true, "mediaType": "video"});
     }
     
-    matches = sequence.match(/\"backgroundImageURL\":\"([^"]*)\"/);
+    matches = sequence.match(/\"videoPreviewURL\":\"([^"]*)\"/);
     if(matches) posterURL = matches[1].replace(/\\\//g,"/");
     
     var title;

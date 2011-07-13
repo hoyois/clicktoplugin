@@ -135,7 +135,7 @@ YouTubeKiller.prototype.processFromFlashVars = function(flashvars, callback) {
 
 YouTubeKiller.prototype.processFromVideoID = function(videoID, callback) {
     var urlMapMatch = /\"fmt_url_map\":\s\"([^"]*)/; // works for both Flash and HTML5 Beta player pages
-    var titleMatch = /document\.title\s=\s'YouTube\s-\s('?)(.*)/;
+    var titleMatch = /<meta name=\"title\" content=\"([^"]*)\">/;
     var _this = this;
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "http://www.youtube.com/watch?v=" + videoID, true);
@@ -143,8 +143,7 @@ YouTubeKiller.prototype.processFromVideoID = function(videoID, callback) {
         var matches, title, urlMap;
         matches = xhr.responseText.match(titleMatch);
         if(matches) {
-            title = matches[2].replace(/\\["'\/\\]/g, function(s){return s.charAt(1);});
-            title = parseUnicode(title.substring(matches[1] ? 4 : 0, title.length - 2));
+            title = unescapeHTML(matches[1]);
         }
         matches = xhr.responseText.match(urlMapMatch);
         if(matches) urlMap = parseUnicode(matches[1].replace(/\\\//g,"/"));
