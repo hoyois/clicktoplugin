@@ -6,47 +6,60 @@ BlipKiller.prototype.canKill = function(data) {
 };
 
 BlipKiller.prototype.process = function(data, callback) {
-    var isEmbed = true, url;
-    if(/^http:\/\/blip\.tv\//.test(data.location)) isEmbed =  false;
-    /*if(/stratos.swf$/.test(data.src)) {
-        var
-    }*/
-    var match = data.src.match(/blip\.tv\/play\/(.*)/);
-    if(match) {
-        match = decodeURIComponent(match[1]).split(".")[0];
-        url = "http://blip.tv/players/episode/" + match + "?skin=json&version=2&no_wrap=1";
-    } else return;
-    
+    if(/stratos.swf$/.test(data.src)) {
+        this.processFromXML(parseFlashVariables(data.params).file, callback);
+    } else {
+        var match = data.src.match(/blip\.tv\/play\/([^%]*)/);
+        if(match) this.processFromOldVideoID(match[1], callback);
+    }
+};
+
+BlipKiller.prototype.processFromXML = function(url, callback) {
     var sources = new Array();
     
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.onload = function() {
-        var json = JSON.parse(xhr.responseText.replace(/\\'/g, "'"))[0]; // correct Blip.tv's invalid JSON
+        var xml = xhr.responseXML;
+        var media = xml.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "content");
         
-        var ext, format, height, width, isNative, mediaType = "video";
-        for(var i = 0; i < json.additionalMedia.length; i++) {
-            ext = json.additionalMedia[i].url.substr(json.additionalMedia[i].url.lastIndexOf(".") + 1).toUpperCase();
+        var url, ext, format, height, width, isNative, mediaType;
+        for(var i = 0; i < media.length; i++) {
+            mediaType = "video";
+            url = media[i].getAttribute("url");
+            ext = url.substr(url.lastIndexOf(".") + 1).toUpperCase();
             if(ext === "MP4" || ext === "M4V" || ext === "MOV" || ext === "MPG" || ext === "MPEG") isNative = true;
             else if(ext === "MP3") {isNative = true; mediaType = "audio";}
             else if((ext === "FLV" && canPlayFLV) || (ext === "WMV" && canPlayWM)) isNative = false;
             else continue;
             
-            format = json.additionalMedia[i].role;
-            height = json.additionalMedia[i].media_height;
-            if(!height) height = json.additionalMedia[i].height;
-            width = json.additionalMedia[i].media_width;
-            if(!width) width = json.additionalMedia[i].width;
+            format = media[i].getAttributeNS("http://blip.tv/dtd/blip/1.0", "role");
+            height = media[i].getAttribute("height");
+            width = media[i].getAttribute("width");
             if(mediaType === "video") format += " (" + width + "x" + height + ")";
             format += " " + ext;
-            sources.push({"url": json.additionalMedia[i].url, "format": format, "isNative": isNative, "mediaType": mediaType, "resolution": parseInt(height)});
+            sources.push({"url": url, "format": format, "isNative": isNative, "mediaType": mediaType, "resolution": parseInt(height)});
         }
         
         var videoData = {
-            "playlist": [{"title": unescapeHTML(json.title), "posterURL": json.thumbnailUrl, "sources": sources}]
+            "playlist": [{"title": xml.getElementsByTagName("title")[0].textContent, "posterURL": xml.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "thumbnail")[0].getAttribute("url"), "sources": sources}]
         };
-        if(isEmbed) videoData.playlist[0].siteInfo = {"name": "Blip.tv", "url": "http://www.blip.tv/file/" + json.itemId};
         callback(videoData);
+    };
+    xhr.send(null);
+};
+
+BlipKiller.prototype.processFromOldVideoID = function(videoID, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', "http://blip.tv/players/episode/" + videoID + "?skin=api", true);
+    var _this = this;
+    xhr.onload = function() {
+        var xml = xhr.responseXML;
+        var callbackForEmbed = function(videoData) {
+            videoData.playlist[0].siteInfo = {"name": "Blip.tv", "url": "http://www.blip.tv/file/" + xml.getElementsByTagName("item_id")[0].textContent};
+            callback(videoData);
+        };
+        _this.processFromXML("http://blip.tv/rss/flash/" + xml.getElementsByTagName("id")[0].textContent, callbackForEmbed);
     };
     xhr.send(null);
 };

@@ -336,5 +336,8 @@ if(safari.extension.settings.version < 16) {
     }
     updateWhitelists("locationsWhitelist", "sourcesWhitelist", "mediaWhitelist");
 }
+if(safari.extension.settings < 19) {
+    safari.extension.settings.enabledKillers = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+}
 safari.extension.settings.version = 19;
 
