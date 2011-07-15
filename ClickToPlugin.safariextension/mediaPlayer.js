@@ -34,11 +34,6 @@ function mediaPlayer() {
     
     // boolean
     this.playlistControls;
-    
-    // The following will be redefined if playlist controls are present
-    this.showControls = function(fade) {};
-    this.hideControls = function(fade) {};
-    
 }
 
 mediaPlayer.prototype.handleMediaData = function(mediaData) {
@@ -111,27 +106,21 @@ mediaPlayer.prototype.createMediaElement = function(width, height, style, contex
     
     // Make the mediaPlayer a single element for mousover/mouseout events
     this.containerElement.addEventListener("mouseover", function(event) {
-        this.isInFocus = true;
-        _this.showControls(true);
         if(event.target === _this.mediaElement) return;
         var e = document.createEvent("MouseEvents");
         e.initMouseEvent("mouseover", false, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
         _this.mediaElement.dispatchEvent(e);
     }, false);
     this.containerElement.addEventListener("mouseout", function(event) {
-        if(event.relatedTarget && (event.relatedTarget === this || event.relatedTarget.compareDocumentPosition(this) === 10 || event.relatedTarget.hasAttribute("precision"))) {// shadow DOM leaks fully in relatedTarget!
+        if(event.relatedTarget && (event.relatedTarget === this || event.relatedTarget.compareDocumentPosition(this) === 10 || event.relatedTarget.hasAttribute("precision"))) {// shadow DOM leaks fully in relatedTarget! (fixed in 5.1)
             if(event.target === _this.mediaElement) event.preventDefault();
             return;
         }
-        this.isInFocus = false;
-        _this.hideControls(true);
         var e = document.createEvent("MouseEvents");
         e.initMouseEvent("mouseout", false, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
         _this.mediaElement.dispatchEvent(e);
     }, false);
-    this.mediaElement.addEventListener("play", function(event) {if(!_this.containerElement.isInFocus) _this.hideControls(true);}, false);
-    this.mediaElement.addEventListener("pause", function(event) {_this.showControls(true);}, false);
-
+    
     // Additional controls
     if(this.playlist[0].title || this.playlistControls) this.initializeTrackInfo();
     if(this.playlistControls) this.initializePlaylistControls();
@@ -231,17 +220,6 @@ mediaPlayer.prototype.hideTrackInfo = function() {
     this.shadowDOM.fullscreenButton.style.removeProperty("display");
     this.shadowDOM.controlsPanel.style.width = this.width + "px";
     this.shadowDOM.controlsPanel.style.removeProperty("display");
-};
-
-mediaPlayer.prototype.getCoordinates = function(event) {
-    var x = event.offsetX, y = event.offsetY;
-    var e = event.target;
-    do {
-        if(e === this.containerElement) break;
-        x += e.offsetLeft;
-        y += e.offsetTop;
-    } while(e = e.offsetParent);
-    return {"x": x, "y": y};
 };
 
 mediaPlayer.prototype.initializePlaylistControls = function() {
@@ -496,9 +474,15 @@ mediaPlayer.prototype.addEventListener = function(type, handler) {
     }
 };
 
-function opacityTransition(element, opacity, duration, delay, timing) {
-    element.style.WebkitTransition = "opacity " + duration + "s " + timing + " " + delay + "s";
-    element.style.opacity = opacity + " !important";
+mediaPlayer.prototype.getCoordinates = function(event) {
+    var x = event.offsetX, y = event.offsetY;
+    var e = event.target;
+    do {
+        if(e === this.containerElement) break;
+        x += e.offsetLeft;
+        y += e.offsetTop;
+    } while(e = e.offsetParent);
+    return {"x": x, "y": y};
 };
 
 }
