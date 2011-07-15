@@ -8,6 +8,9 @@ BlipKiller.prototype.canKill = function(data) {
 BlipKiller.prototype.process = function(data, callback) {
     var isEmbed = true, url;
     if(/^http:\/\/blip\.tv\//.test(data.location)) isEmbed =  false;
+    /*if(/stratos.swf$/.test(data.src)) {
+        var
+    }*/
     var match = data.src.match(/blip\.tv\/play\/(.*)/);
     if(match) {
         match = decodeURIComponent(match[1]).split(".")[0];
