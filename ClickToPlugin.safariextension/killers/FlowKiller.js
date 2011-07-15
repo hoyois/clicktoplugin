@@ -2,7 +2,7 @@ function FlowKiller() {}
 
 FlowKiller.prototype.canKill = function(data) {
     if(data.plugin !== "Flash") return false;
-    return (/flowplayer[^\/]*\.swf/i.test(data.src) && /(?:^|&)config=/.test(data.params));//
+    return ((/flowplayer[^\/]*\.swf/i.test(data.src) || /bimvid_player-[^\/.]*\.swf$/.test(data.src)) && /(?:^|&)config=/.test(data.params));//
 };
 
 FlowKiller.prototype.process = function(data, callback) {

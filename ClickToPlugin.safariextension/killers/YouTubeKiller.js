@@ -128,8 +128,7 @@ YouTubeKiller.prototype.processFromFlashVars = function(flashvars, callback) {
     var urlMap = decodeURIComponent(flashvars.fmt_url_map);
     var title;
     if(flashvars.rec_title) title = decodeURIComponent(flashvars.rec_title).substring(4).replace(/\+/g, " ");
-    else if(/^YouTube\s-\s/.test(flashvars.title)) title = flashvars.title.slice(11, -2);
-
+    else if(/\s-\sYouTube$/.test(flashvars.title)) title = flashvars.title.slice(0, -10);
     this.finalizeProcessing(flashvars.video_id, urlMap, title, callback);
 };
 

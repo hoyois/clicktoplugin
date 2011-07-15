@@ -283,7 +283,7 @@ function handleBeforeLoadEvent(event) {
         // else by the 'Content-Base' HTTP header if present, else by the current URL.
         // Fortunately the magical anchor trick takes care of all this for us!!
         var tmpAnchor = document.createElement("a");
-        tmpAnchor.href = "./";
+        tmpAnchor.href = "./";//alert((new DOMParser).parseFromString(data.document, "text/xml"));
         elementData = {
             "instance": instance,
             "elementID": elementID,
@@ -293,7 +293,8 @@ function handleBeforeLoadEvent(event) {
             "title": document.title,
             "baseURL": tmpAnchor.href,
             "href": data.href,
-            "params": getParams(element, data.plugin)
+            "params": getParams(element, data.plugin)//,
+            //"document": (new XMLSerializer()).serializeToString(document)
         };
     }
     if(elementData) safari.self.tab.dispatchMessage("killPlugin", elementData);

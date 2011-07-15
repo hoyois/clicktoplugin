@@ -271,7 +271,7 @@ function handleWhitelisting(list, newWLString) {
 }
 
 // KILLERS
-var killers = [new YouTubeKiller(), new VimeoKiller(), new DailymotionKiller(), new FacebookKiller(), new BreakKiller(), new BlipKiller(), new MetacafeKiller(), new TumblrKiller(), new MegavideoKiller(), new BIMKiller(), new FlowKiller(), new GenericKiller(), new SLKiller(), new QTKiller(), new WMKiller(), new DivXKiller()];
+var killers = [new YouTubeKiller(), new VimeoKiller(), new DailymotionKiller(), new FacebookKiller(), new BreakKiller(), new BlipKiller(), new MetacafeKiller(), new TumblrKiller(), new TEDKiller(), new MegavideoKiller(), new BIMKiller(), new FlowKiller(), new GenericKiller(), new SLKiller(), new QTKiller(), new WMKiller(), new DivXKiller()];
 
 function findKillerFor(data) {
     for (var i = 0; i < safari.extension.settings.enabledKillers.length; i++) {
@@ -336,5 +336,5 @@ if(safari.extension.settings.version < 16) {
     }
     updateWhitelists("locationsWhitelist", "sourcesWhitelist", "mediaWhitelist");
 }
-safari.extension.settings.version = 18;
+safari.extension.settings.version = 19;
 
