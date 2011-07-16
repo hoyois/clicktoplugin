@@ -102,10 +102,10 @@ mediaPlayer.prototype.createMediaElement = function(width, height, style, contex
         event.stopPropagation();
     }, false);
     this.mediaElement.addEventListener("loadedmetadata", function() {_this.fixAspectRatio();}, false);
-    this.mediaElement.addEventListener("ended", function() {_this.showControls(true); _this.nextTrack();}, false);
+    this.mediaElement.addEventListener("ended", function() {_this.nextTrack();}, false);
     
     // Make the mediaPlayer a single element for mousover/mouseout events
-    this.containerElement.addEventListener("mouseover", function(event) {
+    /*this.containerElement.addEventListener("mouseover", function(event) {
         if(event.target === _this.mediaElement) return;
         var e = document.createEvent("MouseEvents");
         e.initMouseEvent("mouseover", false, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
@@ -119,7 +119,7 @@ mediaPlayer.prototype.createMediaElement = function(width, height, style, contex
         var e = document.createEvent("MouseEvents");
         e.initMouseEvent("mouseout", false, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
         _this.mediaElement.dispatchEvent(e);
-    }, false);
+    }, false);*/
     
     // Additional controls
     if(this.playlist[0].title || this.playlistControls) this.initializeTrackInfo();
@@ -164,7 +164,7 @@ mediaPlayer.prototype.initializeShadowDOM = function() {
         
         // Show back/forward buttons
         this.shadowDOM.seekBackButton.style.display = "-webkit-box";
-        if(settings.hideRewindButton) this.shadowDOM.seekBackButton.style.marginLeft = "6px";
+        this.shadowDOM.seekBackButton.style.marginLeft = "6px";
         this.shadowDOM.seekBackButton.style.width = "20px";
         this.shadowDOM.seekBackButton.style.height = "12px";
         this.shadowDOM.playButton.style.marginRight = "6px";
@@ -194,10 +194,8 @@ mediaPlayer.prototype.showTrackInfo = function(isLoading) {
     var leftOffset = 0;
     if(isLoading) {
         leftOffset = 53;
-        if(this.shadowDOM.rewindButton.style.display === "none") {
-            if(this.playlistControls) leftOffset += 26;
-            else leftOffset -= 26;
-        } else if(this.playlistControls) leftOffset += 46;
+        if(this.shadowDOM.rewindButton.style.display === "none") leftOffset -= 26;
+        if(this.playlistControls) leftOffset += 52;
         this.shadowDOM.controlsPanel.style.width = leftOffset + "px";
         this.shadowDOM.fullscreenButton.style.display = "none";
         this.shadowDOM.volumeSliderContainer.style.display = "none";
@@ -334,7 +332,6 @@ mediaPlayer.prototype.loadTrack = function(track, init, source) { // init: two-d
         this.trackInfo.childNodes[1].textContent = title;
         this.showTrackInfo(true);
     }
-    this.showControls(false);
     
     if(this.sourceSelector) {
         this.sourceSelector.hide();
@@ -356,7 +353,6 @@ mediaPlayer.prototype.switchSource = function(source) {
     this.setPoster();
     this.mediaElement.setAttribute("preload", "auto");
     this.mediaElement.setAttribute("autoplay", "");
-    this.showControls(false);
     if(this.trackInfo) {
         this.trackInfo.firstChild.textContent = "Loading\u2026\u2002";
         this.showTrackInfo(true);
