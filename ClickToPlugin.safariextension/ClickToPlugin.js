@@ -200,7 +200,7 @@ function handleBeforeLoadEvent(event) {
     placeholderElement.className = "CTFnoimage CTFplaceholder";
     placeholderElement.style.width = data.width + "px !important";
     placeholderElement.style.height = data.height + "px !important";
-    if(responseData.isInvisible) placeholderElement.className += " CTFinvisible"; // .classList supported in WK nightlies
+    if(responseData.isInvisible) placeholderElement.classList.add("CTFinvisible");
     
     // Copy CSS box & positioning properties that have an effect on page layout
     // Note: 'display' is set to 'inline-block', which is ALWAYS the effective value for plugin-loading elements
@@ -347,7 +347,7 @@ function hideSource(string) {
 
 function loadInvisible() {
     for(var i = 0; i < numberOfBlockedElements; i++) {
-        if(placeholderElements[i] && /\bCTFinvisible\b/.test(placeholderElements[i].className)) {
+        if(placeholderElements[i] && placeholderElements[i].classList.contains("CTFinvisible")) {
             loadPlugin(i);
         }
     }
@@ -373,7 +373,7 @@ function prepMedia(mediaData) {
         // show poster as background image
         placeholderElements[elementID].firstChild.style.opacity = "1 !important";
         placeholderElements[elementID].firstChild.style.backgroundImage = "url('" + mediaData.playlist[0].posterURL + "') !important";
-        placeholderElements[elementID].className = placeholderElements[elementID].className.substr(11); // remove 'noimage' class
+        placeholderElements[elementID].classList.remove("CTFnoimage"); // remove 'noimage' class
     }
     if(mediaData.playlist[0].title && settings.showMediaTooltip) placeholderElements[elementID].title = mediaData.playlist[0].title; // set tooltip
     else placeholderElements[elementID].removeAttribute("title");

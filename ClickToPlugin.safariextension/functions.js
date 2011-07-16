@@ -18,7 +18,7 @@ function disableSIFR(element) {
     document.body.className = document.body.className.replace(regex, "");
     var sIFRAlternate = sIFRElement.getElementsByClassName("sIFR-alternate")[0];
     if(sIFRAlternate) sIFRElement.innerHTML = sIFRAlternate.innerHTML;
-    sIFRElement.className = sIFRElement.className.replace(/\bsIFR-replaced\b/, "");
+    sIFRElement.classList.remove("sIFR-replaced");
 }
 
 function applyCSS(element, style, properties) {
@@ -116,12 +116,6 @@ function getAttributes(element, url) {
                             break;
                     }
                 } catch(err) {}
-            }
-            // The following is not needed anymore in the latest Webkit:
-            // enclosed embeds are FINALLY treated as fallback!
-            if(!/\+|Version\/5\.1/.test(navigator.appVersion)) {
-                var embedChild = element.getElementsByTagName("embed")[0];
-                if(embedChild && embedChild.type) info.type = embedChild.type;
             }
             break;
     }
