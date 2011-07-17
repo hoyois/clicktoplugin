@@ -2,7 +2,9 @@ function FlowKiller() {}
 
 FlowKiller.prototype.canKill = function(data) {
     if(data.plugin !== "Flash") return false;
-    return ((/flowplayer[^\/]*\.swf/i.test(data.src) || /bimvid_player-[^\/.]*\.swf$/.test(data.src)) && /(?:^|&)config=/.test(data.params));//
+    if(!/(?:^|&)config=/.test(data.params)) return false;
+    if(/flowplayer[^\/]*\.swf/i.test(data.src)) {return true;}
+    if(/bimvid_player-[^\/.]*\.swf$/.test(data.src)) {data.bim = true; return true;}
 };
 
 FlowKiller.prototype.process = function(data, callback) {
@@ -13,6 +15,10 @@ FlowKiller.prototype.process = function(data, callback) {
     var mediaURL, mediaInfo;
     var playlist = new Array();
     var isAudio = true;
+    
+    var parseTitle = function(title) {return title};
+    if(data.bim) parseTitle = function(title) {return unescapeHTML(title.replace(/\+/g, " "));}
+    
     if(config.playList) config.playlist = config.playList;
     if(typeof config.playlist === "object") {
         for(var i = 0; i < config.playlist.length; i++) {
@@ -25,7 +31,7 @@ FlowKiller.prototype.process = function(data, callback) {
                     if(!/\/$/.test(baseURL)) baseURL += "/";
                     mediaURL = baseURL + mediaURL;
                 }
-                playlist.push({"title": config.playlist[i].title, "posterURL": config.playlist[i].overlay, "sources": [{"url": mediaURL, "mediaType": mediaInfo.type, "isNative": mediaInfo.isNative}]}); // resolution:
+                playlist.push({"title": parseTitle(config.playlist[i].title), "posterURL": config.playlist[i].overlay, "sources": [{"url": mediaURL, "mediaType": mediaInfo.type, "isNative": mediaInfo.isNative}]}); // resolution:
                 if(mediaInfo.type === "video") isAudio = false;
             }
         }
@@ -39,7 +45,7 @@ FlowKiller.prototype.process = function(data, callback) {
                 if(!/\/$/.test(baseURL)) baseURL += "/";
                 mediaURL = baseURL + mediaURL;
             }
-            playlist.push({"title": config.playlist[i].title, "posterURL": config.clip.overlay, "sources": [{"url": mediaURL, "mediaType": mediaInfo.type, "isNative": mediaInfo.isNative}]});
+            playlist.push({"title": parseTitle(config.playlist[i].title), "posterURL": config.clip.overlay, "sources": [{"url": mediaURL, "mediaType": mediaInfo.type, "isNative": mediaInfo.isNative}]});
             if(mediaInfo.type === "video") isAudio = false;
         }
     } else return;
