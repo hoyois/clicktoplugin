@@ -161,10 +161,8 @@ function checkMIMEType(data, tab) {
 // CONTEXT MENU
 function handleContextMenu(event) {
     var s = safari.extension.settings;
-    
-    try {
-        var u = event.userInfo; // throws exception if there are no content scripts
-    } catch(err) {
+    var u = event.userInfo;
+    if(u === null) {
         if(s.disableEnableContext && event.target.url) event.contextMenu.appendContextMenuItem("switchOn", TURN_CTP_ON);
         else if(s.settingsContext) event.contextMenu.appendContextMenuItem("settings", CTP_PREFERENCES + "\u2026");
         return;
@@ -338,6 +336,7 @@ if(safari.extension.settings.version < 16) {
 }
 if(safari.extension.settings < 19) {
     safari.extension.settings.enabledKillers = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+    clearSettings("showVolumeSlider");
 }
-safari.extension.settings.version = 19;
+safari.extension.settings.version = 20;
 
