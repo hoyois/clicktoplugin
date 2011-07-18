@@ -135,10 +135,6 @@ const STRINGS = {
         "en-us": "Include QuickTime Player",
         "fr-fr": "Inclure QuickTime Player"
     },
-    SHOW_SITE_SOURCE: {
-        "en-us": "Include site",
-        "fr-fr": "Inclure le site"
-    },
     USE_PLAYLISTS: {
         "en-us": "Use playlists",
         "fr-fr": "Utiliser les listes de lecture"
@@ -150,10 +146,6 @@ const STRINGS = {
     SHOW_MEDIA_TOOLTIP: {
         "en-us": "Show video title as tooltip",
         "fr-fr": "Afficher le titre de la vidéo en infobulle"
-    },
-    SHOW_WEBKIT_VOLUME_SLIDER: {
-        "en-us": "Show WebKit volume slider",
-        "fr-fr": "Afficher le controlleur de volume"
     },
     HIDE_REWIND_BUTTON: {
         "en-us": "Hide “Rewind” button",

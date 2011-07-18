@@ -293,7 +293,7 @@ function handleBeforeLoadEvent(event) {
             "title": document.title,
             "baseURL": tmpAnchor.href,
             "href": data.href,
-            "params": getParams(element, data.plugin)//,
+            "params": getParams(element, data.plugin)
         };
     }
     if(elementData) safari.self.tab.dispatchMessage("killPlugin", elementData);

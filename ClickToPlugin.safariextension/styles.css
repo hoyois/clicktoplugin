@@ -206,11 +206,6 @@ Placeholder element
 Media player
 ***********/
 
-@font-face {
-    font-family: CTFQuickTimeMediaControls;
-    src: url('QuickTimeMediaControls.ttf');
-}
-
 .CTFmediaPlayer * {
     background: none !important;
 }
@@ -424,7 +419,7 @@ Settings pane
     -webkit-mask-image: none !important;
     -webkit-perspective: none !important;
     -webkit-transform: none !important;
-    -webkit-user-select: none !important; /* not default */
+    -webkit-user-select: none !important;
     border: none !important;
     bottom: 0 !important;
     height: 100% !important;
