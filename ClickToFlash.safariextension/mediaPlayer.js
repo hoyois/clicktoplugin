@@ -27,16 +27,11 @@ function mediaPlayer() {
     this.height;
     
     this.contextInfo;
+    this.playlistControls; // boolean
     
     // Additional HTML elements
     this.trackInfo;
-    this.playlistControls;
     this.sourceSelector;
-    
-    // The following will be redefined if playlist controls are present
-    this.showControls = function(fade) {};
-    this.hideControls = function(fade) {};
-    
 }
 
 mediaPlayer.prototype.handleMediaData = function(mediaData) {
@@ -81,16 +76,14 @@ mediaPlayer.prototype.createMediaElement = function(width, height, style, contex
     }
     this.containerElement.appendChild(this.mediaElement);
     
-    // Set dimensions
+    // Set dimensions & CSS
     this.width = width;
     this.height = height;
     this.containerElement.style.width = width + "px !important";
     this.containerElement.style.height = height + "px !important";
-    // z-index: < 1 -> 1 (avoid WebKit font-rendering bugs with transitions)
-    var zIndex = style.getPropertyValue("z-index");
-    if(zIndex === "auto" || parseInt(zIndex) < 1) this.containerElement.style.setProperty("z-index", "1", "important");
-    else this.containerElement.style.setProperty("z-index", zIndex, "important");
-    applyCSS(this.containerElement, style, ["position", "top", "right", "bottom", "left", "clear", "float", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-top-collapse", "-webkit-margin-bottom-collapse"]);
+    this.mediaElement.style.width = width + "px";
+    this.mediaElement.style.height = height + "px";
+    applyCSS(this.containerElement, style, ["position", "top", "right", "bottom", "left", "z-index", "clear", "float", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-top-collapse", "-webkit-margin-bottom-collapse"]);
     
     // Set volume
     this.mediaElement.volume = settings.volume;
@@ -104,32 +97,9 @@ mediaPlayer.prototype.createMediaElement = function(width, height, style, contex
         _this.setContextInfo(event, contextInfo);
         event.stopPropagation();
     }, false);
-    this.mediaElement.addEventListener("loadedmetadata", function() {_this.fixAspectRatio();}, false);
-    this.mediaElement.addEventListener("ended", function() {_this.showControls(true); _this.nextTrack();}, false);
+    this.mediaElement.addEventListener("loadedmetadata", function() {_this.handleLoadedMetadataEvent();}, false);
+    this.mediaElement.addEventListener("ended", function() {_this.nextTrack();}, false);
     
-    // Make the mediaPlayer a single element for mousover/mouseout events
-    this.containerElement.addEventListener("mouseover", function(event) {
-        this.isInFocus = true;
-        _this.showControls(true);
-        if(event.target === _this.mediaElement) return;
-        var e = document.createEvent("MouseEvents");
-        e.initMouseEvent("mouseover", false, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-        _this.mediaElement.dispatchEvent(e);
-    }, false);
-    this.containerElement.addEventListener("mouseout", function(event) {
-        if(event.relatedTarget && (event.relatedTarget === this || event.relatedTarget.compareDocumentPosition(this) === 10 || event.relatedTarget.hasAttribute("precision"))) {// shadow DOM leaks fully in relatedTarget!
-            if(event.target === _this.mediaElement) event.preventDefault();
-            return;
-        }
-        this.isInFocus = false;
-        _this.hideControls(true);
-        var e = document.createEvent("MouseEvents");
-        e.initMouseEvent("mouseout", false, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-        _this.mediaElement.dispatchEvent(e);
-    }, false);
-    this.mediaElement.addEventListener("play", function(event) {if(!_this.containerElement.isInFocus) _this.hideControls(true);}, false);
-    this.mediaElement.addEventListener("pause", function(event) {_this.showControls(true);}, false);
-
     // Additional controls
     if(this.playlist[0].title || this.playlistControls) this.initializeTrackInfo();
     if(this.playlistControls) this.initializePlaylistControls();
@@ -141,10 +111,10 @@ mediaPlayer.prototype.createMediaElement = function(width, height, style, contex
 
 mediaPlayer.prototype.initializeShadowDOM = function() {
     var stylesheet = this.containerElement.firstChild.sheet;
-    var pseudoElements = {"controlsPanel": "-webkit-media-controls-panel", "playButton": "-webkit-media-controls-play-button", "muteButton": "-webkit-media-controls-mute-button", "rewindButton": "-webkit-media-controls-rewind-button", "fullscreenButton": "-webkit-media-controls-fullscreen-button", "timelineContainer": "-webkit-media-controls-timeline-container", "volumeSliderContainer": "-webkit-media-controls-volume-slider-container", "volumeSlider": "-webkit-media-controls-volume-slider", "statusDisplay": "-webkit-media-controls-status-display"}; //, "timeline": "-webkit-media-controls-timeline", "currentTimeDisplay": "-webkit-media-controls-current-time-display", "timeRemainingDisplay": "-webkit-media-controls-time-remaining-display", "returnToRealtimeButton": "-webkit-media-controls-return-to-realtime-button", "seekBackButton": "-webkit-media-controls-seek-back-button", "seekForwardButton": "-webkit-media-controls-seek-forward-button", "toggleClosedCaptionsButton": "-webkit-media-controls-toggle-closed-captions-button"};
+    var pseudoElements = {"controlsPanel": "-webkit-media-controls-panel", "playButton": "-webkit-media-controls-play-button", "muteButton": "-webkit-media-controls-mute-button", "rewindButton": "-webkit-media-controls-rewind-button", "fullscreenButton": "-webkit-media-controls-fullscreen-button", "timelineContainer": "-webkit-media-controls-timeline-container", "volumeSliderContainer": "-webkit-media-controls-volume-slider-container", "volumeSlider": "-webkit-media-controls-volume-slider", "statusDisplay": "-webkit-media-controls-status-display", "seekBackButton": "-webkit-media-controls-seek-back-button", "seekForwardButton": "-webkit-media-controls-seek-forward-button"};//, "toggleClosedCaptionsButton": "-webkit-media-controls-toggle-closed-captions-button", "timeline": "-webkit-media-controls-timeline", "currentTimeDisplay": "-webkit-media-controls-current-time-display", "timeRemainingDisplay": "-webkit-media-controls-time-remaining-display", "returnToRealtimeButton": "-webkit-media-controls-return-to-realtime-button"};
     
     for(var e in pseudoElements) {
-        stylesheet.insertRule("#CTFmediaElement" + this.contextInfo.elementID + "::" + pseudoElements[e] + "{}", 0);
+        stylesheet.insertRule("#CTFmediaElement" + this.contextInfo.elementID + ":not(:-webkit-full-screen)::" + pseudoElements[e] + "{}", 0);
         this.shadowDOM[e] = stylesheet.cssRules[0];
     }
     
@@ -155,16 +125,26 @@ mediaPlayer.prototype.initializeShadowDOM = function() {
     if(settings.hideRewindButton) this.shadowDOM.rewindButton.style.display = "none";
     
     // Playlist controls
-    if(this.playlistControls) this.shadowDOM.playButton.style.cssText = "margin-left: 36px; margin-right: 30px;";
-    
-    // Set controls width once and for all
-    this.shadowDOM.controlsPanel.style.width = this.width + "px";
-    
-    // Volume slider
-    if(settings.showVolumeSlider && !/\+|Version\/5\.1/.test(navigator.appVersion)) {
-        this.shadowDOM.controlsPanel.style.overflow = "visible";
-        this.shadowDOM.volumeSliderContainer.style.cssText = "display: block; -webkit-appearance: none; height: 80px; width: 15px;";
-        this.shadowDOM.volumeSlider.style.cssText = "display: block; -webkit-appearance: slider-vertical; height: 80px; width: 15px;";
+    if(this.playlistControls) {
+        // Re-order controls
+        this.shadowDOM.rewindButton.style.WebkitBoxOrdinalGroup = "1";
+        this.shadowDOM.seekBackButton.style.WebkitBoxOrdinalGroup = "2";
+        this.shadowDOM.playButton.style.WebkitBoxOrdinalGroup = "3";
+        this.shadowDOM.seekForwardButton.style.WebkitBoxOrdinalGroup = "4";
+        this.shadowDOM.statusDisplay.style.WebkitBoxOrdinalGroup = "5";
+        this.shadowDOM.timelineContainer.style.WebkitBoxOrdinalGroup = "6";
+        this.shadowDOM.muteButton.style.WebkitBoxOrdinalGroup = "7";
+        this.shadowDOM.fullscreenButton.style.WebkitBoxOrdinalGroup = "9";
+        
+        // Show back/forward buttons
+        this.shadowDOM.seekBackButton.style.display = "-webkit-box";
+        this.shadowDOM.seekBackButton.style.marginLeft = "6px";
+        this.shadowDOM.seekBackButton.style.width = "20px";
+        this.shadowDOM.seekBackButton.style.height = "12px";
+        this.shadowDOM.playButton.style.marginRight = "6px";
+        this.shadowDOM.seekForwardButton.style.display = "-webkit-box";
+        this.shadowDOM.seekForwardButton.style.width = "20px";
+        this.shadowDOM.seekForwardButton.style.height = "12px";
     }
 };
 
@@ -179,7 +159,7 @@ mediaPlayer.prototype.showTrackInfo = function(isLoading) {
     if(isLoading) {
         leftOffset = 53;
         if(this.shadowDOM.rewindButton.style.display === "none") leftOffset -= 26;
-        if(this.playlistControls) leftOffset += 58;
+        if(this.playlistControls) leftOffset += 52;
         this.shadowDOM.controlsPanel.style.width = leftOffset + "px";
         this.shadowDOM.fullscreenButton.style.display = "none";
         this.shadowDOM.volumeSliderContainer.style.display = "none";
@@ -187,7 +167,6 @@ mediaPlayer.prototype.showTrackInfo = function(isLoading) {
         this.shadowDOM.timelineContainer.style.display = "none";
     } else {
         this.shadowDOM.controlsPanel.style.display = "none";
-        if(this.playlistControls) this.playlistControls.style.display = "none !important";
     }
     
     this.trackInfo.style.left = leftOffset + "px !important";
@@ -203,41 +182,22 @@ mediaPlayer.prototype.hideTrackInfo = function() {
     this.shadowDOM.fullscreenButton.style.removeProperty("display");
     this.shadowDOM.controlsPanel.style.width = this.width + "px";
     this.shadowDOM.controlsPanel.style.removeProperty("display");
-    if(this.playlistControls) this.playlistControls.style.display = "-webkit-box !important";
 };
 
 mediaPlayer.prototype.initializePlaylistControls = function() {
-    this.playlistControls = document.createElement("div");
-    this.playlistControls.className = "CTFplaylistControls";
-    this.playlistControls.style.display = "-webkit-box !important";
-    this.playlistControls.style.left = settings.hideRewindButton ? "5px" : "31px";
-    
-    var prevButton = document.createElement("div");
-    prevButton.className = "CTFprevButton";
-    prevButton.textContent = "0";
-    this.playlistControls.appendChild(prevButton);
-    var nextButton = document.createElement("div");
-    nextButton.className = "CTFnextButton";
-    nextButton.textContent = "1";
-    this.playlistControls.appendChild(nextButton);
-    
     var _this = this;
-    this.showControls = function(fade) {
-        opacityTransition(_this.playlistControls, 1, fade ? .17 : 0, 0, "ease-in");
-    };
-    this.hideControls = function(fade) {
-        if(_this.mediaElement.paused || this.playlist[this.currentTrack].sources[this.currentSource].mediaType === "audio") return;
-        opacityTransition(_this.playlistControls, 0, fade ? .3 : 0, 0, "ease-in");
-    };
-    
-    prevButton.addEventListener("click", function() {
-        _this.jumpTrack(-1);
+    this.containerElement.addEventListener("click", function(event) {
+        var coord = _this.getCoordinates(event);
+        if(coord.y + 25 > _this.height) { // click in controls
+            if(coord.x >= 32 && coord.x <= 53) {
+                event.preventDefault();
+                _this.jumpTrack(-1);
+            } else if(coord.x >= 80 && coord.x <= 101) {
+                event.preventDefault();
+                _this.jumpTrack(1);
+            }
+        }
     }, false);
-    nextButton.addEventListener("click", function() {
-        _this.jumpTrack(1);
-    }, false);
-    
-    this.containerElement.appendChild(this.playlistControls);
 };
 
 mediaPlayer.prototype.initializeSourceSelector = function() {
@@ -250,36 +210,18 @@ mediaPlayer.prototype.initializeSourceSelector = function() {
     );
     
     this.containerElement.appendChild(this.sourceSelector.containerElement);
+    
+    // Cancel mouseout to source selector
+    this.containerElement.addEventListener("mouseout", function(event) {
+        if(event.target === _this.mediaElement && event.relatedTarget && event.relatedTarget.compareDocumentPosition(this) === 10) event.preventDefault();
+    }, false);
 };
 
-mediaPlayer.prototype.fixAspectRatio = function() {
+mediaPlayer.prototype.handleLoadedMetadataEvent = function() {
     if(this.trackInfo) {
         this.hideTrackInfo();
         this.trackInfo.firstChild.textContent = "";
     }
-    var w = this.mediaElement.videoWidth;
-    var h = this.mediaElement.videoHeight;
-    if(!w || !h) { // audio source
-        this.mediaElement.style.width = this.width + "px";
-        this.mediaElement.style.height = (this.height < 25 ? "25" : this.height) + "px";
-    } else if(w/h > this.width/this.height) {
-        var height = h/w*this.width;
-        this.mediaElement.style.width = this.width + "px";
-        this.mediaElement.style.height = height + "px";
-        this.shadowDOM.controlsPanel.style.bottom = Math.floor((height - this.height)*.5) + "px";
-    } else {
-        var width = w/h*this.height;
-        this.mediaElement.style.height = this.height + "px";
-        this.mediaElement.style.width = width + "px";
-        this.shadowDOM.controlsPanel.style.left = Math.round((width - this.width)*.5) + "px";
-    }
-};
-
-mediaPlayer.prototype.resetAspectRatio = function() {
-    this.shadowDOM.controlsPanel.style.removeProperty("left");
-    this.shadowDOM.controlsPanel.style.removeProperty("bottom");
-    this.mediaElement.style.width = this.width + "px";
-    this.mediaElement.style.height = this.height + "px";
 };
 
 mediaPlayer.prototype.nextTrack = function() {
@@ -314,7 +256,6 @@ mediaPlayer.prototype.loadTrack = function(track, init, source) { // init: two-d
     if(track < 0) track += this.playlist.length; // weird JS behavior
     if(source === undefined) source = this.playlist[track].defaultSource;
     
-    this.resetAspectRatio();
     this.mediaElement.src = this.playlist[track].sources[source].url;
     // If src is not set before poster, poster is not shown. Webkit bug?
     this.currentTrack = track;
@@ -336,7 +277,6 @@ mediaPlayer.prototype.loadTrack = function(track, init, source) { // init: two-d
         this.trackInfo.childNodes[1].textContent = title;
         this.showTrackInfo(true);
     }
-    this.showControls(false);
     
     if(this.sourceSelector) {
         this.sourceSelector.hide();
@@ -352,13 +292,11 @@ mediaPlayer.prototype.switchSource = function(source) {
     this.sourceSelector.setCurrentSource(source);
     
     var currentTime = this.mediaElement.currentTime;
-    this.resetAspectRatio();
     this.mediaElement.src = this.playlist[this.currentTrack].sources[source].url;
     this.currentSource = source;
     this.setPoster();
     this.mediaElement.setAttribute("preload", "auto");
     this.mediaElement.setAttribute("autoplay", "");
-    this.showControls(false);
     if(this.trackInfo) {
         this.trackInfo.firstChild.textContent = "Loading\u2026\u2002";
         this.showTrackInfo(true);
@@ -413,7 +351,10 @@ mediaPlayer.prototype.registerShortcuts = function() {
     }
     if(settings.enterFullscreenShortcut) {
         this.addEventListener(settings.enterFullscreenShortcut.type, function(event) {
-            if(testShortcut(event, settings.enterFullscreenShortcut)) _this.mediaElement.webkitEnterFullscreen();
+            if(testShortcut(event, settings.enterFullscreenShortcut)) {
+                if(_this.mediaElement.webkitDisplayingFullscreen) _this.mediaElement.webkitExitFullscreen();
+                else _this.mediaElement.webkitEnterFullscreen();
+            }
         });
     }
     if(settings.volumeUpShortcut) {
@@ -473,9 +414,15 @@ mediaPlayer.prototype.addEventListener = function(type, handler) {
     }
 };
 
-function opacityTransition(element, opacity, duration, delay, timing) {
-    element.style.WebkitTransition = "opacity " + duration + "s " + timing + " " + delay + "s";
-    element.style.opacity = opacity + " !important";
+mediaPlayer.prototype.getCoordinates = function(event) {
+    var x = event.offsetX, y = event.offsetY;
+    var e = event.target;
+    do {
+        if(e === this.containerElement) break;
+        x += e.offsetLeft;
+        y += e.offsetTop;
+    } while(e = e.offsetParent);
+    return {"x": x, "y": y};
 };
 
 }
