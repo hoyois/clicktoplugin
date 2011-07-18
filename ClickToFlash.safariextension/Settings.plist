@@ -59,6 +59,7 @@
 			<integer>9</integer>
 			<integer>10</integer>
 			<integer>11</integer>
+			<integer>12</integer>
 		</array>
 		<key>Key</key>
 		<string>enabledKillers</string>
@@ -92,12 +93,6 @@
 		<true/>
 		<key>Key</key>
 		<string>usePlaylists</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<false/>
-		<key>Key</key>
-		<string>showVolumeSlider</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>

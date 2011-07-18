@@ -4,6 +4,8 @@
 <dict>
 	<key>Author</key>
 	<string>Marc Hoyois</string>
+	<key>Builder Version</key>
+	<string>6534.42</string>
 	<key>CFBundleDisplayName</key>
 	<string>ClickToFlash</string>
 	<key>CFBundleIdentifier</key>
@@ -11,9 +13,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.2.6</string>
+	<string>2.3</string>
 	<key>CFBundleVersion</key>
-	<string>18</string>
+	<string>20</string>
 	<key>Chrome</key>
 	<dict>
 		<key>Global Page</key>

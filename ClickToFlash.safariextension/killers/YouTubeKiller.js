@@ -10,7 +10,6 @@ YouTubeKiller.prototype.process = function(data, callback) {
     if(data.onsite) {
         var flashvars = parseFlashVariables(data.params);
         flashvars.title = data.title;
-        flashvars.location = data.location;
         
         var videoID = flashvars.video_id;
         if(!videoID) { // new YouTube AJAX player
@@ -127,33 +126,23 @@ YouTubeKiller.prototype.processFromFlashVars = function(flashvars, callback) {
     var urlMap = decodeURIComponent(flashvars.fmt_url_map);
     var title;
     if(flashvars.rec_title) title = decodeURIComponent(flashvars.rec_title).substring(4).replace(/\+/g, " ");
-    else if(/^YouTube\s-\s/.test(flashvars.title)) title = flashvars.title.slice(11, -2);
-
+    else if(/\s-\sYouTube$/.test(flashvars.title)) title = flashvars.title.slice(1, -12);
     this.finalizeProcessing(flashvars.video_id, urlMap, title, callback);
 };
 
 YouTubeKiller.prototype.processFromVideoID = function(videoID, callback) {
-    var urlMapMatch = /\"fmt_url_map\":\s\"([^"]*)/; // works for both Flash and HTML5 Beta player pages
-    var titleMatch = /document\.title\s=\s'YouTube\s-\s('?)(.*)/;
     var _this = this;
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "http://www.youtube.com/watch?v=" + videoID, true);
+    xhr.open("GET", "https://www.youtube.com/get_video_info?&video_id=" + videoID + "&eurl=http%3A%2F%2Fwww%2Eyoutube%2Ecom%2F", true);
     xhr.onload = function() {
-        var matches, title, urlMap;
-        matches = xhr.responseText.match(titleMatch);
-        if(matches) {
-            title = matches[2].replace(/\\["'\/\\]/g, function(s){return s.charAt(1);});
-            title = parseUnicode(title.substring(matches[1] ? 4 : 0, title.length - 2));
-        }
-        matches = xhr.responseText.match(urlMapMatch);
-        if(matches) urlMap = parseUnicode(matches[1].replace(/\\\//g,"/"));
-        
-        if(urlMap) {
+        var flashvars = parseFlashVariables(xhr.responseText);
+        if(flashvars.status === "ok") {
+            var title = decodeURIComponent(flashvars.title.replace(/\+/g, " "));
             var callbackForEmbed = function(videoData) {
                 videoData.playlist[0].siteInfo = {"name": "YouTube", "url": "http://www.youtube.com/watch?v=" + videoID};
                 callback(videoData);
             };
-            _this.finalizeProcessing(videoID, urlMap, title, callbackForEmbed);
+            _this.finalizeProcessing(videoID, decodeURIComponent(flashvars.fmt_url_map), title, callbackForEmbed);
         } else { // happens if YT just removed content and didn't update its playlists yet
             callback({"playlist": []});
         }
@@ -166,11 +155,10 @@ YouTubeKiller.prototype.finalizeProcessing = function(videoID, urlMap, title, ca
     if(/%u/.test(downloadTitle)) downloadTitle = ""; // revert to 'videoplayback' if the title will be garbled (WTF youtube?)
     
     var sources = new Array();
-    
     /*
     Only 18, 22, 37, and 38 are MP4 playable natively by QuickTime.
     Other containers are FLV (5, 34, 35, the latter two are H.264 360p and 480p),
-    3GP (17), or WebM (43,45) [17,43,45 do not appear in the flashvars!]
+    3GP (17), or WebM (43,45) [17,43,45 do not appear in the flashvars]
     */
     var formatList = urlMap.split(",");
     for(var i = 0; i < formatList.length; i++) {

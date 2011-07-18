@@ -206,11 +206,6 @@ Placeholder element
 Media player
 ***********/
 
-@font-face {
-    font-family: CTFQuickTimeMediaControls;
-    src: url('QuickTimeMediaControls.ttf');
-}
-
 .CTFmediaPlayer * {
     background: none !important;
 }
@@ -282,45 +277,6 @@ Media player
 
 .CTFmediaPlayer .CTFtrackTitle {
     -webkit-box-flex: 1 !important;
-}
-
-.CTFmediaPlayer .CTFplaylistControls {
-    position: absolute !important;
-    -webkit-box-align: center !important;
-    -webkit-box-direction: normal !important;
-    -webkit-box-orient: horizontal !important;
-    -webkit-box-pack: start !important;
-    bottom: 0 !important;
-    height: 25px !important;
-    pointer-events: none !important;
-    width: intrinsic !important;
-}
-
-.CTFmediaPlayer .CTFprevButton,
-.CTFmediaPlayer .CTFnextButton {
-    position: static !important;
-    display: -webkit-box !important;
-    -webkit-box-flex: 0 !important;
-    -webkit-font-smoothing: antialiased !important;
-    -webkit-transition-property: none !important;
-    color: #FAFAFA !important;
-    font-family: CTFQuickTimeMediaControls !important;
-    font-size: 25px !important;
-    height: 25px !important;
-    left: auto !important;
-    opacity: .87 !important;
-    text-shadow: black 0 1px 1px !important;
-    width: 25px !important;
-}
-
-.CTFmediaPlayer .CTFnextButton {
-    text-align: right !important;
-    margin-left: 28px !important;
-}
-
-.CTFmediaPlayer .CTFprevButton:active,
-.CTFmediaPlayer .CTFnextButton:active {
-    text-shadow: #555 0 1px 1px, white 0 0 10px !important;
 }
 
 /**************
@@ -463,7 +419,7 @@ Settings pane
     -webkit-mask-image: none !important;
     -webkit-perspective: none !important;
     -webkit-transform: none !important;
-    -webkit-user-select: none !important; /* not default */
+    -webkit-user-select: none !important;
     border: none !important;
     bottom: 0 !important;
     height: 100% !important;

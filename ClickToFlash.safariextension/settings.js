@@ -92,11 +92,6 @@ for(var i = 0; i < tabs.length; i++) {
 main.style.maxHeight = (.85*document.body.offsetHeight - 20) + "px";
 nav.style.minWidth = (nav.offsetWidth + 10) + "px";
 
-// Remove volume slider setting in WebKit nightlies and 5.1
-if(/\+|Version\/5\.1/.test(navigator.appVersion)) {
-    document.getElementById("showVolumeSlider").parentNode.parentNode.style.display = "none";
-}
-
 // Killers list
 document.getElementById("killers_toggle").addEventListener("click", function() {
     for(var i = 0; i < killerInputs.length; i++) {

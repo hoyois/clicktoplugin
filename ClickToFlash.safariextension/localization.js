@@ -126,10 +126,6 @@ const STRINGS = {
         "en-us": "Show video title as tooltip",
         "fr-fr": "Afficher le titre de la vidéo en infobulle"
     },
-    SHOW_WEBKIT_VOLUME_SLIDER: {
-        "en-us": "Show WebKit volume slider",
-        "fr-fr": "Afficher le controlleur de volume"
-    },
     HIDE_REWIND_BUTTON: {
         "en-us": "Hide “Rewind” button",
         "fr-fr": "Supprimer le bouton « Rembobiner 30 secondes »"

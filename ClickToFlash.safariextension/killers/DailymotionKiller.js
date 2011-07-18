@@ -5,14 +5,16 @@ DailymotionKiller.prototype.canKill = function(data) {
 };
 
 DailymotionKiller.prototype.process = function(data, callback) {
-    if(data.params) {
+    if(/^http:\/\/www\.dailymotion\.com\/hub\//.test(data.location)) {
+        var match = data.location.match(/#videoId=(.*)/);
+        if(match) this.processFromVideoID(match[1], callback);
+    } else if(data.params) {
         var sequence = parseFlashVariables(data.params).sequence;
         if(sequence) this.processFromSequence(decodeURIComponent(sequence), callback);
-        return;
+    } else {
+        var match = data.src.match(/\/swf\/([^&]+)/);
+        if(match) this.processFromVideoID(match[1], callback);
     }
-    // The vid has no flashvars... It has to be an embed
-    var matches = data.src.match(/\/swf\/([^&]+)/);
-    if(matches) this.processFromVideoID(matches[1], callback);
 };
 
 DailymotionKiller.prototype.processFromSequence = function(sequence, callback) {
@@ -36,7 +38,7 @@ DailymotionKiller.prototype.processFromSequence = function(sequence, callback) {
         sources.push({"url": matches[1].replace(/\\\//g,"/"), "format": "LD MP4", "resolution": 240, "isNative": true, "mediaType": "video"});
     }
     
-    matches = sequence.match(/\"backgroundImageURL\":\"([^"]*)\"/);
+    matches = sequence.match(/\"videoPreviewURL\":\"([^"]*)\"/);
     if(matches) posterURL = matches[1].replace(/\\\//g,"/");
     
     var title;

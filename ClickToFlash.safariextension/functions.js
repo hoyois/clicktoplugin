@@ -18,7 +18,7 @@ function disableSIFR(element) {
     document.body.className = document.body.className.replace(regex, "");
     var sIFRAlternate = sIFRElement.getElementsByClassName("sIFR-alternate")[0];
     if(sIFRAlternate) sIFRElement.innerHTML = sIFRAlternate.innerHTML;
-    sIFRElement.className = sIFRElement.className.replace(/\bsIFR-replaced\b/, "");
+    sIFRElement.classList.remove("sIFR-replaced");
 }
 
 function applyCSS(element, style, properties) {
@@ -60,10 +60,6 @@ function getType(element) {
             return element.type;
             break;
         case "object":
-            if(!/\+|Version\/5\.1/.test(navigator.appVersion)) {
-                var embedChild = element.getElementsByTagName("embed")[0];
-                if(embedChild && embedChild.type) return embedChild.type;
-            }
             if(element.type) return element.type;
             var paramElements = element.getElementsByTagName("param");
             for (var i = 0; i < paramElements.length; i++) {
