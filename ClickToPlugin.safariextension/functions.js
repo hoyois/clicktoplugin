@@ -80,7 +80,6 @@ function getAttributes(element, url) {
             }
             break;
         case "object":
-            info.classid = element.getAttribute("classid");
             var paramElements = element.getElementsByTagName("param");
             for (var i = 0; i < paramElements.length; i++) {
                 if(!paramElements[i].hasAttribute("value")) continue;

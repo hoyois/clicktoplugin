@@ -225,19 +225,6 @@ function matchList(list, string) {
 Plugin detection methods
 ***********************/
 
-function getTypeFromClassid(classid) { // from WebKit's source code (except divx)
-    switch(classid.toLowerCase()) {
-        case "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000": return "application/x-shockwave-flash";
-        case "clsid:22d6f312-b0f6-11d0-94ab-0080c74c7e95": return "application/x-mplayer2";
-        case "clsid:6bf52a52-394a-11d3-b153-00c04f79faa6": return "application/x-mplayer2";
-        case "clsid:02bf25d5-8c17-4b23-bc80-d3488abddc6b": return "video/quicktime";
-        case "clsid:cfcdaa03-8be4-11cf-b84b-0020afbbccfa": return "audio/x-pn-realaudio-plugin";
-        case "clsid:67dabfbf-d0ab-41fa-9c46-cc0f21721616": return "video/divx";
-        case "clsid:166b1bca-3f9c-11cf-8075-444553540000": return "application/x-director";
-        default: return false;
-    }
-}
-
 function getTypeFromDataURI(url) {
     var match = url.match(/^data:([^,;]+)[,;]/);
     if(match) return match[1];
