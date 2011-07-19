@@ -67,8 +67,8 @@ function blockOrAllow(data) {
     // returns true if element can be loaded, false if it must be hidden,
     // and data on the plugin object otherwise
     
-    // no source, no type & no classid -> cannot instantiate plugin
-    if(!data.url && !data.type && !data.classid) return true;
+    // no source & no type -> cannot instantiate plugin
+    if(!data.url && !data.type ) return true;
     
     // Check if invisible
     if(data.width <= safari.extension.settings.maxInvisibleSize && data.height <= safari.extension.settings.maxInvisibleSize && (data.width > 0 && data.height > 0) || safari.extension.settings.zeroIsInvisible) {
@@ -96,13 +96,6 @@ function blockOrAllow(data) {
             plugin = getPluginForType(type);
             if(!plugin) return true;
             throw null;
-        }
-        if(data.classid) {
-            type = getTypeFromClassid(data.classid);
-            if(type) {
-                plugin = getPluginForType(type);
-                throw null;
-            }
         }
         // For extensions in Info.plist (except css, pdf, xml, xbl), WebKit checks 
         // Content-Type header at this point and only continues if it matches no plugin.
