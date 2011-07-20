@@ -283,6 +283,9 @@ document.getElementById("mediaAutoload").addEventListener("change", function(eve
     document.getElementById("showPoster").disabled = event.target.value === "on";
     document.getElementById("showMediaTooltip").disabled = event.target.value === "on";
 }, false);
+document.getElementById("downloadContext").addEventListener("change", function(event) {
+    document.getElementById("useDownloadManager").disabled = event.target.value !== "on";
+}, false);
 
 // Shortcut display
 function parseKeyID(keyID) {

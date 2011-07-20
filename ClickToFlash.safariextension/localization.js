@@ -331,6 +331,10 @@ const STRINGS = {
         "en-us": "Show Flash source as tooltip",
         "fr-fr": "Afficher la source du Flash en infobulle"
     },
+    USE_DOWNLOAD_MANAGER: {
+        "en-us": "Use a download manager",
+        "fr-fr": "Utiliser un gestionnaire de téléchargement"
+    },
     
     // Context menu items
     CTF_PREFERENCES: {

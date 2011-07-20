@@ -1,5 +1,5 @@
 // SETTINGS
-const allSettings = ["defaultTab", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "useFallbackMedia", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "codecsPolicy", "volume", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+const allSettings = ["defaultTab", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "useFallbackMedia", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "codecsPolicy", "volume", "useDownloadManager", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
 
 /* Hidden settings:
 zeroIsInvisible: undefined
@@ -67,8 +67,8 @@ function blockOrAllow(data) {
     // returns true if element can be loaded, false if it must be hidden,
     // and data on the plugin object otherwise
     
-    // no source, no type & no classid -> cannot instantiate plugin
-    if(!data.src && !data.type && !data.classid) return true;
+    // no source & no type -> cannot instantiate plugin
+    if(!data.src && !data.type) return true;
     
     // Check if invisible
     if(data.width <= safari.extension.settings.maxInvisibleSize && data.height <= safari.extension.settings.maxInvisibleSize && (data.width > 0 && data.height > 0) || safari.extension.settings.zeroIsInvisible) {
@@ -84,15 +84,11 @@ function blockOrAllow(data) {
     if(data.type === "application/x-shockwave-flash" || data.type === "application/futuresplash") return {"isInvisible": isInvisible};
     else if(data.type) return true;
     if(/^data:/.test(data.src)) return true;
-    if(data.classid) {
-        if(data.classid.toLowerCase() === "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000") return {"isInvisible": isInvisible};
-        else return true;
-    }
     
     var ext = extractExt(data.src);
     if(ext === "swf" || ext === "spl") return {"isInvisible": isInvisible};
     else if(isNativeExt(ext)) return true;
-
+    
     return {"isInvisible": isInvisible, "unknownType": true};
 }
 
@@ -134,7 +130,7 @@ function handleContextMenu(event) {
         event.contextMenu.appendContextMenuItem("remove", HIDE_PLUGIN("Flash"));
     }
     if(u.hasMedia && u.source !== undefined) {
-        if(s.downloadContext && !u.noDownload) event.contextMenu.appendContextMenuItem("download", u.mediaType === "audio" ? DOWNLOAD_AUDIO : DOWNLOAD_VIDEO);
+        if(s.downloadContext) event.contextMenu.appendContextMenuItem(safari.extension.settings.useDownloadManager ? "downloadDM" : "download", u.mediaType === "audio" ? DOWNLOAD_AUDIO : DOWNLOAD_VIDEO);
         if(u.siteInfo && s.viewOnSiteContext) event.contextMenu.appendContextMenuItem("viewOnSite", VIEW_ON_SITE(u.siteInfo.name));
         if(s.viewInQTPContext) event.contextMenu.appendContextMenuItem("viewInQTP", VIEW_IN_QUICKTIME_PLAYER);
     }
@@ -285,5 +281,5 @@ if(safari.extension.settings < 19) {
     safari.extension.settings.enabledKillers = [0,1,2,3,4,5,6,7,8,9,10,11,12];
     clearSettings("showVolumeSlider");
 }
-safari.extension.settings.version = 20;
+safari.extension.settings.version = 21;
 
