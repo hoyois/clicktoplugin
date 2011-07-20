@@ -144,12 +144,6 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<false/>
-		<key>Key</key>
-		<string>deanimateGIF</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
 		<integer>2</integer>
 		<key>Key</key>
 		<string>codecsPolicy</string>
@@ -508,6 +502,12 @@
 		<true/>
 		<key>Key</key>
 		<string>showMediaTooltip</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>useDownloadManager</string>
 	</dict>
 </array>
 </plist>

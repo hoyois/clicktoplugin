@@ -387,12 +387,13 @@ Source selector
     width: 7px !important;
 }
 
-/*************************
-Invisible QuickTime object
-*************************/
+/**********************
+Invisible plugin object
+**********************/
 
-.CTFplaceholder .CTFQTObject,
-.CTFmediaPlayer .CTFQTObject {
+.CTFpluginLauncher,
+.CTFplaceholder .CTFpluginLauncher,
+.CTFmediaPlayer .CTFpluginLauncher {
     position: absolute !important;
     height: 0px !important;
     width: 0px !important;

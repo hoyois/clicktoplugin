@@ -35,11 +35,11 @@ VimeoKiller.prototype.process = function(data, callback) {
             if(xml.getElementsByTagName("isHD").length > 0 && xml.getElementsByTagName("isHD")[0].textContent === "1") {
                 var resolution = 720;
                 if(xml.getElementsByTagName("height")[0] && xml.getElementsByTagName("height")[0].textContent === "1080") resolution = 1080;
-                if(isNative || canPlayFLV) sources.push({"url": url + "hd", "format": resolution + "p " + (isNative ? "MP4" : "FLV"), "resolution": resolution, "isNative": isNative, "mediaType": "video", "noDownload": true});
+                if(isNative || canPlayFLV) sources.push({"url": url + "hd", "format": resolution + "p " + (isNative ? "MP4" : "FLV"), "resolution": resolution, "isNative": isNative, "mediaType": "video"});
             }
-            if(isNative || canPlayFLV) sources.push({"url": url + "sd", "format": "360p " + (isNative ? "MP4" : "FLV"), "resolution": 360, "isNative": isNative, "mediaType": "video", "noDownload": true});
+            if(isNative || canPlayFLV) sources.push({"url": url + "sd", "format": "360p " + (isNative ? "MP4" : "FLV"), "resolution": 360, "isNative": isNative, "mediaType": "video"});
             var handleMIMEType2 = function(MIMEType) {
-                if(MIMEType === "video/mp4") sources.push({"url": url + "mobile", "format": "Mobile MP4", "resolution": 240, "isNative": true, "mediaType": "video", "noDownload": true});
+                if(MIMEType === "video/mp4") sources.push({"url": url + "mobile", "format": "Mobile MP4", "resolution": 240, "isNative": true, "mediaType": "video"});
                 
                 if(xml.getElementsByTagName("thumbnail").length > 0) {
                     posterURL = xml.getElementsByTagName("thumbnail")[0].textContent;
