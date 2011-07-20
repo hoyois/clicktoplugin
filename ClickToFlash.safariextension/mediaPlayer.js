@@ -189,10 +189,10 @@ mediaPlayer.prototype.initializePlaylistControls = function() {
     this.containerElement.addEventListener("click", function(event) {
         var coord = _this.getCoordinates(event);
         if(coord.y + 25 > _this.height) { // click in controls
-            if(coord.x >= 32 && coord.x <= 53) {
+            if(coord.x >= 32 && coord.x <= 51) {
                 event.preventDefault();
                 _this.jumpTrack(-1);
-            } else if(coord.x >= 80 && coord.x <= 101) {
+            } else if(coord.x >= 80 && coord.x <= 99) {
                 event.preventDefault();
                 _this.jumpTrack(1);
             }
@@ -323,10 +323,7 @@ mediaPlayer.prototype.setContextInfo = function(event, contextInfo, source) {
     contextInfo.hasMedia = true;
     contextInfo.isMedia = this.currentTrack !== undefined;
     contextInfo.source = source;
-    if(source !== undefined) {
-        contextInfo.noDownload = this.playlist[track].sources[source].noDownload;
-        contextInfo.mediaType = this.playlist[track].sources[source].mediaType;
-    }
+    if(source !== undefined) contextInfo.mediaType = this.playlist[track].sources[source].mediaType;
     safari.self.tab.setContextMenuEventUserInfo(event, contextInfo);
 };
 

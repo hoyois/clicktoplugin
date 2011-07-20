@@ -86,7 +86,10 @@ function respondToMessage(event) {
                     restorePlugin(event.message.elementID);
                     break;
                 case "download":
-                    downloadMedia(event.message.elementID, event.message.source);
+                    downloadMedia(event.message.elementID, event.message.source, false);
+                    break;
+                case "downloadDM":
+                    downloadMedia(event.message.elementID, event.message.source, true);
                     break;
                 case "viewInQTP":
                     viewInQuickTimePlayer(event.message.elementID, event.message.source);
@@ -137,7 +140,8 @@ function handleBeforeLoadEvent(event) {
     to handle px and %), which might be possible using getMatchedCSSRules (returns matching rules in cascading order)
     The 'auto' value will be a problem...
     status: still see no feasible solution to this problem...*/
-    var data = {"width": element.offsetWidth, "height": element.offsetHeight, "location": window.location.href, "type": getType(element), "classid": element.getAttribute("classid")};
+    var data = {"width": element.offsetWidth, "height": element.offsetHeight, "location": window.location.href, "type": getType(element)};
+    if(element.getAttribute("classid")) return; // new behavior in 5.1
     
     if(!event.url) data.src = "";
     else {
@@ -422,50 +426,27 @@ function loadMedia(elementID, init, source) {
     delete placeholderElements[elementID];
 }
 
-function downloadMedia(elementID, source) {
+function downloadMedia(elementID, source, useDownloadManager) {
     var track = mediaPlayers[elementID].currentTrack;
     if(track === undefined) track = 0;
     if(source === undefined) {
         source = mediaPlayers[elementID].currentSource;
         if(source === undefined) return;
     }
-    downloadURL(mediaPlayers[elementID].playlist[track].sources[source].url);
+    var download = downloadURL;
+    if(useDownloadManager) download = sendToDownloadManager;
+    download(mediaPlayers[elementID].playlist[track].sources[source].url);
 }
 
 function viewInQuickTimePlayer(elementID, source) {
     var track = mediaPlayers[elementID].currentTrack;
-    var element;
-    if(track === undefined) {
-        track = 0;
-        element = placeholderElements[elementID];
-    } else {
-        element = mediaPlayers[elementID].containerElement;
-        mediaPlayers[elementID].mediaElement.pause();
-    }
+    if(track === undefined) track = 0;
+    else mediaPlayers[elementID].mediaElement.pause();
     if(source === undefined) {
         source = mediaPlayers[elementID].currentSource;
         if(source === undefined) return;
     }
-    var mediaURL = mediaPlayers[elementID].playlist[track].sources[source].url;
-    // Relative URLs need to be resolved for QTP
-    var tmpAnchor = document.createElement("a");
-    tmpAnchor.href = mediaURL;
-    mediaURL = tmpAnchor.href;
-    var QTObject = document.createElement("embed");
-    QTObject.allowedToLoad = true;
-    QTObject.className = "CTFQTObject";
-    QTObject.setAttribute("type", "video/quicktime");
-    QTObject.setAttribute("width", "0");
-    QTObject.setAttribute("height", "0");
-    // need an external URL for source, since QT plugin doesn't accept safari-extension:// protocol
-    // Apple has a small 1px image for this exact purpose
-    QTObject.setAttribute("src", "http://images.apple.com/apple-events/includes/qtbutton.mov");
-    QTObject.setAttribute("href", mediaURL);
-    QTObject.setAttribute("target", "quicktimeplayer");
-    QTObject.setAttribute("autohref", "true");
-    QTObject.setAttribute("controller", "false");
-    element.appendChild(QTObject);
-    setTimeout(function() {element.removeChild(QTObject);}, 1000);
+    openInQuickTimePlayer(mediaPlayers[elementID].playlist[track].sources[source].url);
 }
 
 function hidePlugin(elementID) {

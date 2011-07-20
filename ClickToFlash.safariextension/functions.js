@@ -6,8 +6,41 @@ function downloadURL(url) {
     
     var event = document.createEvent("MouseEvents");
     event.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, false, true, false, false, 0, null);
-    
     downloadLink.dispatchEvent(event);
+}
+
+function sendToDownloadManager(url) {
+    var DMObject = document.createElement("embed");
+    DMObject.allowedToLoad = true;
+    DMObject.className = "CTFpluginLauncher";
+    DMObject.setAttribute("type", "application/octet-stream");
+    DMObject.setAttribute("width", "0");
+    DMObject.setAttribute("height", "0");
+    DMObject.setAttribute("src", url);
+    document.body.appendChild(DMObject);
+    setTimeout(function() {document.body.removeChild(DMObject);}, 1000);
+}
+
+function openInQuickTimePlayer(url) {
+    // Relative URLs need to be resolved for QTP
+    var tmpAnchor = document.createElement("a");
+    tmpAnchor.href = url;
+    url = tmpAnchor.href;
+    var QTObject = document.createElement("embed");
+    QTObject.allowedToLoad = true;
+    QTObject.className = "CTFpluginLauncher";
+    QTObject.setAttribute("type", "video/quicktime");
+    QTObject.setAttribute("width", "0");
+    QTObject.setAttribute("height", "0");
+    // need an external URL for source, since QT plugin doesn't accept safari-extension:// protocol
+    // Apple has a small 1px image for this exact purpose
+    QTObject.setAttribute("src", "http://images.apple.com/apple-events/includes/qtbutton.mov");
+    QTObject.setAttribute("href", url);
+    QTObject.setAttribute("target", "quicktimeplayer");
+    QTObject.setAttribute("autohref", "true");
+    QTObject.setAttribute("controller", "false");
+    document.body.appendChild(QTObject);
+    setTimeout(function() {document.body.removeChild(QTObject);}, 1000);
 }
 
 function disableSIFR(element) {
