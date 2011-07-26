@@ -1,11 +1,15 @@
 if(window.location.href !== "about:blank") { // rdar://9238075
 
+var handleSettingsShortcut;
+
 function handleSettings(event) {
     if(window.location.href === safari.extension.baseURI + "settings.html") return;
     if(event.name === "settingsShortcut") {
-        document.addEventListener(event.message.type, function(e) {
+        if(handleSettingsShortcut === undefined) handleSettingsShortcut = function(e) {
             if(testShortcut(e, event.message)) safari.self.tab.dispatchMessage("showSettings", "");
-        }, false);
+        };
+        document.removeEventListener(event.message.type, handleSettingsShortcut, false);
+        document.addEventListener(event.message.type, handleSettingsShortcut, false);
     } else if(window === window.top) {
         if(event.name === "showSettings") {
             if(document.body.nodeName === "FRAMESET") {
@@ -19,8 +23,7 @@ function handleSettings(event) {
             iframe.src = safari.extension.baseURI + "settings.html";
             iframe.addEventListener("load", function(e) {e.target.className = "";}, false);
             document.body.appendChild(iframe);
-        }
-        else if(event.name === "hideSettings") {
+        } else if(event.name === "hideSettings") {
             document.body.removeChild(document.getElementById("CTFsettingsPane"));
             window.focus();
         }
@@ -28,7 +31,7 @@ function handleSettings(event) {
 }
 
 safari.self.addEventListener("message", handleSettings, false);
-if(window === window.top) safari.self.tab.dispatchMessage("getSettingsShortcut", "");
+safari.self.tab.dispatchMessage("getSettingsShortcut", "");
 
 /*************************
 ClickToPlugin global scope
