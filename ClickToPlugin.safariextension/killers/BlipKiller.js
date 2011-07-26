@@ -20,7 +20,7 @@ BlipKiller.prototype.processFromXML = function(url, callback) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.onload = function() {
-        var xml = xhr.responseXML; alert(xhr.responseText)
+        var xml = xhr.responseXML;
         var media = xml.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "content");
         
         var url, ext, format, height, width, isNative, mediaType;
