@@ -391,9 +391,7 @@ Source selector
 Invisible plugin object
 **********************/
 
-.CTFpluginLauncher,
-.CTFplaceholder .CTFpluginLauncher,
-.CTFmediaPlayer .CTFpluginLauncher {
+.CTFpluginLauncher {
     position: absolute !important;
     height: 0px !important;
     width: 0px !important;

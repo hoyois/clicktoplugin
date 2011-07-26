@@ -4,37 +4,37 @@
 <array>
 	<dict>
 		<key>DefaultValue</key>
-		<integer>0</integer>
+		<real>0.0</real>
 		<key>Key</key>
 		<string>defaultTab</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<array></array>
+		<array/>
 		<key>Key</key>
 		<string>allowedPlugins</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<array></array>
+		<array/>
 		<key>Key</key>
 		<string>locationsWhitelist</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<array></array>
+		<array/>
 		<key>Key</key>
 		<string>sourcesWhitelist</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<array></array>
+		<array/>
 		<key>Key</key>
 		<string>locationsBlacklist</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<array></array>
+		<array/>
 		<key>Key</key>
 		<string>sourcesBlacklist</string>
 	</dict>
@@ -53,23 +53,23 @@
 	<dict>
 		<key>DefaultValue</key>
 		<array>
-			<integer>0</integer>
-			<integer>1</integer>
-			<integer>2</integer>
-			<integer>3</integer>
-			<integer>4</integer>
-			<integer>5</integer>
-			<integer>6</integer>
-			<integer>7</integer>
-			<integer>8</integer>
-			<integer>9</integer>
-			<integer>10</integer>
-			<integer>11</integer>
-			<integer>12</integer>
-			<integer>13</integer>
-			<integer>14</integer>
-			<integer>15</integer>
-			<integer>16</integer>
+			<real>0.0</real>
+			<real>1</real>
+			<real>2</real>
+			<real>3</real>
+			<real>4</real>
+			<real>5</real>
+			<real>6</real>
+			<real>7</real>
+			<real>8</real>
+			<real>9</real>
+			<real>10</real>
+			<real>11</real>
+			<real>12</real>
+			<real>13</real>
+			<real>14</real>
+			<real>15</real>
+			<real>16</real>
 		</array>
 		<key>Key</key>
 		<string>enabledKillers</string>
@@ -119,7 +119,7 @@
 	<dict>
 		<key>DefaultValue</key>
 		<array>
-		  <string>www.youtube.com/watch</string>
+			<string>www.youtube.com/watch</string>
 		</array>
 		<key>Key</key>
 		<string>mediaWhitelist</string>
@@ -132,7 +132,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<integer>1080</integer>
+		<real>1080</real>
 		<key>Key</key>
 		<string>maxResolution</string>
 	</dict>
@@ -144,7 +144,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<integer>2</integer>
+		<real>2</real>
 		<key>Key</key>
 		<string>codecsPolicy</string>
 	</dict>
@@ -211,18 +211,18 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>type</key>
-			<string>keydown</string>
-			<key>shiftKey</key>
-			<false/>
-			<key>ctrlKey</key>
-			<false/>
 			<key>altKey</key>
 			<true/>
-			<key>metaKey</key>
+			<key>ctrlKey</key>
 			<false/>
 			<key>keyIdentifier</key>
 			<string>U+002C</string>
+			<key>metaKey</key>
+			<false/>
+			<key>shiftKey</key>
+			<false/>
+			<key>type</key>
+			<string>keydown</string>
 		</dict>
 		<key>Key</key>
 		<string>settingsShortcut</string>
@@ -230,18 +230,18 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>type</key>
-			<string>keydown</string>
-			<key>shiftKey</key>
+			<key>altKey</key>
 			<false/>
 			<key>ctrlKey</key>
 			<true/>
-			<key>altKey</key>
-			<false/>
-			<key>metaKey</key>
-			<true/>
 			<key>keyIdentifier</key>
 			<string>U+0057</string>
+			<key>metaKey</key>
+			<true/>
+			<key>shiftKey</key>
+			<false/>
+			<key>type</key>
+			<string>keydown</string>
 		</dict>
 		<key>Key</key>
 		<string>addToWhitelistShortcut</string>
@@ -249,18 +249,18 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>type</key>
-			<string>keydown</string>
-			<key>shiftKey</key>
+			<key>altKey</key>
 			<false/>
 			<key>ctrlKey</key>
 			<true/>
-			<key>altKey</key>
-			<false/>
-			<key>metaKey</key>
-			<true/>
 			<key>keyIdentifier</key>
 			<string>U+0041</string>
+			<key>metaKey</key>
+			<true/>
+			<key>shiftKey</key>
+			<false/>
+			<key>type</key>
+			<string>keydown</string>
 		</dict>
 		<key>Key</key>
 		<string>loadAllShortcut</string>
@@ -268,18 +268,18 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>type</key>
-			<string>keydown</string>
-			<key>shiftKey</key>
+			<key>altKey</key>
 			<false/>
 			<key>ctrlKey</key>
 			<true/>
-			<key>altKey</key>
-			<false/>
-			<key>metaKey</key>
-			<true/>
 			<key>keyIdentifier</key>
 			<string>U+0048</string>
+			<key>metaKey</key>
+			<true/>
+			<key>shiftKey</key>
+			<false/>
+			<key>type</key>
+			<string>keydown</string>
 		</dict>
 		<key>Key</key>
 		<string>hideAllShortcut</string>
@@ -287,18 +287,18 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>type</key>
-			<string>click</string>
-			<key>shiftKey</key>
-			<false/>
-			<key>ctrlKey</key>
-			<false/>
 			<key>altKey</key>
 			<true/>
+			<key>button</key>
+			<real>0.0</real>
+			<key>ctrlKey</key>
+			<false/>
 			<key>metaKey</key>
 			<false/>
-			<key>button</key>
-			<integer>0</integer>
+			<key>shiftKey</key>
+			<false/>
+			<key>type</key>
+			<string>click</string>
 		</dict>
 		<key>Key</key>
 		<string>hidePluginShortcut</string>
@@ -306,18 +306,18 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>type</key>
-			<string>keydown</string>
-			<key>shiftKey</key>
+			<key>altKey</key>
 			<false/>
 			<key>ctrlKey</key>
 			<false/>
-			<key>altKey</key>
-			<false/>
-			<key>metaKey</key>
-			<false/>
 			<key>keyIdentifier</key>
 			<string>U+0020</string>
+			<key>metaKey</key>
+			<false/>
+			<key>shiftKey</key>
+			<false/>
+			<key>type</key>
+			<string>keydown</string>
 		</dict>
 		<key>Key</key>
 		<string>playPauseShortcut</string>
@@ -325,18 +325,18 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>type</key>
-			<string>keydown</string>
-			<key>shiftKey</key>
+			<key>altKey</key>
 			<false/>
 			<key>ctrlKey</key>
 			<false/>
-			<key>altKey</key>
-			<false/>
-			<key>metaKey</key>
-			<false/>
 			<key>keyIdentifier</key>
 			<string>U+0046</string>
+			<key>metaKey</key>
+			<false/>
+			<key>shiftKey</key>
+			<false/>
+			<key>type</key>
+			<string>keydown</string>
 		</dict>
 		<key>Key</key>
 		<string>enterFullscreenShortcut</string>
@@ -344,18 +344,18 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>type</key>
-			<string>keydown</string>
-			<key>shiftKey</key>
+			<key>altKey</key>
 			<false/>
 			<key>ctrlKey</key>
 			<false/>
-			<key>altKey</key>
-			<false/>
-			<key>metaKey</key>
-			<false/>
 			<key>keyIdentifier</key>
 			<string>Up</string>
+			<key>metaKey</key>
+			<false/>
+			<key>shiftKey</key>
+			<false/>
+			<key>type</key>
+			<string>keydown</string>
 		</dict>
 		<key>Key</key>
 		<string>volumeUpShortcut</string>
@@ -363,18 +363,18 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>type</key>
-			<string>keydown</string>
-			<key>shiftKey</key>
+			<key>altKey</key>
 			<false/>
 			<key>ctrlKey</key>
 			<false/>
-			<key>altKey</key>
-			<false/>
-			<key>metaKey</key>
-			<false/>
 			<key>keyIdentifier</key>
 			<string>Down</string>
+			<key>metaKey</key>
+			<false/>
+			<key>shiftKey</key>
+			<false/>
+			<key>type</key>
+			<string>keydown</string>
 		</dict>
 		<key>Key</key>
 		<string>volumeDownShortcut</string>
@@ -382,18 +382,18 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>type</key>
-			<string>keydown</string>
-			<key>shiftKey</key>
+			<key>altKey</key>
 			<false/>
 			<key>ctrlKey</key>
 			<false/>
-			<key>altKey</key>
-			<false/>
-			<key>metaKey</key>
-			<false/>
 			<key>keyIdentifier</key>
 			<string>Left</string>
+			<key>metaKey</key>
+			<false/>
+			<key>shiftKey</key>
+			<false/>
+			<key>type</key>
+			<string>keydown</string>
 		</dict>
 		<key>Key</key>
 		<string>prevTrackShortcut</string>
@@ -401,18 +401,18 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>type</key>
-			<string>keydown</string>
-			<key>shiftKey</key>
+			<key>altKey</key>
 			<false/>
 			<key>ctrlKey</key>
 			<false/>
-			<key>altKey</key>
-			<false/>
-			<key>metaKey</key>
-			<false/>
 			<key>keyIdentifier</key>
 			<string>Right</string>
+			<key>metaKey</key>
+			<false/>
+			<key>shiftKey</key>
+			<false/>
+			<key>type</key>
+			<string>keydown</string>
 		</dict>
 		<key>Key</key>
 		<string>nextTrackShortcut</string>
@@ -420,18 +420,18 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>type</key>
-			<string>dblclick</string>
-			<key>shiftKey</key>
-			<false/>
-			<key>ctrlKey</key>
-			<false/>
 			<key>altKey</key>
+			<false/>
+			<key>button</key>
+			<real>0.0</real>
+			<key>ctrlKey</key>
 			<false/>
 			<key>metaKey</key>
 			<false/>
-			<key>button</key>
-			<integer>0</integer>
+			<key>shiftKey</key>
+			<false/>
+			<key>type</key>
+			<string>dblclick</string>
 		</dict>
 		<key>Key</key>
 		<string>toggleLoopingShortcut</string>
@@ -439,18 +439,18 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>type</key>
-			<string>keydown</string>
-			<key>shiftKey</key>
+			<key>altKey</key>
 			<false/>
 			<key>ctrlKey</key>
 			<false/>
-			<key>altKey</key>
-			<false/>
-			<key>metaKey</key>
-			<false/>
 			<key>keyIdentifier</key>
 			<string>U+005C</string>
+			<key>metaKey</key>
+			<false/>
+			<key>shiftKey</key>
+			<false/>
+			<key>type</key>
+			<string>keydown</string>
 		</dict>
 		<key>Key</key>
 		<string>showTitleShortcut</string>
@@ -481,7 +481,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<integer>8</integer>
+		<real>8</real>
 		<key>Key</key>
 		<string>maxInvisibleSize</string>
 	</dict>

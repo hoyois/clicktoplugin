@@ -166,8 +166,8 @@ function handleContextMenu(event) {
         if(s.disableEnableContext) event.contextMenu.appendContextMenuItem("switchOff", TURN_CTP_OFF);
         if(s.loadAllContext && u.blocked > 0 && (u.blocked > u.invisible || !s.loadInvisibleContext)) event.contextMenu.appendContextMenuItem("loadAll", LOAD_ALL_PLUGINS + " (" + u.blocked + ")");
         if(s.loadInvisibleContext && u.invisible > 0) event.contextMenu.appendContextMenuItem("loadInvisible", LOAD_INVISIBLE_PLUGINS + " (" + u.invisible + ")");
-        if(s.addToWhitelistContext) event.contextMenu.appendContextMenuItem("locationsWhitelist", s.invertWhitelists ? ALWAYS_BLOCK_ON_DOMAIN : ALWAYS_ALLOW_ON_DOMAIN);
-        if(s.addToBlacklistContext) event.contextMenu.appendContextMenuItem("locationsBlacklist", s.invertBlacklists ? ALWAYS_SHOW_ON_DOMAIN : ALWAYS_HIDE_ON_DOMAIN);
+        if(s.addToWhitelistContext && !matchList(safari.extension.settings.locationsWhitelist, u.location)) event.contextMenu.appendContextMenuItem("locationsWhitelist", s.invertWhitelists ? ALWAYS_BLOCK_ON_DOMAIN : ALWAYS_ALLOW_ON_DOMAIN);
+        if(s.addToBlacklistContext && !matchList(safari.extension.settings.locationsBlacklist, u.location)) event.contextMenu.appendContextMenuItem("locationsBlacklist", s.invertBlacklists ? ALWAYS_SHOW_ON_DOMAIN : ALWAYS_HIDE_ON_DOMAIN);
         if(s.settingsContext) event.contextMenu.appendContextMenuItem("settings", CTP_PREFERENCES + "\u2026");
         return;
     }
@@ -331,5 +331,5 @@ if(safari.extension.settings < 19) {
     safari.extension.settings.enabledKillers = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
     clearSettings("showVolumeSlider");
 }
-safari.extension.settings.version = 21;
+safari.extension.settings.version = 22;
 

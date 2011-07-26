@@ -20,7 +20,7 @@ BlipKiller.prototype.processFromXML = function(url, callback) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.onload = function() {
-        var xml = xhr.responseXML;
+        var xml = xhr.responseXML; alert(xhr.responseText)
         var media = xml.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "content");
         
         var url, ext, format, height, width, isNative, mediaType;
@@ -42,7 +42,7 @@ BlipKiller.prototype.processFromXML = function(url, callback) {
         }
         
         var videoData = {
-            "playlist": [{"title": xml.getElementsByTagName("title")[0].textContent, "posterURL": xml.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "thumbnail")[0].getAttribute("url"), "sources": sources}]
+            "playlist": [{"title": xml.getElementsByTagName("item")[0].getElementsByTagName("title")[0].textContent, "posterURL": xml.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "thumbnail")[0].getAttribute("url"), "sources": sources}]
         };
         callback(videoData);
     };
