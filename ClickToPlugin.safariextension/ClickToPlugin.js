@@ -137,9 +137,9 @@ function handleBeforeLoadEvent(event) {
     
     if(!(element instanceof HTMLObjectElement || element instanceof HTMLEmbedElement)) return;
     
-    var data = getAttributes(element, event.url);
-    if(data.classid) return; // new behavior in 5.1
+    if(element.getAttribute("classid")) return; // new behavior in 5.1
     // see also Safari5.1bug.html for a related issue. These behaviors might change at any update!
+    var data = getAttributes(element, event.url);
     /* PROBLEM: elements within display:none iframes fire beforeload events, and the following is incorrect
     To solve this we'd need the CSS 2.1 'computed value' of height and width (and modify the arithmetic in mediaPlayer
     to handle px and %), which might be possible using getMatchedCSSRules (returns matching rules in cascading order)
