@@ -1,6 +1,7 @@
 function VimeoKiller() {}
 
 VimeoKiller.prototype.canKill = function(data) {
+    if(data.plugin !== "Flash") return false;
     return (data.src.indexOf("vimeo.com/moogaloop") !== -1 || data.src.indexOf("vimeocdn.com/p/flash/moogalo") !== -1);
 };
 

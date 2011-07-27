@@ -1,6 +1,7 @@
 function TEDKiller() {}
 
 TEDKiller.prototype.canKill = function(data) {
+    if(data.plugin !== "Flash") return false;
     return data.src.indexOf("http://video.ted.com/assets/player/swf") !== -1;
 };
 

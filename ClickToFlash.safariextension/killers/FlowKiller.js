@@ -1,6 +1,7 @@
 function FlowKiller() {}
 
 FlowKiller.prototype.canKill = function(data) {
+    if(data.plugin !== "Flash") return false;
     if(!/(?:^|&)config=/.test(data.params)) return false;
     if(/flowplayer[^\/]*\.swf/i.test(data.src)) {return true;}
     if(/bimvid_player-[^\/.]*\.swf$/.test(data.src)) {data.bim = true; return true;}

@@ -1,6 +1,7 @@
 function MegavideoKiller() {}
 
 MegavideoKiller.prototype.canKill = function(data) {
+    if(data.plugin !== "Flash") return false;
     if(!canPlayFLV) return false;
     if(/^http:\/\/wwwstatic\.megavideo\.com\/mv_player[2-9]?\.swf/.test(data.src)) {data.onsite = true; return true;};
     if(data.src.indexOf("megavideo.com/v/") !== -1) {data.onsite = false; return true;}

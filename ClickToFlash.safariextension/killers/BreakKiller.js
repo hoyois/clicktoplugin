@@ -1,6 +1,7 @@
 function BreakKiller() {}
 
 BreakKiller.prototype.canKill = function(data) {
+    if(data.plugin !== "Flash") return false;
     if(data.src.indexOf(".break.com/static/") !== -1) {data.onsite = true; return true;}
     if(data.src.indexOf("embed.break.com/") !== -1) {data.onsite = false; return true;}
     return false;
