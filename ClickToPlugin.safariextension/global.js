@@ -241,7 +241,7 @@ function switchOn() {
 }
 
 function handleWhitelisting(list, newWLString) {
-    safari.extension.settings[list] = safari.extension.settings[list].concat(newWLString); // push doesn't seem to work??
+    safari.extension.settings[list] = safari.extension.settings[list].concat(newWLString); // push doesn't work
     // load targeted content at once
     switch(list) {
         case "locationsWhitelist":
