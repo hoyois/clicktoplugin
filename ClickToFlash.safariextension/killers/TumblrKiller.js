@@ -1,6 +1,7 @@
 function TumblrKiller() {}
 
 TumblrKiller.prototype.canKill = function(data) {
+    if(data.plugin !== "Flash") return false;
     return /\?audio_file=/.test(data.src);
 };
 

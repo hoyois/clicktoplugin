@@ -1,6 +1,7 @@
 function GenericKiller() {}
 
 GenericKiller.prototype.canKill = function(data) {
+    if(data.plugin !== "Flash") return false;
     var matches = data.params.match(/(?:^|&)(file|load|playlistfile|src|mp3|mp3url|soundFile|soundUrl|url|file_url)=/);
     if(matches) {data.file = matches[1]; return true;}
     // other video flashvars: wmvUrl/flvUrl (gvideoplayer.swf)

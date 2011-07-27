@@ -1,8 +1,11 @@
 if(window.location.href !== "about:blank") { // rdar://9238075
 
+var needsSettingsShortcut = true;
+
 function handleSettings(event) {
     if(window.location.href === safari.extension.baseURI + "settings.html") return;
-    if(event.name === "settingsShortcut") {
+    if(needsSettingsShortcut && event.name === "settingsShortcut") {
+        needsSettingsShortcut = false;
         document.addEventListener(event.message.type, function(e) {
             if(testShortcut(e, event.message)) safari.self.tab.dispatchMessage("showSettings", "");
         }, false);
@@ -19,8 +22,7 @@ function handleSettings(event) {
             iframe.src = safari.extension.baseURI + "settings.html";
             iframe.addEventListener("load", function(e) {e.target.className = "";}, false);
             document.body.appendChild(iframe);
-        }
-        else if(event.name === "hideSettings") {
+        } else if(event.name === "hideSettings") {
             document.body.removeChild(document.getElementById("CTFsettingsPane"));
             window.focus();
         }
@@ -28,7 +30,7 @@ function handleSettings(event) {
 }
 
 safari.self.addEventListener("message", handleSettings, false);
-if(window === window.top) safari.self.tab.dispatchMessage("getSettingsShortcut", "");
+safari.self.tab.dispatchMessage("getSettingsShortcut", "");
 
 /*************************
 ClickToPlugin global scope
@@ -135,13 +137,13 @@ function handleBeforeLoadEvent(event) {
     
     if(!(element instanceof HTMLObjectElement || element instanceof HTMLEmbedElement)) return;
     
+    if(element.getAttribute("classid")) return; // new behavior in 5.1
     /* PROBLEM: elements within display:none iframes fire beforeload events, and the following is incorrect
     To solve this we'd need the CSS 2.1 'computed value' of height and width (and modify the arithmetic in mediaPlayer
     to handle px and %), which might be possible using getMatchedCSSRules (returns matching rules in cascading order)
     The 'auto' value will be a problem...
     status: still see no feasible solution to this problem...*/
     var data = {"width": element.offsetWidth, "height": element.offsetHeight, "location": window.location.href, "type": getType(element)};
-    if(element.getAttribute("classid")) return; // new behavior in 5.1
     
     if(!event.url) data.src = "";
     else {
@@ -285,6 +287,7 @@ function handleBeforeLoadEvent(event) {
         elementData = {
             "instance": instance,
             "elementID": elementID,
+            "plugin": "Flash",
             "src": data.src,
             "location": window.location.href,
             "title": document.title,

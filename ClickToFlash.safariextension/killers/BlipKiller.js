@@ -1,6 +1,7 @@
 function BlipKiller() {}
 
 BlipKiller.prototype.canKill = function(data) {
+    if(data.plugin !== "Flash") return false;
     return data.src.indexOf("blip.tv/") !== -1;
 };
 
@@ -41,7 +42,7 @@ BlipKiller.prototype.processFromXML = function(url, callback) {
         }
         
         var videoData = {
-            "playlist": [{"title": xml.getElementsByTagName("title")[0].textContent, "posterURL": xml.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "thumbnail")[0].getAttribute("url"), "sources": sources}]
+            "playlist": [{"title": xml.getElementsByTagName("item")[0].getElementsByTagName("title")[0].textContent, "posterURL": xml.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "thumbnail")[0].getAttribute("url"), "sources": sources}]
         };
         callback(videoData);
     };
