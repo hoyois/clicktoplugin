@@ -1,15 +1,14 @@
 if(window.location.href !== "about:blank") { // rdar://9238075
 
-var handleSettingsShortcut;
+var needsSettingsShortcut = true;
 
 function handleSettings(event) {
     if(window.location.href === safari.extension.baseURI + "settings.html") return;
-    if(event.name === "settingsShortcut") {
-        if(handleSettingsShortcut === undefined) handleSettingsShortcut = function(e) {
+    if(needsSettingsShortcut && event.name === "settingsShortcut") {
+        needsSettingsShortcut = false;
+        document.addEventListener(event.message.type, function(e) {
             if(testShortcut(e, event.message)) safari.self.tab.dispatchMessage("showSettings", "");
-        };
-        document.removeEventListener(event.message.type, handleSettingsShortcut, false);
-        document.addEventListener(event.message.type, handleSettingsShortcut, false);
+        }, false);
     } else if(window === window.top) {
         if(event.name === "showSettings") {
             if(document.body.nodeName === "FRAMESET") {

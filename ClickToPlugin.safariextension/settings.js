@@ -164,20 +164,11 @@ document.getElementById("killers_all").addEventListener("click", function() {
 
 
 // Control lists
-var auxDiv = document.createElement("div");
-auxDiv.id = "aux";
-document.body.appendChild(auxDiv);
-
 function resizeTextArea(textarea) {
-    auxDiv.textContent = textarea.value;
     var height = textarea.value.split("\n").length*16 + 15;
-    var width = auxDiv.offsetWidth + 16;
     if(height > 175) height = 175;
     if(height < 47) height = 47;
-    if(width > document.body.offsetWidth*.9 - 345) width = document.body.offsetWidth*.9 - 345;
-    if(width < 300) width = 300
     textarea.style.minHeight = height + "px";
-    textarea.style.minWidth = width + "px";
 }
 
 var textareas = document.getElementsByTagName("textarea");
