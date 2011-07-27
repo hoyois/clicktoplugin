@@ -24,6 +24,7 @@ div#container {
     top: 10%;
     margin: auto;
     width: intrinsic;
+    border-radius: 5px;
 }
 
 #container.init {
@@ -34,21 +35,6 @@ div#main {
     overflow: auto;
 }
 
-div#main::-webkit-scrollbar {
-    display: none;
-}
-
-
-#aux {
-    display: inline-block;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    visibility: hidden;
-    height: 0px;
-    white-space: pre;
-}
-
 menu, ul {
     -webkit-padding-start: 0;
     list-style-type: none;
@@ -56,8 +42,10 @@ menu, ul {
 
 nav {
     display: block;
-    background: -webkit-gradient(linear, left top, left bottom, from(#D0D0D0), to(#A7A7A7));
+    background: -webkit-gradient(linear, left top, left bottom, from(#E9E9E9), to(#BDBDBD));
     border-bottom: 1px solid #515151;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
 }
 
 nav ul {
