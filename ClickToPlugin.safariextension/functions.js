@@ -18,7 +18,7 @@ function sendToDownloadManager(url) {
     DMObject.setAttribute("height", "0");
     DMObject.setAttribute("src", url);
     document.body.appendChild(DMObject);
-    setTimeout(function() {document.body.removeChild(DMObject);}, 1000);
+    setTimeout(function() {document.body.removeChild(DMObject);}, 2000);
 }
 
 function openInQuickTimePlayer(url) {
@@ -40,7 +40,7 @@ function openInQuickTimePlayer(url) {
     QTObject.setAttribute("autohref", "true");
     QTObject.setAttribute("controller", "false");
     document.body.appendChild(QTObject);
-    setTimeout(function() {document.body.removeChild(QTObject);}, 1000);
+    setTimeout(function() {document.body.removeChild(QTObject);}, 2000);
 }
 
 function disableSIFR(element) {
