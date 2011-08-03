@@ -26,11 +26,6 @@ Should pseudo-elements be reset as well? e.g.
 etc.
 */
 
-/*
-In the WebKit nightlies the universal selector seems to select pseudo-elements as well.
-If this is the correct behavior (??), * should not be used.
-*/
-
 .CTFplaceholder,
 .CTFplaceholder *,
 .CTFmediaPlayer,
@@ -39,12 +34,12 @@ If this is the correct behavior (??), * should not be used.
     -webkit-appearance: none !important;
     -webkit-box-reflect: none !important;
     -webkit-box-shadow: none !important;
-    -webkit-box-sizing: content-box !important;
     -webkit-mask-image: none !important;
     -webkit-perspective: none !important;
     -webkit-transform: none !important;
     -webkit-user-select: none !important; /* not default */
     border: none !important;
+    box-sizing: content-box !important;
     /* This is incorrectly computed as rect(0px,0px,0px,0px) on video elements, which screws things up */
     /* clip: auto !important; */
     cursor: default !important; /* not default */
@@ -112,7 +107,6 @@ Placeholder element
     -webkit-box-direction: normal !important;
     -webkit-box-orient: horizontal !important;
     -webkit-box-pack: center !important;
-    -webkit-box-sizing: border-box !important;
     -webkit-transition-property: none !important;
     background-attachment: scroll !important;
     background-clip: padding-box !important;
@@ -122,6 +116,7 @@ Placeholder element
     background-repeat: no-repeat !important;
     background-size: contain !important;
     border: 1px solid rgba(180, 180, 180, 1) !important;
+    box-sizing: border-box !important;
     height: inherit !important;
     width: inherit !important;
 }
@@ -241,9 +236,9 @@ Media player
     -webkit-box-direction: normal !important;
     -webkit-box-orient: horizontal !important;
     -webkit-box-pack: start !important;
-    -webkit-box-sizing: border-box !important;
     -webkit-transition-property: none !important;
     bottom: 0 !important;
+    box-sizing: border-box !important;
     height: 25px !important;
     opacity: 1 !important;
     padding: 0 7px !important;
@@ -414,13 +409,13 @@ Settings pane
     display: block !important;
     -webkit-animation-name: none !important;
     -webkit-appearance: none !important;
-    -webkit-box-sizing: content-box !important;
     -webkit-mask-image: none !important;
     -webkit-perspective: none !important;
     -webkit-transform: none !important;
     -webkit-user-select: none !important;
     border: none !important;
     bottom: 0 !important;
+    box-sizing: content-box !important;
     height: 100% !important;
     left: 0 !important;
     margin: 0 !important;

@@ -70,7 +70,7 @@ function canPlayTypeWithHTML5(MIMEType) {
 const canPlayFLV = canPlayTypeWithHTML5("video/x-flv");
 const canPlayWM = canPlayTypeWithHTML5("video/x-ms-wmv");
 const canPlayDivX = canPlayFLV; // 'video/divx' always returns "", probably a Perian oversight
-//const canPlayWebM = canPlayFLV; // same as above (needs Perian 2.2)
+const canPlayWebM = canPlayTypeWithHTML5("video/webm"); // OK with Perian 2.2
 const canPlayOGG = canPlayTypeWithHTML5("video/ogg"); // OK with Xiph component
 
 // and certainly not this this one! but it does the job reasonably well

@@ -1,54 +1,18 @@
 var container = document.getElementById("container");
 var main = document.getElementById("main");
 var nav = document.getElementById("nav");
+var tabs = nav.children;
+var sections = document.getElementsByTagName("section");
+
 var inputs = document.getElementsByClassName("setting");
 var numberInputs = document.getElementsByClassName("number");
 var keyboardInputs = document.getElementsByClassName("keyboard");
 var mouseInputs = document.getElementsByClassName("mouse");
+var textareas = document.getElementsByTagName("textarea");
 var clearShortcutButtons = document.getElementsByClassName("shortcut_clear");
 var killerInputs = document.getElementsByClassName("killer");
 
-// Localization
-document.title = CTF_PREFERENCES;
-var strings = document.getElementsByClassName("string");
-var options = document.getElementsByTagName("option");
-while(strings.length > 0) {
-    strings[0].parentNode.replaceChild(document.createTextNode(this[strings[0].title]), strings[0]);
-}
-for(var i = 0; i < options.length; i++) {
-    if(options[i].hasAttribute("title")) {
-        options[i].appendChild(document.createTextNode(this[options[i].title]));
-        options[i].removeAttribute("title");
-    }
-}
-document.getElementById("killers_toggle").value = TOGGLE_BUTTON;
-document.getElementById("killers_all").value = SELECT_ALL_BUTTON;
-for(var i = 0; i < clearShortcutButtons.length; i++) {
-    clearShortcutButtons[i].value = CLEAR_BUTTON;
-}
-
-function updateWhitelistLabels(invert) {
-    if(invert) {
-        document.getElementById("locationsWhitelist").parentNode.previousSibling.textContent = BLOCK_LOCATIONS + ":";
-        document.getElementById("sourcesWhitelist").parentNode.previousSibling.textContent = BLOCK_SOURCES + ":";
-    } else {
-        document.getElementById("locationsWhitelist").parentNode.previousSibling.textContent = ALLOW_LOCATIONS + ":";
-        document.getElementById("sourcesWhitelist").parentNode.previousSibling.textContent = ALLOW_SOURCES + ":";
-    }
-}
-function updateBlacklistLabels(invert) {
-    if(invert) {
-        document.getElementById("locationsBlacklist").parentNode.previousSibling.textContent = SHOW_LOCATIONS + ":";
-        document.getElementById("sourcesBlacklist").parentNode.previousSibling.textContent = SHOW_SOURCES + ":";
-    } else {
-        document.getElementById("locationsBlacklist").parentNode.previousSibling.textContent = HIDE_LOCATIONS + ":";
-        document.getElementById("sourcesBlacklist").parentNode.previousSibling.textContent = HIDE_SOURCES + ":";
-    }
-}
-
 // Bind tabs to sections
-var tabs = nav.children;
-var sections = document.getElementsByTagName("section");
 var currentTab = 0;
 
 container.addEventListener("webkitTransitionEnd", function(event) {
@@ -89,22 +53,19 @@ for(var i = 0; i < tabs.length; i++) {
     bindTab(i);
 }
 
-main.style.maxHeight = (.85*document.body.offsetHeight - 20) + "px";
-nav.style.minWidth = (nav.offsetWidth + 10) + "px";
-
 // Killers list
-document.getElementById("killers_toggle").addEventListener("click", function() {
-    for(var i = 0; i < killerInputs.length; i++) {
-        killerInputs[i].checked ^= true;
-    }
-    changeSetting("enabledKillers", checkedKillers());
-}, false);
-document.getElementById("killers_all").addEventListener("click", function() {
+document.getElementById("select_all_killers").addEventListener("click", function() {
     for(var i = 0; i < killerInputs.length; i++) {
         killerInputs[i].checked = true;
     }
     changeSetting("enabledKillers", checkedKillers());
 }, false);
+
+for(var i = 0; i < killerInputs.length; i++) {
+    killerInputs[i].addEventListener("change", function(event) {
+        changeSetting("enabledKillers", checkedKillers());
+    }, false);
+}
 
 
 // Control lists
@@ -114,8 +75,6 @@ function resizeTextArea(textarea) {
     if(height < 47) height = 47;
     textarea.style.minHeight = height + "px";
 }
-
-var textareas = document.getElementsByTagName("textarea");
 function handleTextAreaInput(event) {
     event.target.value = event.target.value.replace(/[\t ]+/g, "\n");
     changeSetting(event.target.id, parseTextList(event.target.value));
@@ -140,7 +99,6 @@ for(var i = 0; i < textareas.length; i++) {
     }, false);
     
     textareas[i].addEventListener("input", handleTextAreaInput, false);
-    textareas[i].addEventListener("focus", handleTextAreaInput, false); // not needed in nightlies
 }
 
 // Bind 'change' events
@@ -173,11 +131,6 @@ function bindChangeEvent(input) {
         changeSetting(event.target.id, parseValue(event.target.value));
     }, false);
 }
-for(var i = 0; i < killerInputs.length; i++) {
-    killerInputs[i].addEventListener("change", function(event) {
-        changeSetting("enabledKillers", checkedKillers());
-    }, false);
-}
 
 document.getElementById("invertWhitelists").addEventListener("change", function(event) {
     updateWhitelistLabels(event.target.value === "on");
@@ -192,7 +145,6 @@ function handleNumberInput(event) {
 }
 for(var i = 0; i < numberInputs.length; i++) {
     numberInputs[i].addEventListener("input", handleNumberInput, false);
-    numberInputs[i].addEventListener("blur", handleNumberInput, false); // not needed in nightlies
 }
 
 function checkedKillers() {
@@ -244,40 +196,6 @@ function registerShortcut(shortcut, input) {
     if(input.id === "settingsShortcut") document.getElementById("settingsContext").disabled = false;
 }
 
-function simplifyWheelDelta(x, y) {
-    if(x > y && y > -x) return "left";
-    if(x > y) return "down";
-    if(-x > y) return "right";
-    return "up";
-}
-
-// Bind settings dependencies
-document.getElementById("showSourceSelector").addEventListener("change", function(event) {
-    document.getElementById("showPluginSourceItem").disabled = event.target.value !== "on";
-    document.getElementById("showQTPSourceItem").disabled = event.target.value !== "on";
-}, false);
-document.getElementById("defaultPlayer").addEventListener("change", function(event) {
-    if(this.value === "html5") {
-        document.getElementById("mediaAutoload").disabled = false;
-        var e = document.createEvent("HTMLEvents");
-        e.initEvent("change", false, false);
-        document.getElementById("mediaAutoload").dispatchEvent(e);
-    } else {
-        document.getElementById("mediaAutoload").disabled = true;
-        document.getElementById("mediaAutoload").checked = false;
-        changeSetting("mediaAutoload", false);
-        document.getElementById("showPoster").disabled = false;
-        document.getElementById("showMediaTooltip").disabled = false;
-    }
-}, false);
-document.getElementById("mediaAutoload").addEventListener("change", function(event) {
-    document.getElementById("showPoster").disabled = event.target.value === "on";
-    document.getElementById("showMediaTooltip").disabled = event.target.value === "on";
-}, false);
-document.getElementById("downloadContext").addEventListener("change", function(event) {
-    document.getElementById("useDownloadManager").disabled = event.target.value !== "on";
-}, false);
-
 // Shortcut display
 function parseKeyID(keyID) {
     if(/^U\+/.test(keyID)) {
@@ -308,7 +226,12 @@ function parseKeyID(keyID) {
         case "Clear": return "\u2327";
     }
 }
-
+function simplifyWheelDelta(x, y) {
+    if(x > y && y > -x) return "left";
+    if(x > y) return "down";
+    if(-x > y) return "right";
+    return "up";
+}
 function showShortcut(shortcut) {
     if(!shortcut) return "";
     var prefix = (shortcut.shiftKey ? "\u21e7" : "") + (shortcut.ctrlKey ? "\u2303" : "") + (shortcut.altKey ? "\u2325" : "") + (shortcut.metaKey ? "\u2318" : "");
@@ -318,20 +241,112 @@ function showShortcut(shortcut) {
     if(shortcut.type === "mousewheel") return prefix + "[wheel" + shortcut.direction + "]";
 }
 
+// Bind settings dependencies
+document.getElementById("showSourceSelector").addEventListener("change", function(event) {
+    document.getElementById("showPluginSourceItem").disabled = event.target.value !== "on";
+    document.getElementById("showQTPSourceItem").disabled = event.target.value !== "on";
+}, false);
+document.getElementById("defaultPlayer").addEventListener("change", function(event) {
+    if(this.value === "html5") {
+        document.getElementById("mediaAutoload").disabled = false;
+        var e = document.createEvent("HTMLEvents");
+        e.initEvent("change", false, false);
+        document.getElementById("mediaAutoload").dispatchEvent(e);
+    } else {
+        document.getElementById("mediaAutoload").disabled = true;
+        document.getElementById("mediaAutoload").checked = false;
+        changeSetting("mediaAutoload", false);
+        document.getElementById("showPoster").disabled = false;
+        document.getElementById("showMediaTooltip").disabled = false;
+    }
+}, false);
+document.getElementById("mediaAutoload").addEventListener("change", function(event) {
+    document.getElementById("showPoster").disabled = event.target.value === "on";
+    document.getElementById("showMediaTooltip").disabled = event.target.value === "on";
+}, false);
+document.getElementById("downloadContext").addEventListener("change", function(event) {
+    document.getElementById("useDownloadManager").disabled = event.target.value !== "on";
+}, false);
+
+// Localization
+function localizeSettings() {
+    document.title = PREFERENCES_TITLE;
+    var strings = document.getElementsByClassName("string");
+    var options = document.getElementsByTagName("option");
+    while(strings.length > 0) {
+        strings[0].parentNode.replaceChild(document.createTextNode(this[strings[0].title]), strings[0]);
+    }
+    for(var i = 0; i < options.length; i++) {
+        if(options[i].hasAttribute("title")) {
+            options[i].appendChild(document.createTextNode(this[options[i].title]));
+            options[i].removeAttribute("title");
+        }
+    }
+    document.getElementById("select_all_killers").value = SELECT_ALL_BUTTON;
+    for(var i = 0; i < clearShortcutButtons.length; i++) {
+        clearShortcutButtons[i].value = CLEAR_BUTTON;
+    }
+}
+function updateWhitelistLabels(invert) {
+    document.querySelector("[for=\"locationsWhitelist\"]").textContent = (invert ? BLOCK_LOCATIONS : ALLOW_LOCATIONS) + ":";
+    document.querySelector("[for=\"sourcesWhitelist\"]").textContent = (invert ? BLOCK_SOURCES : ALLOW_SOURCES) + ":";
+}
+function updateBlacklistLabels(invert) {
+    document.querySelector("[for=\"locationsBlacklist\"]").textContent = (invert ? SHOW_LOCATIONS : HIDE_LOCATIONS) + ":";
+    document.querySelector("[for=\"sourcesBlacklist\"]").textContent = (invert ? SHOW_SOURCES : HIDE_SOURCES) + ":";
+}
+
+// Adjust layout
+function adjustLayout() {
+    var minWidth = 20;
+    for(var i = 0; i < tabs.length; i++) {
+        minWidth += tabs[i].offsetWidth;
+    }
+    nav.style.minWidth = minWidth + "px";
+    main.style.maxHeight = (.85*document.body.offsetHeight - 20) + "px";
+
+    var stylesheet = document.getElementsByTagName("style")[0].sheet;
+    for(var i = 0; i < tabs.length; i++) {
+        var prefix = "section:nth-child(" + (i+1) +") ";
+        if(PREFERENCES_LAYOUT[i][0]) stylesheet.insertRule(prefix + "span.left{max-width:" + PREFERENCES_LAYOUT[i][0] + "px;}", 0);
+        var width = 300;
+        if(PREFERENCES_LAYOUT[i][1]) width = PREFERENCES_LAYOUT[i][1];
+        stylesheet.insertRule(prefix + "select," + prefix + "input[type=\"range\"]{width:" + width + "px;}", 0);
+        stylesheet.insertRule(prefix + "textarea{min-width:" + width + "px;}", 0);
+    }
+    for(var i = 0; i < tabs.length; i++) {
+        var prefix = "section:nth-child(" + (i+1) +") ";
+        var width = nav.offsetWidth - (sections[i].children[0].children[0].children[0].offsetWidth + 30);
+        stylesheet.insertRule(prefix + "span.checkbox{max-width:" + width + "px;}", 0);
+    }
+}
+
 // Load settings
 function loadSettings(event) {
     if(event.name !== "settings") return;
     var settings = event.message;
+    
+    // Localize
+    localize(PREFERENCES_STRINGS, settings.language);
+    delete settings.language;
+    localizeSettings();
+    updateWhitelistLabels(settings.invertWhitelists);
+    updateBlacklistLabels(settings.invertBlacklists);
+    adjustLayout();
+    
+    // Set current tab
     tabs[settings.defaultTab].className = "selected";
     sections[settings.defaultTab].className = "selected";
     currentTab = settings.defaultTab;
+    delete settings.defaultTab;
+    
+    // Killers
     for(var i = 0; i < settings.enabledKillers.length; i++) {
         document.getElementById("killer" + settings.enabledKillers[i]).checked = true;
     }
-    delete settings.defaultTab;
     delete settings.enabledKillers;
-    updateWhitelistLabels(settings.invertWhitelists);
-    updateBlacklistLabels(settings.invertBlacklists);
+    
+    // Other settings
     for(var id in settings) {
         var input = document.getElementById(id);
         if(!input) continue; // to be removed
@@ -364,6 +379,8 @@ function loadSettings(event) {
                 break;
         }
     }
+    
+    // Dependencies
     if(!settings.showSourceSelector) {
         document.getElementById("showPluginSourceItem").disabled = true;
         document.getElementById("showQTPSourceItem").disabled = true;
