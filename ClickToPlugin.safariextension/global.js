@@ -1,8 +1,12 @@
+// LOCALIZATION
+localize(GLOBAL_STRINGS, safari.extension.settings.language);
+
 // SETTINGS
-const allSettings = ["defaultTab", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "useFallbackMedia", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "codecsPolicy", "volume", "useDownloadManager", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+const allSettings = ["language", "defaultTab", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "useFallbackMedia", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "codecsPolicy", "volume", "useDownloadManager", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
 
 /* Hidden settings:
-zeroIsInvisible: undefined
+language (default: "automatic")
+zeroIsInvisible: (default: undefined)
 */
 
 const injectedSettings = ["enabledKillers", "useFallbackMedia", "showSourceSelector", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "volume", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
@@ -16,7 +20,7 @@ function getSettings(array) {
 }
 
 // CORE
-var CTP_instance = 0; // incremented by one whenever a ClickToPlugin instance with content is created
+var instance = 0;
 
 function respondToMessage(event) {
     switch (event.name) {
@@ -60,7 +64,7 @@ function respondToCanLoad(message) {
     // Make checks in correct order for optimal performance
     if(message.location !== undefined) return blockOrAllow(message);
     if(message === "getSettings") return getSettings(injectedSettings);
-    if(message === "getInstance") return ++CTP_instance;
+    if(message === "getInstance") return ++instance;
 }
 
 function blockOrAllow(data) {
@@ -156,19 +160,19 @@ function handleContextMenu(event) {
     var s = safari.extension.settings;
     var u = event.userInfo;
     if(u === null) {
-        if(s.disableEnableContext && event.target.url) event.contextMenu.appendContextMenuItem("switchOn", TURN_CTP_ON);
-        else if(s.settingsContext) event.contextMenu.appendContextMenuItem("settings", CTP_PREFERENCES + "\u2026");
+        if(s.disableEnableContext && event.target.url) event.contextMenu.appendContextMenuItem("switchOn", SWITCH_ON);
+        else if(s.settingsContext) event.contextMenu.appendContextMenuItem("settings", PREFERENCES + "\u2026");
         return;
     }
     if(u.location === safari.extension.baseURI + "settings.html") return;
     
     if(u.elementID === undefined) { // Generic menu
-        if(s.disableEnableContext) event.contextMenu.appendContextMenuItem("switchOff", TURN_CTP_OFF);
+        if(s.disableEnableContext) event.contextMenu.appendContextMenuItem("switchOff", SWITCH_OFF);
         if(s.loadAllContext && u.blocked > 0 && (u.blocked > u.invisible || !s.loadInvisibleContext)) event.contextMenu.appendContextMenuItem("loadAll", LOAD_ALL_PLUGINS + " (" + u.blocked + ")");
         if(s.loadInvisibleContext && u.invisible > 0) event.contextMenu.appendContextMenuItem("loadInvisible", LOAD_INVISIBLE_PLUGINS + " (" + u.invisible + ")");
         if(s.addToWhitelistContext && !matchList(s.locationsWhitelist, u.location)) event.contextMenu.appendContextMenuItem("locationsWhitelist", s.invertWhitelists ? ALWAYS_BLOCK_ON_DOMAIN : ALWAYS_ALLOW_ON_DOMAIN);
         if(s.addToBlacklistContext && !matchList(s.locationsBlacklist, u.location)) event.contextMenu.appendContextMenuItem("locationsBlacklist", s.invertBlacklists ? ALWAYS_SHOW_ON_DOMAIN : ALWAYS_HIDE_ON_DOMAIN);
-        if(s.settingsContext) event.contextMenu.appendContextMenuItem("settings", CTP_PREFERENCES + "\u2026");
+        if(s.settingsContext) event.contextMenu.appendContextMenuItem("settings", PREFERENCES + "\u2026");
         return;
     }
     
@@ -312,24 +316,5 @@ safari.application.addEventListener("contextmenu", handleContextMenu, false);
 safari.application.addEventListener("command", doCommand, false);
 
 // UPDATE
-function clearSettings() {
-    for(var i = 0; i < arguments.length; i++) {
-        safari.extension.settings.removeItem(arguments[i]);
-    }
-}
-if(safari.extension.settings.version < 10) clearSettings("pluginsWhitelist", "invertPluginsWhitelist", "replacePlugins", "useSourceSelector");
-else if(safari.extension.settings.version < 15) clearSettings("preload");
-if(safari.extension.settings.version < 16) {
-    function updateWhitelists() {
-        for(var i = 0; i < arguments.length; i++) {
-            if(typeof safari.extension.settings[arguments[i]] === "string") safari.extension.settings[arguments[i]] = safari.extension.settings[arguments[i]].split(/\s+/);
-        }
-    }
-    updateWhitelists("locationsWhitelist", "sourcesWhitelist", "mediaWhitelist");
-}
-if(safari.extension.settings < 19) {
-    safari.extension.settings.enabledKillers = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
-    clearSettings("showVolumeSlider");
-}
-safari.extension.settings.version = 22;
+safari.extension.settings.version = 24;
 

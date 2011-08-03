@@ -216,7 +216,7 @@ function handleBeforeLoadEvent(event) {
     var position = style.getPropertyValue("position");
     if(position === "static") placeholderElement.style.setProperty("position", "relative", "important");
     else placeholderElement.style.setProperty("position", position, "important");
-    applyCSS(placeholderElement, style, ["top", "right", "bottom", "left", "z-index", "clear", "float", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-top-collapse", "-webkit-margin-bottom-collapse"]);
+    applyCSS(placeholderElement, style, ["top", "right", "bottom", "left", "z-index", "clear", "float", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-before-collapse", "-webkit-margin-after-collapse"]);
     
     // Fill the main arrays
     blockedElements[elementID] = element;
