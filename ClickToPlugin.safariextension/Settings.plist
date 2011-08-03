@@ -509,5 +509,11 @@
 		<key>Key</key>
 		<string>useDownloadManager</string>
 	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string>automatic</string>
+		<key>Key</key>
+		<string>language</string>
+	</dict>
 </array>
 </plist>

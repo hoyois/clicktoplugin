@@ -10,10 +10,10 @@ YouTubeKiller.prototype.canKill = function(data) {
 YouTubeKiller.prototype.process = function(data, callback) {
     if(data.onsite) {
         var flashvars = parseFlashVariables(data.params);
-        flashvars.title = data.title;
+        if(/\s-\sYouTube$/.test(data.title)) flashvars.title = data.title.slice(1, -12);
         
         var videoID = flashvars.video_id;
-        if(!videoID) { // new YouTube AJAX player
+        if(!videoID) { // YouTube AJAX player
             var match = data.location.match(/[!&]v=([^&]+)/);
             if(!match) return;
             videoID = match[1];
@@ -43,6 +43,75 @@ YouTubeKiller.prototype.process = function(data, callback) {
             this.processFromPlaylistID(match[2], false, false, callback);
         }
     }
+};
+
+YouTubeKiller.prototype.processFromFlashVars = function(flashvars, callback) {
+    if(!flashvars.url_encoded_fmt_stream_map) return;
+    var formatList = decodeURIComponent(flashvars.url_encoded_fmt_stream_map).split(",");
+        
+    var sources = new Array();
+    
+    /* fmt values:
+    MP4 (AVC1/MP4A): 38 (2304p), 37 (1080p), 22 (720p), 18 (360p)
+    FLV (AVC1/MP4A): 35 (480p), 34 (360p)
+    FLV (FLV1/MP3): 5 (240p)
+    WebM (VP8/Vorbis): 45 (720p), 44 (480p), 43 (360p)
+    */
+    for(var i = 0; i < formatList.length; i++) {
+        var x = parseFlashVariables(formatList[i]);
+        var videoURL = decodeURIComponent(x.url) + "&title=" + encodeURIComponent(flashvars.title);
+        if(x.itag === "38") {
+            sources.push({"url": videoURL, "format": "4K MP4", "resolution": 2304, "isNative": true, "mediaType": "video"});
+        } else if(x.itag === "37") {
+            sources.push({"url": videoURL, "format": "1080p MP4", "resolution": 1080, "isNative": true, "mediaType": "video"});
+        } else if(x.itag === "22") {
+            sources.push({"url": videoURL, "format": "720p MP4", "resolution": 720, "isNative": true, "mediaType": "video"});
+        } else if(x.itag === "18") {
+            sources.push({"url": videoURL, "format": "360p MP4", "resolution": 360, "isNative": true, "mediaType": "video"});
+        } else if(x.itag === "35" && canPlayFLV) {
+            sources.push({"url": videoURL, "format": "480p FLV", "resolution": 480, "isNative": false, "mediaType": "video"});
+        } else if(x.itag === "34" && canPlayFLV) {
+            sources.push({"url": videoURL, "format": "360p FLV", "resolution": 360, "isNative": false, "mediaType": "video"});
+        } else if(x.itag === "5" && canPlayFLV) {
+            sources.push({"url": videoURL, "format": "240p FLV", "resolution": 240, "isNative": false, "mediaType": "video"});
+        } /*else if(x.itag === "45" && canPlayWebM) {
+            sources.push({"url": videoURL, "format": "720p WebM", "resolution": 720, "isNative": false, "mediaType": "video"});
+        } else if(x.itag === "44" && canPlayWebM) {
+            sources.push({"url": videoURL, "format": "480p WebM", "resolution": 480, "isNative": false, "mediaType": "video"});
+        } else if(x.itag === "43" && canPlayWebM) {
+            sources.push({"url": videoURL, "format": "360p WebM", "resolution": 360, "isNative": false, "mediaType": "video"});
+        }*/
+    }
+    
+    var posterURL;
+    if(flashvars.iurlmaxres) posterURL = decodeURIComponent(flashvars.iurlmaxres);
+    else if(flashvars.iurlsd) posterURL = decodeURIComponent(flashvars.iurlsd);
+    else posterURL = "https://i.ytimg.com/vi/" + flashvars.video_id + "/hqdefault.jpg";
+        
+    var videoData = {
+        "playlist": [{"title": flashvars.title, "posterURL": posterURL, "sources": sources}]
+    };
+    callback(videoData);
+};
+
+YouTubeKiller.prototype.processFromVideoID = function(videoID, callback) {
+    var _this = this;
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "https://www.youtube.com/get_video_info?&video_id=" + videoID + "&eurl=http%3A%2F%2Fwww%2Eyoutube%2Ecom%2F", true);
+    xhr.onload = function() {
+        var flashvars = parseFlashVariables(xhr.responseText);
+        if(flashvars.status === "ok") {
+            flashvars.title = decodeURIComponent(flashvars.title.replace(/\+/g, " "));
+            var callbackForEmbed = function(videoData) {
+                videoData.playlist[0].siteInfo = {"name": "YouTube", "url": "http://www.youtube.com/watch?v=" + videoID};
+                callback(videoData);
+            };
+            _this.processFromFlashVars(flashvars, callbackForEmbed);
+        } else { // happens if YT just removed content and didn't update its playlists yet
+            callback({"playlist": []});
+        }
+    };
+    xhr.send(null);
 };
 
 YouTubeKiller.prototype.processFromPlaylistID = function(playlistID, videoID, flashvars, callback) {
@@ -75,7 +144,7 @@ YouTubeKiller.prototype.processFromPlaylistID = function(playlistID, videoID, fl
 
 YouTubeKiller.prototype.buildVideoIDList = function(playlistID, startIndex, videoIDList, processList) {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', "http://gdata.youtube.com/feeds/api/playlists/" + playlistID + "?start-index=" + startIndex + "&max-results=50", true);
+    xhr.open('GET', "https://gdata.youtube.com/feeds/api/playlists/" + playlistID + "?start-index=" + startIndex + "&max-results=50", true);
     var _this = this;
     xhr.onload = function() {
         var entries = xhr.responseXML.getElementsByTagName("entry");
@@ -120,73 +189,5 @@ YouTubeKiller.prototype.buildPlaylist = function(playlistID, videoIDList, n, cal
     };
     this.processFromVideoID(videoIDList.shift(), next);
     return;
-};
-
-YouTubeKiller.prototype.processFromFlashVars = function(flashvars, callback) {
-    if(!flashvars.fmt_url_map) return;
-    var urlMap = decodeURIComponent(flashvars.fmt_url_map);
-    var title;
-    if(flashvars.rec_title) title = decodeURIComponent(flashvars.rec_title).substring(4).replace(/\+/g, " ");
-    else if(/\s-\sYouTube$/.test(flashvars.title)) title = flashvars.title.slice(1, -12);
-    this.finalizeProcessing(flashvars.video_id, urlMap, title, callback);
-};
-
-YouTubeKiller.prototype.processFromVideoID = function(videoID, callback) {
-    var _this = this;
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", "https://www.youtube.com/get_video_info?&video_id=" + videoID + "&eurl=http%3A%2F%2Fwww%2Eyoutube%2Ecom%2F", true);
-    xhr.onload = function() {
-        var flashvars = parseFlashVariables(xhr.responseText);
-        if(flashvars.status === "ok") {
-            var title = decodeURIComponent(flashvars.title.replace(/\+/g, " "));
-            var callbackForEmbed = function(videoData) {
-                videoData.playlist[0].siteInfo = {"name": "YouTube", "url": "http://www.youtube.com/watch?v=" + videoID};
-                callback(videoData);
-            };
-            _this.finalizeProcessing(videoID, decodeURIComponent(flashvars.fmt_url_map), title, callbackForEmbed);
-        } else { // happens if YT just removed content and didn't update its playlists yet
-            callback({"playlist": []});
-        }
-    };
-    xhr.send(null);
-};
-
-YouTubeKiller.prototype.finalizeProcessing = function(videoID, urlMap, title, callback) {
-    var downloadTitle = escape(title); // using escape here because YT needs latin1, and it cannot handle other Unicode chars anyway
-    if(/%u/.test(downloadTitle)) downloadTitle = ""; // revert to 'videoplayback' if the title will be garbled (WTF youtube?)
-    
-    var sources = new Array();
-    /*
-    Only 18, 22, 37, and 38 are MP4 playable natively by QuickTime.
-    Other containers are FLV (5, 34, 35, the latter two are H.264 360p and 480p),
-    3GP (17), or WebM (43,45) [17,43,45 do not appear in the flashvars]
-    */
-    var formatList = urlMap.split(",");
-    for(var i = 0; i < formatList.length; i++) {
-        var x = formatList[i].split("|");
-        if(x[0] === "38") {
-            sources.push({"url": x[1] + "&title=" + downloadTitle, "format": "4K MP4", "resolution": 2304, "isNative": true, "mediaType": "video"});
-        } else if(x[0] === "37") {
-            sources.push({"url": x[1] + "&title=" + downloadTitle, "format": "1080p MP4", "resolution": 1080, "isNative": true, "mediaType": "video"});
-        } else if(x[0] === "22") {
-            sources.push({"url": x[1] + "&title=" + downloadTitle, "format": "720p MP4", "resolution": 720, "isNative": true, "mediaType": "video"});
-        } else if(x[0] === "18") {
-            sources.push({"url": x[1] + "&title=" + downloadTitle, "format": "360p MP4", "resolution": 360, "isNative": true, "mediaType": "video"});
-        } else if(x[0] === "35" && canPlayFLV) {
-            sources.push({"url": x[1] + "&title=" + downloadTitle, "format": "480p FLV", "resolution": 480, "isNative": false, "mediaType": "video"});
-        } else if(x[0] === "34" && canPlayFLV) {
-            sources.push({"url": x[1] + "&title=" + downloadTitle, "format": "360p FLV", "resolution": 360, "isNative": false, "mediaType": "video"});
-        } else if(x[0] === "5" && canPlayFLV) {
-            sources.push({"url": x[1] + "&title=" + downloadTitle, "format": "240p FLV", "resolution": 240, "isNative": false, "mediaType": "video"});
-        }
-    }
-    
-    // var videoURL = "http://www.youtube.com/get_video?fmt=18&asv=&video_id=" + videoID + "&t=" + videoHash; 
-    
-    var posterURL = "http://i.ytimg.com/vi/" + videoID + "/hqdefault.jpg";
-    var videoData = {
-        "playlist": [{"title": title, "posterURL": posterURL, "sources": sources}]
-    };
-    callback(videoData);
 };
 

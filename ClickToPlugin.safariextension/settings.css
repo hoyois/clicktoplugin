@@ -32,13 +32,10 @@ div#container {
 }
 
 div#main {
+    position: relative;
     overflow: auto;
 }
 
-menu, ul {
-    -webkit-padding-start: 0;
-    list-style-type: none;
-}
 
 nav {
     display: block;
@@ -49,6 +46,8 @@ nav {
 }
 
 nav ul {
+    -webkit-padding-start: 0;
+    list-style-type: none;
     display: -webkit-box;
     -webkit-box-orient: horizontal;
     -webkit-box-pack: center;
@@ -61,9 +60,8 @@ nav ul li {
     -webkit-box-flex: 0;
     padding: 0;
     margin: 0;
-    height: 19px;
+    height: 20px;
     text-shadow: #EDEDED 0 1px 1px;
-    white-space: nowrap;
 }
 
 nav ul li.selected {
@@ -73,16 +71,16 @@ nav ul li.selected {
 
 li span.tab {
     display: block;
-    padding: 3px 6px;
+    padding: 0 6px;
+    height: 21px;
+    line-height: 20px !important; /* What kind of crazy bug is this??? */
     cursor: pointer;
-    border-bottom: 1px solid #515151;
     font: -webkit-small-control;
 }
 
 li.selected span.tab {
-    padding: 3px 5px;
+    padding: 0 5px;
     background-color: #EDEDED;
-    border-bottom-color: #EDEDED;
 }
 
 section {
@@ -101,11 +99,14 @@ section.selected {
 }
 
 menu {
-    margin: 15px;
+    -webkit-padding-start: 0;
+    display: table;
+    margin: 0 auto;
+    padding: 15px;
 }
 
 menu li {
-    white-space: nowrap;
+    display: table-row;
 }
 
 li.glue {
@@ -113,29 +114,42 @@ li.glue {
 }
 
 span.left {
-    display: inline-block;
-    width: 300px;
-    text-align: right;
-    margin-right: 7px;
+    position: relative;
+    display: table-cell;
     white-space: normal;
+    text-align: right;
+    vertical-align: baseline;
+    padding-right: 7px;
+}
+
+span.left input[type="button"] {
+    position: absolute;
+    right: 7px;
+}
+
+span.left label {
+    display: inline-block;
 }
 
 span.right {
-    display: inline-block;
-    white-space: nowrap;
-}
-
-span.right.sub {
-    margin-left: 18px;
-}
-
-span.right.tip {
-    display: inline-block;
-    font: -webkit-small-control;
-    font-size: 10px;
-    line-height: 15px;
-    width: 450px;
+    display: table-cell;
     white-space: normal;
+    text-align: left;
+    vertical-align: baseline;
+}
+
+span.checkbox {
+    padding: 2px 0 2px 18px;
+    text-indent: -18px;
+    -webkit-line-box-contain: block;
+    box-sizing: border-box;
+}
+#container.init span.checkbox {
+    display: none;
+}
+
+span.checkbox.sub {
+    padding-left: 36px;
 }
 
 textarea, input[type="text"], input[type="number"] {
@@ -155,12 +169,8 @@ textarea {
 }
 
 span.left.textarea {
-    margin-top: 5px;
+    padding-top: 5px;
     vertical-align: top;
-}
-
-textarea, select, input[type="range"] {
-    width: 300px;
 }
 
 input[type="range"] {
@@ -168,16 +178,12 @@ input[type="range"] {
 }
 
 input[type="checkbox"] {
-    font-size: 17px;
-    margin: 3px 4px 3px 0;
+    font-size: 16px;
+    margin: 0 4px 0 0;
 }
 
 select {
-    font-size: 17px;
-}
-
-input[type="button"] {
-    height: 13px;
+    font-size: 16px;
 }
 
 span.mouse {
