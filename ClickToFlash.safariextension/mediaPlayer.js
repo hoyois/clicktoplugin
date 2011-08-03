@@ -83,7 +83,7 @@ mediaPlayer.prototype.createMediaElement = function(width, height, style, contex
     this.containerElement.style.height = height + "px !important";
     this.mediaElement.style.width = width + "px";
     this.mediaElement.style.height = height + "px";
-    applyCSS(this.containerElement, style, ["position", "top", "right", "bottom", "left", "z-index", "clear", "float", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-top-collapse", "-webkit-margin-bottom-collapse"]);
+    applyCSS(this.containerElement, style, ["position", "top", "right", "bottom", "left", "z-index", "clear", "float", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-before-collapse", "-webkit-margin-after-collapse"]);
     
     // Set volume
     this.mediaElement.volume = settings.volume;
@@ -186,13 +186,15 @@ mediaPlayer.prototype.hideTrackInfo = function() {
 
 mediaPlayer.prototype.initializePlaylistControls = function() {
     var _this = this;
+    var x = 26;
+    if(settings.hideRewindButton) x = 0;
     this.containerElement.addEventListener("click", function(event) {
         var coord = _this.getCoordinates(event);
         if(coord.y + 25 > _this.height) { // click in controls
-            if(coord.x >= 32 && coord.x <= 51) {
+            if(coord.x >= x + 6 && coord.x <= x + 25) {
                 event.preventDefault();
                 _this.jumpTrack(-1);
-            } else if(coord.x >= 80 && coord.x <= 99) {
+            } else if(coord.x >= x + 54 && coord.x <= x + 73) {
                 event.preventDefault();
                 _this.jumpTrack(1);
             }
