@@ -3,6 +3,7 @@ var main = document.getElementById("main");
 var nav = document.getElementById("nav");
 var tabs = nav.children;
 var sections = document.getElementsByTagName("section");
+var menus = document.getElementsByTagName("menu");
 
 var inputs = document.getElementsByClassName("setting");
 var numberInputs = document.getElementsByClassName("number");
@@ -54,26 +55,11 @@ for(var i = 0; i < tabs.length; i++) {
     bindTab(i);
 }
 
-// Killers list
-document.getElementById("select_all_killers").addEventListener("click", function() {
-    for(var i = 0; i < killerInputs.length; i++) {
-        killerInputs[i].checked = true;
-    }
-    changeSetting("enabledKillers", checkedKillers());
-}, false);
-
-for(var i = 0; i < killerInputs.length; i++) {
-    killerInputs[i].addEventListener("change", function(event) {
-        changeSetting("enabledKillers", checkedKillers());
-    }, false);
-}
-
-
 // Control lists
 function resizeTextArea(textarea) {
-    var height = textarea.value.split("\n").length*16 + 15;
-    if(height > 175) height = 175;
-    if(height < 47) height = 47;
+    var height = textarea.value.split("\n").length*16;
+    if(height > 176) height = 176;
+    if(height < 48) height = 48;
     textarea.style.minHeight = height + "px";
 }
 function handleTextAreaInput(event) {
@@ -102,6 +88,15 @@ for(var i = 0; i < textareas.length; i++) {
     textareas[i].addEventListener("input", handleTextAreaInput, false);
 }
 
+// Killer reset
+var defaultKillers = "killers/YouTube.js\nkillers/Vimeo.js\nkillers/Dailymotion.js\nkillers/Facebook.js\nkillers/Break.js\nkillers/Blip.js\nkillers/Metacafe.js\nkillers/TED.js\nkillers/Tumblr.js\nkillers/Flash.js\nkillers/Silverlight.js\nkillers/QuickTime.js\nkillers/WindowsMedia.js\nkillers/DivX.js";
+document.getElementById("reset_killers").addEventListener("click", function() {
+    var textarea = document.getElementById("additionalScripts");
+    textarea.value = defaultKillers;
+    changeSetting("additionalScripts", parseTextList(defaultKillers));
+    resizeTextArea(textarea);
+}, false);
+
 // Bind 'change' events
 function changeSetting(setting, value) {
     safari.self.tab.dispatchMessage("changeSetting", {"setting": setting, "value": value});
@@ -123,6 +118,9 @@ function bindChangeEvent(input) {
                     break;
                 case "checkbox":
                     parseValue = function(value) {return value === "on";}
+                    break;
+                case "text":
+                    parseValue = function(value) {return value;}
                     break;
             }
             break;
@@ -148,21 +146,6 @@ for(var i = 0; i < numberInputs.length; i++) {
     numberInputs[i].addEventListener("input", handleNumberInput, false);
 }
 
-function checkedPlugins() {
-    var array = new Array();
-    for(var i = 0; i < pluginInputs.length; i++) {
-        if(pluginInputs[i].checked) array.push(pluginInputs[i].id.substr(7));
-    }
-    return array;
-}
-function checkedKillers() {
-    var array = new Array();
-    for(var i = 0; i < killerInputs.length; i++) {
-        if(killerInputs[i].checked) array.push(parseInt(killerInputs[i].id.substr(6)));
-    }
-    return array;
-}
-
 // Shortcuts input
 for(var i = 0; i < keyboardInputs.length; i++) {
     keyboardInputs[i].addEventListener("keydown", handleKeyboardEvent, false);
@@ -171,7 +154,7 @@ for(var i = 0; i < keyboardInputs.length; i++) {
 function clearShortcut(event) {
     var textField = event.target.previousSibling.previousSibling;
     textField.value = "";
-    changeSetting(textField.id, null);
+    changeSetting(textField.id, false);
     if(textField.id === "settingsShortcut") {
         document.getElementById("settingsContext").disabled = true;
         document.getElementById("settingsContext").checked = true;
@@ -280,9 +263,19 @@ document.getElementById("downloadContext").addEventListener("change", function(e
 function localizeSettings() {
     document.title = PREFERENCES_TITLE;
     var strings = document.getElementsByClassName("string");
+    var splitstrings = document.getElementsByClassName("splitstring");
     var options = document.getElementsByTagName("option");
     while(strings.length > 0) {
         strings[0].parentNode.replaceChild(document.createTextNode(this[strings[0].title]), strings[0]);
+    }
+    while(splitstrings.length > 0) {
+        var s = splitstrings[0];
+        s.parentNode.insertBefore(document.createTextNode(this[s.title][0]), s);
+        for(var i = 1; i < this[s.title].length; i++) {
+            s.parentNode.insertBefore(s.childNodes[i-1], s);
+            s.parentNode.insertBefore(document.createTextNode(this[s.title][i]), s);
+        }
+        s.parentNode.removeChild(s);
     }
     for(var i = 0; i < options.length; i++) {
         if(options[i].hasAttribute("title")) {
@@ -290,73 +283,58 @@ function localizeSettings() {
             options[i].removeAttribute("title");
         }
     }
-    document.getElementById("select_all_killers").value = SELECT_ALL_BUTTON;
     for(var i = 0; i < clearShortcutButtons.length; i++) {
         clearShortcutButtons[i].value = CLEAR_BUTTON;
     }
+    document.getElementById("reset_killers").value = DEFAULT_KILLERS_BUTTON;
 }
 function updateWhitelistLabels(invert) {
-    document.querySelector("[for=\"locationsWhitelist\"]").textContent = (invert ? BLOCK_LOCATIONS : ALLOW_LOCATIONS) + ":";
-    document.querySelector("[for=\"sourcesWhitelist\"]").textContent = (invert ? BLOCK_SOURCES : ALLOW_SOURCES) + ":";
+    document.querySelector("[for=\"locationsWhitelist\"]").textContent = (invert ? BLOCK_LOCATIONS : ALLOW_LOCATIONS);
+    document.querySelector("[for=\"sourcesWhitelist\"]").textContent = (invert ? BLOCK_SOURCES : ALLOW_SOURCES);
 }
 function updateBlacklistLabels(invert) {
-    document.querySelector("[for=\"locationsBlacklist\"]").textContent = (invert ? SHOW_LOCATIONS : HIDE_LOCATIONS) + ":";
-    document.querySelector("[for=\"sourcesBlacklist\"]").textContent = (invert ? SHOW_SOURCES : HIDE_SOURCES) + ":";
+    document.querySelector("[for=\"locationsBlacklist\"]").textContent = (invert ? SHOW_LOCATIONS : HIDE_LOCATIONS);
+    document.querySelector("[for=\"sourcesBlacklist\"]").textContent = (invert ? SHOW_SOURCES : HIDE_SOURCES);
 }
 
 // List of plugins
-function createListOfPlugins() {
-    var pluginList = sections[0].getElementsByTagName("menu")[0];
+function buildPluginMenu() {
+    var pluginMenu = document.getElementById("plug-ins");
+    var span = pluginMenu.children[0].children[0];
     if(navigator.plugins.length === 0) {
-        pluginList.innerHTML = "<li><span></span></li>";
-        pluginList.firstChild.firstChild.textContent = NO_PLUGINS_NOTICE;
+        span.textContent = NO_PLUGINS_NOTICE;
         return;
     }
-    var pluginItems = new Array();
-    for(var i = 0; i < navigator.plugins.length; i++) {
+    span.textContent = ALLOW_THESE_PLUGINS;
+    var plugins = Array.prototype.slice.call(navigator.plugins, 0).sort(function(p, q) {
+        p = p.name.toLowerCase();
+        q = q.name.toLowerCase();
+        if(p < q) return -1;
+        if(p > q) return 1;
+        return 0;
+    });
+    for(var i = 0; i < plugins.length; i++) {
+        var li = document.createElement("li");
         var span = document.createElement("span");
-        span.className = "right checkbox";
-        span.title = PLUGIN_FILENAME + ": " + navigator.plugins[i].filename + "\n" + PLUGIN_DESCRIPTION + ": " + navigator.plugins[i].description;
-        //var title = "";
+        span.className = "checkbox sub";
+        span.title = PLUGIN_FILENAME + ": " + plugins[i].filename + "\n" + PLUGIN_DESCRIPTION + ": " + plugins[i].description;
         span.innerHTML = "<input class=\"plugin\" type=\"checkbox\"><label></label></span>";
-        span.childNodes[0].id = "plugin/" + navigator.plugins[i].filename;
+        span.childNodes[0].id = "plugin/" + plugins[i].filename;
         span.childNodes[0].addEventListener("change", function(event) {
             changeSetting("allowedPlugins", checkedPlugins());
         }, false);
-        span.childNodes[1].htmlFor = "plugin/" + navigator.plugins[i].filename;
-        span.childNodes[1].textContent = navigator.plugins[i].name;
-        pluginItems.push(span);
-    }
-    var alphabeticalSort = function(a, b) {
-        a = a.childNodes[1].textContent.toLowerCase();
-        b = b.childNodes[1].textContent.toLowerCase();
-        if(a < b) return -1;
-        if(a > b) return 1;
-        return 0;
-    };
-    pluginItems.sort(alphabeticalSort);
-    for(var i = 0; i < pluginItems.length || i < 2; i++) {
-        var li = document.createElement("li");
-        var span = document.createElement("span");
-        span.className = "left";
-        if(i === 0) {
-            span.innerHTML = "<label></label>";
-            span.firstChild.textContent = ALLOW_THESE_PLUGINS + ":";
-        } else if(i === 1) {
-            span.innerHTML = "<input id=\"plugins_reset\" type=\"button\">";
-            span.childNodes[0].value = DESELECT_ALL_BUTTON;
-        }
+        span.childNodes[1].htmlFor = "plugin/" + plugins[i].filename;
+        span.childNodes[1].textContent = plugins[i].name;
         li.appendChild(span);
-        if(i < pluginItems.length) li.appendChild(pluginItems[i]);
-        pluginList.appendChild(li);
+        pluginMenu.appendChild(li);
     }
-    
-    document.getElementById("plugins_reset").addEventListener("click", function() {
-        for(var i = 0; i < pluginInputs.length; i++) {
-            pluginInputs[i].checked = false;
-        }
-        changeSetting("allowedPlugins", []);
-    }, false);
+}
+function checkedPlugins() {
+    var array = new Array();
+    for(var i = 0; i < pluginInputs.length; i++) {
+        if(pluginInputs[i].checked) array.push(pluginInputs[i].id.substr(7));
+    }
+    return array;
 }
 
 // Adjust layout
@@ -369,18 +347,13 @@ function adjustLayout() {
     main.style.maxHeight = (.85*document.body.offsetHeight - 20) + "px";
 
     var stylesheet = document.getElementsByTagName("style")[0].sheet;
-    for(var i = 0; i < tabs.length; i++) {
-        var prefix = "section:nth-child(" + (i+1) +") ";
-        if(PREFERENCES_LAYOUT[i][0]) stylesheet.insertRule(prefix + "span.left{max-width:" + PREFERENCES_LAYOUT[i][0] + "px;}", 0);
-        var width = 300;
-        if(PREFERENCES_LAYOUT[i][1]) width = PREFERENCES_LAYOUT[i][1];
-        stylesheet.insertRule(prefix + "select," + prefix + "input[type=\"range\"]{width:" + width + "px;}", 0);
-        stylesheet.insertRule(prefix + "textarea{min-width:" + width + "px;}", 0);
+    for(var i = 0; i < PREFERENCES_LAYOUT.length; i++) {
+        stylesheet.insertRule(PREFERENCES_LAYOUT[i], 0);
     }
-    for(var i = 0; i < tabs.length; i++) {
-        var prefix = "section:nth-child(" + (i+1) +") ";
-        var width = nav.offsetWidth - (sections[i].children[0].children[0].children[0].offsetWidth + 30);
-        stylesheet.insertRule(prefix + "span.checkbox{max-width:" + width + "px;}", 0);
+    for(var i = 0; i < menus.length; i++) {
+        var usedWidth = 20;
+        if(menus[i].className === "two_column") usedWidth += 21 + menus[i].children[0].children[0].offsetWidth;
+        stylesheet.insertRule("#" + menus[i].id + " .checkbox{max-width:" + (nav.offsetWidth - usedWidth) + "px;}", 0);
     }
 }
 
@@ -393,10 +366,8 @@ function loadSettings(event) {
     localize(PREFERENCES_STRINGS, settings.language);
     delete settings.language;
     localizeSettings();
-    createListOfPlugins();
     updateWhitelistLabels(settings.invertWhitelists);
     updateBlacklistLabels(settings.invertBlacklists);
-    adjustLayout();
     
     // Set current tab
     tabs[settings.defaultTab].className = "selected";
@@ -405,6 +376,7 @@ function loadSettings(event) {
     delete settings.defaultTab;
     
     // Plugins
+    buildPluginMenu();
     for(var i = 0; i < settings.allowedPlugins.length; i++) {
         var input = document.getElementById("plugin/" + settings.allowedPlugins[i]);
         if(input) input.checked = true;
@@ -413,11 +385,8 @@ function loadSettings(event) {
     changeSetting("allowedPlugins", settings.allowedPlugins);
     delete settings.allowedPlugins;
     
-    // Killers
-    for(var i = 0; i < settings.enabledKillers.length; i++) {
-        document.getElementById("killer" + settings.enabledKillers[i]).checked = true;
-    }
-    delete settings.enabledKillers;
+    // Adjust Layout
+    adjustLayout();
     
     // Other settings
     for(var id in settings) {
@@ -443,7 +412,8 @@ function loadSettings(event) {
                         input.value = settings[id];
                         break;
                     case "text":
-                        input.value = showShortcut(settings[id]);
+                        if(input.className === "keyboard") input.value = showShortcut(settings[id]);
+                        else input.value = settings[id];
                         break;
                     case "checkbox":
                         if(settings[id]) input.checked = true;

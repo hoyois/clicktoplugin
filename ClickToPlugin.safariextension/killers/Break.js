@@ -1,13 +1,14 @@
-function BreakKiller() {}
+var killer = new Object();
+addKiller("Break", killer);
 
-BreakKiller.prototype.canKill = function(data) {
+killer.canKill = function(data) {
     if(data.plugin !== "Flash") return false;
     if(data.src.indexOf(".break.com/static/") !== -1) {data.onsite = true; return true;}
     if(data.src.indexOf("embed.break.com/") !== -1) {data.onsite = false; return true;}
     return false;
 };
 
-BreakKiller.prototype.process = function(data, callback) {
+killer.process = function(data, callback) {
     var videoURL, posterURL, videoHash, url;
     if(data.onsite) {
         var flashvars = parseFlashVariables(data.params);
@@ -38,18 +39,18 @@ BreakKiller.prototype.process = function(data, callback) {
         }
         var matches = xhr.responseText.match(/sGlobalFileNameHDD=['"]([^'"]*)['"]/);
         if(matches) {
-            sources.push({"url": matches[1].replace(/\.flv$/, "").replace(/\.mp4$/, "") + ".mp4?" + videoHash, "format": "720p MP4", "resolution": 720, "isNative": true, "mediaType": "video"});
+            sources.push({"url": matches[1].replace(/\.flv$/, "").replace(/\.mp4$/, "") + ".mp4?" + videoHash, "format": "720p MP4", "height": 720, "isNative": true, "mediaType": "video"});
         }
         matches = xhr.responseText.match(/sGlobalFileNameHD=['"]([^'"]*)['"]/);
         if(matches) {
-            sources.push({"url": matches[1].replace(/\.flv$/, "").replace(/\.mp4$/, "") + ".mp4?" + videoHash, "format": "480p MP4", "resolution": 480, "isNative": true, "mediaType": "video"});
+            sources.push({"url": matches[1].replace(/\.flv$/, "").replace(/\.mp4$/, "") + ".mp4?" + videoHash, "format": "480p MP4", "height": 480, "isNative": true, "mediaType": "video"});
         }
         matches = xhr.responseText.match(/sGlobalFileName=['"]([^'"]*)['"]/);
         if(matches) {
-            sources.push({"url": matches[1].replace(/\.flv$/, "").replace(/\.mp4$/, "") + ".mp4?" + videoHash, "format": "360p MP4", "resolution": 360, "isNative": true, "mediaType": "video"});
+            sources.push({"url": matches[1].replace(/\.flv$/, "").replace(/\.mp4$/, "") + ".mp4?" + videoHash, "format": "360p MP4", "height": 360, "isNative": true, "mediaType": "video"});
         }
         if(sources.length === 0) {
-            if(videoURL) sources.push({"url": videoURL.replace(/\.flv$/, "").replace(/\.mp4$/, "") + ".mp4?" + videoHash, "format": "360p MP4", "resolution": 360, "isNative": true, "mediaType": "video"});
+            if(videoURL) sources.push({"url": videoURL.replace(/\.flv$/, "").replace(/\.mp4$/, "") + ".mp4?" + videoHash, "format": "360p MP4", "height": 360, "isNative": true, "mediaType": "video"});
             else return;
         }
         
@@ -63,7 +64,7 @@ BreakKiller.prototype.process = function(data, callback) {
         if(!data.onsite || data.location === "http://www.break.com/") siteInfo = {"name": "Break", "url": url};
         
         var videoData = {
-            "playlist": [{"title": title, "posterURL": posterURL, "sources": sources, "siteInfo": siteInfo}]
+            "playlist": [{"title": title, "poster": posterURL, "sources": sources, "siteInfo": siteInfo}]
         };
         callback(videoData);
     };

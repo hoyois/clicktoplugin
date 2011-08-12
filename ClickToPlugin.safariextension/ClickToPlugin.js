@@ -42,7 +42,7 @@ var placeholderElements = new Array(); // array containing the corresponding pla
 var mediaPlayers = new Array(); // array containing the HTML5 media players
 
 var settings;
-var instance;
+var documentID;
 var numberOfBlockedElements = 0;
 var stack;
 /*
@@ -56,7 +56,7 @@ safari.self.addEventListener("message", respondToMessage, false);
 document.addEventListener("beforeload", handleBeforeLoadEvent, true);
 
 document.addEventListener("contextmenu", function(event) {
-    safari.self.tab.setContextMenuEventUserInfo(event, {"instance": instance, "location": window.location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length, "invisible": this.getElementsByClassName("CTFinvisible").length});
+    safari.self.tab.setContextMenuEventUserInfo(event, {"documentID": documentID, "location": window.location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length, "invisible": this.getElementsByClassName("CTFinvisible").length});
 }, false);
 
 function clearAll(elementID) {
@@ -69,12 +69,12 @@ function clearAll(elementID) {
 function respondToMessage(event) {
     switch(event.name) {
         case "mediaData":
-            if(event.message.instance !== instance) return; // ignore message from other instances
+            if(event.message.documentID !== documentID) return; // ignore message from other documents
             if(event.message.plugin) blockedData[event.message.elementID].plugin = event.message.plugin;
             prepMedia(event.message);
             break;
         case "loadContent":
-            if(event.message.instance !== instance) return; // ignore message from other instances
+            if(event.message.documentID !== documentID) return; // ignore message from other documents
             switch(event.message.command) {
                 case "plugin":
                     loadPlugin(event.message.elementID);
@@ -180,9 +180,9 @@ function handleBeforeLoadEvent(event) {
     // At this point we know we have to block 'element' from loading
     var elementID = numberOfBlockedElements++;
     
-    // Give an address to this CTP instance to receive messages
-    if(instance === undefined) {
-        instance = safari.self.tab.canLoad(event, "getInstance");
+    // Give an address to this document to receive messages
+    if(documentID === undefined) {
+        documentID = safari.self.tab.canLoad(event, "getDocumentID");
         registerGlobalShortcuts();
     }
     
@@ -192,7 +192,7 @@ function handleBeforeLoadEvent(event) {
         do {
             positionX += e.offsetLeft; positionY += e.offsetTop;
         } while(e = e.offsetParent);
-        if(!confirm("ClickToPlugin is about to block element " + instance + "." + elementID + ":\n" + "\nType: " + (responseData.plugin ? responseData.plugin : "?") + "\nLocation: " + window.location.href + "\nSource: " + data.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + data.width + "x" + data.height)) return;
+        if(!confirm("ClickToPlugin is about to block element " + documentID + "." + elementID + ":\n" + "\nType: " + (responseData.plugin ? responseData.plugin : "?") + "\nLocation: " + window.location.href + "\nSource: " + data.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + data.width + "x" + data.height)) return;
     }
     // END DEBUG
     
@@ -232,7 +232,7 @@ function handleBeforeLoadEvent(event) {
     }, false);
     placeholderElement.addEventListener("contextmenu", function(event) {
         var contextInfo = {
-            "instance": instance,
+            "documentID": documentID,
             "elementID": elementID,
             "src": data.src,
             "plugin": blockedData[elementID].plugin // it can change in time
@@ -279,21 +279,22 @@ function handleBeforeLoadEvent(event) {
     if(!data.plugin) {
         var tmpAnchor = document.createElement("a");
         tmpAnchor.href = event.url;
-        safari.self.tab.dispatchMessage("checkMIMEType", {"instance": instance, "elementID": elementID, "url": tmpAnchor.href});
+        safari.self.tab.dispatchMessage("checkMIMEType", {"documentID": documentID, "elementID": elementID, "url": tmpAnchor.href});
     }
-
+    
     // Look for video replacements
     var elementData = false;
     if(settings.useFallbackMedia && element.nodeName.toLowerCase() === "object") elementData = directKill(elementID);
-    if(!elementData && settings.enabledKillers.length > 0) { // send to the killers
+    if(!elementData && settings.additionalScripts.length > 0) { // send to the killers
         // Need to pass the base URL to the killers so that they can resolve URLs, eg. for AJAX requests.
-        // According to RFC1808, the base URL is given by the <base> tag if present,
+        // According to rfc1808, the base URL is given by the <base> tag if present,
         // else by the 'Content-Base' HTTP header if present, else by the current URL.
         // Fortunately the magical anchor trick takes care of all this for us!!
         var tmpAnchor = document.createElement("a");
         tmpAnchor.href = "./";
+        
         elementData = {
-            "instance": instance,
+            "documentID": documentID,
             "elementID": elementID,
             "plugin": data.plugin ? data.plugin : "Flash",
             "src": data.src,
@@ -377,10 +378,10 @@ function prepMedia(mediaData) {
         loadMedia(elementID, mediaData.autoplay ? 3 : 0);
         return;
     }
-    if(settings.showPoster && mediaData.playlist[0].posterURL) {
+    if(settings.showPoster && mediaData.playlist[0].poster) {
         // show poster as background image
         placeholderElements[elementID].firstChild.style.opacity = "1 !important";
-        placeholderElements[elementID].firstChild.style.backgroundImage = "url('" + mediaData.playlist[0].posterURL + "') !important";
+        placeholderElements[elementID].firstChild.style.backgroundImage = "url('" + mediaData.playlist[0].poster + "') !important";
         placeholderElements[elementID].classList.remove("CTFnoimage"); // remove 'noimage' class
     }
     if(mediaData.playlist[0].title && settings.showMediaTooltip) placeholderElements[elementID].title = mediaData.playlist[0].title; // set tooltip
@@ -403,7 +404,7 @@ function initializeSourceSelector(elementID, media) {
         function(event, source) {loadMedia(elementID, 2, source);},
         function(event, source) {
             var contextInfo = {
-                "instance": instance,
+                "documentID": documentID,
                 "elementID": elementID,
                 "src": blockedData[elementID].src,
                 "plugin": blockedData[elementID].plugin
@@ -423,7 +424,7 @@ function loadMedia(elementID, init, source) {
     if(source === undefined) source = mediaPlayers[elementID].currentSource;
     
     var contextInfo = {
-        "instance": instance,
+        "documentID": documentID,
         "elementID": elementID,
         "plugin": blockedData[elementID].plugin
     };
@@ -576,10 +577,10 @@ function directKill(elementID) {
     } else sources.push({"url": mediaElements[0].getAttribute("src"), "format": mediaElements[0].getAttribute("type").split(";")[0], "mediaType": mediaType});
     
     return {
-        "instance": instance,
+        "documentID": documentID,
         "elementID": elementID,
         "location": window.location.href,
-        "playlist": [{"posterURL": mediaElements[0].getAttribute("poster"), "sources": sources, "title": mediaElements[0].title}]
+        "playlist": [{"poster": mediaElements[0].getAttribute("poster"), "sources": sources, "title": mediaElements[0].title}]
     };
 }
 

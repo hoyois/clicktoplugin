@@ -114,7 +114,7 @@ function getAttributes(element, url) {
             break;
         case "object":
             var paramElements = element.getElementsByTagName("param");
-            for (var i = 0; i < paramElements.length; i++) {
+            for(var i = 0; i < paramElements.length; i++) {
                 if(!paramElements[i].hasAttribute("value")) continue;
                 /* NOTE 1
                 The 'name' attribute of a <param> element is mandatory.
@@ -170,7 +170,7 @@ function getParams(element, plugin) {
                     break
                 case "object":
                     var paramElements = element.getElementsByTagName("param");
-                    for (var i = paramElements.length - 1; i >= 0; i--) {
+                    for(var i = paramElements.length - 1; i >= 0; i--) {
                         try{ // see NOTE 1
                             if(paramElements[i].getAttribute("name").toLowerCase() === "flashvars") {
                                 return paramElements[i].getAttribute("value");
@@ -184,7 +184,7 @@ function getParams(element, plugin) {
         case "Silverlight": // need initparams
             if(element.nodeName.toLowerCase() !== "object") return "";
             var paramElements = element.getElementsByTagName("param");
-            for (var i = 0; i < paramElements.length; i++) {
+            for(var i = 0; i < paramElements.length; i++) {
                 try { // see NOTE 1
                     if(paramElements[i].getAttribute("name").toLowerCase() === "initparams") {
                         return paramElements[i].getAttribute("value").replace(/\s+/g,"");
@@ -200,7 +200,7 @@ function getParams(element, plugin) {
                     break
                 case "object":
                     var paramElements = element.getElementsByTagName("param");
-                    for (var i = 0; i < paramElements.length; i++) {
+                    for(var i = 0; i < paramElements.length; i++) {
                         try{ // see NOTE 1
                             if(paramElements[i].getAttribute("name").toLowerCase() === "previewimage") {
                                 return paramElements[i].getAttribute("value");

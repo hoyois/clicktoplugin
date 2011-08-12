@@ -1,20 +1,21 @@
-function BlipKiller() {}
+var killer = new Object();
+addKiller("Blip", killer);
 
-BlipKiller.prototype.canKill = function(data) {
+killer.canKill = function(data) {
     if(data.plugin !== "Flash") return false;
     return data.src.indexOf("blip.tv/") !== -1;
 };
 
-BlipKiller.prototype.process = function(data, callback) {
+killer.process = function(data, callback) {
     if(/stratos.swf$/.test(data.src)) {
-        this.processFromXML(parseFlashVariables(data.params).file, callback);
+        this.processXML(parseFlashVariables(data.params).file, callback);
     } else {
         var match = data.src.match(/blip\.tv\/play\/([^%]*)/);
-        if(match) this.processFromOldVideoID(match[1], callback);
+        if(match) this.processOldVideoID(match[1], callback);
     }
 };
 
-BlipKiller.prototype.processFromXML = function(url, callback) {
+killer.processXML = function(url, callback) {
     var sources = new Array();
     
     var xhr = new XMLHttpRequest();
@@ -38,18 +39,18 @@ BlipKiller.prototype.processFromXML = function(url, callback) {
             width = media[i].getAttribute("width");
             if(mediaType === "video") format += " (" + width + "x" + height + ")";
             format += " " + ext;
-            sources.push({"url": url, "format": format, "isNative": isNative, "mediaType": mediaType, "resolution": parseInt(height)});
+            sources.push({"url": url, "format": format, "isNative": isNative, "mediaType": mediaType, "height": parseInt(height)});
         }
         
         var videoData = {
-            "playlist": [{"title": xml.getElementsByTagName("item")[0].getElementsByTagName("title")[0].textContent, "posterURL": xml.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "thumbnail")[0].getAttribute("url"), "sources": sources}]
+            "playlist": [{"title": xml.getElementsByTagName("item")[0].getElementsByTagName("title")[0].textContent, "poster": xml.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "thumbnail")[0].getAttribute("url"), "sources": sources}]
         };
         callback(videoData);
     };
     xhr.send(null);
 };
 
-BlipKiller.prototype.processFromOldVideoID = function(videoID, callback) {
+killer.processOldVideoID = function(videoID, callback) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', "http://blip.tv/players/episode/" + videoID + "?skin=api", true);
     var _this = this;
@@ -59,7 +60,7 @@ BlipKiller.prototype.processFromOldVideoID = function(videoID, callback) {
             videoData.playlist[0].siteInfo = {"name": "Blip.tv", "url": "http://www.blip.tv/file/" + xml.getElementsByTagName("item_id")[0].textContent};
             callback(videoData);
         };
-        _this.processFromXML("http://blip.tv/rss/flash/" + xml.getElementsByTagName("id")[0].textContent, callbackForEmbed);
+        _this.processXML("http://blip.tv/rss/flash/" + xml.getElementsByTagName("id")[0].textContent, callbackForEmbed);
     };
     xhr.send(null);
 };

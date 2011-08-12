@@ -1,3 +1,12 @@
+function loadScripts() { // add scripts to the global page
+    for(var i = 0; i < arguments.length; i++) {
+        var scriptElement = document.createElement("script");
+        scriptElement.type = "text/javascript";
+        scriptElement.src = makeAbsoluteURL(arguments[i], safari.extension.baseURI);
+        document.head.appendChild(scriptElement);
+    }
+}
+
 function dispatchMessageToAllPages(name, message) {
     for(var i = 0; i < safari.application.browserWindows.length; i++) {
         for(var j = 0; j < safari.application.browserWindows[i].tabs.length; j++) {
@@ -9,16 +18,16 @@ function dispatchMessageToAllPages(name, message) {
     }
 }
 
-// not meant to follow the specs, but works in practice
-const protocolMatch = /^[^\/:]+:/;
-const authorityMatch = /^[^\/:]+:\/\/[^\/]*/;
+// Follows rfc3986
+const schemeMatch = new RegExp("^[^:]+:");
+const authorityMatch = new RegExp("^[^:]+://[^/]*");
 function makeAbsoluteURL(url, base) {
     if(!url) return "";
-    if(protocolMatch.test(url)) return url; // already absolute
-    base = base.substring(0, base.lastIndexOf("/") + 1);
+    if(schemeMatch.test(url)) return url; // already absolute
+    base = base.substring(0, base.split(/[?#]/)[0].lastIndexOf("/") + 1);
     if(url.charAt(0) === "/") {
-        if(url.charAt(1) === "/") { // relative to protocol
-            base = base.match(protocolMatch)[0];
+        if(url.charAt(1) === "/") { // relative to scheme
+            base = base.match(schemeMatch)[0];
         } else { // relative to authority
             base = base.match(authorityMatch)[0];
         }
@@ -32,11 +41,11 @@ function extractDomain(url) {
 
 function unescapeHTML(text) {
     var e = document.createElement("div");
-    e.innerHTML = text;
-    return e.firstChild.nodeValue;
+    e.innerHTML = text.replace(/</g, "&lt;");
+    return e.textContent;
 }
 
-function parseUnicode(text) {
+function unescapeUnicode(text) {
     return text.replace(/\\u([0-9a-fA-F]{4})/g, function(s,c) {return String.fromCharCode(parseInt(c, 16));});
 }
 
@@ -53,8 +62,12 @@ function parseFlashVariables(s) {return parseWithRegExp(s, /([^&=]*)=([^&]*)/g);
 function parseSLVariables(s) {return parseWithRegExp(s, /([^,=]*)=([^,]*)/gi);}
 
 function extractExt(url) {
-    url = url.split(/[?#]/)[0];
-    return url.substring(url.lastIndexOf(".") + 1);
+    var i = url.search(/[?#]/);
+    if(i === -1) i = undefined;
+    url = url.substring(url.lastIndexOf("/", i) + 1, i);
+    i = url.lastIndexOf(".");
+    if(i === -1) return "";
+    return url.substring(i + 1);
 }
 
 // In this function 'ext' is a string representing a regular expression, eg. "mp4|mpe?g"
@@ -64,28 +77,25 @@ function hasExt(ext, url) {
     return ext.test(url);
 }
 
-// this function is not to be trusted...
-function canPlayTypeWithHTML5(MIMEType) {
-    return document.createElement("video").canPlayType(MIMEType);
-}
-const canPlayFLV = canPlayTypeWithHTML5("video/x-flv");
-const canPlayWM = canPlayTypeWithHTML5("video/x-ms-wmv");
+const HTML5 = document.createElement("video");
+const canPlayFLV = HTML5.canPlayType("video/x-flv"); // OK with Perian
+const canPlayWM = HTML5.canPlayType("video/x-ms-wmv"); // OK with Flip4Mac
 const canPlayDivX = canPlayFLV; // 'video/divx' always returns "", probably a Perian oversight
-const canPlayWebM = canPlayTypeWithHTML5("video/webm"); // OK with Perian 2.2
-const canPlayOGG = canPlayTypeWithHTML5("video/ogg"); // OK with Xiph component
+const canPlayWebM = HTML5.canPlayType("video/webm"); // OK with Perian 2.2
+const canPlayOgg = HTML5.canPlayType("video/ogg"); // OK with Xiph component
 
 // and certainly not this this one! but it does the job reasonably well
-function getMediaInfo(url) {
-    url = extractExt(url);
-    if(/^(?:mp4|mpe?g|mov|m4v)$/i.test(url)) return {"type": "video", "isNative": true};
-    if(canPlayFLV && /^flv$/i.test(url)) return {"type": "video", "isNative": false};
-    if(canPlayWM && /^(?:wm[vp]?|asf)$/i.test(url)) return {"type": "video", "isNative": false};
-    if(canPlayDivX && /^divx$/i.test(url)) return {"type": "video", "isNative": false};
-    if(canPlayOGG && /^ogg$/i.test(url)) return {"type": "video", "isNative": false};
-    if(/^(?:mp3|wav|aif[fc]?|aac|m4a)$/i.test(url)) return {"type": "audio", "isNative": true}; // midi not in QTX
-    if(canPlayFLV && /^fla$/i.test(url)) return {"type": "audio", "isNative": false};
-    if(canPlayWM && /^wma$/i.test(url)) return {"type": "audio", "isNative": false};
-    return false;
+function getInfoFromExt(ext) {
+    if(/^(?:mp4|mpe?g|mov|m4v)$/i.test(ext)) return {"mediaType": "video", "isNative": true};
+    if(canPlayFLV && /^flv$/i.test(ext)) return {"mediaType": "video", "isNative": false};
+    if(canPlayWM && /^(?:wm[vp]?|asf)$/i.test(ext)) return {"mediaType": "video", "isNative": false};
+    if(canPlayDivX && /^divx$/i.test(ext)) return {"mediaType": "video", "isNative": false};
+    if(canPlayWebM && /^webm$/i.test(ext)) return {"mediaType": "video", "isNative": false};
+    if(canPlayOGG && /^ogg$/i.test(ext)) return {"mediaType": "video", "isNative": false};
+    if(/^(?:mp3|wav|aif[fc]?|aac|m4a)$/i.test(ext)) return {"mediaType": "audio", "isNative": true}; // midi not in QTX
+    if(canPlayFLV && /^fla$/i.test(ext)) return {"mediaType": "audio", "isNative": false};
+    if(canPlayWM && /^wma$/i.test(ext)) return {"mediaType": "audio", "isNative": false};
+    return null;
 }
 
 function chooseDefaultSource(sourceArray) {
@@ -93,7 +103,7 @@ function chooseDefaultSource(sourceArray) {
     var hasNativeSource = false;
     var resolutionMap = new Array();
     for(var i = sourceArray.length - 1; i >= 0; i--) {
-        var h = sourceArray[i].resolution;
+        var h = sourceArray[i].height;
         if(!h) h = 0;
         if(sourceArray[i].isNative) {
             resolutionMap[h] = i;
@@ -104,7 +114,7 @@ function chooseDefaultSource(sourceArray) {
     }
     
     var setAsDefault = function(source) {
-        var h = sourceArray[source].resolution;
+        var h = sourceArray[source].height;
         if(!h) h = 0;
         if(safari.extension.settings.codecsPolicy === 2 && hasNativeSource && !sourceArray[source].isNative) return;
         if(safari.extension.settings.maxResolution === "infinity" || h <= safari.extension.settings.maxResolution) defaultSource = source;
@@ -122,8 +132,8 @@ function makeLabel(source) {
     if(safari.extension.settings.defaultPlayer === "qtp") return "QTP";
     if(source.mediaType === "audio") return "Audio";
     var prefix = "";
-    if(source.resolution >= 720) prefix = "HD ";
-    if(source.resolution >= 2304) prefix = "4K ";
+    if(source.height >= 720) prefix = "HD ";
+    if(source.height >= 2304) prefix = "4K ";
     return prefix + (source.isNative ? "H.264" : "Video"); // right...
 }
 
@@ -157,7 +167,7 @@ function getMIMEType(resourceURL, handleMIMEType) {
     xhr.send(null);
 }
 
-function parseXSPFPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlaylistData) {
+function parseXSPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlaylistData) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', playlistURL, true);
     xhr.onload = function() {
@@ -175,12 +185,12 @@ function parseXSPFPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlay
             if(list.length > 0) mediaURL = makeAbsoluteURL(list[0].firstChild.nodeValue, baseURL);
             else if(i === 0) return;
             else continue;
-            mediaInfo = getMediaInfo(mediaURL);
-            if(!mediaInfo) {
+            mediaInfo = getInfoFromExt(extractExt(mediaURL));
+            if(mediaInfo === null) {
                 if(i === 0) return;
                 if(i >= x.length - track) --startTrack;
                 continue;
-            } else if(mediaInfo.type === "video") isAudio = false;
+            } else if(mediaInfo.mediaType === "video") isAudio = false;
             
             list = x[I].getElementsByTagName("image");
             if(list.length > 0) posterURL = list[0].firstChild.nodeValue;
@@ -191,7 +201,7 @@ function parseXSPFPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlay
                 list = x[I].getElementsByTagName("annotation");
                 if(list.length > 0) title = list[0].firstChild.nodeValue;
             }
-            playlist.push({"sources": [{"url": mediaURL, "isNative": mediaInfo.isNative, "mediaType": mediaInfo.type}], "posterURL": posterURL, "title": title});
+            playlist.push({"sources": [{"url": mediaURL, "isNative": mediaInfo.isNative, "mediaType": mediaInfo.mediaType}], "poster": posterURL, "title": title});
         }
         var playlistData = {
             "playlist": playlist,
@@ -241,7 +251,7 @@ function getPluginForType(type) { // type is a string
 }
 
 function getPluginAndTypeForExt(ext) {
-    var suffixes = null;
+    var suffixes;
     for(var i = 0; i < navigator.plugins.length; i++) {
         for(var j = 0; j < navigator.plugins[i].length; j++) {
             suffixes = navigator.plugins[i][j].suffixes.split(",");
@@ -257,29 +267,26 @@ function getPluginName(plugin, type) {
     if(plugin) {
         if(plugin.name === "Shockwave Flash") return "Flash";
         if(plugin.name === "Silverlight Plug-In") return "Silverlight";
-        if(plugin.name.indexOf("Java") !== -1) return "Java";
         if(plugin.name.indexOf("QuickTime") !== -1) return "QuickTime";
-        if(plugin.name.indexOf("Flip4Mac") !== -1) return "Flip4Mac";
-        if(plugin.name === "iPhotoPhotocast") return "iPhoto";
-        if(plugin.name === "Quartz Composer Plug-In") return "Quartz";
-        if(plugin.name === "VideoLAN VLC Plug-in") return "VLC";
+        if(plugin.name.indexOf("Flip4Mac") !== -1) return "Windows Media";
+        if(plugin.name.indexOf("Java") !== -1) return "Java";
         if(plugin.name === "DivX Web Player") return "DivX";
+        if(plugin.name === "VideoLAN VLC Plug-in") return "VLC";
         if(plugin.name === "RealPlayer Plugin.plugin") return "Real";
         if(plugin.name === "Shockwave for Director") return "Shockwave";
+        if(plugin.name === "iPhotoPhotocast") return "iPhoto";
+        if(plugin.name === "Quartz Composer Plug-In") return "Quartz";
         if(plugin.name === "Unity Player") return "Unity";
         return plugin.name;
     } else if(type) { // only so that killers can work with plugins not installed
-        if(type === "application/x-shockwave-flash") return "Flash";
-        if(type === "application/futuresplash") return "Flash";
-        if(type === "application/x-silverlight-2") return "Silverlight";
-        if(type === "application/x-silverlight") return "Silverlight";
+        if(type === "application/x-shockwave-flash" || type === "application/futuresplash") return "Flash";
+        if(type === "application/x-silverlight-2" || type === "application/x-silverlight") return "Silverlight";
+        if(/x-ms/.test(type) || type === "application/x-mplayer2" || type === "application/asx") return "Windows Media";
+        if(type === "video/divx") return "DivX";
         //if(/x-java/.test(type)) return "Java";
-        if(/x-ms/.test(type) || type === "application/x-mplayer2" || type === "application/asx") return "Flip4Mac";
         //if(/x-pn/.test(type)) return "Real";
         //if(type === "application/x-director") return "Shockwave";
         //if(type === "application/vnd.unity") return "Unity";
-        type = type.split(";")[0];
-        if(type === "video/divx") return "DivX";
-        return "";// type.split("/")[1];
+        return "";
     } else return "";
 }

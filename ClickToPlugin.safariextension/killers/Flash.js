@@ -1,6 +1,7 @@
-function GenericKiller() {}
+var killer = new Object();
+addKiller("Flash", killer);
 
-GenericKiller.prototype.canKill = function(data) {
+killer.canKill = function(data) {
     if(data.plugin !== "Flash") return false;
     var matches = data.params.match(/(?:^|&)(file|load|playlistfile|src|mp3|mp3url|soundFile|soundUrl|url|file_url)=/);
     if(matches) {data.file = matches[1]; return true;}
@@ -10,7 +11,7 @@ GenericKiller.prototype.canKill = function(data) {
     return false;
 };
 
-GenericKiller.prototype.process = function(data, callback) {
+killer.process = function(data, callback) {
     var flashvars = parseFlashVariables(data.params);
     if(flashvars.streamer && flashvars.streamer.substring(0,4) === "rtmp") return;
     var baseURL = data.src; // used to resolve video URLs
@@ -44,8 +45,7 @@ GenericKiller.prototype.process = function(data, callback) {
     
     // Playlist support
     if(isPlaylist) {
-        if(!safari.extension.settings.usePlaylists) return;
-        this.processFromPlaylist(makeAbsoluteURL(sourceURL, data.baseURL), baseURL, posterURL, flashvars.item, callback);
+        this.processPlaylist(makeAbsoluteURL(sourceURL, data.baseURL), baseURL, posterURL, flashvars.item, callback);
         return;
     }
     
@@ -56,24 +56,24 @@ GenericKiller.prototype.process = function(data, callback) {
     var sources = new Array();
     var mediaInfo;
     if(sourceURL2) {
-        mediaInfo = getMediaInfo(sourceURL2);
-        if(mediaInfo) sources.push({"url": makeAbsoluteURL(sourceURL2, baseURL), "format": "HD", "isNative": mediaInfo.isNative, "resolution": 720, "mediaType": mediaInfo.type});
+        mediaInfo = getInfoFromExt(extractExt(sourceURL2));
+        if(mediaInfo) sources.push({"url": makeAbsoluteURL(sourceURL2, baseURL), "format": "HD", "isNative": mediaInfo.isNative, "height": 720, "mediaType": mediaInfo.mediaType});
     }
     
-    mediaInfo = getMediaInfo(sourceURL);
-    if(mediaInfo) sources.push({"url": makeAbsoluteURL(sourceURL, baseURL), "format": sources[0] ? "SD" : "", "isNative": mediaInfo.isNative, "mediaType": mediaInfo.type});
+    mediaInfo = getInfoFromExt(extractExt(sourceURL));
+    if(mediaInfo) sources.push({"url": makeAbsoluteURL(sourceURL, baseURL), "format": sources[0] ? "SD" : "", "isNative": mediaInfo.isNative, "mediaType": mediaInfo.mediaType});
     
     var mediaData = {
-        "playlist": [{"posterURL": posterURL, "sources": sources}],
-        "isAudio": mediaInfo.type === "audio"
+        "playlist": [{"poster": posterURL, "sources": sources}],
+        "isAudio": mediaInfo.mediaType === "audio"
     };
     callback(mediaData);
 };
 
-GenericKiller.prototype.processFromPlaylist = function(playlistURL, baseURL, posterURL, track, callback) {
+killer.processPlaylist = function(playlistURL, baseURL, posterURL, track, callback) {
     var handlePlaylistData = function(playlistData) {
         callback(playlistData);
     };
-    parseXSPFPlaylist(playlistURL, baseURL, posterURL, track, handlePlaylistData);
+    parseXSPlaylist(playlistURL, baseURL, posterURL, track, handlePlaylistData);
 };
 
