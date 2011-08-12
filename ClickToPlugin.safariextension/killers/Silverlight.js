@@ -1,16 +1,17 @@
-function SLKiller() {}
+var killer = new Object();
+addKiller("Silverlight", killer);
 
-SLKiller.prototype.canKill = function(data) {
+killer.canKill = function(data) {
     if(!data.plugin === "Silverlight") return false;
     var matches = data.params.match(/(?:^|,)(m|fileurl|mediaurl)=/);
     if(matches) {data.file = matches[1]; return true;}
     return false;
 };
 
-SLKiller.prototype.process = function(data, callback) {
+killer.process = function(data, callback) {
     var SLvars = parseSLVariables(data.params);
     var mediaURL = decodeURIComponent(SLvars[data.file]);
-    var mediaInfo = getMediaInfo(mediaURL);
+    var mediaInfo = getInfoFromExt(extractExt(mediaURL));
     
     var sources = new Array();
     if(mediaInfo && (mediaInfo.isNative || canPlayWM)) sources.push({"url": mediaURL, "isNative": mediaInfo.isNative, "mediaType": mediaInfo});
@@ -19,8 +20,8 @@ SLKiller.prototype.process = function(data, callback) {
     if(SLvars.thumbnail) posterURL = decodeURIComponent(SLvars.thumbnail);
     
     var mediaData = {
-        "playlist": [{"posterURL": posterURL, "sources": sources}],
-        "isAudio": mediaInfo.type === "audio"
+        "playlist": [{"poster": posterURL, "sources": sources}],
+        "isAudio": mediaInfo.mediaType === "audio"
     }
     callback(mediaData);
 };

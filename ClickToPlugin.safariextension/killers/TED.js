@@ -1,11 +1,12 @@
-function TEDKiller() {}
+var killer = new Object();
+addKiller("TED", killer);
 
-TEDKiller.prototype.canKill = function(data) {
+killer.canKill = function(data) {
     if(data.plugin !== "Flash") return false;
     return data.src.indexOf("http://video.ted.com/assets/player/swf") !== -1;
 };
 
-TEDKiller.prototype.process = function(data, callback) {
+killer.process = function(data, callback) {
     //var url = decodeURIComponent(parseFlashVariables(data.params).mediaXML);
     //var title, posterURL, videoURL;
     var url, siteInfo;
@@ -28,16 +29,16 @@ TEDKiller.prototype.process = function(data, callback) {
         var sources = new Array();
         var downloads = xml.getElementsByClassName("downloads");
         var anchor = downloads[1].getElementsByTagName("a")[2];
-        if(anchor) sources.push({"url": anchor.href, "format": "480p MP4", "resolution": 480, "isNative": true, "mediaType": "video"});
+        if(anchor) sources.push({"url": anchor.href, "format": "480p MP4", "height": 480, "isNative": true, "mediaType": "video"});
         anchor = downloads[1].getElementsByTagName("a")[0];
-        sources.push({"url": anchor.href, "format": "360p MP4", "resolution": 360, "isNative": true, "mediaType": "video"});
+        sources.push({"url": anchor.href, "format": "360p MP4", "height": 360, "isNative": true, "mediaType": "video"});
         anchor = downloads[0].getElementsByTagName("a")[0];
-        if(anchor) sources.push({"url": anchor.href, "format": "Audio MP3", "resolution": 0, "isNative": true, "mediaType": "audio"});
+        if(anchor) sources.push({"url": anchor.href, "format": "Audio MP3", "height": 0, "isNative": true, "mediaType": "audio"});
         
         var posterURL = xml.getElementById("embedCode").getAttribute("value").match(/&su=([^&]*)&/)[1];
         
         var videoData = {
-            "playlist": [{"posterURL": posterURL, "title": xml.getElementById("altHeadline").textContent, "sources": sources, "siteInfo": siteInfo}]
+            "playlist": [{"poster": posterURL, "title": xml.getElementById("altHeadline").textContent, "sources": sources, "siteInfo": siteInfo}]
         };
         callback(videoData);
     };

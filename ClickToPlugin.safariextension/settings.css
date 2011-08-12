@@ -1,5 +1,4 @@
 * {
-    -webkit-font-smoothing: subpixel-antialiased; /* for the nightlies */
     cursor: default;
     font: -webkit-control;
     text-rendering: optimizelegibility;
@@ -15,7 +14,7 @@ body {
     -webkit-user-select: none;
 }
 
-div#container {
+#container {
     position: relative;
     -webkit-box-shadow: 0 8px 20px 5px rgba(0, 0, 0, .3);
     -webkit-transition-timing-function: linear;
@@ -31,7 +30,7 @@ div#container {
     visibility: hidden;
 }
 
-div#main {
+#main {
     position: relative;
     overflow: auto;
 }
@@ -61,7 +60,8 @@ nav ul li {
     padding: 0;
     margin: 0;
     height: 20px;
-    text-shadow: #EDEDED 0 1px 1px;
+    color: #333;
+    text-shadow: #EDEDED 0 1px 0;
 }
 
 nav ul li.selected {
@@ -73,9 +73,8 @@ li span.tab {
     display: block;
     padding: 0 6px;
     height: 21px;
-    line-height: 20px !important; /* What kind of crazy bug is this??? */
-    cursor: pointer;
     font: -webkit-small-control;
+    line-height: 20px;
 }
 
 li.selected span.tab {
@@ -87,11 +86,13 @@ section {
     height: 0px;
     overflow: hidden;
     visibility: hidden;
+    padding: 0 10px;
 }
 
 section.selected {
     height: auto;
     visibility: visible;
+    padding: 10px;
 }
 
 .hidden section.selected {
@@ -102,59 +103,69 @@ menu {
     -webkit-padding-start: 0;
     display: table;
     margin: 0 auto;
-    padding: 15px;
+    -webkit-border-horizontal-spacing: 7px;
+    -webkit-border-vertical-spacing: 4px;
+}
+
+menu#keyboard_mouse {
+    -webkit-border-vertical-spacing: 0;
 }
 
 menu li {
     display: table-row;
 }
 
-li.glue {
-    height: 13px;
-}
-
-span.left {
-    position: relative;
+menu li > span {
     display: table-cell;
-    white-space: normal;
-    text-align: right;
     vertical-align: baseline;
-    padding-right: 7px;
 }
 
-span.left input[type="button"] {
-    position: absolute;
-    right: 7px;
+menu.two_column li > span:first-child {
+    text-align: right;
 }
 
-span.left label {
+menu.two_column li > span:first-child > label {
     display: inline-block;
 }
 
-span.right {
-    display: table-cell;
-    white-space: normal;
-    text-align: left;
-    vertical-align: baseline;
+li.meter {
+    visibility: hidden;
+}
+
+li.glue {
+    height: 9px;
+}
+
+li.header > span {
+    padding-bottom: 4px;
 }
 
 span.checkbox {
-    padding: 2px 0 2px 18px;
+    padding-left: 18px;
     text-indent: -18px;
     -webkit-line-box-contain: block;
     box-sizing: border-box;
 }
-#container.init span.checkbox {
+
+span.checkbox * {
+    -webkit-line-box-contain: initial;
+}
+
+input[type="number"] {
+    margin-left: 5px;
+    margin-right: 0;
+}
+
+.init span.checkbox {
     display: none;
+}
+
+span.sub {
+    padding-left: 18px;
 }
 
 span.checkbox.sub {
     padding-left: 36px;
-}
-
-textarea, input[type="text"], input[type="number"] {
-    -webkit-appearance: textfield;
-    margin-left: 0;
 }
 
 input.keyboard {
@@ -163,18 +174,27 @@ input.keyboard {
 }
 
 textarea {
-     margin: 2px 0;
+     margin: 0;
      vertical-align: top;
+     min-width: 300px;
      /* white-space: nowrap; */ /* This makes pasted line breaks invisible in .value! Only wrap="off" works. */
 }
 
-span.left.textarea {
+input[type="text"] {
+    -webkit-appearance: textarea;
+}
+
+span.textarea_label {
     padding-top: 5px;
     vertical-align: top;
 }
 
 input[type="range"] {
     vertical-align: middle;
+}
+
+.hfil {
+    width: 300px;
 }
 
 input[type="checkbox"] {
@@ -187,19 +207,20 @@ select {
 }
 
 span.mouse {
-    -webkit-box-sizing: border-box;
-    border: 1px solid #515151;
+    box-sizing: border-box;
+    border: 1px solid #999999;
+    /* border-top-color: #737373; */
     display: inline-block;
-    vertical-align: -5px;
-    width: 20px;
-    height: 20px;
-    margin-left: 5px;
+    vertical-align: -6px;
+    width: 22px;
+    height: 22px;
+    margin-left: 4px;
     padding: 0;
-    background-color: #CCC;
+    background-color: white;
 }
 
 span.mouse:hover {
-    background-color: #A7A7A7;
+    -webkit-box-shadow: inset 0 0 2px 1px rgba(153,153,153,1);
 }
 
 span.mouse.disabled {
@@ -207,6 +228,8 @@ span.mouse.disabled {
 }
 
 input.shortcut_clear {
-    margin-left: 6px;
+    position: relative;
+    bottom: 1px;
+    margin-left: 10px;
 }
 

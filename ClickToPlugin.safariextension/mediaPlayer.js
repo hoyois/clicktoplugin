@@ -239,13 +239,13 @@ mediaPlayer.prototype.jumpTrack = function(diff) {
 };
 
 mediaPlayer.prototype.setPoster = function() {
-    if(this.playlist[this.currentTrack].posterURL) {
+    if(this.playlist[this.currentTrack].poster) {
         if(this.playlist[this.currentTrack].sources[this.currentSource].mediaType === "video") {
-            this.mediaElement.poster = this.playlist[this.currentTrack].posterURL;
+            this.mediaElement.poster = this.playlist[this.currentTrack].poster;
             this.containerElement.style.backgroundImage = "none !important";
         } else {
             if(this.mediaElement.hasAttribute("poster")) this.mediaElement.removeAttribute("poster");
-            this.containerElement.style.backgroundImage = "url('" + this.playlist[this.currentTrack].posterURL + "') !important";
+            this.containerElement.style.backgroundImage = "url('" + this.playlist[this.currentTrack].poster + "') !important";
         }
     } else {
         if(this.mediaElement.hasAttribute("poster")) this.mediaElement.removeAttribute("poster");

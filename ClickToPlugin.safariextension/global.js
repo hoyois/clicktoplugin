@@ -1,15 +1,24 @@
+// UPDATE
+if(safari.extension.settings.version < 25) {
+    safari.extension.settings.removeItem("enabledKillers");
+    safari.extension.settings.removeItem("usePlaylists");
+    safari.extension.settings.removeItem("language");
+    safari.extension.settings.defaultTab = 0;
+}
+safari.extension.settings.version = 25;
+
 // LOCALIZATION
 localize(GLOBAL_STRINGS, safari.extension.settings.language);
 
 // SETTINGS
-const allSettings = ["language", "defaultTab", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "enabledKillers", "useFallbackMedia", "showSourceSelector", "usePlaylists", "mediaAutoload", "mediaWhitelist", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "codecsPolicy", "volume", "useDownloadManager", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "zeroIsInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+const allSettings = ["language", "defaultTab", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "additionalScripts", "useFallbackMedia", "showSourceSelector", "mediaAutoload", "mediaWhitelist", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "codecsPolicy", "volume", "useDownloadManager", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
 
 /* Hidden settings:
-language (default: "automatic")
+language (default: undefined)
 zeroIsInvisible: (default: undefined)
 */
 
-const injectedSettings = ["enabledKillers", "useFallbackMedia", "showSourceSelector", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "volume", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+const injectedSettings = ["additionalScripts", "useFallbackMedia", "showSourceSelector", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "volume", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
 
 function getSettings(array) {
     var s = new Object();
@@ -20,7 +29,7 @@ function getSettings(array) {
 }
 
 // CORE
-var instance = 0;
+var documentID = 0;
 
 function respondToMessage(event) {
     switch (event.name) {
@@ -64,7 +73,7 @@ function respondToCanLoad(message) {
     // Make checks in correct order for optimal performance
     if(message.location !== undefined) return blockOrAllow(message);
     if(message === "getSettings") return getSettings(injectedSettings);
-    if(message === "getInstance") return ++instance;
+    if(message === "getDocumentID") return ++documentID;
 }
 
 function blockOrAllow(data) {
@@ -147,9 +156,9 @@ function checkMIMEType(data, tab) {
     var handleMIMEType = function(type) {
         var plugin = getPluginForType(type);
         if(!plugin || isAllowed(plugin)) {
-            tab.page.dispatchMessage("loadContent", {"instance": data.instance, "elementID": data.elementID, "command": "plugin"});
+            tab.page.dispatchMessage("loadContent", {"documentID": data.documentID, "elementID": data.elementID, "command": "plugin"});
         } else {
-            tab.page.dispatchMessage("loadContent", {"instance": data.instance, "elementID": data.elementID, "command": "changeLabel", "plugin": getPluginName(plugin, type)});
+            tab.page.dispatchMessage("loadContent", {"documentID": data.documentID, "elementID": data.elementID, "command": "changeLabel", "plugin": getPluginName(plugin, type)});
         }
     };
     getMIMEType(data.url, handleMIMEType);
@@ -220,7 +229,7 @@ function doCommand(event) {
             showSettings(safari.application.activeBrowserWindow.activeTab);
             break;
         default:
-            safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("loadContent", {"instance": event.userInfo.instance, "elementID": event.userInfo.elementID, "source": event.userInfo.source, "command": event.command});
+            safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("loadContent", {"documentID": event.userInfo.documentID, "elementID": event.userInfo.elementID, "source": event.userInfo.source, "command": event.command});
             break;
     }
 }
@@ -266,25 +275,22 @@ function handleWhitelisting(list, newWLString) {
 }
 
 // KILLERS
-var killers = [new YouTubeKiller(), new VimeoKiller(), new DailymotionKiller(), new FacebookKiller(), new BreakKiller(), new BlipKiller(), new MetacafeKiller(), new TumblrKiller(), new TEDKiller(), new MegavideoKiller(), new BIMKiller(), new FlowKiller(), new GenericKiller(), new SLKiller(), new QTKiller(), new WMKiller(), new DivXKiller()];
+var killers = new Object();
+function addKiller(name, killer) {killers[name] = killer;}
+function getKiller(name) {return killers[name];}
 
 function findKillerFor(data) {
-    for (var i = 0; i < safari.extension.settings.enabledKillers.length; i++) {
-        if(killers[safari.extension.settings.enabledKillers[i]].canKill(data)) return safari.extension.settings.enabledKillers[i];
+    for(var name in killers) {
+        if(killers[name].canKill(data)) return killers[name];
     }
     return null;
 }
 
 function killPlugin(data, tab) {
-    if(data.baseURL) {
-        var killerID = findKillerFor(data);
-        if(killerID === null) return;
-    }
-    
     var callback = function(mediaData) {
         if(mediaData.playlist.length === 0) return;
         mediaData.elementID = data.elementID;
-        mediaData.instance = data.instance;
+        mediaData.documentID = data.documentID;
         mediaData.plugin = data.plugin;
         
         if(!mediaData.loadAfter) {
@@ -306,8 +312,12 @@ function killPlugin(data, tab) {
         tab.page.dispatchMessage("mediaData", mediaData);
     };
     
-    if(data.baseURL) killers[killerID].process(data, callback);
-    else callback(data);
+    if(data.playlist) callback(data);
+    else {
+        var killer = findKillerFor(data);
+        if(killer === null) return;
+        killer.process(data, callback);
+    }
 }
 
 // EVENT LISTENERS
@@ -315,6 +325,6 @@ safari.application.addEventListener("message", respondToMessage, false);
 safari.application.addEventListener("contextmenu", handleContextMenu, false);
 safari.application.addEventListener("command", doCommand, false);
 
-// UPDATE
-safari.extension.settings.version = 24;
+// ADDITIONAL SCRIPTS
+loadScripts.apply(this, safari.extension.settings.additionalScripts);
 
