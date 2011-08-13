@@ -6,7 +6,6 @@ var sections = document.getElementsByTagName("section");
 var menus = document.getElementsByTagName("menu");
 
 var inputs = document.getElementsByClassName("setting");
-var numberInputs = document.getElementsByClassName("number");
 var keyboardInputs = document.getElementsByClassName("keyboard");
 var mouseInputs = document.getElementsByClassName("mouse");
 var textareas = document.getElementsByTagName("textarea");
@@ -138,14 +137,6 @@ document.getElementById("invertBlacklists").addEventListener("change", function(
     updateBlacklistLabels(event.target.value === "on");
 }, false);
 
-function handleNumberInput(event) {
-    var value = event.target.value;
-    if(/\d+/.test(value)) changeSetting(event.target.id, parseInt(value));
-}
-for(var i = 0; i < numberInputs.length; i++) {
-    numberInputs[i].addEventListener("input", handleNumberInput, false);
-}
-
 // Shortcuts input
 for(var i = 0; i < keyboardInputs.length; i++) {
     keyboardInputs[i].addEventListener("keydown", handleKeyboardEvent, false);
@@ -263,19 +254,9 @@ document.getElementById("downloadContext").addEventListener("change", function(e
 function localizeSettings() {
     document.title = PREFERENCES_TITLE;
     var strings = document.getElementsByClassName("string");
-    var splitstrings = document.getElementsByClassName("splitstring");
     var options = document.getElementsByTagName("option");
     while(strings.length > 0) {
         strings[0].parentNode.replaceChild(document.createTextNode(this[strings[0].title]), strings[0]);
-    }
-    while(splitstrings.length > 0) {
-        var s = splitstrings[0];
-        s.parentNode.insertBefore(document.createTextNode(this[s.title][0]), s);
-        for(var i = 1; i < this[s.title].length; i++) {
-            s.parentNode.insertBefore(s.childNodes[i-1], s);
-            s.parentNode.insertBefore(document.createTextNode(this[s.title][i]), s);
-        }
-        s.parentNode.removeChild(s);
     }
     for(var i = 0; i < options.length; i++) {
         if(options[i].hasAttribute("title")) {
@@ -407,9 +388,6 @@ function loadSettings(event) {
                 switch(input.type) {
                     case "range":
                         input.value = settings[id]*100;
-                        break;
-                    case "number":
-                        input.value = settings[id];
                         break;
                     case "text":
                         if(input.className === "keyboard") input.value = showShortcut(settings[id]);

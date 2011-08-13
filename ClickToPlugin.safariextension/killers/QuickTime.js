@@ -11,10 +11,10 @@ killer.process = function(data, callback) {
     var isAudio = true;
     var playlist = new Array();
     var addTrack = function(url) {
-        var mediaInfo = getInfoFromExt(extractExt(url));
-        if(!mediaInfo) return;
-        var source = {"url": url, "isNative": mediaInfo.isNative, "mediaType": mediaInfo.mediaType};
-        if(mediaInfo.mediaType === "video") isAudio = false;
+        var ext = extInfo(url);
+        if(!ext) return;
+        var source = {"url": url, "isNative": ext.isNative, "mediaType": ext.mediaType};
+        if(ext.mediaType === "video") isAudio = false;
         playlist.push({"sources": [source]});
     };
     addTrack(data.src);

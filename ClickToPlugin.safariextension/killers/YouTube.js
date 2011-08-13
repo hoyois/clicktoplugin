@@ -11,7 +11,7 @@ killer.canKill = function(data) {
 killer.process = function(data, callback) {
     if(data.onsite) {
         var flashvars = parseFlashVariables(data.params);
-        if(/\s-\sYouTube$/.test(data.title)) flashvars.title = data.title.slice(1, -12);
+        if(/\s-\sYouTube$/.test(data.title)) flashvars.title = data.title.slice(0, -10);
         
         if(flashvars.list) this.processPlaylistID(flashvars.list.substr(2), flashvars, callback);
         else if(flashvars.url_encoded_fmt_stream_map) this.processFlashVars(flashvars, callback);

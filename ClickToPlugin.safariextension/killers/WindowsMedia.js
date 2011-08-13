@@ -6,13 +6,13 @@ killer.canKill = function(data) {
 };
 
 killer.process = function(data, callback) {
-    var mediaInfo = getInfoFromExt(extractExt(data.src));
-    if(!mediaInfo) return;
-    var sources = [{"url": data.src, "isNative": false, "mediaType": mediaInfo.mediaType}];
+    var ext = extInfo(data.src);
+    if(!ext) return;
+    var sources = [{"url": data.src, "isNative": false, "mediaType": ext.mediaType}];
     
     var mediaData = {
         "playlist": [{"sources": sources}],
-        "isAudio": mediaInfo.mediaType === "audio"
+        "isAudio": ext.mediaType === "audio"
     };
     callback(mediaData);
 };

@@ -13,14 +13,12 @@ killer.canKill = function(data) {
 
 killer.process = function(data, callback) {
     var flashvars = parseFlashVariables(data.params);
-    if(flashvars.streamer && flashvars.streamer.substring(0,4) === "rtmp") return;
-    var baseURL = data.src; // used to resolve video URLs
-    if(flashvars.netstreambasepath) baseURL = decodeURIComponent(flashvars.netstreambasepath);
+    if(/^rmtp/.test(flashvars.streamer)) return;
     
     // get media and poster URL
     var sourceURL, posterURL;
     if(data.file) {
-        sourceURL = decodeURIComponent(flashvars[data.file]);
+        sourceURL = decodeURIComponent(flashvars[data.file].replace(/\+/g, "%20"));
         switch(data.file) {
             case "file_url":
                 if(flashvars.poster_url) posterURL = decodeURIComponent(flashvars.poster_url);
@@ -37,11 +35,27 @@ killer.process = function(data, callback) {
         }
     }
     
+    // YouTube redirection
+    // In JW player, flashvars.provider === "youtube"
+    if(sourceURL.substr(0,28) === "http://www.youtube.com/watch") {
+        var match = sourceURL.match(/[?&]v=([^&]*)/);
+        if(match) {
+            if(!hasKiller("YouTube")) return;
+            var YTcallback = callback;
+            if(posterURL) YTcallback = function(mediaData) {
+                mediaData.playlist[0].poster = posterURL;
+                callback(mediaData);
+            };
+            getKiller("YouTube").processVideoID(match[1], YTcallback);
+            return;
+        }
+    }
+    
     if(!sourceURL) return;
     var isPlaylist = data.file === "playlistfile" || data.hash === "playlist_url" || hasExt("xml|xspf", sourceURL);
     
-    // Site-specific decoding
-    if(/player_mp3_maxi\.swf$/.test(data.src)) sourceURL = sourceURL.replace(/\+/g, "%20");
+    var baseURL = data.src; // used to resolve video URLs
+    if(flashvars.netstreambasepath) baseURL = decodeURIComponent(flashvars.netstreambasepath);
     
     // Playlist support
     if(isPlaylist) {
@@ -54,18 +68,18 @@ killer.process = function(data, callback) {
     sourceURL2 = flashvars["hd.file"];
     
     var sources = new Array();
-    var mediaInfo;
+    var ext;
     if(sourceURL2) {
-        mediaInfo = getInfoFromExt(extractExt(sourceURL2));
-        if(mediaInfo) sources.push({"url": makeAbsoluteURL(sourceURL2, baseURL), "format": "HD", "isNative": mediaInfo.isNative, "height": 720, "mediaType": mediaInfo.mediaType});
+        ext = extInfo(sourceURL2);
+        if(ext) sources.push({"url": makeAbsoluteURL(sourceURL2, baseURL), "format": "HD", "isNative": ext.isNative, "height": 720, "mediaType": ext.mediaType});
     }
     
-    mediaInfo = getInfoFromExt(extractExt(sourceURL));
-    if(mediaInfo) sources.push({"url": makeAbsoluteURL(sourceURL, baseURL), "format": sources[0] ? "SD" : "", "isNative": mediaInfo.isNative, "mediaType": mediaInfo.mediaType});
+    ext = extInfo(sourceURL);
+    if(ext) sources.push({"url": makeAbsoluteURL(sourceURL, baseURL), "format": sources[0] ? "SD" : "", "isNative": ext.isNative, "mediaType": ext.mediaType});
     
     var mediaData = {
         "playlist": [{"poster": posterURL, "sources": sources}],
-        "isAudio": mediaInfo.mediaType === "audio"
+        "isAudio": ext.mediaType === "audio"
     };
     callback(mediaData);
 };

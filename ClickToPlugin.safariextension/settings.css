@@ -61,7 +61,7 @@ nav ul li {
     margin: 0;
     height: 20px;
     color: #333;
-    text-shadow: #EDEDED 0 1px 0;
+    text-shadow: #EDEDED 0 1px 1px;
 }
 
 nav ul li.selected {
@@ -107,7 +107,7 @@ menu {
     -webkit-border-vertical-spacing: 4px;
 }
 
-menu#keyboard_mouse {
+menu#keyboard_shortcuts {
     -webkit-border-vertical-spacing: 0;
 }
 
@@ -128,10 +128,6 @@ menu.two_column li > span:first-child > label {
     display: inline-block;
 }
 
-li.meter {
-    visibility: hidden;
-}
-
 li.glue {
     height: 9px;
 }
@@ -148,12 +144,7 @@ span.checkbox {
 }
 
 span.checkbox * {
-    -webkit-line-box-contain: initial;
-}
-
-input[type="number"] {
-    margin-left: 5px;
-    margin-right: 0;
+    -webkit-line-box-contain: block inline replaced;
 }
 
 .init span.checkbox {
@@ -185,7 +176,7 @@ input[type="text"] {
 }
 
 span.textarea_label {
-    padding-top: 5px;
+    padding-top: 3px;
     vertical-align: top;
 }
 

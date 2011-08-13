@@ -4,6 +4,7 @@ if(safari.extension.settings.version < 25) {
     safari.extension.settings.removeItem("usePlaylists");
     safari.extension.settings.removeItem("language");
     safari.extension.settings.defaultTab = 0;
+    safari.extension.settings.maxInvisibleSize = 8;
 }
 safari.extension.settings.version = 25;
 
@@ -11,10 +12,11 @@ safari.extension.settings.version = 25;
 localize(GLOBAL_STRINGS, safari.extension.settings.language);
 
 // SETTINGS
-const allSettings = ["language", "defaultTab", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "additionalScripts", "useFallbackMedia", "showSourceSelector", "mediaAutoload", "mediaWhitelist", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "codecsPolicy", "volume", "useDownloadManager", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "maxInvisibleSize", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+const allSettings = ["language", "defaultTab", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "additionalScripts", "useFallbackMedia", "showSourceSelector", "mediaAutoload", "mediaWhitelist", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "codecsPolicy", "volume", "useDownloadManager", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
 
 /* Hidden settings:
 language (default: undefined)
+maxInvisibleSize (default: 8)
 zeroIsInvisible: (default: undefined)
 */
 
@@ -277,6 +279,7 @@ function handleWhitelisting(list, newWLString) {
 // KILLERS
 var killers = new Object();
 function addKiller(name, killer) {killers[name] = killer;}
+function hasKiller(name) {return killers[name] !== undefined;}
 function getKiller(name) {return killers[name];}
 
 function findKillerFor(data) {

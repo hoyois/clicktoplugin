@@ -286,7 +286,7 @@ function handleBeforeLoadEvent(event) {
     var elementData = false;
     if(settings.useFallbackMedia && element.nodeName.toLowerCase() === "object") elementData = directKill(elementID);
     if(!elementData && settings.additionalScripts.length > 0) { // send to the killers
-        // Need to pass the base URL to the killers so that they can resolve URLs, eg. for AJAX requests.
+        // Need to pass the base URL to the killers so that they can resolve URLs, eg. for XHRs.
         // According to rfc1808, the base URL is given by the <base> tag if present,
         // else by the 'Content-Base' HTTP header if present, else by the current URL.
         // Fortunately the magical anchor trick takes care of all this for us!!
@@ -468,7 +468,7 @@ function hidePlugin(elementID) {
 }
 
 function getPluginInfo(elementID) {
-    alert("Plugin: " + blockedData[elementID].plugin + " (" + blockedData[elementID].width + "x" + blockedData[elementID].height + ")\nLocation: " + window.location.href + "\nSource: " + blockedData[elementID].src + "\n\nEmbed code:\n" + HTMLToString(blockedElements[elementID]));
+    alert("Plug-in: " + blockedData[elementID].plugin + " (" + blockedData[elementID].width + "x" + blockedData[elementID].height + ")\nLocation: " + window.location.href + "\nSource: " + blockedData[elementID].src + "\n\nEmbed code:\n" + HTMLToString(blockedElements[elementID]));
 }
 
 function displayBadge(badgeLabel, elementID) {

@@ -11,17 +11,17 @@ killer.canKill = function(data) {
 killer.process = function(data, callback) {
     var SLvars = parseSLVariables(data.params);
     var mediaURL = decodeURIComponent(SLvars[data.file]);
-    var mediaInfo = getInfoFromExt(extractExt(mediaURL));
+    var ext = extInfo(mediaURL);
     
     var sources = new Array();
-    if(mediaInfo && (mediaInfo.isNative || canPlayWM)) sources.push({"url": mediaURL, "isNative": mediaInfo.isNative, "mediaType": mediaInfo});
+    if(ext && (ext.isNative || canPlayWM)) sources.push({"url": mediaURL, "isNative": ext.isNative, "mediaType": ext});
     
     var posterURL;
     if(SLvars.thumbnail) posterURL = decodeURIComponent(SLvars.thumbnail);
     
     var mediaData = {
         "playlist": [{"poster": posterURL, "sources": sources}],
-        "isAudio": mediaInfo.mediaType === "audio"
+        "isAudio": ext.mediaType === "audio"
     }
     callback(mediaData);
 };

@@ -18,7 +18,7 @@ function dispatchMessageToAllPages(name, message) {
     }
 }
 
-// Follows rfc3986
+// Follows rfc3986 except ? and # in base are ignored (as in WebKit)
 const schemeMatch = new RegExp("^[^:]+:");
 const authorityMatch = new RegExp("^[^:]+://[^/]*");
 function makeAbsoluteURL(url, base) {
@@ -84,17 +84,18 @@ const canPlayDivX = canPlayFLV; // 'video/divx' always returns "", probably a Pe
 const canPlayWebM = HTML5.canPlayType("video/webm"); // OK with Perian 2.2
 const canPlayOgg = HTML5.canPlayType("video/ogg"); // OK with Xiph component
 
-// and certainly not this this one! but it does the job reasonably well
-function getInfoFromExt(ext) {
-    if(/^(?:mp4|mpe?g|mov|m4v)$/i.test(ext)) return {"mediaType": "video", "isNative": true};
-    if(canPlayFLV && /^flv$/i.test(ext)) return {"mediaType": "video", "isNative": false};
-    if(canPlayWM && /^(?:wm[vp]?|asf)$/i.test(ext)) return {"mediaType": "video", "isNative": false};
-    if(canPlayDivX && /^divx$/i.test(ext)) return {"mediaType": "video", "isNative": false};
-    if(canPlayWebM && /^webm$/i.test(ext)) return {"mediaType": "video", "isNative": false};
-    if(canPlayOGG && /^ogg$/i.test(ext)) return {"mediaType": "video", "isNative": false};
-    if(/^(?:mp3|wav|aif[fc]?|aac|m4a)$/i.test(ext)) return {"mediaType": "audio", "isNative": true}; // midi not in QTX
-    if(canPlayFLV && /^fla$/i.test(ext)) return {"mediaType": "audio", "isNative": false};
-    if(canPlayWM && /^wma$/i.test(ext)) return {"mediaType": "audio", "isNative": false};
+function extInfo(url) {
+    url = extractExt(url);
+    if(url === "") return undefined;
+    if(/^(?:mp4|mpe?g|mov|m4v)$/i.test(url)) return {"mediaType": "video", "isNative": true};
+    if(canPlayFLV && /^flv$/i.test(url)) return {"mediaType": "video", "isNative": false};
+    if(canPlayWM && /^(?:wm[vp]?|asf)$/i.test(url)) return {"mediaType": "video", "isNative": false};
+    if(canPlayDivX && /^divx$/i.test(url)) return {"mediaType": "video", "isNative": false};
+    if(canPlayWebM && /^webm$/i.test(url)) return {"mediaType": "video", "isNative": false};
+    if(canPlayOgg && /^ogg$/i.test(url)) return {"mediaType": "video", "isNative": false};
+    if(/^(?:mp3|wav|aif[fc]?|aac|m4a)$/i.test(url)) return {"mediaType": "audio", "isNative": true}; // midi not in QTX
+    if(canPlayFLV && /^fla$/i.test(url)) return {"mediaType": "audio", "isNative": false};
+    if(canPlayWM && /^wma$/i.test(url)) return {"mediaType": "audio", "isNative": false};
     return null;
 }
 
@@ -176,7 +177,7 @@ function parseXSPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlayli
         var isAudio = true;
         var startTrack = track;
         if(!(track >= 0 && track < x.length)) track = 0;
-        var list, I, mediaInfo, mediaURL, posterURL, title;
+        var list, I, ext, mediaURL, posterURL, title;
         
         for(var i = 0; i < x.length; i++) {
             // what about <jwplayer:streamer> rtmp??
@@ -185,12 +186,12 @@ function parseXSPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlayli
             if(list.length > 0) mediaURL = makeAbsoluteURL(list[0].firstChild.nodeValue, baseURL);
             else if(i === 0) return;
             else continue;
-            mediaInfo = getInfoFromExt(extractExt(mediaURL));
-            if(mediaInfo === null) {
+            ext = extInfo(mediaURL);
+            if(ext === null) {
                 if(i === 0) return;
                 if(i >= x.length - track) --startTrack;
                 continue;
-            } else if(mediaInfo.mediaType === "video") isAudio = false;
+            } else if(ext.mediaType === "video") isAudio = false;
             
             list = x[I].getElementsByTagName("image");
             if(list.length > 0) posterURL = list[0].firstChild.nodeValue;
@@ -201,7 +202,7 @@ function parseXSPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlayli
                 list = x[I].getElementsByTagName("annotation");
                 if(list.length > 0) title = list[0].firstChild.nodeValue;
             }
-            playlist.push({"sources": [{"url": mediaURL, "isNative": mediaInfo.isNative, "mediaType": mediaInfo.mediaType}], "poster": posterURL, "title": title});
+            playlist.push({"sources": [{"url": mediaURL, "isNative": ext.isNative, "mediaType": ext.mediaType}], "poster": posterURL, "title": title});
         }
         var playlistData = {
             "playlist": playlist,
