@@ -1,4 +1,4 @@
-if(window.location.href !== "about:blank") {
+if(location.href !== "about:blank") {
 
 function downloadURL(url) {
 	var downloadLink = document.createElement("a");
@@ -95,7 +95,7 @@ function getAttributes(element, url) {
 	var info = new Object();
 	info.type = element.type;
 	var tmpAnchor = document.createElement("a");
-	switch (element.nodeName.toLowerCase()) {
+	switch(element.nodeName.toLowerCase()) {
 		case "embed":
 			if(element.hasAttribute("qtsrc")) {
 				tmpAnchor.href = element.getAttribute("qtsrc");
@@ -164,7 +164,7 @@ function getAttributes(element, url) {
 function getParams(element, plugin) {
 	switch(plugin) {
 		case "Flash": // need flashvars
-			switch (element.nodeName.toLowerCase()) {
+			switch(element.nodeName.toLowerCase()) {
 				case "embed":
 					return (element.hasAttribute("flashvars") ? element.getAttribute("flashvars") : ""); // fixing Safari's buggy JS
 					break

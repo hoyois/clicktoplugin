@@ -10,8 +10,8 @@ killer.process = function(data, callback) {
 	var videoID;
 	if(data.params) videoID = parseFlashVariables(data.params).clip_id;
 	if(!videoID) {
-		var matches = data.src.match(/clip_id=([^&]+)/);
-		if(matches) videoID = matches[1];
+		var match = data.src.match(/clip_id=([^&]+)/);
+		if(match) videoID = match[1];
 	}
 	if(!videoID) return;
 	

@@ -3,8 +3,8 @@ addKiller("Silverlight", killer);
 
 killer.canKill = function(data) {
 	if(!data.plugin === "Silverlight") return false;
-	var matches = data.params.match(/(?:^|,)(m|fileurl|mediaurl)=/);
-	if(matches) {data.file = matches[1]; return true;}
+	var match = data.params.match(/(?:^|,)(m|fileurl|mediaurl)=/);
+	if(match) {data.file = match[1]; return true;}
 	return false;
 };
 
@@ -14,7 +14,7 @@ killer.process = function(data, callback) {
 	var ext = extInfo(mediaURL);
 	
 	var sources = new Array();
-	if(ext && (ext.isNative || canPlayWM)) sources.push({"url": mediaURL, "isNative": ext.isNative, "mediaType": ext});
+	if(ext) sources.push({"url": mediaURL, "isNative": ext.isNative, "mediaType": ext.mediaType});
 	
 	var posterURL;
 	if(SLvars.thumbnail) posterURL = decodeURIComponent(SLvars.thumbnail);

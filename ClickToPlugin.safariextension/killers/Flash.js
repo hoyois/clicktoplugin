@@ -3,11 +3,11 @@ addKiller("Flash", killer);
 
 killer.canKill = function(data) {
 	if(data.plugin !== "Flash") return false;
-	var matches = data.params.match(/(?:^|&)(file|load|playlistfile|src|mp3|mp3url|soundFile|soundUrl|url|file_url)=/);
-	if(matches) {data.file = matches[1]; return true;}
+	var match = data.params.match(/(?:^|&)(file|load|playlistfile|src|mp3|mp3url|soundFile|soundUrl|url|file_url)=/);
+	if(match) {data.file = match[1]; return true;}
 	// other video flashvars: wmvUrl/flvUrl (gvideoplayer.swf)
-	matches = data.src.match(/[?&](file|mp3|playlist_url)=/);
-	if(matches) {data.hash = matches[1]; return true;}
+	match = data.src.match(/[?&](file|mp3|playlist_url)=/);
+	if(match) {data.hash = match[1]; return true;}
 	return false;
 };
 

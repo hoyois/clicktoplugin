@@ -7,8 +7,14 @@ killer.canKill = function(data) {
 };
 
 killer.process = function(data, callback) {
-	if(/stratos.swf$/.test(data.src)) {
-		this.processXML(parseFlashVariables(data.params).file, callback);
+	if(/stratos.swf/.test(data.src)) {
+		var url = parseFlashVariables(data.params).file;
+		if(!url) {
+			var match = data.src.match(/[?&]file=([^&]*)/);
+			if(!match) return;
+			url = match[1]; // should have siteInfo...
+		}
+		this.processXML(decodeURIComponent(url), callback);
 	} else {
 		var match = data.src.match(/blip\.tv\/play\/([^%]*)/);
 		if(match) this.processOldVideoID(match[1], callback);
