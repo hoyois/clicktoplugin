@@ -355,16 +355,16 @@ function loadSettings(event) {
 	if(!settings.settingsShortcut) document.getElementById("settingsContext").disabled = true;
 	
 	// Intercept Cmd+W & pref-pane shortcut to close the pref pane
-	if(window !== window.top) {
+	if(window !== top) {
 		document.addEventListener("keydown", function(event) {
 			if((event.keyIdentifier === "U+0057" && event.metaKey === true && event.altKey === false && event.ctrlKey === false && event.shiftKey === false) || (settings.settingsShortcut && event.keyIdentifier === settings.settingsShortcut.keyIdentifier && event.metaKey === settings.settingsShortcut.metaKey && event.altKey === settings.settingsShortcut.altKey && event.ctrlKey === settings.settingsShortcut.ctrlKey && event.shiftKey === settings.settingsShortcut.shiftKey)) {
 				event.preventDefault();
-				safari.self.tab.dispatchMessage("hideSettings", "");
+				safari.self.tab.dispatchMessage("toggleSettings", "");
 			}
 		}, false);
 	}
 	
-	window.focus();
+	focus();
 	
 	// Show settings pane
 	container.className = "";
@@ -372,7 +372,7 @@ function loadSettings(event) {
 
 container.addEventListener("click", function(event) {event.stopPropagation();}, false);
 document.body.addEventListener("click", function(event) {
-	safari.self.tab.dispatchMessage("hideSettings", "");
+	safari.self.tab.dispatchMessage("toggleSettings", "");
 }, false);
 
 safari.self.addEventListener("message", loadSettings, false);

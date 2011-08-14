@@ -7,8 +7,6 @@ killer.canKill = function(data) {
 };
 
 killer.process = function(data, callback) {
-	//var url = decodeURIComponent(parseFlashVariables(data.params).mediaXML);
-	//var title, posterURL, videoURL;
 	var url, siteInfo;
 	if(/^http:\/\/www\.ted\.com\/talks/.test(data.location)) {
 		url = data.location;

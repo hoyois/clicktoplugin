@@ -1,36 +1,4 @@
-if(window.location.href !== "about:blank") { // rdar://9238075
-
-var needsSettingsShortcut = true;
-
-function handleSettings(event) {
-	if(window.location.href === safari.extension.baseURI + "settings.html") return;
-	if(needsSettingsShortcut && event.name === "settingsShortcut") {
-		needsSettingsShortcut = false;
-		document.addEventListener(event.message.type, function(e) {
-			if(testShortcut(e, event.message)) safari.self.tab.dispatchMessage("showSettings", "");
-		}, false);
-	} else if(window === window.top) {
-		if(event.name === "showSettings") {
-			if(document.body.nodeName === "FRAMESET") {
-				// for HTML4 frameset documents, need to open settings in a new tab
-				safari.self.tab.dispatchMessage("openSettings", "");
-				return;
-			}
-			var iframe = document.createElement("iframe");
-			iframe.id = "CTFsettingsPane";
-			iframe.className = "CTFhidden";
-			iframe.src = safari.extension.baseURI + "settings.html";
-			iframe.addEventListener("load", function(e) {e.target.className = "";}, false);
-			document.body.appendChild(iframe);
-		} else if(event.name === "hideSettings") {
-			document.body.removeChild(document.getElementById("CTFsettingsPane"));
-			window.focus();
-		}
-	}
-}
-
-safari.self.addEventListener("message", handleSettings, false);
-safari.self.tab.dispatchMessage("getSettingsShortcut", "");
+if(location.href !== "about:blank") { // rdar://9238075
 
 /*************************
 ClickToFlash global scope
@@ -56,14 +24,30 @@ safari.self.addEventListener("message", respondToMessage, false);
 document.addEventListener("beforeload", handleBeforeLoadEvent, true);
 
 document.addEventListener("contextmenu", function(event) {
-	safari.self.tab.setContextMenuEventUserInfo(event, {"documentID": documentID, "location": window.location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length, "invisible": this.getElementsByClassName("CTFinvisible").length});
+	safari.self.tab.setContextMenuEventUserInfo(event, {"documentID": documentID, "location": location.href, "blocked": this.getElementsByClassName("CTFplaceholder").length, "invisible": this.getElementsByClassName("CTFinvisible").length});
 }, false);
 
-function clearAll(elementID) {
-	delete blockedElements[elementID];
-	delete blockedData[elementID];
-	delete placeholderElements[elementID];
-	delete mediaPlayers[elementID];
+if(window === top) {
+	function toggleSettings() {
+		var iframe = document.getElementById("CTFsettingsPane");
+		if(iframe === null) {
+			if(location.href === safari.extension.baseURI + "settings.html") return;
+			if(document.body.nodeName === "FRAMESET") {
+				// for HTML4 frameset documents, need to open settings in a new tab
+				safari.self.tab.dispatchMessage("openSettings", "");
+				return;
+			}
+			iframe = document.createElement("iframe");
+			iframe.id = "CTFsettingsPane";
+			iframe.className = "CTFhidden";
+			iframe.src = safari.extension.baseURI + "settings.html";
+			iframe.addEventListener("load", function(e) {e.target.className = "";}, false);
+			document.body.appendChild(iframe);
+		} else {
+			document.body.removeChild(iframe);
+			focus();
+		}
+	}
 }
 
 function respondToMessage(event) {
@@ -115,13 +99,16 @@ function respondToMessage(event) {
 			loadSource(event.message);
 			break;
 		case "loadLocation":
-			if(window.location.href.indexOf(event.message) !== -1) loadAll();
+			if(location.href.indexOf(event.message) !== -1) loadAll();
 			break;
 		case "hideSource":
 			hideSource(event.message);
 			break;
 		case "hideLocation":
-			if(window.location.href.indexOf(event.message) !== -1) hideAll();
+			if(location.href.indexOf(event.message) !== -1) hideAll();
+			break;
+		case "toggleSettings":
+			if(window === top) toggleSettings();
 			break;
 	}
 }
@@ -143,7 +130,7 @@ function handleBeforeLoadEvent(event) {
 	to handle px and %), which might be possible using getMatchedCSSRules (returns matching rules in cascading order)
 	The 'auto' value will be a problem...
 	status: still see no feasible solution to this problem...*/
-	var data = {"width": element.offsetWidth, "height": element.offsetHeight, "location": window.location.href, "type": getType(element)};
+	var data = {"width": element.offsetWidth, "height": element.offsetHeight, "location": location.href, "type": getType(element)};
 	
 	if(!event.url) data.src = "";
 	else {
@@ -190,7 +177,7 @@ function handleBeforeLoadEvent(event) {
 		do {
 			positionX += e.offsetLeft; positionY += e.offsetTop;
 		} while(e = e.offsetParent);
-		if(!confirm("ClickToFlash is about to block element " + documentID + "." + elementID + ":\n" + "\nLocation: " + window.location.href + "\nSource: " + data.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + data.width + "x" + data.height)) return;
+		if(!confirm("ClickToFlash is about to block element " + documentID + "." + elementID + ":\n" + "\nLocation: " + location.href + "\nSource: " + data.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + data.width + "x" + data.height)) return;
 	}
 	// END DEBUG
 	
@@ -289,7 +276,7 @@ function handleBeforeLoadEvent(event) {
 			"elementID": elementID,
 			"plugin": "Flash",
 			"src": data.src,
-			"location": window.location.href,
+			"location": location.href,
 			"title": document.title,
 			"baseURL": tmpAnchor.href,
 			"href": data.href,
@@ -297,6 +284,13 @@ function handleBeforeLoadEvent(event) {
 		};
 	}
 	if(elementData) safari.self.tab.dispatchMessage("killPlugin", elementData);
+}
+
+function clearAll(elementID) {
+	delete blockedElements[elementID];
+	delete blockedData[elementID];
+	delete placeholderElements[elementID];
+	delete mediaPlayers[elementID];
 }
 
 function loadPlugin(elementID) {
@@ -458,7 +452,7 @@ function hidePlugin(elementID) {
 }
 
 function getPluginInfo(elementID) {
-	alert("Plug-in: Flash (" + blockedData[elementID].width + "x" + blockedData[elementID].height + ")\nLocation: " + window.location.href + "\nSource: " + blockedData[elementID].src + "\n\nEmbed code:\n" + HTMLToString(blockedElements[elementID]));
+	alert("Plug-in: Flash (" + blockedData[elementID].width + "x" + blockedData[elementID].height + ")\nLocation: " + location.href + "\nSource: " + blockedData[elementID].src + "\n\nEmbed code:\n" + HTMLToString(blockedElements[elementID]));
 }
 
 function displayBadge(badgeLabel, elementID) {
@@ -516,11 +510,6 @@ function clickPlaceholder(elementID) {
 }
 
 function registerGlobalShortcuts() {
-	if(settings.addToWhitelistShortcut) {
-		document.addEventListener(settings.addToWhitelistShortcut.type, function(event) {
-			if(testShortcut(event, settings.addToWhitelistShortcut)) safari.self.tab.dispatchMessage("whitelist", window.location.href);
-		}, false);
-	}
 	if(settings.loadAllShortcut) {
 		document.addEventListener(settings.loadAllShortcut.type, function(event) {
 			if(testShortcut(event, settings.loadAllShortcut)) safari.self.tab.dispatchMessage("loadAll", true);
@@ -569,7 +558,7 @@ function directKill(elementID) {
 	return {
 		"documentID": documentID,
 		"elementID": elementID,
-		"location": window.location.href,
+		"location": location.href,
 		"playlist": [{"poster": mediaElements[0].getAttribute("poster"), "sources": sources, "title": mediaElements[0].title}]
 	};
 }

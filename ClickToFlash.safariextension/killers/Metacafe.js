@@ -10,8 +10,8 @@ killer.process = function(data, callback) {
 	if(/(?:^|&)mediaData=/.test(data.params)) {
 		this.processFlashVars(parseFlashVariables(data.params), callback);
 	} else {
-		var matches = data.src.match(/metacafe\.com\/fplayer\/([0-9]*)\//);
-		if(matches) this.processVideoID(matches[1], callback);
+		var match = data.src.match(/metacafe\.com\/fplayer\/([0-9]*)\//);
+		if(match) this.processVideoID(match[1], callback);
 		return;
 	}
 };
@@ -49,13 +49,13 @@ killer.processVideoID = function(videoID, callback) {
 	xhr.open('GET', url, true);
 	var _this = this;
 	xhr.onload = function() {
-		var matches = xhr.responseText.match(/name=\"flashvars\"\svalue=\"([^"]*)\"/);
-		if(matches) {
+		var match = xhr.responseText.match(/name=\"flashvars\"\svalue=\"([^"]*)\"/);
+		if(match) {
 			var callbackForEmbed = function(videoData) {
 				videoData.playlist[0].siteInfo = {"name": "Metacafe", "url": url};
 				callback(videoData);
 			};
-			_this.processFlashVars(matches[1], callbackForEmbed);
+			_this.processFlashVars(match[1], callbackForEmbed);
 		}
 	};
 	xhr.send(null);

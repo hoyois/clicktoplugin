@@ -20,7 +20,7 @@ maxInvisibleSize (default: 8)
 zeroIsInvisible: (default: undefined)
 */
 
-const injectedSettings = ["additionalScripts", "useFallbackMedia", "showSourceSelector", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "volume", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+const injectedSettings = ["additionalScripts", "useFallbackMedia", "showSourceSelector", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "volume", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
 
 function getSettings(array) {
 	var s = new Object();
@@ -30,11 +30,23 @@ function getSettings(array) {
 	return s;
 }
 
+// The shortcuts to open the prefs and to whitelist a page must work on all pages
+// To avoid messaging, we use a dynamic content script to register them
+var dynamicScriptURL;
+function updateGlobalShortcuts() {
+	safari.extension.removeContentScript(dynamicScriptURL);
+	var script = "";
+	if(safari.extension.settings.settingsShortcut) script += "document.addEventListener(\"" + safari.extension.settings.settingsShortcut.type + "\",function(e){if(testShortcut(e," + JSON.stringify(safari.extension.settings.settingsShortcut) + "))safari.self.tab.dispatchMessage(\"toggleSettings\", \"\");},false);";
+	if(safari.extension.settings.addToWhitelistShortcut) script += "document.addEventListener(\"" + safari.extension.settings.addToWhitelistShortcut.type + "\",function(e){if(testShortcut(e," + JSON.stringify(safari.extension.settings.addToWhitelistShortcut) + "))safari.self.tab.dispatchMessage(\"whitelist\",location.href);},false);";
+	if(script) dynamicScriptURL =  safari.extension.addContentScript(script, [], [safari.extension.baseURI + "*"], false);
+}
+updateGlobalShortcuts();
+
 // CORE
 var documentID = 0;
 
 function respondToMessage(event) {
-	switch (event.name) {
+	switch(event.name) {
 		case "canLoad":
 			event.message = respondToCanLoad(event.message);
 			break;
@@ -53,17 +65,15 @@ function respondToMessage(event) {
 		case "whitelist":
 			handleWhitelisting("locationsWhitelist", extractDomain(event.message));
 			break;
-		case "hideSettings":
-			event.target.page.dispatchMessage("hideSettings", "");
-			break;
-		case "showSettings":
-			event.target.page.dispatchMessage("showSettings", "");
+		case "toggleSettings":
+			event.target.page.dispatchMessage("toggleSettings", "");
 			break;
 		case "openSettings":
-			showSettings(safari.application.activeBrowserWindow.openTab("foreground"));
+			openSettings(safari.application.activeBrowserWindow.openTab("foreground"));
 			break;
 		case "changeSetting":
 			safari.extension.settings[event.message.setting] = event.message.value;
+			if(event.message.setting === "settingsShortcut" || event.message.setting === "addToWhitelistShortcut") updateGlobalShortcuts();
 			break;
 		case "getSettings":
 			event.target.page.dispatchMessage("settings", getSettings(allSettings));
@@ -152,9 +162,7 @@ function handleContextMenu(event) {
 	if(!u.isMedia) {
 		if(s.addToWhitelistContext && !s.invertWhitelists) event.contextMenu.appendContextMenuItem("sourcesWhitelist", ALWAYS_ALLOW_SOURCE);
 		if(s.addToBlacklistContext && !s.invertBlacklists) event.contextMenu.appendContextMenuItem("sourcesBlacklist", ALWAYS_HIDE_SOURCE);
-		// BEGIN DEBUG
 		if(s.debug) event.contextMenu.appendContextMenuItem("info", GET_PLUGIN_INFO);
-		//END DEBUG
 	}
 }
 
@@ -179,7 +187,7 @@ function doCommand(event) {
 			switchOn();
 			break;
 		case "settings":
-			showSettings(safari.application.activeBrowserWindow.activeTab);
+			openSettings(safari.application.activeBrowserWindow.activeTab);
 			break;
 		default:
 			safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("loadContent", {"documentID": event.userInfo.documentID, "elementID": event.userInfo.elementID, "source": event.userInfo.source, "command": event.command});
@@ -187,9 +195,9 @@ function doCommand(event) {
 	}
 }
 
-function showSettings(tab) {
+function openSettings(tab) {
 	if(!tab.url) tab.url = safari.extension.baseURI + "settings.html";
-	else tab.page.dispatchMessage("showSettings", "");
+	else tab.page.dispatchMessage("toggleSettings", "");
 }
 
 function switchOff() {
@@ -203,6 +211,7 @@ function switchOn() {
 	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "sourceSelector.js");
 	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "mediaPlayer.js");
 	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "ClickToFlash.js");
+	updateGlobalShortcuts();
 	safari.application.activeBrowserWindow.activeTab.url = safari.application.activeBrowserWindow.activeTab.url;
 }
 

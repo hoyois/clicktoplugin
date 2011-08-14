@@ -1,4 +1,4 @@
-if(window.location.href !== "about:blank") {
+if(location.href !== "about:blank") {
 
 /***************************
 mediaPlayer class definition

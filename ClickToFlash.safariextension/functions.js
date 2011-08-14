@@ -1,4 +1,4 @@
-if(window.location.href !== "about:blank") {
+if(location.href !== "about:blank") {
 
 function downloadURL(url) {
 	var downloadLink = document.createElement("a");
@@ -107,7 +107,7 @@ function getType(element) {
 }
 
 function getParams(element) {
-		switch (element.nodeName.toLowerCase()) {
+		switch(element.nodeName.toLowerCase()) {
 			case "embed":
 				return (element.hasAttribute("flashvars") ? element.getAttribute("flashvars") : ""); // fixing Safari's buggy JS
 				break
