@@ -4,7 +4,7 @@
 <array>
 	<dict>
 		<key>DefaultValue</key>
-		<real>0.0</real>
+		<integer>0</integer>
 		<key>Key</key>
 		<string>defaultTab</string>
 	</dict>
@@ -53,20 +53,20 @@
 	<dict>
 		<key>DefaultValue</key>
 		<array>
-		    <string>killers/YouTube.js</string>
-		    <string>killers/Vimeo.js</string>
-		    <string>killers/Dailymotion.js</string>
-		    <string>killers/Facebook.js</string>
-		    <string>killers/Break.js</string>
-		    <string>killers/Blip.js</string>
-		    <string>killers/Metacafe.js</string>
-		    <string>killers/TED.js</string>
-		    <string>killers/Tumblr.js</string>
-		    <string>killers/Flash.js</string>
-		    <string>killers/Silverlight.js</string>
-		    <string>killers/QuickTime.js</string>
-		    <string>killers/WindowsMedia.js</string>
-		    <string>killers/DivX.js</string>
+			<string>killers/YouTube.js</string>
+			<string>killers/Vimeo.js</string>
+			<string>killers/Dailymotion.js</string>
+			<string>killers/Facebook.js</string>
+			<string>killers/Break.js</string>
+			<string>killers/Blip.js</string>
+			<string>killers/Metacafe.js</string>
+			<string>killers/TED.js</string>
+			<string>killers/Tumblr.js</string>
+			<string>killers/Flash.js</string>
+			<string>killers/Silverlight.js</string>
+			<string>killers/QuickTime.js</string>
+			<string>killers/WindowsMedia.js</string>
+			<string>killers/DivX.js</string>
 		</array>
 		<key>Key</key>
 		<string>additionalScripts</string>
@@ -123,7 +123,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<real>1080</real>
+		<integer>1080</integer>
 		<key>Key</key>
 		<string>maxResolution</string>
 	</dict>
@@ -135,7 +135,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<real>2</real>
+		<integer>2</integer>
 		<key>Key</key>
 		<string>codecsPolicy</string>
 	</dict>
@@ -242,7 +242,7 @@
 			<key>altKey</key>
 			<true/>
 			<key>button</key>
-			<real>0.0</real>
+			<integer>0</integer>
 			<key>ctrlKey</key>
 			<false/>
 			<key>metaKey</key>
@@ -375,7 +375,7 @@
 			<key>altKey</key>
 			<false/>
 			<key>button</key>
-			<real>0.0</real>
+			<integer>0</integer>
 			<key>ctrlKey</key>
 			<false/>
 			<key>metaKey</key>
@@ -433,7 +433,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<real>8</real>
+		<integer>8</integer>
 		<key>Key</key>
 		<string>maxInvisibleSize</string>
 	</dict>

@@ -1,226 +1,225 @@
 * {
-    cursor: default;
-    font: -webkit-control;
-    text-rendering: optimizelegibility;
+	cursor: default;
+	font: -webkit-control;
+	text-rendering: optimizelegibility;
 }
 
 html, body {
-    height: 100%;
-    width: 100%;
+	height: 100%;
+	width: 100%;
 }
 
 body {
-    margin: 0px;
-    -webkit-user-select: none;
+	margin: 0px;
+	-webkit-user-select: none;
 }
 
 #container {
-    position: relative;
-    -webkit-box-shadow: 0 8px 20px 5px rgba(0, 0, 0, .3);
-    -webkit-transition-timing-function: linear;
-    background-color: #EDEDED;
-    border: 1px solid #9B9B9B;
-    top: 10%;
-    margin: auto;
-    width: intrinsic;
-    border-radius: 5px;
+	position: relative;
+	-webkit-box-shadow: 0 8px 20px 5px rgba(0, 0, 0, .3);
+	-webkit-transition-timing-function: linear;
+	background-color: #EDEDED;
+	border: 1px solid #9B9B9B;
+	top: 10%;
+	margin: auto;
+	width: intrinsic;
+	border-radius: 5px;
 }
 
 #container.init {
-    visibility: hidden;
+	visibility: hidden;
 }
 
 #main {
-    position: relative;
-    overflow: auto;
+	position: relative;
+	overflow: auto;
 }
 
 
 nav {
-    display: block;
-    background: -webkit-gradient(linear, left top, left bottom, from(#E9E9E9), to(#BDBDBD));
-    border-bottom: 1px solid #515151;
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
+	display: block;
+	background: -webkit-gradient(linear, left top, left bottom, from(#E9E9E9), to(#BDBDBD));
+	border-bottom: 1px solid #515151;
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
 }
 
 nav ul {
-    -webkit-padding-start: 0;
-    list-style-type: none;
-    display: -webkit-box;
-    -webkit-box-orient: horizontal;
-    -webkit-box-pack: center;
-    -webkit-box-align: baseline;
-    margin: 0 auto;
+	-webkit-padding-start: 0;
+	list-style-type: none;
+	display: -webkit-box;
+	-webkit-box-orient: horizontal;
+	-webkit-box-pack: center;
+	-webkit-box-align: baseline;
+	margin: 0 auto;
 }
 
 nav ul li {
-    display: block;
-    -webkit-box-flex: 0;
-    padding: 0;
-    margin: 0;
-    height: 20px;
-    color: #333;
-    text-shadow: #EDEDED 0 1px 1px;
+	display: block;
+	-webkit-box-flex: 0;
+	padding: 0;
+	margin: 0;
+	height: 20px;
+	color: #333;
+	text-shadow: #EDEDED 0 1px 1px;
 }
 
 nav ul li.selected {
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#9B9B9B), to(#515151));
-    padding: 0 1px;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#9B9B9B), to(#515151));
+	padding: 0 1px;
 }
 
 li span.tab {
-    display: block;
-    padding: 0 6px;
-    height: 21px;
-    font: -webkit-small-control;
-    line-height: 20px;
+	display: block;
+	padding: 0 6px;
+	height: 21px;
+	font: -webkit-small-control;
+	line-height: 20px;
 }
 
 li.selected span.tab {
-    padding: 0 5px;
-    background-color: #EDEDED;
+	padding: 0 5px;
+	background-color: #EDEDED;
 }
 
 section {
-    height: 0px;
-    overflow: hidden;
-    visibility: hidden;
-    padding: 0 10px;
+	height: 0px;
+	overflow: hidden;
+	visibility: hidden;
+	padding: 0 10px;
 }
 
 section.selected {
-    height: auto;
-    visibility: visible;
-    padding: 10px;
+	height: auto;
+	visibility: visible;
+	padding: 10px;
 }
 
 .hidden section.selected {
-    visibility: hidden;
+	visibility: hidden;
 }
 
 menu {
-    -webkit-padding-start: 0;
-    display: table;
-    margin: 0 auto;
-    -webkit-border-horizontal-spacing: 7px;
-    -webkit-border-vertical-spacing: 4px;
+	-webkit-padding-start: 0;
+	display: table;
+	margin: 0 auto;
+	-webkit-border-horizontal-spacing: 7px;
+	-webkit-border-vertical-spacing: 4px;
 }
 
 menu#keyboard_shortcuts {
-    -webkit-border-vertical-spacing: 0;
+	-webkit-border-vertical-spacing: 0;
 }
 
 menu li {
-    display: table-row;
+	display: table-row;
 }
 
 menu li > span {
-    display: table-cell;
-    vertical-align: baseline;
+	display: table-cell;
+	vertical-align: baseline;
 }
 
 menu.two_column li > span:first-child {
-    text-align: right;
+	text-align: right;
 }
 
 menu.two_column li > span:first-child > label {
-    display: inline-block;
+	display: inline-block;
 }
 
 li.glue {
-    height: 9px;
+	height: 9px;
 }
 
 li.header > span {
-    padding-bottom: 4px;
+	padding-bottom: 4px;
 }
 
 span.checkbox {
-    padding-left: 18px;
-    text-indent: -18px;
-    -webkit-line-box-contain: block;
-    box-sizing: border-box;
+	padding-left: 18px;
+	text-indent: -18px;
+	-webkit-line-box-contain: block;
+	box-sizing: border-box;
 }
 
 span.checkbox * {
-    -webkit-line-box-contain: block inline replaced;
+	-webkit-line-box-contain: block inline replaced;
 }
 
 .init span.checkbox {
-    display: none;
+	display: none;
 }
 
 span.sub {
-    padding-left: 18px;
+	padding-left: 18px;
 }
 
 span.checkbox.sub {
-    padding-left: 36px;
+	padding-left: 36px;
 }
 
 input.keyboard {
-    text-align: center;
-    width: 135px;
+	text-align: center;
+	width: 135px;
 }
 
 textarea {
-     margin: 0;
-     vertical-align: top;
-     min-width: 300px;
-     /* white-space: nowrap; */ /* This makes pasted line breaks invisible in .value! Only wrap="off" works. */
+	 margin: 0;
+	 vertical-align: top;
+	 min-width: 300px;
+	 /* white-space: nowrap; */ /* This makes pasted line breaks invisible in .value! Only wrap="off" works. */
 }
 
 input[type="text"] {
-    -webkit-appearance: textarea;
+	-webkit-appearance: textarea;
 }
 
 span.textarea_label {
-    padding-top: 3px;
-    vertical-align: top;
+	padding-top: 3px;
+	vertical-align: top;
 }
 
 input[type="range"] {
-    vertical-align: middle;
+	vertical-align: middle;
 }
 
 .hfil {
-    width: 300px;
+	width: 300px;
 }
 
 input[type="checkbox"] {
-    font-size: 16px;
-    margin: 0 4px 0 0;
+	font-size: 16px;
+	margin: 0 4px 0 0;
 }
 
 select {
-    font-size: 16px;
+	font-size: 16px;
 }
 
 span.mouse {
-    box-sizing: border-box;
-    border: 1px solid #999999;
-    /* border-top-color: #737373; */
-    display: inline-block;
-    vertical-align: -6px;
-    width: 22px;
-    height: 22px;
-    margin-left: 4px;
-    padding: 0;
-    background-color: white;
+	box-sizing: border-box;
+	border: 1px solid #999999;
+	display: inline-block;
+	vertical-align: -6px;
+	width: 22px;
+	height: 22px;
+	margin-left: 4px;
+	padding: 0;
+	background-color: white;
 }
 
 span.mouse:hover {
-    -webkit-box-shadow: inset 0 0 2px 1px rgba(153,153,153,1);
+	-webkit-box-shadow: inset 0 0 2px 1px rgba(153,153,153,1);
 }
 
 span.mouse.disabled {
-    visibility: hidden;
+	visibility: hidden;
 }
 
 input.shortcut_clear {
-    position: relative;
-    bottom: 1px;
-    margin-left: 10px;
+	position: relative;
+	bottom: 1px;
+	margin-left: 10px;
 }
 
