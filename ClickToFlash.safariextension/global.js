@@ -50,9 +50,6 @@ function respondToMessage(event) {
 		case "canLoad":
 			event.message = respondToCanLoad(event.message);
 			break;
-		case "getSettingsShortcut":
-			if(safari.extension.settings.settingsShortcut) event.target.page.dispatchMessage("settingsShortcut", safari.extension.settings.settingsShortcut);
-			break;
 		case "killPlugin":
 			killPlugin(event.message, event.target);
 			break;
