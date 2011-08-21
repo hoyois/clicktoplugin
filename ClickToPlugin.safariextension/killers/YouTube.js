@@ -13,7 +13,7 @@ killer.process = function(data, callback) {
 		var flashvars = parseFlashVariables(data.params);
 		if(/\s-\sYouTube$/.test(data.title)) flashvars.title = data.title.slice(0, -10);
 		
-		if(flashvars.list) this.processPlaylistID(flashvars.list.substr(2), flashvars, callback);
+		if(flashvars.list && /^PL/.test(flashvars.list)) this.processPlaylistID(flashvars.list.substr(2), flashvars, callback);
 		else if(flashvars.url_encoded_fmt_stream_map) this.processFlashVars(flashvars, callback);
 		else if(flashvars.video_id) this.processVideoID(flashvars.video_id, callback);
 		return;

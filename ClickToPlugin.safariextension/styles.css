@@ -33,12 +33,12 @@ etc.
 	-webkit-animation-name: none !important;
 	-webkit-appearance: none !important;
 	-webkit-box-reflect: none !important;
-	-webkit-box-shadow: none !important;
 	-webkit-mask-image: none !important;
 	-webkit-perspective: none !important;
 	-webkit-transform: none !important;
 	-webkit-user-select: none !important; /* not default */
 	border: none !important;
+	box-shadow: none !important;
 	box-sizing: content-box !important;
 	/* This is incorrectly computed as rect(0px,0px,0px,0px) on video elements, which screws things up */
 	/* clip: auto !important; */
@@ -146,9 +146,9 @@ Placeholder element
 .CTFplaceholder .CTFlogo {
 	position: static !important;
 	display: block !important;
-	-webkit-box-shadow: 0 0 2px rgba(0, 0, 0, 1), inset 0 0 2px rgba(0, 0, 0, 1), 0 0 6px rgba(0, 0, 0, 0.6), inset 0 0 6px rgba(0, 0, 0, 0.6) !important;
 	border: 3px solid rgba(240, 240, 240, 1) !important;
 	border-radius: 7px !important;
+	box-shadow: 0 0 2px rgba(0, 0, 0, 1), inset 0 0 2px rgba(0, 0, 0, 1), 0 0 6px rgba(0, 0, 0, 0.6), inset 0 0 6px rgba(0, 0, 0, 0.6) !important;
 	color: rgba(240, 240, 240, 1) !important;
 	font: -webkit-control !important;
 	font-size: 20px !important;
@@ -157,8 +157,8 @@ Placeholder element
 }
 
 .CTFplaceholder.CTFnoimage .CTFlogo {
-	-webkit-box-shadow: none !important;
 	border: 3px solid rgba(0, 0, 0, 0.25) !important;
+	box-shadow: none !important;
 	color: rgba(0, 0, 0, 0.35) !important;
 	text-shadow: none !important;
 }
@@ -292,7 +292,6 @@ Source selector
 .CTFsourceSelector {
 	position: absolute !important;
 	display: block !important;
-	-webkit-box-shadow: rgba(0, 0, 0, .5) 0 1px 2px !important;
 	-webkit-transition-delay: 0s !important;
 	-webkit-transition-duration: .2s !important;
 	-webkit-transition-timing-function: ease-in !important;
@@ -306,6 +305,7 @@ Source selector
 	background-size: contain !important;
 	border: 1px solid rgba(0, 0, 0, .6) !important;
 	border-radius: 5px !important;
+	box-shadow: rgba(0, 0, 0, .5) 0 1px 2px !important;
 	height: auto !important;
 	left: 10px !important;
 	opacity: 0 !important;
@@ -425,7 +425,7 @@ Settings pane
 	right: 0 !important;
 	top: 0 !important;
 	width: 100% !important;
-	z-index: 1000000000 !important;
+	z-index: 2147483647 !important;
 	zoom: normal !important;
 }
 

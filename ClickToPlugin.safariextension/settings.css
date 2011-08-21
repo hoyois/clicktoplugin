@@ -44,7 +44,7 @@ nav {
 	border-top-right-radius: 3px;
 }
 
-nav ul {
+nav > ul {
 	-webkit-padding-start: 0;
 	list-style-type: none;
 	display: -webkit-box;
@@ -54,7 +54,7 @@ nav ul {
 	margin: 0 auto;
 }
 
-nav ul li {
+nav > ul > li {
 	display: block;
 	-webkit-box-flex: 0;
 	padding: 0;
@@ -64,12 +64,12 @@ nav ul li {
 	text-shadow: #EDEDED 0 1px 1px;
 }
 
-nav ul li.selected {
+nav > ul > li.selected {
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#9B9B9B), to(#515151));
 	padding: 0 1px;
 }
 
-li span.tab {
+nav > ul > li > span {
 	display: block;
 	padding: 0 6px;
 	height: 21px;
@@ -77,7 +77,7 @@ li span.tab {
 	line-height: 20px;
 }
 
-li.selected span.tab {
+nav > ul > li.selected > span {
 	padding: 0 5px;
 	background-color: #EDEDED;
 }
