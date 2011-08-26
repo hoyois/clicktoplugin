@@ -55,7 +55,6 @@ mediaPlayer.prototype.createMediaElement = function(width, height, style, contex
 	this.containerElement.addEventListener("click", function(event) {event.stopPropagation();}, false);
 	
 	var styleElement = document.createElement("style"); // use scoped attribute when supported
-	styleElement.type = "text/css";
 	this.containerElement.appendChild(styleElement);
 	
 	this.mediaElement = document.createElement(this.playerType);
