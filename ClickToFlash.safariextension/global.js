@@ -6,7 +6,7 @@ if(safari.extension.settings.version < 25) {
 	safari.extension.settings.defaultTab = 0;
 	safari.extension.settings.maxInvisibleSize = 8;
 }
-safari.extension.settings.version = 25;
+safari.extension.settings.version = 26;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, safari.extension.settings.language);

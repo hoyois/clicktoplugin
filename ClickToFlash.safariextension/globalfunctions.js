@@ -1,7 +1,6 @@
 function loadScripts() { // add scripts to the global page
 	for(var i = 0; i < arguments.length; i++) {
 		var scriptElement = document.createElement("script");
-		scriptElement.type = "text/javascript";
 		scriptElement.src = makeAbsoluteURL(arguments[i], safari.extension.baseURI);
 		document.head.appendChild(scriptElement);
 	}
