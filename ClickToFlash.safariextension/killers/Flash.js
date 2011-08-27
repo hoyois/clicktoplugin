@@ -37,7 +37,7 @@ killer.process = function(data, callback) {
 	
 	// YouTube redirection
 	// In JW player, flashvars.provider === "youtube"
-	if(sourceURL.substr(0,28) === "http://www.youtube.com/watch") {
+	if(/^http:\/\/(?:www.)?youtube.com\/watch/.test(sourceURL)) {
 		var match = sourceURL.match(/[?&]v=([^&]*)/);
 		if(match) {
 			if(!hasKiller("YouTube")) return;
