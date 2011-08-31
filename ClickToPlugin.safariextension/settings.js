@@ -304,7 +304,7 @@ function buildPluginMenu() {
 	}
 }
 function checkedPlugins() {
-	var array = new Array();
+	var array = [];
 	for(var i = 0; i < pluginInputs.length; i++) {
 		if(pluginInputs[i].checked) array.push(pluginInputs[i].id.substr(7));
 	}

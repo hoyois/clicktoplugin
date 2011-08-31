@@ -1,14 +1,14 @@
-var killer = new Object();
+var killer = {};
 addKiller("Vimeo", killer);
 
 killer.canKill = function(data) {
 	if(data.plugin !== "Flash") return false;
-	return (data.src.indexOf("vimeo.com/moogaloop") !== -1 || data.src.indexOf("vimeocdn.com/p/flash/moogalo") !== -1);
+	return data.src.indexOf("vimeo.com/moogaloop") !== -1 || data.src.indexOf("vimeocdn.com/p/flash/moogalo") !== -1;
 };
 
 killer.process = function(data, callback) {
 	var videoID;
-	if(data.params) videoID = parseFlashVariables(data.params).clip_id;
+	if(data.params.flashvars) videoID = parseFlashVariables(data.params.flashvars).clip_id;
 	if(!videoID) {
 		var match = data.src.match(/clip_id=([^&]+)/);
 		if(match) videoID = match[1];
@@ -16,7 +16,7 @@ killer.process = function(data, callback) {
 	if(!videoID) return;
 	
 	var title, posterURL, siteInfo;
-	var sources = new Array();
+	var sources = [];
 	var isNative = true;
 	
 	var xhr = new XMLHttpRequest();
@@ -25,11 +25,6 @@ killer.process = function(data, callback) {
 		var xml = xhr.responseXML;
 		
 		var url = "http://www.vimeo.com/moogaloop/play/clip:" + videoID + "/" + xml.getElementsByTagName("request_signature")[0].textContent + "/" + xml.getElementsByTagName("request_signature_expires")[0].textContent + "/?q=";
-		// As of December 2010, these URLs are not downloadable, because Vimeo returns 404 to
-		// the Downloads window's user agent (Safari CFNetwork Darwin).
-		// It correctly redirects to the video URL for Safari Mac and CoreMedia user agents, so
-		// it's still possible to download the video by copying the final URL from the browser...
-		// Unfortunately it's impossible to get using XMLHttpRequest.
 		
 		var handleMIMEType = function(MIMEType) {
 			if(MIMEType.split(";")[0] !== "video/mp4") isNative = false;
@@ -50,11 +45,8 @@ killer.process = function(data, callback) {
 				}
 				
 				if(data.location.indexOf("vimeo.com/") === -1 || data.location === "http://vimeo.com/" || data.location.indexOf("player.vimeo.com/") !== -1) siteInfo = {"name": "Vimeo", "url": "http://vimeo.com/" + videoID};
-
-				var videoData = {
-					"playlist": [{"siteInfo": siteInfo, "title": title, "poster": posterURL, "sources": sources}]
-				};
-				callback(videoData);
+				
+				callback({"playlist": [{"siteInfo": siteInfo, "title": title, "poster": posterURL, "sources": sources}]});
 			};
 			getMIMEType(url + "mobile", handleMIMEType2);
 		};

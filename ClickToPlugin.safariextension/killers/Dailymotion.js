@@ -1,4 +1,4 @@
-var killer = new Object();
+var killer = {};
 addKiller("Dailymotion", killer);
 
 killer.canKill = function(data) {
@@ -10,8 +10,8 @@ killer.process = function(data, callback) {
 	if(/^http:\/\/www\.dailymotion\.com\/hub\//.test(data.location)) {
 		var match = data.location.match(/#videoId=(.*)/);
 		if(match) this.processVideoID(match[1], callback);
-	} else if(data.params) {
-		var sequence = parseFlashVariables(data.params).sequence;
+	} else if(data.params.flashvars) {
+		var sequence = parseFlashVariables(data.params.flashvars).sequence;
 		if(sequence) this.processSequence(decodeURIComponent(sequence), callback);
 	} else {
 		var match = data.src.match(/\/swf\/([^&]+)/);
@@ -22,7 +22,7 @@ killer.process = function(data, callback) {
 killer.processSequence = function(sequence, callback) {
 	// NOTE: sequence.replace(/\\'/g, "'") is JSON but it's so messy that regexp search is easier
 	var posterURL, match;
-	var sources = new Array();
+	var sources = [];
 	
 	// hd720URL (720p)
 	match = sequence.match(/\"hd720URL\":\"([^"]*)\"/);
@@ -47,10 +47,7 @@ killer.processSequence = function(sequence, callback) {
 	match = sequence.match(/\"videoTitle\":\"((?:\\"|[^"])*)\"/);
 	if(match) title = unescape(match[1].replace(/\+/g, " ").replace(/\\u/g, "%u").replace(/\\["'\/\\]/g, function(s){return s.charAt(1);}));
 	
-	var videoData = {
-		"playlist": [{"title": title, "poster": posterURL, "sources": sources}]
-	};
-	callback(videoData);
+	callback({"playlist": [{"title": title, "poster": posterURL, "sources": sources}]});
 };
 
 killer.processVideoID = function(videoID, callback) {

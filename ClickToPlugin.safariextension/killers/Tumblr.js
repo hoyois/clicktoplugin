@@ -1,4 +1,4 @@
-var killer = new Object();
+var killer = {};
 addKiller("Tumblr", killer);
 
 killer.canKill = function(data) {
@@ -9,11 +9,10 @@ killer.canKill = function(data) {
 killer.process = function(data, callback) {
 	var audioURL = data.src.match(/\?audio_file=([^&]*)/);
 	if(audioURL) audioURL = audioURL[1] + "?plead=please-dont-download-this-or-our-lawyers-wont-let-us-host-audio"; // lol
-
-	var mediaData = {
+	
+	callback({
 		"playlist": [{"sources": [{"url": audioURL, "isNative": true, "mediaType": "audio"}]}],
 		"isAudio": true
-	};
-	callback(mediaData);
+	});
 };
 

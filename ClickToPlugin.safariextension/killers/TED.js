@@ -1,4 +1,4 @@
-var killer = new Object();
+var killer = {};
 addKiller("TED", killer);
 
 killer.canKill = function(data) {
@@ -11,7 +11,7 @@ killer.process = function(data, callback) {
 	if(/^http:\/\/www\.ted\.com\/talks/.test(data.location)) {
 		url = data.location;
 	} else {
-		var match = data.params.match(/adKeys=talk=([^;]*);/);
+		var match = /adKeys=talk=([^;]*);/.exec(data.params.flashvars);
 		if(match) {
 			url = "http://www.ted.com/talks/" + match[1] + ".html";
 			siteInfo = {"name": "TED", "url": url};
@@ -21,10 +21,10 @@ killer.process = function(data, callback) {
 	var xhr = new XMLHttpRequest();
 	xhr.open('GET', url, true);
 	xhr.onload = function() {
-		// make global DOM parser?
-		var xml = (new DOMParser()).parseFromString(xhr.responseText, "text/xml");
+		// response is XML as "text/html"
+		var xml = new DOMParser().parseFromString(xhr.responseText, "text/xml");
 		
-		var sources = new Array();
+		var sources = [];
 		var downloads = xml.getElementsByClassName("downloads");
 		var anchor = downloads[1].getElementsByTagName("a")[2];
 		if(anchor) sources.push({"url": anchor.href, "format": "480p MP4", "height": 480, "isNative": true, "mediaType": "video"});
@@ -35,10 +35,14 @@ killer.process = function(data, callback) {
 		
 		var posterURL = xml.getElementById("embedCode").getAttribute("value").match(/&su=([^&]*)&/)[1];
 		
-		var videoData = {
-			"playlist": [{"poster": posterURL, "title": xml.getElementById("altHeadline").textContent, "sources": sources, "siteInfo": siteInfo}]
-		};
-		callback(videoData);
+		callback({
+			"playlist": [{
+				"poster": posterURL,
+				"title": xml.getElementById("altHeadline").textContent,
+				"sources": sources,
+				"siteInfo": siteInfo
+			}]
+		});
 	};
 	xhr.send(null);
 };

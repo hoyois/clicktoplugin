@@ -1,24 +1,23 @@
 if(location.href !== "about:blank") { // rdar://9238075
+// TODO: check if this is still an issue in 5.1
 
 /*************************
 ClickToPlugin global scope
 *************************/
 
-var blockedElements = new Array(); // array containing the blocked HTML elements
-var blockedData = new Array(); // array containing info on the blocked element (plugin, dimensions, source, ...)
-var placeholderElements = new Array(); // array containing the corresponding placeholder elements
-var mediaPlayers = new Array(); // array containing the HTML5 media players
+var blockedElements = []; // array containing the blocked HTML elements
+var blockedData = []; // array containing info on the blocked element (plugin, dimensions, source, ...)
+var placeholderElements = []; // array containing the corresponding placeholder elements
+var mediaPlayers = []; // array containing the HTML5 media players
 
 var settings;
 var documentID;
 var numberOfBlockedElements = 0;
 var stack;
-/*
-The stack is a <div> appended as a child of <body> in which the blocked elements are stored unmodified.
+/* The stack is a <div> appended as a child of <body> in which the blocked elements are stored unmodified.
 This allows scripts that need to set custom JS properties to those elements (or otherwise modify them) to work.
 The stack itself has display:none so that plugins are not instantiated.
-Scripts that try to interact with the plugin will still fail, of course. No way around that.
-*/
+Scripts that try to interact with the plugin will still fail, of course. No way around that. */
 
 safari.self.addEventListener("message", respondToMessage, false);
 document.addEventListener("beforeload", handleBeforeLoadEvent, true);
@@ -51,63 +50,57 @@ if(window === top) {
 }
 
 function respondToMessage(event) {
+	// ignore messages for other documents
+	if(event.message.documentID !== undefined && event.message.documentID !== documentID) return;
 	switch(event.name) {
 		case "mediaData":
-			if(event.message.documentID !== documentID) return; // ignore message from other documents
-			if(event.message.plugin) blockedData[event.message.elementID].plugin = event.message.plugin;
 			prepMedia(event.message);
 			break;
-		case "loadContent":
-			if(event.message.documentID !== documentID) return; // ignore message from other documents
-			switch(event.message.command) {
-				case "plugin":
-					loadPlugin(event.message.elementID);
-					break;
-				case "changeLabel":
-					blockedData[event.message.elementID].plugin = event.message.plugin;
-					if(placeholderElements[event.message.elementID] && !mediaPlayers[event.message.elementID]) displayBadge(event.message.plugin, event.message.elementID);
-					break;
-				case "remove":
-					hidePlugin(event.message.elementID);
-					break;
-				case "reload":
-					restorePlugin(event.message.elementID);
-					break;
-				case "download":
-					downloadMedia(event.message.elementID, event.message.source, false);
-					break;
-				case "downloadDM":
-					downloadMedia(event.message.elementID, event.message.source, true);
-					break;
-				case "viewInQTP":
-					viewInQuickTimePlayer(event.message.elementID, event.message.source);
-					break;
-				case "loadAll":
-					loadAll();
-					break;
-				case "loadInvisible":
-					loadInvisible();
-					break;
-				case "info":
-					getPluginInfo(event.message.elementID);
-					break;
-			}
+		case "load":
+			loadPlugin(event.message.elementID);
+			break;
+		case "plugin":
+			blockedData[event.message.elementID].plugin = event.message.plugin;
+			handleBlockedPlugin(event.message.elementID);
+			break;
+		case "hide":
+			hidePlugin(event.message.elementID);
+			break;
+		case "restore":
+			restorePlugin(event.message.elementID);
+			break;
+		case "download":
+			downloadMedia(event.message.elementID, event.message.source, false);
+			break;
+		case "downloadDM":
+			downloadMedia(event.message.elementID, event.message.source, true);
+			break;
+		case "viewInQTP":
+			viewInQuickTimePlayer(event.message.elementID, event.message.source);
+			break;
+		case "showInfo":
+			getPluginInfo(event.message.elementID);
 			break;
 		case "loadAll":
-			if(event.message) loadAll();
-			else hideAll();
+			loadAll();
+			break;
+		case "hideAll":
+			hideAll();
 			break;
 		case "loadSource":
 			loadSource(event.message);
 			break;
-		case "loadLocation":
-			if(location.href.indexOf(event.message) !== -1) loadAll();
-			break;
 		case "hideSource":
 			hideSource(event.message);
 			break;
+		case "loadLocation":
+			if(location.href.indexOf(event.message) !== -1) loadAll();
+			break;
 		case "hideLocation":
 			if(location.href.indexOf(event.message) !== -1) hideAll();
+			break;
+		case "loadInvisible":
+			loadInvisible();
 			break;
 		case "toggleSettings":
 			if(window === top) toggleSettings();
@@ -115,38 +108,21 @@ function respondToMessage(event) {
 	}
 }
 
-function handleBeforeLoadEvent(event) {
-	var element = event.target;
+function handleBeforeLoadEvent(event) {	
+	if(!(event.target instanceof HTMLObjectElement || event.target instanceof HTMLEmbedElement)) return;
+	if(event.target.allowedToLoad) return;
 	
-	// the following happens when the Flash element is reloaded
-	// (for instance after the user clicks on its placeholder):
-	// the beforeload event is fired again but this time the
-	// flash element must not be blocked
-	if(element.allowedToLoad) return;
+	// cf. HTMLObjectElement::hasValidClassId
+	if(event.target.getAttribute("classid") && event.target.getAttribute("classid").slice(0,5) !== "java:") return;
 	
-	if(!(element instanceof HTMLObjectElement || element instanceof HTMLEmbedElement)) return;
+	var data = getData(event);
 	
-	if(element.getAttribute("classid")) return; // new behavior in 5.1
-	// see also Safari5.1bug.html for a related issue. These behaviors might change at any update!
-	var data = getAttributes(element, event.url);
-	/* PROBLEM: elements within display:none iframes fire beforeload events, and the following is incorrect
-	To solve this we'd need the CSS 2.1 'computed value' of height and width (and modify the arithmetic in mediaPlayer
-	to handle px and %), which might be possible using getMatchedCSSRules (returns matching rules in cascading order)
-	The 'auto' value will be a problem...
-	status: still see no feasible solution to this problem...
-	and getMatchedCSSRules is buggy as hell */
-	data.url = event.url;
-	data.width = element.offsetWidth;
-	data.height = element.offsetHeight;
-	data.location = location.href;
-	data.className = element.className;
-	
-	var responseData = safari.self.tab.canLoad(event, data);
-	if(responseData === true) return; // whitelisted
-	if(responseData === false) { // hide plugin
+	var response = safari.self.tab.canLoad(event, data);
+	if(response === true) return; // allow plugin
+	if(response === false) { // hide plugin
 		event.preventDefault();
 		event.stopImmediatePropagation();
-		removeHTMLNode(element);
+		removeHTMLNode(event.target);
 		return;
 	}
 	
@@ -154,10 +130,10 @@ function handleBeforeLoadEvent(event) {
 	if(settings === undefined) settings = safari.self.tab.canLoad(event, "getSettings");
 	
 	// Deal with sIFR Flash
-	if(element.className === "sIFR-flash") {
+	if(event.target.classList.contains("sIFR-flash")) {
 		if(settings.sIFRPolicy === "autoload") return;
 		if(settings.sIFRPolicy === "textonly") {
-			setTimeout(function() {disableSIFR(element);}, 0);
+			setTimeout(function() {disableSIFR(event.target);}, 0);
 			event.preventDefault();
 			event.stopImmediatePropagation();
 			return;
@@ -173,44 +149,73 @@ function handleBeforeLoadEvent(event) {
 		registerGlobalShortcuts();
 	}
 	
-	// BEGIN DEBUG
 	if(settings.debug) {
-		var e = element, positionX = 0, positionY = 0;
+		var e = event.target, positionX = 0, positionY = 0;
 		do {
 			positionX += e.offsetLeft; positionY += e.offsetTop;
 		} while(e = e.offsetParent);
-		if(!confirm("ClickToPlugin is about to block element " + documentID + "." + elementID + ":\n" + "\nType: " + (responseData.plugin ? responseData.plugin : "?") + "\nLocation: " + location.href + "\nSource: " + data.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + data.width + "x" + data.height)) return;
+		if(!confirm("ClickToPlugin is about to block element " + documentID + "." + elementID + ":\n" + "\nType: " + (response.plugin ? response.plugin : "?") + "\nLocation: " + location.href + "\nSource: " + response.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + data.width + "x" + data.height)) return;
 	}
-	// END DEBUG
 	
-	event.preventDefault(); // prevents 'element' from loading
+	event.preventDefault(); // prevents resource from loading
 	event.stopImmediatePropagation(); // compatibility with other extensions
 	
-	if(!event.url && !element.id) return;
-	data.plugin = responseData.plugin;
+	if(!event.url && !event.target.id) return;
 	
 	// Create the placeholder element
 	var placeholderElement = document.createElement("div");
-	if(settings.showTooltip) placeholderElement.title = data.src; // tooltip
+	if(settings.showTooltip) placeholderElement.title = response.src; // tooltip
 	placeholderElement.className = "CTFnoimage CTFplaceholder";
 	placeholderElement.style.width = data.width + "px !important";
 	placeholderElement.style.height = data.height + "px !important";
-	if(responseData.isInvisible) placeholderElement.classList.add("CTFinvisible");
+	if(response.isInvisible) placeholderElement.classList.add("CTFinvisible");
 	
 	// Copy CSS box & positioning properties that have an effect on page layout
-	// Note: 'display' is set to 'inline-block', which is ALWAYS the effective value for plugin-loading elements
-	var style = getComputedStyle(element, null);
+	// Note: 'display' is set to 'inline-block', which is ALWAYS the effective value for "replaced" elements
+	var style = getComputedStyle(event.target, null);
 	var position = style.getPropertyValue("position");
 	if(position === "static") placeholderElement.style.setProperty("position", "relative", "important");
 	else placeholderElement.style.setProperty("position", position, "important");
 	applyCSS(placeholderElement, style, ["top", "right", "bottom", "left", "z-index", "clear", "float", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-before-collapse", "-webkit-margin-after-collapse"]);
 	
+	// Replace the element by the placeholder
+	if(event.target.parentNode && event.target.parentNode.className !== "CTFnodisplay") {
+		event.target.parentNode.replaceChild(placeholderElement, event.target);
+	} else return; // fired beforeload twice (WebKit bug)
+	
+	// Put the element in the stack
+	if(stack === undefined) {
+		stack = document.createElement("div");
+		stack.id = "CTFstack";
+		stack.className = "CTFnodisplay";
+		stack.style.display = "none !important";
+		stack.innerHTML = "<div class=\"CTFnodisplay\"><div class=\"CTFnodisplay\"></div></div>";
+		document.body.appendChild(stack);
+	}
+	try {
+		stack.firstChild.firstChild.appendChild(event.target);
+	} catch(err) { // some script has modified the stack structure. No big deal, we just reset it
+		stack.innerHTML = "<div class=\"CTFnodisplay\"><div class=\"CTFnodisplay\"></div></div>";
+		stack.firstChild.firstChild.appendChild(event.target);
+	}
+	
+	// Complete and cleanup data
+	data.src = response.src;
+	data.plugin = response.plugin;
+	delete data.type;
+	delete data.location;
+	delete data.source;
+	delete data.qtsrc;
+	
 	// Fill the main arrays
-	blockedElements[elementID] = element;
+	blockedElements[elementID] = event.target;
 	blockedData[elementID] = data;
 	placeholderElements[elementID] = placeholderElement;
 	
-	// Register shortcuts
+	// Check MIME type if plugin is undefined
+	if(!data.plugin) safari.self.tab.dispatchMessage("checkMIMEType", {"documentID": documentID, "elementID": elementID, "url": data.src});
+	
+	// Event listeners
 	registerLocalShortcuts(elementID);
 	
 	placeholderElement.addEventListener("click", function(event) {
@@ -221,7 +226,7 @@ function handleBeforeLoadEvent(event) {
 		var contextInfo = {
 			"documentID": documentID,
 			"elementID": elementID,
-			"src": data.src,
+			"src": blockedData[elementID].src,
 			"plugin": blockedData[elementID].plugin // it can change in time
 		};
 		if(mediaPlayers[elementID] && mediaPlayers[elementID].startTrack !== undefined && mediaPlayers[elementID].currentSource !== undefined) {
@@ -233,65 +238,43 @@ function handleBeforeLoadEvent(event) {
 		}
 	}, false);
 	
-	// Replace the element by the placeholder
-	if(element.parentNode && element.parentNode.className !== "CTFnodisplay") {
-		element.parentNode.replaceChild(placeholderElement, element);
-	} else { // fired beforeload twice (NOTE: as of Safari 5.0.3, this test does not work too early in the handler! HUGE webkit bug here)
-		return;
-	}
-	
-	// Place the blocked element in the stack
-	if(stack === undefined) {
-		stack = document.createElement("div");
-		stack.id = "CTFstack";
-		stack.className = "CTFnodisplay";
-		stack.style.display = "none !important";
-		stack.innerHTML = "<div class=\"CTFnodisplay\"><div class=\"CTFnodisplay\"></div></div>";
-		document.body.appendChild(stack);
-	}
-	try {
-		stack.firstChild.firstChild.appendChild(element);
-	} catch(err) { // some script has modified the stack structure. No big deal, we just reset it
-		stack.innerHTML = "<div class=\"CTFnodisplay\"><div class=\"CTFnodisplay\"></div></div>";
-		stack.firstChild.firstChild.appendChild(element);
-	}
-	
-	// Build the placeholder
+	// Fill the placeholder
 	placeholderElement.innerHTML = "<div class=\"CTFplaceholderContainer\"><div class=\"CTFlogoContainer CTFnodisplay\"><div class=\"CTFlogo\"></div><div class=\"CTFlogo CTFinset\"></div></div></div>";
 	placeholderElement.firstChild.style.opacity = settings.opacity + " !important";
 	
+	if(data.plugin) handleBlockedPlugin(elementID);
+	else displayBadge("?", elementID);
+}
+
+function handleBlockedPlugin(elementID) {
 	// Display the badge
-	displayBadge(data.plugin ? data.plugin : "?", elementID);
+	displayBadge(blockedData[elementID].plugin, elementID);
 	
-	if(!data.plugin) {
-		var tmpAnchor = document.createElement("a");
-		tmpAnchor.href = event.url;
-		safari.self.tab.dispatchMessage("checkMIMEType", {"documentID": documentID, "elementID": elementID, "url": tmpAnchor.href});
-	}
-	
-	// Look for video replacements
-	var elementData = false;
-	if(settings.useFallbackMedia && element.nodeName.toLowerCase() === "object") elementData = directKill(elementID);
+	// Look for HTML5 replacements
+	var elementData;
+	if(settings.useFallbackMedia && blockedElements[elementID].nodeName.toLowerCase() === "object") elementData = directKill(blockedElements[elementID]);
 	if(!elementData && settings.additionalScripts.length > 0) { // send to the killers
 		// Need to pass the base URL to the killers so that they can resolve URLs, eg. for XHRs.
 		// According to rfc1808, the base URL is given by the <base> tag if present,
 		// else by the 'Content-Base' HTTP header if present, else by the current URL.
-		// Fortunately the magical anchor trick takes care of all this for us!!
-		var tmpAnchor = document.createElement("a");
-		tmpAnchor.href = "./";
+		// Fortunately the magical anchor trick takes care of all this for us!
+		var anchor = document.createElement("a");
+		anchor.href = "./";
 		elementData = {
-			"documentID": documentID,
-			"elementID": elementID,
-			"plugin": data.plugin ? data.plugin : "Flash",
-			"src": data.src,
+			"plugin": blockedData[elementID].plugin,
+			"src": blockedData[elementID].src,
 			"location": location.href,
 			"title": document.title,
-			"baseURL": tmpAnchor.href,
-			"href": data.href,
-			"params": getParams(element, data.plugin)
+			"baseURL": anchor.href,
+			"params": blockedData[elementID].params
 		};
 	}
-	if(elementData) safari.self.tab.dispatchMessage("killPlugin", elementData);
+	if(elementData) {
+		elementData.documentID = documentID;
+		elementData.elementID = elementID;
+		safari.self.tab.dispatchMessage("killPlugin", elementData);
+	}
+	delete blockedData[elementID].params;
 }
 
 function clearAll(elementID) {
@@ -461,11 +444,11 @@ function hidePlugin(elementID) {
 }
 
 function getPluginInfo(elementID) {
-	alert("Plug-in: " + blockedData[elementID].plugin + " (" + blockedData[elementID].width + "x" + blockedData[elementID].height + ")\nLocation: " + location.href + "\nSource: " + blockedData[elementID].src + "\n\nEmbed code:\n" + HTMLToString(blockedElements[elementID]));
+	alert("Plug-in: " + blockedData[elementID].plugin + " (" + blockedData[elementID].width + "x" + blockedData[elementID].height + ")\nLocation: " + location.href + "\nSource: " + blockedData[elementID].src + "\n\nEmbed code:\n" + new XMLSerializer().serializeToString(blockedElements[elementID]));
 }
 
 function displayBadge(badgeLabel, elementID) {
-	if(!badgeLabel) return;
+	if(!placeholderElements[elementID]) return;
 	// Hide the logo before changing the label
 	placeholderElements[elementID].firstChild.firstChild.className = "CTFlogoContainer CTFhidden";
 	// Set the new label
@@ -480,6 +463,7 @@ function displayBadge(badgeLabel, elementID) {
 
 // NOTE: this function should never be called directly (use displayBadge instead)
 function unhideLogo(elementID, i) {
+	if(!placeholderElements[elementID]) return;
 	var logoContainer = placeholderElements[elementID].firstChild.firstChild;
 	var w0 = placeholderElements[elementID].offsetWidth;
 	var h0 = placeholderElements[elementID].offsetHeight;
@@ -521,12 +505,12 @@ function clickPlaceholder(elementID) {
 function registerGlobalShortcuts() {
 	if(settings.loadAllShortcut) {
 		document.addEventListener(settings.loadAllShortcut.type, function(event) {
-			if(testShortcut(event, settings.loadAllShortcut)) safari.self.tab.dispatchMessage("loadAll", true);
+			if(testShortcut(event, settings.loadAllShortcut)) safari.self.tab.dispatchMessage("loadAll", "");
 		}, false);
 	}
 	if(settings.hideAllShortcut) {
 		document.addEventListener(settings.hideAllShortcut.type, function(event) {
-			if(testShortcut(event, settings.hideAllShortcut)) safari.self.tab.dispatchMessage("loadAll", false);
+			if(testShortcut(event, settings.hideAllShortcut)) safari.self.tab.dispatchMessage("hideAll", "");
 		}, false);
 	}
 }
@@ -540,36 +524,6 @@ function registerLocalShortcuts(elementID) {
 			}
 		}, false);
 	}
-}
-
-// Sometimes an <object> has a media element as fallback content
-function directKill(elementID) {
-	var mediaElements = blockedElements[elementID].getElementsByTagName("video");
-	var audioElements = blockedElements[elementID].getElementsByTagName("audio");
-	var mediaType;
-	if(mediaElements.length === 0) {
-		if(audioElements.length === 0) return false;
-		else mediaType = "audio";
-	} else mediaType = "video";
-	if(mediaType === "audio") mediaElements = audioElements;
-
-	var sources = new Array();
-	
-	if(!mediaElements[0].hasAttribute("src")) { // look for <source> tags
-		var sourceElements = mediaElements[0].getElementsByTagName("source");
-		for(var i = 0; i < sourceElements.length; i++) {
-			if(mediaElements[0].canPlayType(sourceElements[i].getAttribute("type"))) {
-				sources.push({"url": sourceElements[i].getAttribute("src"), "format": sourceElements[i].getAttribute("type").split(";")[0], "mediaType": mediaType});
-			}
-		}
-	} else sources.push({"url": mediaElements[0].getAttribute("src"), "format": mediaElements[0].getAttribute("type").split(";")[0], "mediaType": mediaType});
-	
-	return {
-		"documentID": documentID,
-		"elementID": elementID,
-		"location": location.href,
-		"playlist": [{"poster": mediaElements[0].getAttribute("poster"), "sources": sources, "title": mediaElements[0].title}]
-	};
 }
 
 }

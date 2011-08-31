@@ -50,7 +50,7 @@ sourceSelector.prototype.buildSourceList = function(sources) {
 	if(settings.showPluginSourceItem) {
 		this.pluginSourceItem = document.createElement("li");
 		this.pluginSourceItem.className = "CTFsourceItem";
-		this.pluginSourceItem.textContent = this.plugin;
+		this.pluginSourceItem.textContent = this.plugin ? this.plugin : "Plug-in";
 		this.pluginSourceItem.addEventListener("click", function(event) {
 			_this.loadPlugin(event);
 			event.stopPropagation();

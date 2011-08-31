@@ -1,4 +1,4 @@
-var killer = new Object();
+var killer = {};
 addKiller("WindowsMedia", killer);
 
 killer.canKill = function(data) {
@@ -10,9 +10,8 @@ killer.process = function(data, callback) {
 	if(!ext) return;
 	var sources = [{"url": data.src, "isNative": false, "mediaType": ext.mediaType}];
 	
-	var mediaData = {
+	callback({
 		"playlist": [{"sources": sources}],
 		"isAudio": ext.mediaType === "audio"
-	};
-	callback(mediaData);
+	});
 };

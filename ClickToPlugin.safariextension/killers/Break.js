@@ -1,4 +1,4 @@
-var killer = new Object();
+var killer = {};
 addKiller("Break", killer);
 
 killer.canKill = function(data) {
@@ -11,7 +11,7 @@ killer.canKill = function(data) {
 killer.process = function(data, callback) {
 	var videoURL, posterURL, videoHash, url;
 	if(data.onsite) {
-		var flashvars = parseFlashVariables(data.params);
+		var flashvars = parseFlashVariables(data.params.flashvars);
 		videoURL = flashvars.videoPath;//??
 		posterURL = flashvars.thumbnailURL;
 		videoHash = flashvars.icon;
@@ -31,7 +31,7 @@ killer.process = function(data, callback) {
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", url, true);
 	xhr.onload = function() {
-		var sources = new Array();
+		var sources = [];
 		if(!videoHash) {
 			match = xhr.responseText.match(/sGlobalToken=['"]([^'"]*)['"]/);
 			if(!match) return;
@@ -63,10 +63,7 @@ killer.process = function(data, callback) {
 		if(match) title = decodeURIComponent(match[1]);
 		if(!data.onsite || data.location === "http://www.break.com/") siteInfo = {"name": "Break", "url": url};
 		
-		var videoData = {
-			"playlist": [{"title": title, "poster": posterURL, "sources": sources, "siteInfo": siteInfo}]
-		};
-		callback(videoData);
+		callback({"playlist": [{"title": title, "poster": posterURL, "sources": sources, "siteInfo": siteInfo}]});
 	};
 	xhr.send(null);
 };

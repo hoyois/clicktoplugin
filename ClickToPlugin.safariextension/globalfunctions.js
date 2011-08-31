@@ -17,6 +17,38 @@ function dispatchMessageToAllPages(name, message) {
 	}
 }
 
+function matchList(list, string) {
+	var s;
+	for(var i = 0; i < list.length; i++) {
+		s = list[i];
+		if(s.charAt(0) === "@") { // if s starts with '@', interpret as regexp
+			try {
+				s = new RegExp(s.substr(1));
+			} catch(err) { // invalid regexp, just ignore
+				continue;
+			}
+			if(s.test(string)) return true;
+		} else { // otherwise, regular string match
+			if(string.indexOf(s) !== -1) return true;
+		}
+	}
+	return false;
+}
+
+function getMIMEType(resourceURL, handleMIMEType) {
+	var xhr = new XMLHttpRequest();
+	xhr.open('HEAD', resourceURL, true);
+	var MIMEType = false;
+	xhr.onreadystatechange = function () {
+		if(!MIMEType && xhr.getResponseHeader("Content-Type")) {
+			MIMEType = xhr.getResponseHeader("Content-Type");
+			xhr.abort();
+			handleMIMEType(MIMEType);
+		}
+	};
+	xhr.send(null);
+}
+
 // Follows rfc3986 except ? and # in base are ignored (as in WebKit)
 const schemeMatch = new RegExp("^[^:]+:");
 const authorityMatch = new RegExp("^[^:]+://[^/]*");
@@ -49,9 +81,10 @@ function unescapeUnicode(text) {
 }
 
 function parseWithRegExp(string, regex, process) { // regex needs 'g' flag
+	var obj = {};
+	if(typeof string !== "string") return obj;
 	if(process === undefined) process = function(s) {return s;};
 	var match;
-	var obj = new Object();
 	while((match = regex.exec(string)) !== null) {
 		obj[match[1]] = process(match[2]);
 	}
@@ -101,7 +134,7 @@ function extInfo(url) {
 function chooseDefaultSource(sourceArray) {
 	var defaultSource;
 	var hasNativeSource = false;
-	var resolutionMap = new Array();
+	var resolutionMap = [];
 	for(var i = sourceArray.length - 1; i >= 0; i--) {
 		var h = sourceArray[i].height;
 		if(!h) h = 0;
@@ -137,42 +170,12 @@ function makeLabel(source) {
 	return prefix + (source.isNative ? "H.264" : "Video"); // right...
 }
 
-// native MIME types that might realistically appear in <object> tags
-const nativeTypes = ["image/svg+xml", "image/png", "image/tiff", "image/gif", "image/jpeg", "image/jp2", "image/x-icon", "text/html", "text/xml"];
-const nativeExts = ["svg", "png", "tif", "tiff", "gif", "jpg", "jpeg", "jp2", "ico", "html", "xml"];
-function isNativeType(MIMEType) {
-	for(var i = 0; i < 9; i++) {
-		if(MIMEType === nativeTypes[i]) return true;
-	}
-	return false;
-}
-function isNativeExt(ext) {
-	for(var i = 0; i < 11; i++) {
-		if(ext === nativeExts[i]) return true;
-	}
-	return false;
-}
-
-function getMIMEType(resourceURL, handleMIMEType) {
-	var xhr = new XMLHttpRequest();
-	xhr.open('HEAD', resourceURL, true);
-	var MIMEType = false;
-	xhr.onreadystatechange = function () {
-		if(!MIMEType && xhr.getResponseHeader('Content-Type')) {
-			MIMEType = xhr.getResponseHeader('Content-Type');
-			xhr.abort();
-			handleMIMEType(MIMEType);
-		}
-	};
-	xhr.send(null);
-}
-
 function parseXSPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlaylistData) {
 	var xhr = new XMLHttpRequest();
 	xhr.open('GET', playlistURL, true);
 	xhr.onload = function() {
 		var x = xhr.responseXML.getElementsByTagName("track");
-		var playlist = new Array();
+		var playlist = [];
 		var isAudio = true;
 		var startTrack = track;
 		if(!(track >= 0 && track < x.length)) track = 0;
@@ -203,40 +206,28 @@ function parseXSPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlayli
 			}
 			playlist.push({"sources": [{"url": mediaURL, "isNative": ext.isNative, "mediaType": ext.mediaType}], "poster": posterURL, "title": title});
 		}
-		var playlistData = {
-			"playlist": playlist,
-			"startTrack": startTrack,
-			"isAudio": isAudio
-		};
-		handlePlaylistData(playlistData);
+		handlePlaylistData({"playlist": playlist, "startTrack": startTrack, "isAudio": isAudio});
 	};
 	xhr.send(null);
-}
-
-function matchList(list, string) {
-	var s;
-	for(var i = 0; i < list.length; i++) {
-		s = list[i];
-		if(s.charAt(0) === "@") { // if s starts with '@', interpret as regexp
-			try {
-				s = new RegExp(s.substr(1));
-			} catch(err) { // invalid regexp, just ignore
-				continue;
-			}
-			if(s.test(string)) return true;
-		} else { // otherwise, regular string match
-			if(string.indexOf(s) !== -1) return true;
-		}
-	}
-	return false;
 }
 
 /***********************
 Plugin detection methods
 ***********************/
 
+// Some native MIME type exclusions
+/* TODO: review this, cf. platform/MIMETypeRegistry.cpp and WebFrameLoaderClient::ObjectContentType
+   Should contain supportedImageMimeTypes, but also we don't want to go MIME type sniffing on a typeless .html <object>...
+   Currently contains types from Info.plist, which are not relevant here! */
+// WATCH: Safari 5.1 cannot display pdfs in objects anymore...
+const nativeTypes = ["image/svg+xml", "image/png", "image/tiff", "image/gif", "image/jpeg", "image/jp2", "image/x-icon", "text/html", "text/xml", "application/xml", "application/xhtml+xml"];
+const nativeExts = ["svg", "png", "tif", "tiff", "gif", "jpg", "jpeg", "jp2", "ico", "html", "xml", "xhtml"];
+function isNativeType(type) {return nativeTypes.indexOf(type) !== -1;}
+function isNativeExt(ext) {return nativeExts.indexOf(ext) !== -1;}
+
+// cf. WebCore::mimeTypeFromDataURL
 function getTypeFromDataURI(url) {
-	var match = url.match(/^data:([^,;]+)[,;]/);
+	var match = /^data:([^,;]+)[,;]/.exec(url);
 	if(match) return match[1];
 	else return "text/plain";
 }
@@ -251,10 +242,10 @@ function getPluginForType(type) { // type is a string
 }
 
 function getPluginAndTypeForExt(ext) {
-	var suffixes;
 	for(var i = 0; i < navigator.plugins.length; i++) {
 		for(var j = 0; j < navigator.plugins[i].length; j++) {
-			suffixes = navigator.plugins[i][j].suffixes.split(",");
+			if(navigator.plugins[i][j].suffixes === "") continue;
+			var suffixes = navigator.plugins[i][j].suffixes.split(",");
 			for(var k = 0; k < suffixes.length; k++) {
 				if(ext === suffixes[k]) return {"plugin": navigator.plugins[i], "type": navigator.plugins[i][j].type};
 			}

@@ -1,4 +1,4 @@
-var killer = new Object();
+var killer = {};
 addKiller("Facebook", killer);
 
 killer.canKill = function(data) {
@@ -7,8 +7,8 @@ killer.canKill = function(data) {
 };
 
 killer.process = function(data, callback) {
-	if(data.params) {
-		var flashvars = parseFlashVariables(data.params);
+	if(data.params.flashvars) {
+		var flashvars = parseFlashVariables(data.params.flashvars);
 		if(flashvars.video_href && flashvars.video_id) this.processVideoID(flashvars.video_id, callback);
 		else this.processFlashVars(flashvars, callback);
 		return;
@@ -19,7 +19,7 @@ killer.process = function(data, callback) {
 };
 
 killer.processFlashVars = function(flashvars, callback) {
-	var sources = new Array();
+	var sources = [];
 	var isHD = flashvars.video_has_high_def === "1";
 	if(flashvars.highqual_src) {
 		sources.push({"url": decodeURIComponent(flashvars.highqual_src), "format": isHD ? "720p MP4" : "HQ MP4", "height": isHD ? 720 : 600, "isNative": true, "mediaType": "video"});
@@ -31,10 +31,8 @@ killer.processFlashVars = function(flashvars, callback) {
 	var posterURL, title;
 	if(flashvars.thumb_url) posterURL = decodeURIComponent(flashvars.thumb_url);
 	if(flashvars.video_title) title = decodeURIComponent(flashvars.video_title).replace(/\+/g, " ");
-	var videoData = {
-		"playlist": [{"title": title, "poster": posterURL, "sources": sources}]
-	};
-	callback(videoData);
+	
+	callback({"playlist": [{"title": title, "poster": posterURL, "sources": sources}]});
 };
 
 killer.processVideoID = function(videoID, callback) {

@@ -1,4 +1,4 @@
-var killer = new Object();
+var killer = {};
 addKiller("Blip", killer);
 
 killer.canKill = function(data) {
@@ -8,7 +8,7 @@ killer.canKill = function(data) {
 
 killer.process = function(data, callback) {
 	if(/stratos.swf/.test(data.src)) {
-		var url = parseFlashVariables(data.params).file;
+		var url = parseFlashVariables(data.params.flashvars).file;
 		if(!url) {
 			var match = data.src.match(/[?&]file=([^&]*)/);
 			if(!match) return;
@@ -22,7 +22,7 @@ killer.process = function(data, callback) {
 };
 
 killer.processXML = function(url, callback) {
-	var sources = new Array();
+	var sources = [];
 	
 	var xhr = new XMLHttpRequest();
 	xhr.open('GET', url, true);
@@ -47,11 +47,13 @@ killer.processXML = function(url, callback) {
 			format += " " + ext;
 			sources.push({"url": url, "format": format, "isNative": isNative, "mediaType": mediaType, "height": parseInt(height)});
 		}
-		
-		var videoData = {
-			"playlist": [{"title": xml.getElementsByTagName("item")[0].getElementsByTagName("title")[0].textContent, "poster": xml.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "thumbnail")[0].getAttribute("url"), "sources": sources}]
-		};
-		callback(videoData);
+		callback({
+			"playlist": [{
+				"title": xml.getElementsByTagName("item")[0].getElementsByTagName("title")[0].textContent,
+				"poster": xml.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "thumbnail")[0].getAttribute("url"),
+				"sources": sources
+			}]
+		});
 	};
 	xhr.send(null);
 };

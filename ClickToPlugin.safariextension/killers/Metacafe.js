@@ -1,4 +1,4 @@
-var killer = new Object();
+var killer = {};
 addKiller("Metacafe", killer);
 
 killer.canKill = function(data) {
@@ -7,8 +7,8 @@ killer.canKill = function(data) {
 };
 
 killer.process = function(data, callback) {
-	if(/(?:^|&)mediaData=/.test(data.params)) {
-		this.processFlashVars(parseFlashVariables(data.params), callback);
+	if(/(?:^|&)mediaData=/.test(data.params.flashvars)) {
+		this.processFlashVars(parseFlashVariables(data.params.flashvars), callback);
 	} else {
 		var match = data.src.match(/metacafe\.com\/fplayer\/([0-9]*)\//);
 		if(match) this.processVideoID(match[1], callback);
@@ -22,7 +22,7 @@ killer.processFlashVars = function(flashvars, callback) {
 	for(var type in mediaList) {
 		mediaList[type] = mediaList[type].mediaURL + "?__gda__=" + mediaList[type].key;
 	}
-	var sources = new Array();
+	var sources = [];
 	
 	if(mediaList.highDefinitionMP4) {
 		sources.push({"url": mediaList.highDefinitionMP4, "format": "HD MP4", "height": 720, "isNative": true, "mediaType": "video"});
@@ -37,10 +37,7 @@ killer.processFlashVars = function(flashvars, callback) {
 	var title;
 	if(flashvars.title) title = decodeURIComponent(flashvars.title);
 	
-	var videoData = {
-		"playlist": [{"title": title, "sources": sources}]
-	};
-	callback(videoData);
+	callback({"playlist": [{"title": title, "sources": sources}]});
 };
 
 killer.processVideoID = function(videoID, callback) {

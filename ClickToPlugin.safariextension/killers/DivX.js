@@ -1,4 +1,4 @@
-var killer = new Object();
+var killer = {};
 addKiller("DivX", killer);
 
 killer.canKill = function(data) {
@@ -7,8 +7,10 @@ killer.canKill = function(data) {
 
 
 killer.process = function(data, callback) {
-	var videoData = {
-		"playlist": [{"poster": data.params, "sources": [{"url": data.src, "isNative": false, "mediaType": "video"}]}]
-	};
-	callback(videoData);
+	callback({
+		"playlist": [{
+			"poster": data.params.previewimage,
+			"sources": [{"url": data.src, "isNative": false, "mediaType": "video"}]
+		}]
+	});
 };

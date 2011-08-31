@@ -1,4 +1,4 @@
-var killer = new Object();
+var killer = {};
 addKiller("YouTube", killer);
 
 killer.canKill = function(data) {
@@ -10,20 +10,18 @@ killer.canKill = function(data) {
 
 killer.process = function(data, callback) {
 	if(data.onsite) {
-		var flashvars = parseFlashVariables(data.params);
+		var flashvars = parseFlashVariables(data.params.flashvars);
 		if(/\s-\sYouTube$/.test(data.title)) flashvars.title = data.title.slice(0, -10);
 		
-		if(flashvars.list && /^PL/.test(flashvars.list)) this.processPlaylistID(flashvars.list.substr(2), flashvars, callback);
+		if(flashvars.list && /^[PU]L/.test(flashvars.list)) this.processPlaylistID(flashvars.list, flashvars, callback);
 		else if(flashvars.url_encoded_fmt_stream_map) this.processFlashVars(flashvars, callback);
 		else if(flashvars.video_id) this.processVideoID(flashvars.video_id, callback);
-		return;
-	}
-	
-	// Embedded YT video
-	var match = data.src.match(/\.com\/([vpe])\/([^&?]+)/);
-	if(match) {
-		if(match[1] === "p") this.processPlaylistID(match[2], false, callback);
-		else this.processVideoID(match[2], callback);
+	} else { // Embedded YT video
+		var match = data.src.match(/\.com\/([vpe])\/([^&?]+)/);
+		if(match) {
+			if(match[1] === "p") this.processPlaylistID("PL" + match[2], {}, callback);
+			else this.processVideoID(match[2], callback);
+		}
 	}
 };
 
@@ -31,7 +29,7 @@ killer.processFlashVars = function(flashvars, callback) {
 	if(!flashvars.url_encoded_fmt_stream_map || flashvars.ps === "live") return;
 	var formatList = decodeURIComponent(flashvars.url_encoded_fmt_stream_map).split(",");
 		
-	var sources = new Array();
+	var sources = [];
 	
 	/* fmt values:
 	MP4 (AVC1/MP4A): 38 (2304p), 37 (1080p), 22 (720p), 18 (360p)
@@ -72,11 +70,8 @@ killer.processFlashVars = function(flashvars, callback) {
 	
 	var siteInfo;
 	if(!flashvars.t) siteInfo = {"name": "YouTube", "url": "http://www.youtube.com/watch?v=" + flashvars.video_id};
-		
-	var videoData = {
-		"playlist": [{"title": flashvars.title, "poster": posterURL, "sources": sources, "siteInfo": siteInfo}]
-	};
-	callback(videoData);
+	
+	callback({"playlist": [{"title": flashvars.title, "poster": posterURL, "sources": sources, "siteInfo": siteInfo}]});
 };
 
 killer.processVideoID = function(videoID, callback) {
@@ -96,79 +91,86 @@ killer.processVideoID = function(videoID, callback) {
 };
 
 killer.processPlaylistID = function(playlistID, flashvars, callback) {
+	var videoIDList = [];
 	var _this = this;
-	var processList = function(list) {
-		var track = 0;
-		var length = list.length;
-		if(flashvars.video_id) { // shift list so that videoID is first
-			for(var i = 0; i < length; i++) {
-				if(list[0] === flashvars.video_id) {track = i; break;}
-				list.push(list.shift());
+	
+	var init = function() {
+		var useURL = function(url) {loadList(url, 1);};
+		if(playlistID.charAt(0) === "P") useURL("https://gdata.youtube.com/feeds/api/playlists/" + playlistID.substr(2));
+		else { // charAt(0) === "U"
+			if(flashvars.creator) useURL("https://gdata.youtube.com/feeds/api/users/" + flashvars.creator + "/uploads");
+			else if(flashvars.ptchn) useURL("https://gdata.youtube.com/feeds/api/users/" + flashvars.ptchn + "/uploads");
+			else {
+				var xhr = new XMLHttpRequest();
+				xhr.open("GET", "https://www.youtube.com/get_video_info?&video_id=" + playlistID.substr(2) + "&eurl=http%3A%2F%2Fwww%2Eyoutube%2Ecom%2F", true);
+				xhr.onload = function() {useURL("https://gdata.youtube.com/feeds/api/users/" + parseFlashVariables(xhr.responseText).author + "/uploads");};
+				xhr.send(null);
 			}
 		}
-		
-		var callbackForPlaylist = function(videoData) {
-			videoData.playlistLength = length;
-			videoData.startTrack = track;
-			if(videoData.playlist[0].siteInfo) videoData.playlist[0].siteInfo.url += "&list=PL" + playlistID;
-			callback(videoData);
+	};
+	
+	var loadList = function(playlistURL, startIndex) {
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', playlistURL + "?start-index=" + startIndex + "&max-results=50", true);
+		xhr.onload = function() {
+			var entries = xhr.responseXML.getElementsByTagName("entry");
+			for(var i = 0; i < entries.length; i++) {
+				try{ // being lazy
+					videoIDList.push(/\?v=([^&?']+)/.exec(entries[i].getElementsByTagNameNS("http://search.yahoo.com/mrss/", "player")[0].getAttribute("url"))[1]);
+				} catch(err) {}
+			}
+			if(xhr.responseXML.querySelector("link[rel='next']") === null) processList();
+			else loadList(playlistURL, startIndex + 50);
 		};
+		xhr.send(null);
+	};
+	
+	var processList = function() {
+		var track = 0;
+		var length = videoIDList.length;
+		if(flashvars.video_id) { // shift list so that videoID is first
+			while(videoIDList[0] !== flashvars.video_id && track < length) {
+				++track;
+				videoIDList.push(videoIDList.shift());
+			}
+		}
+
+		var callbackForPlaylist = function(mediaData) {
+			mediaData.playlistLength = length;
+			mediaData.startTrack = track;
+			if(mediaData.playlist[0].siteInfo) mediaData.playlist[0].siteInfo.url += "&list=" + playlistID;
+			callback(mediaData);
+		};
+		
 		// load the first video at once
 		if(flashvars.url_encoded_fmt_stream_map) _this.processFlashVars(flashvars, callbackForPlaylist);
-		else _this.processVideoID(list[0], callbackForPlaylist);
-		list.shift();
-		// load the rest of the playlist 3 by 3
-		_this.processVideoIDList(playlistID, list, 3, callback);
+		else _this.processVideoID(videoIDList[0], callbackForPlaylist);
+		videoIDList.shift();
+		unloadList();
 	};
-	this.buildVideoIDList(playlistID, [], 1, processList);
-};
-
-killer.buildVideoIDList = function(playlistID, videoIDList, startIndex, processList) {
-	var xhr = new XMLHttpRequest();
-	xhr.open('GET', "https://gdata.youtube.com/feeds/api/playlists/" + playlistID + "?start-index=" + startIndex + "&max-results=50", true);
-	var _this = this;
-	xhr.onload = function() {
-		var entries = xhr.responseXML.getElementsByTagName("entry");
-		for(var i = 0; i < entries.length; i++) {
-			try{ // being lazy
-				videoIDList.push(entries[i].getElementsByTagNameNS("http://search.yahoo.com/mrss/", "player")[0].getAttribute("url").match(/\?v=([^&?']+)/)[1]);
-			} catch(err) {}
-		}
-		var links = xhr.responseXML.getElementsByTagName("link");
-		for(var i = 0; i < links.length; i++) {
-			if(links[i].getAttribute("rel") === "next") {
-				_this.buildVideoIDList(playlistID, videoIDList, startIndex + 50, processList);
-				return;
-			}
-		}
-		// If we're here we reached the end of the list
-		processList(videoIDList);
+	
+	var unloadList = function() {
+		if(videoIDList.length === 0) return;
+		var i = 0;
+		var imax = videoIDList.length;
+		if(imax > 3) imax = 3; // load by groups of 3
+		var mediaData = {"loadAfter": true, "playlist": []};
+		var next = function(data) {
+			// this actually works!! feels like TeXing...
+			if(data.playlist.length > 0) {
+				data.playlist[0].siteInfo.url += "&list=" + playlistID;
+				mediaData.playlist.push(data.playlist[0]);
+			} else mediaData.playlist.push(null);
+			++i;
+			if(i === imax) {
+				callback(mediaData);
+				unloadList();
+			} else _this.processVideoID(videoIDList.shift(), next);
+		};
+		_this.processVideoID(videoIDList.shift(), next);
+		return;
 	};
-	xhr.send(null);
-};
-
-killer.processVideoIDList = function(playlistID, videoIDList, n, callback) {
-	if(videoIDList.length === 0) return;
-	var i = 0;
-	var imax = videoIDList.length;
-	if(imax > n) imax = n; // load by groups of n
-	var mediaData = {"loadAfter": true, "missed": 0, "playlist": []};
-	var _this = this;
-	var next = function(videoData) {
-		// this actually works!! feels like TeXing...
-		if(videoData.playlist.length > 0) {
-			videoData.playlist[0].siteInfo.url += "&list=PL" + playlistID;
-			mediaData.playlist.push(videoData.playlist[0]);
-		} else { // playlist is 1 shorter than announced
-			++mediaData.missed;
-		}
-		++i;
-		if(i === imax) {
-			callback(mediaData);
-			_this.processVideoIDList(playlistID, videoIDList, n, callback);
-		} else _this.processVideoID(videoIDList.shift(), next);
-	};
-	this.processVideoID(videoIDList.shift(), next);
-	return;
+	
+	init();
 };
 

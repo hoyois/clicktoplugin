@@ -1,18 +1,18 @@
-var killer = new Object();
+var killer = {};
 addKiller("Flash", killer);
 
 killer.canKill = function(data) {
 	if(data.plugin !== "Flash") return false;
-	var match = data.params.match(/(?:^|&)(file|load|playlistfile|src|mp3|mp3url|soundFile|soundUrl|url|file_url)=/);
+	var match = /(?:^|&)(file|load|playlistfile|src|mp3|mp3url|soundFile|soundUrl|url|file_url)=/.exec(data.params.flashvars);
 	if(match) {data.file = match[1]; return true;}
 	// other video flashvars: wmvUrl/flvUrl (gvideoplayer.swf)
-	match = data.src.match(/[?&](file|mp3|playlist_url)=/);
+	match = /[?&](file|mp3|playlist_url)=/.exec(data.src);
 	if(match) {data.hash = match[1]; return true;}
 	return false;
 };
 
 killer.process = function(data, callback) {
-	var flashvars = parseFlashVariables(data.params);
+	var flashvars = parseFlashVariables(data.params.flashvars);
 	if(/^rmtp/.test(flashvars.streamer)) return;
 	
 	// get media and poster URL
@@ -67,21 +67,27 @@ killer.process = function(data, callback) {
 	if(sourceURL2) sourceURL = decodeURIComponent(sourceURL2);
 	sourceURL2 = flashvars["hd.file"];
 	
-	var sources = new Array();
+	var sources = [];
+	var isAudio = true;
 	var ext;
 	if(sourceURL2) {
 		ext = extInfo(sourceURL2);
-		if(ext) sources.push({"url": makeAbsoluteURL(sourceURL2, baseURL), "format": "HD", "isNative": ext.isNative, "height": 720, "mediaType": ext.mediaType});
+		if(ext) {
+			sources.push({"url": makeAbsoluteURL(sourceURL2, baseURL), "format": "HD", "isNative": ext.isNative, "height": 720, "mediaType": ext.mediaType});
+			if(ext.mediaType === "video") isAudio = false;
+		}
 	}
 	
 	ext = extInfo(sourceURL);
-	if(ext) sources.push({"url": makeAbsoluteURL(sourceURL, baseURL), "format": sources[0] ? "SD" : "", "isNative": ext.isNative, "mediaType": ext.mediaType});
+	if(ext) {
+		sources.push({"url": makeAbsoluteURL(sourceURL, baseURL), "format": sources[0] ? "SD" : "", "isNative": ext.isNative, "mediaType": ext.mediaType});
+		if(ext.mediaType === "video") isAudio = false;
+	}
 	
-	var mediaData = {
+	callback({
 		"playlist": [{"poster": posterURL, "sources": sources}],
-		"isAudio": ext.mediaType === "audio"
-	};
-	callback(mediaData);
+		"isAudio": isAudio
+	});
 };
 
 killer.processPlaylist = function(playlistURL, baseURL, posterURL, track, callback) {
