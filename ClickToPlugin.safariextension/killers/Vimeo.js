@@ -34,7 +34,7 @@ killer.process = function(data, callback) {
 				if(isNative || canPlayFLV) sources.push({"url": url + "hd", "format": height + "p " + (isNative ? "MP4" : "FLV"), "height": height, "isNative": isNative, "mediaType": "video"});
 			}
 			if(isNative || canPlayFLV) sources.push({"url": url + "sd", "format": "360p " + (isNative ? "MP4" : "FLV"), "height": 360, "isNative": isNative, "mediaType": "video"});
-			var handleMIMEType2 = function(MIMEType) {
+			var handleMIMEType = function(MIMEType) {
 				if(MIMEType === "video/mp4") sources.push({"url": url + "mobile", "format": "Mobile MP4", "height": 240, "isNative": true, "mediaType": "video"});
 				
 				if(xml.getElementsByTagName("thumbnail").length > 0) {
@@ -48,7 +48,7 @@ killer.process = function(data, callback) {
 				
 				callback({"playlist": [{"siteInfo": siteInfo, "title": title, "poster": posterURL, "sources": sources}]});
 			};
-			getMIMEType(url + "mobile", handleMIMEType2);
+			getMIMEType(url + "mobile", handleMIMEType);
 		};
 		getMIMEType(url + "sd", handleMIMEType);
 	};

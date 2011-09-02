@@ -229,36 +229,27 @@ Media player
 	top: 0 !important;
 }
 
-.CTFmediaPlayer .CTFtrackSelector {
+.CTFmediaPlayer .CTFtrackInfo {
 	position: absolute !important;
+	display: -webkit-box !important;
 	-webkit-appearance: media-controls-background !important;
+	-webkit-box-align: center !important;
+	-webkit-box-direction: normal !important;
+	-webkit-box-orient: horizontal !important;
+	-webkit-box-pack: start !important;
 	-webkit-transition-property: none !important;
 	bottom: 0 !important;
 	box-sizing: border-box !important;
-	color: white !important;
-	font: -webkit-small-control !important;
-	font-size: 10px !important;
 	height: 25px !important;
-	left: auto !important;
 	opacity: 1 !important;
-	overflow: hidden !important;
 	padding: 0 7px !important;
-	text-overflow: ellipsis !important;
-	text-shadow: black 0 1px 1px !important;
-	white-space: pre-wrap !important;
+	pointer-events: visible !important;
 	right: 0 !important;
 }
 
-.CTFmediaPlayer .CTFtrackSelector > option {
-	color: red !important;
-}
-
-.CTFmediaPlayer .CTFtrackStatus,
-.CTFmediaPlayer .CTFtrackTitle {
+.CTFmediaPlayer .CTFstatusDisplay,
+.CTFmediaPlayer .CTFtrackSelector {
 	position: static !important;
-	display: -webkit-box !important;
-	-webkit-box-orient: vertical !important;
-	-webkit-line-clamp: 1 !important;
 	-webkit-transition-property: none !important;
 	color: white !important;
 	font: -webkit-small-control !important;
@@ -266,19 +257,25 @@ Media player
 	height: auto !important;
 	left: auto !important;
 	opacity: 1 !important;
-	overflow: hidden !important;
-	text-overflow: ellipsis !important;
 	text-shadow: black 0 1px 1px !important;
 	white-space: pre-wrap !important;
 	width: auto !important;
 }
 
-.CTFmediaPlayer .CTFtrackStatus {
+.CTFmediaPlayer .CTFstatusDisplay {
+	display: block;
 	-webkit-box-flex: 0 !important;
+	pointer-events: none !important;
 }
 
-.CTFmediaPlayer .CTFtrackTitle {
+.CTFmediaPlayer .CTFtrackSelector {
+	display: -webkit-box !important;
+	-webkit-box-align: start !important;
 	-webkit-box-flex: 1 !important;
+	-webkit-box-orient: vertical !important;
+	-webkit-line-clamp: 1 !important;
+	overflow: hidden !important;
+	text-overflow: ellipsis !important;
 }
 
 /**************
@@ -447,9 +444,4 @@ Generic classes
 .CTFhidden, .CTFplaceholder .CTFhidden, .CTFmediaPlayer .CTFhidden {
 	visibility: hidden !important;
 }
-
-.CTFdisabled, .CTFplaceholder .CTFdisabled, .CTFmediaPlayer .CTFdisabled {
-	pointer-events: none !important;
-}
-
 

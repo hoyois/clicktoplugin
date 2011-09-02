@@ -135,26 +135,27 @@ function chooseDefaultSource(sourceArray) {
 	var defaultSource;
 	var hasNativeSource = false;
 	var resolutionMap = [];
+	
 	for(var i = sourceArray.length - 1; i >= 0; i--) {
 		var h = sourceArray[i].height;
 		if(!h) h = 0;
-		if(sourceArray[i].isNative) {
-			resolutionMap[h] = i;
-			hasNativeSource = true;
-		} else if(resolutionMap[h] === undefined && safari.extension.settings.codecsPolicy > 1) {
-			resolutionMap[h] = i;
+		if(!sourceArray[i].isNative && (safari.extension.settings.codecsPolicy !== 3 || resolutionMap[h] !== undefined)) continue;
+		resolutionMap[h] = i;
+	}
+	if(resolutionMap.length === 0) {
+		if(safari.extension.settings.codecsPolicy !== 2) return undefined;
+		for(var i = sourceArray.length - 1; i >= 0; i--) {
+			var h = sourceArray[i].height;
+			resolutionMap[h?h:0] = i;
 		}
 	}
 	
-	var setAsDefault = function(source) {
-		var h = sourceArray[source].height;
-		if(!h) h = 0;
-		if(safari.extension.settings.codecsPolicy === 2 && hasNativeSource && !sourceArray[source].isNative) return;
-		if(safari.extension.settings.maxResolution === "infinity" || h <= safari.extension.settings.maxResolution) defaultSource = source;
-	};
-	
 	for(var h in resolutionMap) {
-		setAsDefault(resolutionMap[h]);
+		if(h > safari.extension.settings.maxResolution) {
+			if(defaultSource === undefined) defaultSource = resolutionMap[h];
+			break;
+		}
+		defaultSource = resolutionMap[h];
 	}
 	return defaultSource;
 }

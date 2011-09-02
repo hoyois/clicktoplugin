@@ -16,7 +16,7 @@ function addLocalizationScript() {
 addLocalizationScript();
 
 // SETTINGS
-const allSettings = ["language", "defaultTab", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "additionalScripts", "useFallbackMedia", "showSourceSelector", "mediaAutoload", "mediaWhitelist", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "codecsPolicy", "volume", "useDownloadManager", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+const allSettings = ["language", "defaultTab", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "additionalScripts", "useFallbackMedia", "showSourceSelector", "mediaAutoload", "mediaWhitelist", "initialBehavior", "instantPlay", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "codecsPolicy", "volume", "useDownloadManager", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
 
 /* Hidden settings:
 language (default: undefined)
@@ -24,7 +24,7 @@ maxInvisibleSize (default: 8)
 zeroIsInvisible: (default: undefined)
 */
 
-const injectedSettings = ["additionalScripts", "useFallbackMedia", "showSourceSelector", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "volume", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+const injectedSettings = ["additionalScripts", "useFallbackMedia", "showSourceSelector", "initialBehavior", "instantPlay", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "volume", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
 
 function getSettings(array) {
 	var s = {};
@@ -51,33 +51,33 @@ var documentID = 0;
 
 function respondToMessage(event) {
 	switch(event.name) {
-		case "canLoad":
-			event.message = respondToCanLoad(event.message);
-			break;
-		case "killPlugin":
-			killPlugin(event.message, event.target);
-			break;
-		case "checkMIMEType":
-			checkMIMEType(event.message, event.target);
-			break;
-		case "loadAll":
-		case "hideAll":
-		case "toggleSettings":
-			event.target.page.dispatchMessage(event.name, "");
-			break;
-		case "whitelist":
-			handleWhitelisting("locationsWhitelist", extractDomain(event.message));
-			break;
-		case "openSettings":
-			openSettings(safari.application.activeBrowserWindow.openTab("foreground"));
-			break;
-		case "changeSetting":
-			safari.extension.settings[event.message.setting] = event.message.value;
-			if(event.message.setting === "settingsShortcut" || event.message.setting === "addToWhitelistShortcut") updateGlobalShortcuts();
-			break;
-		case "getSettings":
-			event.target.page.dispatchMessage("settings", getSettings(allSettings));
-			break;
+	case "canLoad":
+		event.message = respondToCanLoad(event.message);
+		break;
+	case "killPlugin":
+		killPlugin(event.message, event.target);
+		break;
+	case "checkMIMEType":
+		checkMIMEType(event.message, event.target);
+		break;
+	case "loadAll":
+	case "hideAll":
+	case "toggleSettings":
+		event.target.page.dispatchMessage(event.name, "");
+		break;
+	case "whitelist":
+		handleWhitelisting("locationsWhitelist", extractDomain(event.message));
+		break;
+	case "openSettings":
+		openSettings(safari.application.activeBrowserWindow.openTab("foreground"));
+		break;
+	case "changeSetting":
+		safari.extension.settings[event.message.setting] = event.message.value;
+		if(event.message.setting === "settingsShortcut" || event.message.setting === "addToWhitelistShortcut") updateGlobalShortcuts();
+		break;
+	case "getSettings":
+		event.target.page.dispatchMessage("settings", getSettings(allSettings));
+		break;
 	}
 }
 
@@ -138,21 +138,23 @@ function canLoadPlugin(data) {
 	
 	if(plugin && isAllowed(plugin)) return true;
 	
+	var pluginName = getPluginName(plugin, type);
+	
 	// Check control lists
-	if(plugin === "Silverlight" && data.source) data.src = data.source;
-	else if(plugin === "QuickTime" && data.qtsrc) data.src = data.qtsrc;
+	if(pluginName === "Silverlight" && data.source) data.src = data.source;
+	else if(pluginName === "QuickTime" && data.qtsrc) data.src = data.qtsrc;
 	if(safari.extension.settings.invertWhitelists !== (matchList(safari.extension.settings.locationsWhitelist, data.location) || matchList(safari.extension.settings.sourcesWhitelist, data.src))) return true;
 	if(safari.extension.settings.invertBlacklists !== (matchList(safari.extension.settings.locationsBlacklist, data.location) || matchList(safari.extension.settings.sourcesBlacklist, data.src))) return false;
 	
 	// At this point we know we should block the element
 	
 	// Exception: ask the user what to do if a QT object would launch QTP
-	if(data.params.href && /^true$/i.test(data.params.autohref) && /^quicktimeplayer$/i.test(data.params.target)) {
+	if(pluginName === "QuickTime" && data.params.href && /^true$/i.test(data.params.autohref) && /^quicktimeplayer$/i.test(data.params.target)) {
 		if(/\bCTFallowedToLoad\b/.test(data.params.class)) return true; // for other extensions with open-in-QTP functionality
 		if(confirm(QT_CONFIRM_LAUNCH_DIALOG(data.params.href))) return true;
 	}
 	
-	return {"plugin": getPluginName(plugin, type), "src": data.src, "isInvisible": isInvisible};
+	return {"plugin": pluginName, "src": data.src, "isInvisible": isInvisible};
 }
 
 function isAllowed(plugin) {
@@ -216,30 +218,30 @@ function handleContextMenu(event) {
 
 function doCommand(event) {
 	switch(event.command) {
-		case "viewOnSite":
-			var newTab = safari.application.activeBrowserWindow.openTab("foreground");
-			newTab.url = event.userInfo.siteInfo.url;
-			break;
-		case "locationsWhitelist":
-		case "locationsBlacklist":
-			handleWhitelisting(event.command, extractDomain(event.userInfo.location));
-			break;
-		case "sourcesWhitelist":
-		case "sourcesBlacklist":
-			handleWhitelisting(event.command, event.userInfo.src.split(/[?#]/)[0]);
-			break;
-		case "switchOff":
-			switchOff();
-			break;
-		case "switchOn":
-			switchOn();
-			break;
-		case "settings":
-			openSettings(safari.application.activeBrowserWindow.activeTab);
-			break;
-		default:
-			safari.application.activeBrowserWindow.activeTab.page.dispatchMessage(event.command, {"documentID": event.userInfo.documentID, "elementID": event.userInfo.elementID, "source": event.userInfo.source});
-			break;
+	case "viewOnSite":
+		var newTab = safari.application.activeBrowserWindow.openTab("foreground");
+		newTab.url = event.userInfo.siteInfo.url;
+		break;
+	case "locationsWhitelist":
+	case "locationsBlacklist":
+		handleWhitelisting(event.command, extractDomain(event.userInfo.location));
+		break;
+	case "sourcesWhitelist":
+	case "sourcesBlacklist":
+		handleWhitelisting(event.command, event.userInfo.src.split(/[?#]/)[0]);
+		break;
+	case "switchOff":
+		switchOff();
+		break;
+	case "switchOn":
+		switchOn();
+		break;
+	case "settings":
+		openSettings(safari.application.activeBrowserWindow.activeTab);
+		break;
+	default:
+		safari.application.activeBrowserWindow.activeTab.page.dispatchMessage(event.command, {"documentID": event.userInfo.documentID, "elementID": event.userInfo.elementID, "source": event.userInfo.source});
+		break;
 	}
 }
 
@@ -268,20 +270,20 @@ function handleWhitelisting(list, newWLString) {
 	safari.extension.settings[list] = safari.extension.settings[list].concat(newWLString); // push doesn't work
 	// load targeted content at once
 	switch(list) {
-		case "locationsWhitelist":
-			if(!safari.extension.settings.invertWhitelists) dispatchMessageToAllPages("loadLocation", newWLString);
-			else safari.application.activeBrowserWindow.activeTab.url = safari.application.activeBrowserWindow.activeTab.url;
-			break;
-		case "sourcesWhitelist":
-			dispatchMessageToAllPages("loadSource", newWLString);
-			break;
-		case "locationsBlacklist":
-			if(!safari.extension.settings.invertBlacklists) dispatchMessageToAllPages("hideLocation", newWLString);
-			else safari.application.activeBrowserWindow.activeTab.url = safari.application.activeBrowserWindow.activeTab.url;
-			break;
-		case "sourcesBlacklist":
-			dispatchMessageToAllPages("hideSource", newWLString);
-			break;
+	case "locationsWhitelist":
+		if(!safari.extension.settings.invertWhitelists) dispatchMessageToAllPages("loadLocation", newWLString);
+		else safari.application.activeBrowserWindow.activeTab.url = safari.application.activeBrowserWindow.activeTab.url;
+		break;
+	case "sourcesWhitelist":
+		dispatchMessageToAllPages("loadSource", newWLString);
+		break;
+	case "locationsBlacklist":
+		if(!safari.extension.settings.invertBlacklists) dispatchMessageToAllPages("hideLocation", newWLString);
+		else safari.application.activeBrowserWindow.activeTab.url = safari.application.activeBrowserWindow.activeTab.url;
+		break;
+	case "sourcesBlacklist":
+		dispatchMessageToAllPages("hideSource", newWLString);
+		break;
 	}
 }
 

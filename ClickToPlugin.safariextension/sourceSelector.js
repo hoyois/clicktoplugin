@@ -13,33 +13,14 @@ function sourceSelector(plugin, loadPlugin, viewInQTP, handleClickEvent, handleC
 	var _this = this;
 	setTimeout(function() {_this.containerElement.style.WebkitTransitionProperty = "opacity !important";}, 0);
 	
-	this.sources = null;
 	this.plugin = plugin;
-	
-	this.currentSource;
-	
 	this.handleClickEvent = handleClickEvent;
 	this.handleContextMenuEvent = handleContextMenuEvent;
 	this.loadPlugin = loadPlugin;
 	this.viewInQTP = viewInQTP;
 }
 
-sourceSelector.prototype.setCurrentSource = function(source) {
-	if(source === undefined) source = "plugin";
-	if(this.currentSource !== undefined) {
-		if(this.currentSource === "plugin") this.pluginSourceItem.className = "CTFsourceItem";
-		else if(this.currentSource === "qtp") this.QTPSourceItem.className = "CTFsourceItem";
-		else this.containerElement.firstChild.childNodes[this.currentSource].className = "CTFsourceItem";
-	}
-	if(source === "plugin") {
-		if(this.pluginSourceItem) this.pluginSourceItem.className += " CTFcurrentSource";
-	} else if(source === "qtp") {
-		if(this.QTPSourceItem) this.QTPSourceItem.className += " CTFcurrentSource";
-	} else this.containerElement.firstChild.childNodes[source].className += " CTFcurrentSource";
-	this.currentSource = source;
-};
-
-sourceSelector.prototype.buildSourceList = function(sources) {
+sourceSelector.prototype.init = function(sources) {
 	this.containerElement.firstChild.innerHTML = "";
 	this.sources = sources;
 	for(var i = 0; i < sources.length; i++) {
@@ -62,8 +43,7 @@ sourceSelector.prototype.buildSourceList = function(sources) {
 		this.containerElement.firstChild.appendChild(this.pluginSourceItem);
 	}
 	// QuickTime Player source item
-	if(settings.showQTPSourceItem) {
-		if(this.viewInQTP === undefined) return;
+	if(settings.showQTPSourceItem && this.viewInQTP !== undefined) {
 		this.QTPSourceItem = document.createElement("li");
 		this.QTPSourceItem.className = "CTFsourceItem";
 		this.QTPSourceItem.textContent = "QuickTime Player";
@@ -89,7 +69,7 @@ sourceSelector.prototype.appendSource = function(source) {
 		if(event.altKey) return; // to allow option-click download
 		event.preventDefault();
 		_this.handleClickEvent(event, source);
-		event.stopImmediatePropagation(); // For Facebook...
+		event.stopImmediatePropagation(); // Needed for Facebook
 	}, false);
 	
 	sourceItem.addEventListener("click", function(event) {
@@ -101,6 +81,21 @@ sourceSelector.prototype.appendSource = function(source) {
 		event.stopPropagation();
 	}, false);
 	this.containerElement.firstChild.appendChild(sourceItem);
+};
+
+sourceSelector.prototype.setCurrentSource = function(source) {
+	if(source === undefined) source = "plugin";
+	if(this.currentSource !== undefined) {
+		if(this.currentSource === "plugin") this.pluginSourceItem.className = "CTFsourceItem";
+		else if(this.currentSource === "qtp") this.QTPSourceItem.className = "CTFsourceItem";
+		else this.containerElement.firstChild.childNodes[this.currentSource].className = "CTFsourceItem";
+	}
+	if(source === "plugin") {
+		if(this.pluginSourceItem) this.pluginSourceItem.className += " CTFcurrentSource";
+	} else if(source === "qtp") {
+		if(this.QTPSourceItem) this.QTPSourceItem.className += " CTFcurrentSource";
+	} else this.containerElement.firstChild.childNodes[source].className += " CTFcurrentSource";
+	this.currentSource = source;
 };
 
 sourceSelector.prototype.unhide = function(width, height) {

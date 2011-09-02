@@ -53,58 +53,57 @@ function respondToMessage(event) {
 	// ignore messages for other documents
 	if(event.message.documentID !== undefined && event.message.documentID !== documentID) return;
 	switch(event.name) {
-		case "mediaData":
-			prepMedia(event.message);
-			break;
-		case "load":
-			loadPlugin(event.message.elementID);
-			break;
-		case "plugin":
-			blockedData[event.message.elementID].plugin = event.message.plugin;
-			handleBlockedPlugin(event.message.elementID);
-			break;
-		case "hide":
-			hidePlugin(event.message.elementID);
-			break;
-		case "restore":
-			restorePlugin(event.message.elementID);
-			break;
-		case "download":
-			downloadMedia(event.message.elementID, event.message.source, false);
-			break;
-		case "downloadDM":
-			downloadMedia(event.message.elementID, event.message.source, true);
-			break;
-		case "viewInQTP":
-			viewInQuickTimePlayer(event.message.elementID, event.message.source);
-			break;
-		case "showInfo":
-			getPluginInfo(event.message.elementID);
-			break;
-		case "loadAll":
-			loadAll();
-			break;
-		case "hideAll":
-			hideAll();
-			break;
-		case "loadSource":
-			loadSource(event.message);
-			break;
-		case "hideSource":
-			hideSource(event.message);
-			break;
-		case "loadLocation":
-			if(location.href.indexOf(event.message) !== -1) loadAll();
-			break;
-		case "hideLocation":
-			if(location.href.indexOf(event.message) !== -1) hideAll();
-			break;
-		case "loadInvisible":
-			loadInvisible();
-			break;
-		case "toggleSettings":
-			if(window === top) toggleSettings();
-			break;
+	case "mediaData":
+		prepMedia(event.message);
+		break;
+	case "load":
+		loadPlugin(event.message.elementID);
+		break;
+	case "plugin":
+		if(blockedElements[event.message.elementID]) handleBlockedPlugin(event.message.elementID, event.message.plugin);
+		break;
+	case "hide":
+		hidePlugin(event.message.elementID);
+		break;
+	case "restore":
+		restorePlugin(event.message.elementID);
+		break;
+	case "download":
+		downloadMedia(event.message.elementID, event.message.source, false);
+		break;
+	case "downloadDM":
+		downloadMedia(event.message.elementID, event.message.source, true);
+		break;
+	case "viewInQTP":
+		viewInQuickTimePlayer(event.message.elementID, event.message.source);
+		break;
+	case "showInfo":
+		getPluginInfo(event.message.elementID);
+		break;
+	case "loadAll":
+		loadAll();
+		break;
+	case "hideAll":
+		hideAll();
+		break;
+	case "loadSource":
+		loadSource(event.message);
+		break;
+	case "hideSource":
+		hideSource(event.message);
+		break;
+	case "loadLocation":
+		if(location.href.indexOf(event.message) !== -1) loadAll();
+		break;
+	case "hideLocation":
+		if(location.href.indexOf(event.message) !== -1) hideAll();
+		break;
+	case "loadInvisible":
+		loadInvisible();
+		break;
+	case "toggleSettings":
+		if(window === top) toggleSettings();
+		break;
 	}
 }
 
@@ -201,7 +200,6 @@ function handleBeforeLoadEvent(event) {
 	
 	// Complete and cleanup data
 	data.src = response.src;
-	data.plugin = response.plugin;
 	delete data.type;
 	delete data.location;
 	delete data.source;
@@ -213,7 +211,7 @@ function handleBeforeLoadEvent(event) {
 	placeholderElements[elementID] = placeholderElement;
 	
 	// Check MIME type if plugin is undefined
-	if(!data.plugin) safari.self.tab.dispatchMessage("checkMIMEType", {"documentID": documentID, "elementID": elementID, "url": data.src});
+	if(!response.plugin) safari.self.tab.dispatchMessage("checkMIMEType", {"documentID": documentID, "elementID": elementID, "url": data.src});
 	
 	// Event listeners
 	registerLocalShortcuts(elementID);
@@ -242,13 +240,15 @@ function handleBeforeLoadEvent(event) {
 	placeholderElement.innerHTML = "<div class=\"CTFplaceholderContainer\"><div class=\"CTFlogoContainer CTFnodisplay\"><div class=\"CTFlogo\"></div><div class=\"CTFlogo CTFinset\"></div></div></div>";
 	placeholderElement.firstChild.style.opacity = settings.opacity + " !important";
 	
-	if(data.plugin) handleBlockedPlugin(elementID);
-	else displayBadge("?", elementID);
+	if(response.plugin) handleBlockedPlugin(elementID, response.plugin);
+	else displayBadge(elementID, "?");
 }
 
-function handleBlockedPlugin(elementID) {
+function handleBlockedPlugin(elementID, plugin) {
+	blockedData[elementID].plugin = plugin;
+	
 	// Display the badge
-	displayBadge(blockedData[elementID].plugin, elementID);
+	displayBadge(elementID, plugin);
 	
 	// Look for HTML5 replacements
 	var elementData;
@@ -261,7 +261,7 @@ function handleBlockedPlugin(elementID) {
 		var anchor = document.createElement("a");
 		anchor.href = "./";
 		elementData = {
-			"plugin": blockedData[elementID].plugin,
+			"plugin": plugin,
 			"src": blockedData[elementID].src,
 			"location": location.href,
 			"title": document.title,
@@ -367,8 +367,8 @@ function prepMedia(mediaData) {
 		var hasSourceSelector = initializeSourceSelector(elementID, mediaData.playlist[0]);
 	}
 	
-	if(mediaData.badgeLabel) displayBadge(mediaData.badgeLabel, elementID);
-	else if(hasSourceSelector) displayBadge(blockedData[elementID].plugin + "*", elementID);
+	if(mediaData.badgeLabel) displayBadge(elementID, mediaData.badgeLabel);
+	else if(hasSourceSelector) displayBadge(elementID, blockedData[elementID].plugin + "*");
 }
 
 function initializeSourceSelector(elementID, media) {
@@ -389,7 +389,7 @@ function initializeSourceSelector(elementID, media) {
 		}
 	);
 	
-	selector.buildSourceList(media.sources);
+	selector.init(media.sources);
 	selector.setCurrentSource(settings.defaultPlayer === "html5" ? media.defaultSource : settings.defaultPlayer);
 	
 	placeholderElements[elementID].appendChild(selector.containerElement);
@@ -447,57 +447,41 @@ function getPluginInfo(elementID) {
 	alert("Plug-in: " + blockedData[elementID].plugin + " (" + blockedData[elementID].width + "x" + blockedData[elementID].height + ")\nLocation: " + location.href + "\nSource: " + blockedData[elementID].src + "\n\nEmbed code:\n" + new XMLSerializer().serializeToString(blockedElements[elementID]));
 }
 
-function displayBadge(badgeLabel, elementID) {
-	if(!placeholderElements[elementID]) return;
+function displayBadge(elementID, badgeLabel) {
 	// Hide the logo before changing the label
 	placeholderElements[elementID].firstChild.firstChild.className = "CTFlogoContainer CTFhidden";
 	// Set the new label
-	placeholderElements[elementID].firstChild.firstChild.childNodes[0].textContent = badgeLabel;
-	placeholderElements[elementID].firstChild.firstChild.childNodes[1].textContent = badgeLabel;
+	placeholderElements[elementID].firstChild.firstChild.firstChild.textContent = badgeLabel;
+	placeholderElements[elementID].firstChild.firstChild.lastChild.textContent = badgeLabel;
 	
 	// Prepare for logo unhiding
-	placeholderElements[elementID].firstChild.firstChild.childNodes[1].className = "CTFlogo CTFtmp";
+	placeholderElements[elementID].firstChild.firstChild.lastChild.className = "CTFlogo CTFtmp";
 	
-	unhideLogo(elementID, 0);
+	unhideLogo(elementID);
 }
 
 // NOTE: this function should never be called directly (use displayBadge instead)
-function unhideLogo(elementID, i) {
-	if(!placeholderElements[elementID]) return;
+function unhideLogo(elementID) {
 	var logoContainer = placeholderElements[elementID].firstChild.firstChild;
-	var w0 = placeholderElements[elementID].offsetWidth;
-	var h0 = placeholderElements[elementID].offsetHeight;
-	var w1 = logoContainer.childNodes[0].offsetWidth;
-	var h1 = logoContainer.childNodes[0].offsetHeight;
-	var w2 = logoContainer.childNodes[1].offsetWidth;
-	var h2 = logoContainer.childNodes[1].offsetHeight;
 	
-	if(w2 === 0 || h2 === 0 || w1 === 0 || h1 === 0 || w0 === 0 || h0 === 0) {
-		if(i > 5) return;
-		setTimeout(function() {unhideLogo(elementID, ++i);}, 100); // there's no hurry here
-		return;
-	}
-	
-	if(logoContainer.childNodes[1].className !== "CTFlogo CTFtmp") return;
-	
-	logoContainer.childNodes[1].className = "CTFlogo CTFinset";
-	if(w1 <= w0 - 4 && h1 <= h0 - 4) logoContainer.className = "CTFlogoContainer";
-	else if(w2 <= w0 - 4 && h2 <= h0 - 4) logoContainer.className = "CTFlogoContainer CTFmini";
+	if(logoContainer.firstChild.offsetWidth <= blockedData[elementID].width - 4 && logoContainer.firstChild.offsetHeight <= blockedData[elementID].height - 4) logoContainer.className = "CTFlogoContainer";
+	else if(logoContainer.lastChild.offsetWidth <= blockedData[elementID].width - 4 && logoContainer.lastChild.offsetHeight <= blockedData[elementID].height - 4) logoContainer.className = "CTFlogoContainer CTFmini";
 	else logoContainer.className = "CTFlogoContainer CTFnodisplay";
+	logoContainer.lastChild.className = "CTFlogo CTFinset";
 }
 
 function clickPlaceholder(elementID) {
 	if(mediaPlayers[elementID] && mediaPlayers[elementID].startTrack !== undefined && mediaPlayers[elementID].currentSource !== undefined) {
 		switch(settings.defaultPlayer) {
-			case "html5": 
-				loadMedia(elementID, 2);
-				break;
-			case "qtp":
-				viewInQuickTimePlayer(elementID);
-				break;
-			case "plugin":
-				loadPlugin(elementID);
-				break;
+		case "html5": 
+			loadMedia(elementID, 2);
+			break;
+		case "qtp":
+			viewInQuickTimePlayer(elementID);
+			break;
+		case "plugin":
+			loadPlugin(elementID);
+			break;
 		}
 	} else loadPlugin(elementID);
 }

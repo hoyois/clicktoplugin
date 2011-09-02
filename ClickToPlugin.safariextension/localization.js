@@ -366,7 +366,7 @@ const PREFERENCES_STRINGS = {
 		"zh-cn": "初始動作："
 	},
 	"INITIAL_NO_BUFFER": {
-		"en-us": "Do not buffer",
+		"en-us": "Do nothing",
 		"fr-fr": "Aucune",
 		"es-es": "No precargar",
 		"ja-jp": "何もしません",
@@ -374,20 +374,28 @@ const PREFERENCES_STRINGS = {
 		"zh-cn": "不缓冲"
 	},
 	"INITIAL_BUFFER": {
-		"en-us": "Start buffering",
-		"fr-fr": "Commencer le téléchargement",
+		"en-us": "Preload",
+		"fr-fr": "Téléchargement",
 		"es-es": "Emprezar la precarga",
 		"ja-jp": "バッファリングを始めます",
 		"zh-tw": "只開始緩衝",
 		"zh-cn": "开始缓冲"
 	},
 	"INITIAL_AUTOPLAY": {
-		"en-us": "Start buffering and play automatically",
-		"fr-fr": "Commencer la lecture automatiquement",
+		"en-us": "Autoplay",
+		"fr-fr": "Lecture automatique",
 		"es-es": "Emprezar la precarga y reproducir automáticamente",
 		"ja-jp": "バッファリングを始めると共に再生します",
 		"zh-tw": "開始緩衝並且自動播放",
 		"zh-cn": "开始缓冲并且自动播放"
+	},
+	"FAST_AUTOPLAY": {
+		"en-us": "Instant autoplay",
+		"fr-fr": "Lecture instantanée",
+		"es-es": "Reproducción instantánea",
+		"ja-jp": "",
+		"zh-tw": "",
+		"zh-cn": ""
 	},
 	"MAX_RESOLUTION": {
 		"en-us": "Default resolution:",
@@ -666,8 +674,8 @@ const PREFERENCES_STRINGS = {
 		"zh-cn": "下一个曲目："
 	},
 	"TRACK_SELECTOR_SHORTCUT": {
-		"en-us": "Show/hide track title:",
-		"fr-fr": "Afficher/masquer le titre :",
+		"en-us": "Show/hide track selector:",
+		"fr-fr": "Afficher/masquer le selecteur de piste :",
 		"es-es": "Mostrar/Ocultar el título de la pista:",
 		"ja-jp": "タイトルの表示／非表示：",
 		"zh-tw": "顯示/隱藏標題：",
@@ -677,14 +685,6 @@ const PREFERENCES_STRINGS = {
 
 const GLOBAL_STRINGS = {
 	// Context menu items
-	"PLUGIN_GENERIC": {
-		"en-us": "Plug-in",
-		"fr-fr": "le plugin",
-		"es-es": "Complemento",
-		"ja-jp": "プラグイン",
-		"zh-tw": "外掛模組",
-		"zh-cn": "插件"
-	},
 	"PREFERENCES": {
 		"en-us": "ClickToPlugin Preferences…",
 		"fr-fr": "Préférences ClickToPlugin…",
@@ -815,27 +815,27 @@ const GLOBAL_STRINGS = {
 	},
 	"LOAD_PLUGIN": {
 		"en-us": function(plugin) {return plugin ? "Load " + plugin : "Load Plug-in";},
-		"fr-fr": function(plugin) {return plugin ? "Charger " + plugin : "";},
-		"es-es": function(plugin) {return plugin ? "Cargar " + plugin : "";},
-		"ja-jp": function(plugin) {return plugin ? plugin + " を読み込む" : "";},
-		"zh-tw": function(plugin) {return plugin ? "載入 " + plugin : "";},
-		"zh-cn": function(plugin) {return plugin ? "加载 " + plugin : "";}
+		"fr-fr": function(plugin) {return plugin ? "Charger " + plugin : "Charger le plugin";},
+		"es-es": function(plugin) {return plugin ? "Cargar " + plugin : "Cargar el complemento";},
+		"ja-jp": function(plugin) {return plugin ? plugin + " を読み込む" : "プラグインを読み込む";},
+		"zh-tw": function(plugin) {return plugin ? "載入 " + plugin : "載入外掛模組";},
+		"zh-cn": function(plugin) {return plugin ? "加载 " + plugin : "加载插件";}
 	},
 	"HIDE_PLUGIN": {
 		"en-us": function(plugin) {return plugin ? "Hide " + plugin : "Hide Plug-in";},
-		"fr-fr": function(plugin) {return plugin ? "Masquer " + plugin : "";},
-		"es-es": function(plugin) {return plugin ? "Ocultar " + plugin : "";},
-		"ja-jp": function(plugin) {return plugin ? plugin + " を隠す" : "";},
-		"zh-tw": function(plugin) {return plugin ? "隱藏 " + plugin : "";},
-		"zh-cn": function(plugin) {return plugin ? "隐藏 " + plugin : "";}
+		"fr-fr": function(plugin) {return plugin ? "Masquer " + plugin : "Masquer le plugin";},
+		"es-es": function(plugin) {return plugin ? "Ocultar " + plugin : "Ocultar el complemento";},
+		"ja-jp": function(plugin) {return plugin ? plugin + " を隠す" : "プラグインを隠す";},
+		"zh-tw": function(plugin) {return plugin ? "隱藏 " + plugin : "隱藏外掛模組";},
+		"zh-cn": function(plugin) {return plugin ? "隐藏 " + plugin : "隐藏插件";}
 	},
 	"RESTORE_PLUGIN": {
 		"en-us": function(plugin) {return plugin ? "Restore " + plugin : "Restore Plug-in";},
 		"fr-fr": function(plugin) {return plugin ? "Restaurer " + plugin : "";},
 		"es-es": function(plugin) {return plugin ? "Restablecer " + plugin : "";},
-		"ja-jp": function(plugin) {return plugin ? plugin + " に戻す" : "";},
-		"zh-tw": function(plugin) {return plugin ? "復原 " + plugin : "";},
-		"zh-cn": function(plugin) {return plugin ? "还原 " + plugin : "";}
+		"ja-jp": function(plugin) {return plugin ? plugin + " に戻す" : "プラグインに戻す";},
+		"zh-tw": function(plugin) {return plugin ? "復原 " + plugin : "復原外掛模組";},
+		"zh-cn": function(plugin) {return plugin ? "还原 " + plugin : "还原插件";}
 	},
 	"VIEW_ON_SITE": {
 		"en-us": function(site) {return "View on " + site;},
@@ -861,14 +861,6 @@ const INJECTED_STRINGS = {
 	"LOADING": {
 		"en-us": "Loading...",
 		"fr-fr": "Chargement…",
-		"es-es": "Cargando...",
-		"ja-jp": "読み込み中...",
-		"zh-tw": "載入中⋯",
-		"zh-cn": "正在载入…"
-	},
-	"NO_TITLE": {
-		"en-us": "(no title)",
-		"fr-fr": "(sans titre)",
 		"es-es": "Cargando...",
 		"ja-jp": "読み込み中...",
 		"zh-tw": "載入中⋯",
@@ -901,13 +893,13 @@ function localizeAsScript(strings, language) {
 
 function fallback(lang) {
 	switch(lang) {
-		case "en-gb": return "en-us";
-		case "en-ca":
-		case "en-au": return "en-gb";
-		case "fr-ca":
-		case "fr-ch": return "fr-fr";
-		case "es-xl": return "es-es";
-		default: return "en-us";
+	case "en-gb": return "en-us";
+	case "en-ca":
+	case "en-au": return "en-gb";
+	case "fr-ca":
+	case "fr-ch": return "fr-fr";
+	case "es-xl": return "es-es";
+	default: return "en-us";
 	}
 }
 

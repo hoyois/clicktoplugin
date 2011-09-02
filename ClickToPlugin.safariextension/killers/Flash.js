@@ -20,11 +20,11 @@ killer.process = function(data, callback) {
 	if(data.file) {
 		sourceURL = decodeURIComponent(flashvars[data.file].replace(/\+/g, "%20"));
 		switch(data.file) {
-			case "file_url":
-				if(flashvars.poster_url) posterURL = decodeURIComponent(flashvars.poster_url);
-				break;
-			default:
-				if(flashvars.image) posterURL = decodeURIComponent(flashvars.image);
+		case "file_url":
+			if(flashvars.poster_url) posterURL = decodeURIComponent(flashvars.poster_url);
+			break;
+		default:
+			if(flashvars.image) posterURL = decodeURIComponent(flashvars.image);
 		}
 	} else {
 		sourceURL = data.src.match(new RegExp("[?&]" + data.hash + "=([^&]*)"));

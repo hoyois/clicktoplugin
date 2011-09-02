@@ -3,7 +3,7 @@ addKiller("QuickTime", killer);
 
 killer.canKill = function(data) {
 	// streaming is not yet supported by HTML5 video in Safari
-	return data.plugin === "QuickTime" && data.src.substring(0,4) === "http" && (!data.params.href || data.params.href.slice(0,4) === "http");
+	return data.plugin === "QuickTime" && data.src.substring(0,4) === "http" && (!data.params.href || data.params.href.slice(0,5) !== "rtsp:");
 };
 
 

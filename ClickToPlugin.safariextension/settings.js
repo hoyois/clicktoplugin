@@ -70,19 +70,19 @@ function parseTextList(text) {
 	if(!s) return [];
 	else return s.split("\n");
 }
+function handleKeyPressEvent(event) {
+	if(event.keyCode === 32) {
+		event.preventDefault();
+		var position = event.target.selectionStart;
+		event.target.value = event.target.value.substr(0, position) + "\n" + event.target.value.substr(position);
+		event.target.selectionEnd = position + 1;
+		var e = document.createEvent("HTMLEvents");
+		e.initEvent("input", true, true);
+		event.target.dispatchEvent(e);
+	}
+}
 for(var i = 0; i < textareas.length; i++) {
-	textareas[i].addEventListener("keypress", function(event) {
-		if(event.keyCode === 32) {
-			event.preventDefault();
-			var position = event.target.selectionStart;
-			event.target.value = event.target.value.substr(0, position) + "\n" + event.target.value.substr(position);
-			event.target.selectionEnd = position + 1;
-			var e = document.createEvent("HTMLEvents");
-			e.initEvent("input", true, true);
-			event.target.dispatchEvent(e);
-		}
-	}, false);
-	
+	textareas[i].addEventListener("keypress", handleKeyPressEvent, false);
 	textareas[i].addEventListener("input", handleTextAreaInput, false);
 }
 
@@ -100,30 +100,29 @@ function changeSetting(setting, value) {
 	safari.self.tab.dispatchMessage("changeSetting", {"setting": setting, "value": value});
 }
 
-for(var i = 0; i < inputs.length; i++) {
-	bindChangeEvent(inputs[i]);
-}
 function bindChangeEvent(input) {
 	var parseValue;
 	switch(input.nodeName) {
-		case "SELECT":
-			parseValue = function(value) {if(isNaN(parseInt(value))) return value; else return parseInt(value);}
+	case "SELECT":
+		parseValue = function(value) {if(isNaN(parseInt(value))) return value; else return parseInt(value);}
+		break;
+	case "INPUT":
+		switch(input.type) {
+		case "range":
+			parseValue = function(value) {return parseInt(value)*.01}
 			break;
-		case "INPUT":
-			switch(input.type) {
-				case "range":
-					parseValue = function(value) {return parseInt(value)*.01}
-					break;
-				case "checkbox":
-					parseValue = function(value) {return value === "on";}
-					break;
-			}
+		case "checkbox":
+			parseValue = function(value) {return value === "on";}
 			break;
+		}
+		break;
 	}
-	
 	input.addEventListener("change", function(event) {
 		changeSetting(event.target.id, parseValue(event.target.value));
 	}, false);
+}
+for(var i = 0; i < inputs.length; i++) {
+	bindChangeEvent(inputs[i]);
 }
 
 document.getElementById("invertWhitelists").addEventListener("change", function(event) {
@@ -179,29 +178,29 @@ function parseKeyID(keyID) {
 	if(/^U\+/.test(keyID)) {
 		var code = parseInt(keyID.substr(2), 16);
 		switch(code) {
-			case 8: return "\u232b";
-			case 9: return "\u21e5";
-			case 27: return "\u238b";
-			case 32: return "[space]";
-			case 127: return "\u2326";
-			default: return String.fromCharCode(code);
+		case 8: return "\u232b";
+		case 9: return "\u21e5";
+		case 27: return "\u238b";
+		case 32: return "[space]";
+		case 127: return "\u2326";
+		default: return String.fromCharCode(code);
 		}
 	}
 	if(keyID.charAt(0) === "F") {
 		return "[F" + keyID.substr(1) + "]";
 	}
 	switch(keyID) {
-		case "Enter": return "\u2305";
-		case "Left": return "\u2190";
-		case "Up": return "\u2191";
-		case "Right": return "\u2192";
-		case "Down": return "\u2193";
-		case "Home": return "\u2196";
-		case "End": return "\u2198";
-		case "PageUp": return "\u21de";
-		case "PageDown": return "\u21df";
-		case "CapsLock": return "\u21ea";
-		case "Clear": return "\u2327";
+	case "Enter": return "\u2305";
+	case "Left": return "\u2190";
+	case "Up": return "\u2191";
+	case "Right": return "\u2192";
+	case "Down": return "\u2193";
+	case "Home": return "\u2196";
+	case "End": return "\u2198";
+	case "PageUp": return "\u21de";
+	case "PageDown": return "\u21df";
+	case "CapsLock": return "\u21ea";
+	case "Clear": return "\u2327";
 	}
 }
 function simplifyWheelDelta(x, y) {
@@ -227,20 +226,11 @@ document.getElementById("showSourceSelector").addEventListener("change", functio
 document.getElementById("defaultPlayer").addEventListener("change", function(event) {
 	if(this.value === "html5") {
 		document.getElementById("mediaAutoload").disabled = false;
-		var e = document.createEvent("HTMLEvents");
-		e.initEvent("change", false, false);
-		document.getElementById("mediaAutoload").dispatchEvent(e);
 	} else {
 		document.getElementById("mediaAutoload").disabled = true;
 		document.getElementById("mediaAutoload").checked = false;
 		changeSetting("mediaAutoload", false);
-		document.getElementById("showPoster").disabled = false;
-		document.getElementById("showMediaTooltip").disabled = false;
 	}
-}, false);
-document.getElementById("mediaAutoload").addEventListener("change", function(event) {
-	document.getElementById("showPoster").disabled = event.target.value === "on";
-	document.getElementById("showMediaTooltip").disabled = event.target.value === "on";
 }, false);
 
 // Localization
@@ -287,18 +277,19 @@ function buildPluginMenu() {
 		if(p > q) return 1;
 		return 0;
 	});
+	var handleChangeEvent = function() {
+		changeSetting("allowedPlugins", checkedPlugins());
+	};
 	for(var i = 0; i < plugins.length; i++) {
 		var li = document.createElement("li");
 		var span = document.createElement("span");
 		span.className = "checkbox sub";
 		span.title = PLUGIN_FILENAME + ": " + plugins[i].filename + "\n" + PLUGIN_DESCRIPTION + ": " + plugins[i].description;
-		span.innerHTML = "<input class=\"plugin\" type=\"checkbox\"><label></label></span>";
-		span.childNodes[0].id = "plugin/" + plugins[i].filename;
-		span.childNodes[0].addEventListener("change", function(event) {
-			changeSetting("allowedPlugins", checkedPlugins());
-		}, false);
-		span.childNodes[1].htmlFor = "plugin/" + plugins[i].filename;
-		span.childNodes[1].textContent = plugins[i].name;
+		span.innerHTML = "<input class=\"plugin\" type=\"checkbox\"><label></label>";
+		span.firstChild.id = "plugin/" + plugins[i].filename;
+		span.firstChild.addEventListener("change", handleChangeEvent, false);
+		span.lastChild.htmlFor = "plugin/" + plugins[i].filename;
+		span.lastChild.textContent = plugins[i].name;
 		li.appendChild(span);
 		pluginMenu.appendChild(li);
 	}
@@ -367,29 +358,29 @@ function loadSettings(event) {
 		var input = document.getElementById(id);
 		if(!input) continue; // to be removed
 		switch(input.nodeName) {
-			case "TEXTAREA":
-				input.value = settings[id].join("\n");
-				resizeTextArea(input);
+		case "TEXTAREA":
+			input.value = settings[id].join("\n");
+			resizeTextArea(input);
+			break;
+		case "SELECT":
+			var options = input.getElementsByTagName("option");
+			for(var i = 0; i < options.length; i++) {
+				options[i].selected = options[i].value === settings[id] + "";
+			}
+			break;
+		case "INPUT":
+			switch(input.type) {
+			case "range":
+				input.value = settings[id]*100;
 				break;
-			case "SELECT":
-				var options = input.getElementsByTagName("option");
-				for(var i = 0; i < options.length; i++) {
-					options[i].selected = options[i].value === settings[id] + "";
-				}
+			case "text":
+				input.value = showShortcut(settings[id]);
 				break;
-			case "INPUT":
-				switch(input.type) {
-					case "range":
-						input.value = settings[id]*100;
-						break;
-					case "text":
-						input.value = showShortcut(settings[id]);
-						break;
-					case "checkbox":
-						if(settings[id]) input.checked = true;
-						break;
-				}
+			case "checkbox":
+				if(settings[id]) input.checked = true;
 				break;
+			}
+			break;
 		}
 	}
 	
@@ -399,10 +390,6 @@ function loadSettings(event) {
 		document.getElementById("showQTPSourceItem").disabled = true;
 	}
 	if(settings.defaultPlayer !== "html5") document.getElementById("mediaAutoload").disabled = true;
-	if(settings.mediaAutoload) {
-		document.getElementById("showPoster").disabled = true;
-		document.getElementById("showMediaTooltip").disabled = true;
-	}
 	if(!settings.settingsShortcut) document.getElementById("settingsContext").disabled = true;
 	
 	// Intercept Cmd+W & pref-pane shortcut to close the pref pane

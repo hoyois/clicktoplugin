@@ -5,39 +5,14 @@ mediaPlayer class definition
 ****************************/
 
 function mediaPlayer() {
-	
-	// this.playerType; // audio or video
 	this.playlist = [];
-	this.playlistLength = 0; // not necessarily synced with playlist.length!
-	
-	// this.startTrack; // internal start track is always 0
-	// when startTrack is set, createMediaElement can be called
-	// this.currentTrack; // for the user, current track is startTrack + currentTrack + 1
-	// currentTrack is set iff loadTrack has been called
-	// this.currentSource; // the source being used for the currentTrack (an integer)
-	
-	// this.containerElement;
-	// this.mediaElement; // the HTML video/audio element
-	
-	// Shadow DOM
 	this.shadowDOM = {};
-	
-	// Dimensions of the container
-	// this.width;
-	// this.height;
-	
-	// this.contextInfo;
-	// this.playlistControls; // boolean
-	
-	// Additional HTML elements
-	// this.trackSelector;
-	// this.sourceSelector;
 }
 
 mediaPlayer.prototype.handleMediaData = function(mediaData) {
 	if(mediaData.loadAfter) { // just adding stuff to the playlist
 		this.playlist = this.playlist.concat(mediaData.playlist);
-		if(this.trackSelector) this.addToPlaylist(mediaData.playlist);
+		if(this.trackInfo) this.addToSelector(mediaData.playlist);
 	} else { // initial mediaData
 		this.playerType = mediaData.isAudio ? "audio" : "video";
 		this.playlist = mediaData.playlist.concat(this.playlist);
@@ -62,16 +37,16 @@ mediaPlayer.prototype.createMediaElement = function(width, height, style, contex
 	this.mediaElement.id = "CTFmediaElement" + contextInfo.elementID;
 	this.mediaElement.setAttribute("controls", "");
 	switch(settings.initialBehavior) {
-		case "none":
-			this.mediaElement.setAttribute("preload", "none");
-			break;
-		case "buffer":
-			this.mediaElement.setAttribute("preload", "auto");
-			break;
-		case "autoplay":
-			this.mediaElement.setAttribute("preload", "auto");
-			this.mediaElement.setAttribute("autoplay", "");
-			break;
+	case "none":
+		this.mediaElement.setAttribute("preload", "none");
+		break;
+	case "buffer":
+		this.mediaElement.setAttribute("preload", "auto");
+		break;
+	case "autoplay":
+		this.mediaElement.setAttribute("preload", "auto");
+		this.mediaElement.setAttribute("autoplay", "");
+		break;
 	}
 	this.containerElement.appendChild(this.mediaElement);
 	
@@ -92,15 +67,16 @@ mediaPlayer.prototype.createMediaElement = function(width, height, style, contex
 	
 	// Set listeners
 	var _this = this;
-	this.mediaElement.addEventListener("contextmenu", function(event) {
+	this.containerElement.addEventListener("contextmenu", function(event) {
 		_this.setContextInfo(event, contextInfo);
 		event.stopPropagation();
 	}, false);
+	// use anonymous function to have the desired this value in handler
 	this.mediaElement.addEventListener("loadedmetadata", function() {_this.handleLoadedMetadataEvent();}, false);
 	this.mediaElement.addEventListener("ended", function() {_this.handleEndedEvent();}, false);
 	
 	// Additional controls
-	if(this.playlist[0].title || this.playlistControls) this.initializeTrackSelector();
+	this.initializeTrackInfo();
 	if(this.playlistControls) this.initializePlaylistControls();
 	if(settings.showSourceSelector) this.initializeSourceSelector();
 	
@@ -110,7 +86,7 @@ mediaPlayer.prototype.createMediaElement = function(width, height, style, contex
 
 mediaPlayer.prototype.initializeShadowDOM = function() {
 	var stylesheet = this.containerElement.firstChild.sheet;
-	var pseudoElements = {"controlsPanel": "-webkit-media-controls-panel", "playButton": "-webkit-media-controls-play-button", "muteButton": "-webkit-media-controls-mute-button", "rewindButton": "-webkit-media-controls-rewind-button", "fullscreenButton": "-webkit-media-controls-fullscreen-button", "timelineContainer": "-webkit-media-controls-timeline-container", "volumeSliderContainer": "-webkit-media-controls-volume-slider-container", "volumeSlider": "-webkit-media-controls-volume-slider", "statusDisplay": "-webkit-media-controls-status-display", "seekBackButton": "-webkit-media-controls-seek-back-button", "seekForwardButton": "-webkit-media-controls-seek-forward-button"};//, "toggleClosedCaptionsButton": "-webkit-media-controls-toggle-closed-captions-button", "timeline": "-webkit-media-controls-timeline", "currentTimeDisplay": "-webkit-media-controls-current-time-display", "timeRemainingDisplay": "-webkit-media-controls-time-remaining-display", "returnToRealtimeButton": "-webkit-media-controls-return-to-realtime-button"};
+	var pseudoElements = {"controlsPanel": "-webkit-media-controls-panel", "playButton": "-webkit-media-controls-play-button", "muteButton": "-webkit-media-controls-mute-button", "volumeSliderContainer": "-webkit-media-controls-volume-slider-container", "rewindButton": "-webkit-media-controls-rewind-button", "fullscreenButton": "-webkit-media-controls-fullscreen-button", "timelineContainer": "-webkit-media-controls-timeline-container", "statusDisplay": "-webkit-media-controls-status-display", "seekBackButton": "-webkit-media-controls-seek-back-button", "seekForwardButton": "-webkit-media-controls-seek-forward-button"};//, "volumeSlider": "-webkit-media-controls-volume-slider", "toggleClosedCaptionsButton": "-webkit-media-controls-toggle-closed-captions-button", "timeline": "-webkit-media-controls-timeline", "currentTimeDisplay": "-webkit-media-controls-current-time-display", "timeRemainingDisplay": "-webkit-media-controls-time-remaining-display", "returnToRealtimeButton": "-webkit-media-controls-return-to-realtime-button"};
 	
 	for(var e in pseudoElements) {
 		stylesheet.insertRule("#CTFmediaElement" + this.contextInfo.elementID + ":not(:-webkit-full-screen)::" + pseudoElements[e] + "{}", 0);
@@ -118,7 +94,7 @@ mediaPlayer.prototype.initializeShadowDOM = function() {
 	}
 	
 	// Status display
-	if(this.trackSelector) this.shadowDOM.statusDisplay.style.display = "none";
+	this.shadowDOM.statusDisplay.style.display = "none";
 	
 	// Rewind button
 	if(settings.hideRewindButton) this.shadowDOM.rewindButton.style.display = "none";
@@ -140,46 +116,66 @@ mediaPlayer.prototype.initializeShadowDOM = function() {
 		this.shadowDOM.seekBackButton.style.marginLeft = "6px";
 		this.shadowDOM.seekBackButton.style.width = "20px";
 		this.shadowDOM.seekBackButton.style.height = "12px";
-		this.shadowDOM.playButton.style.marginRight = "6px";
 		this.shadowDOM.seekForwardButton.style.display = "-webkit-box";
+		this.shadowDOM.seekForwardButton.style.marginLeft = "6px";
 		this.shadowDOM.seekForwardButton.style.width = "20px";
 		this.shadowDOM.seekForwardButton.style.height = "12px";
 	}
 };
 
-mediaPlayer.prototype.initializeTrackSelector = function() {
-	this.trackSelector = document.createElement("select");
-	this.trackSelector.className = "CTFtrackSelector";
-	this.containerElement.appendChild(this.trackSelector);
-	this.statusDisplay = document.createElement("span");
-	this.statusDisplay.textContent = LOADING + "\u2002";
+mediaPlayer.prototype.initializeTrackInfo = function() {
+	this.trackInfo = document.createElement("div");
+	this.trackInfo.className = "CTFtrackInfo";
+	var statusDisplay = document.createElement("div");
+	statusDisplay.className = "CTFstatusDisplay";
+	var trackSelector = document.createElement("select");
+	trackSelector.className = "CTFtrackSelector";
+	this.trackInfo.appendChild(statusDisplay);
+	this.trackInfo.appendChild(trackSelector);
+	this.containerElement.appendChild(this.trackInfo);
 	
-	if(this.playlistLength === 1) {
-		this.trackSelector.classList.add("CTFdisabled");
-		var option = document.createElement("option");
-		option.textContent = this.playlist[0].title;
-		this.trackSelector.appendChild(option);
-		return;
-	}
-	this.addToPlaylist(this.playlist);
-	
-	var _this = this;
-	this.trackSelector.addEventListener("change", function(event) {
-		_this.loadTrack(parseInt(event.target.value), 3);
-	}, false);
-	this.trackSelector.addEventListener("mousedown", function() {_this.showTrackSelector(false);}, false);
-	if(settings.showTitleShortcut && settings.showTitleShortcut.type === "keydown") { // override keydown shortcuts
-		this.trackSelector.addEventListener("keydown", function(event) {
-			if((event.keyIdentifier === "U+0020" || event.keyIdentifier === "Up" || event.keyIdentifier === "Down") && !event.shiftKey && !event.metaKey && !event.altKey && !event.ctrlKey) event.allowDefault = true;
+	if(this.playlistControls) {
+		this.addToSelector(this.playlist);
+		
+		var _this = this;
+		trackSelector.addEventListener("change", function(event) {
+			_this.loadTrack(parseInt(event.target.value), 3);
 		}, false);
+		if(settings.showTitleShortcut && settings.showTitleShortcut.type === "keydown") { // override keydown shortcuts
+			trackSelector.addEventListener("keydown", function(event) {
+				if((event.keyIdentifier === "U+0020" || event.keyIdentifier === "Up" || event.keyIdentifier === "Down") && !event.shiftKey && !event.metaKey && !event.altKey && !event.ctrlKey) event.allowDefault = true;
+			}, false);
+		}
+	} else {
+		trackSelector.disabled = true;
+		var option = document.createElement("option");
+		if(this.playlist[0].title) option.textContent = this.playlist[0].title;
+		trackSelector.appendChild(option);
 	}
 };
 
-mediaPlayer.prototype.showTrackSelector = function(isLoading) {
+mediaPlayer.prototype.addToSelector = function(playlist) {
+	var firstTrack = this.trackInfo.lastChild.querySelector("[value='0']");
+	var start = this.playlist.length - playlist.length;
+	for(var i = 0; i < playlist.length; i++) {
+		if(playlist[i] === null) continue;
+		var option = document.createElement("option");
+		var track = i + start;
+		option.value = track;
+		var title = "[" + this.printTrack(track) + "/" + this.playlistLength + "]\u2002";
+		if(playlist[i].title) title += playlist[i].title;
+		option.textContent = title;
+		if(firstTrack === null) firstTrack = option;
+		if(this.printTrack(track) <= this.startTrack) this.trackInfo.lastChild.insertBefore(option, firstTrack);
+		else this.trackInfo.lastChild.appendChild(option);
+	}
+};
+
+mediaPlayer.prototype.showTrackInfo = function(isLoading) {
 	var leftOffset = 0;
 	if(isLoading) {
 		leftOffset = 53;
-		if(this.shadowDOM.rewindButton.style.display === "none") leftOffset -= 26;
+		if(settings.hideRewindButton) leftOffset -= 26;
 		if(this.playlistControls) leftOffset += 52;
 		this.shadowDOM.controlsPanel.style.width = leftOffset + "px";
 		this.shadowDOM.fullscreenButton.style.display = "none";
@@ -187,17 +183,16 @@ mediaPlayer.prototype.showTrackSelector = function(isLoading) {
 		this.shadowDOM.muteButton.style.display = "none";
 		this.shadowDOM.timelineContainer.style.display = "none";
 	} else {
-		if(this.statusDisplay.parentNode !== null) this.statusDisplay.parentNode.removeChild(this.statusDisplay);
 		this.shadowDOM.controlsPanel.style.display = "none";
 	}
 	
-	this.trackSelector.style.left = leftOffset + "px !important";
-	this.trackSelector.style.width = (this.width - leftOffset) + "px !important";
-	this.trackSelector.style.display = "block !important";
+	this.trackInfo.style.left = leftOffset + "px !important";
+	this.trackInfo.style.width = (this.width - leftOffset) + "px !important";
+	this.trackInfo.classList.remove("CTFhidden");
 };
 
-mediaPlayer.prototype.hideTrackSelector = function() {
-	this.trackSelector.style.display = "none !important";
+mediaPlayer.prototype.hideTrackInfo = function() {
+	this.trackInfo.classList.add("CTFhidden");
 	this.shadowDOM.timelineContainer.style.removeProperty("display");
 	this.shadowDOM.muteButton.style.removeProperty("display");
 	this.shadowDOM.volumeSliderContainer.style.removeProperty("display");
@@ -242,22 +237,19 @@ mediaPlayer.prototype.initializeSourceSelector = function() {
 };
 
 mediaPlayer.prototype.handleLoadedMetadataEvent = function() {
-	if(this.trackSelector && this.statusDisplay.parentNode !== null) {
-		this.hideTrackSelector();
-		this.statusDisplay.parentNode.removeChild(this.statusDisplay);
-	}
+	this.hideTrackInfo();
+	this.trackInfo.firstChild.textContent = "";
 };
 
 mediaPlayer.prototype.handleEndedEvent = function() {
-	if(!this.mediaElement.hasAttribute("loop")) {
-		var track = this.currentTrack;
-		while(track + this.startTrack + 1 < this.playlistLength) {
-			++track;
-			if(this.playlist[track] === undefined) break;
-			if(this.playlist[track] !== null) {
-				this.loadTrack(track, 1);
-				break;
-			}
+	if(this.mediaElement.hasAttribute("loop")) return;
+	var track = this.currentTrack;
+	while(track + this.startTrack + 1 < this.playlistLength) {
+		++track;
+		if(this.playlist[track] === undefined) break;
+		if(this.playlist[track] !== null) {
+			this.loadTrack(track, 1);
+			break;
 		}
 	}
 };
@@ -316,23 +308,19 @@ mediaPlayer.prototype.loadTrack = function(track, init, source) { // init: two-d
 	}
 	if(init === 2 || init === 3) this.containerElement.focus();
 	
-	if(this.trackSelector) {
-		this.hideTrackSelector();
-		this.trackSelector.value = track;
-		if(this.mediaElement.preload === "auto") {
-			var option = this.trackSelector[this.trackSelector.selectedIndex];
-			option.insertBefore(this.statusDisplay, option.firstChild);
-		}
-		this.showTrackSelector(true);
-	}
+	this.hideTrackInfo();
+	this.trackInfo.lastChild.value = track;
+	if(this.mediaElement.preload === "auto") this.trackInfo.firstChild.textContent = LOADING + "\u2002";
+	this.showTrackInfo(true);
+	
+	if(this.mediaElement.autoplay && settings.instantPlay) this.mediaElement.play();
 	
 	if(this.sourceSelector) {
 		this.sourceSelector.hide();
-		this.sourceSelector.buildSourceList(this.playlist[track].sources);
+		this.sourceSelector.init(this.playlist[track].sources);
 		this.sourceSelector.setCurrentSource(source);
 		this.sourceSelector.unhide(this.width, this.height);
 	}
-	//alert(getComputedStyle(this.mediaElement, ":-webkit-media-controls-status-display").getPropertyValue("width"))
 };
 
 mediaPlayer.prototype.switchSource = function(source) {
@@ -341,25 +329,26 @@ mediaPlayer.prototype.switchSource = function(source) {
 	this.sourceSelector.setCurrentSource(source);
 	
 	var currentTime = this.mediaElement.currentTime;
-	this.hideTrackSelector();
 	this.mediaElement.pause();
 	this.mediaElement.src = this.playlist[this.currentTrack].sources[source].url;
 	this.currentSource = source;
 	this.setPoster();
 	this.mediaElement.setAttribute("preload", "auto");
 	this.mediaElement.setAttribute("autoplay", "");
-	if(this.trackSelector) {
-		var option = this.trackSelector[this.trackSelector.selectedIndex];
-		option.insertBefore(this.statusDisplay, option.firstChild);
-		this.showTrackSelector(true);
-	}
+	
 	this.containerElement.focus();
+	
+	this.hideTrackInfo();
+	this.trackInfo.firstChild.textContent = LOADING + "\u2002";
+	this.showTrackInfo(true);
 	
 	var setInitialTime = function(event) {
 		event.target.removeEventListener("loadedmetadata", setInitialTime, false);
 		event.target.currentTime = currentTime;
 	};
 	this.mediaElement.addEventListener("loadedmetadata", setInitialTime, false);
+	
+	if(this.mediaElement.autoplay && settings.instantPlay) this.mediaElement.play();
 };
 
 mediaPlayer.prototype.toggleLooping = function() {
@@ -381,24 +370,6 @@ mediaPlayer.prototype.setContextInfo = function(event, contextInfo, source) {
 
 mediaPlayer.prototype.printTrack = function(track) {
 	return (track + this.startTrack) % this.playlistLength + 1;
-};
-
-mediaPlayer.prototype.addToPlaylist = function(playlist) {
-	var firstTrack = this.trackSelector.querySelector("[value='0']");
-	var start = this.trackSelector.childNodes.length;
-	for(var i = 0; i < playlist.length; i++) {
-		var option = document.createElement("option");
-		var track = i + start;
-		option.value = track;
-		var title = "[" + this.printTrack(track) + "/" + this.playlistLength + "]\u2002";
-		if(playlist[i] === null) option.disabled = true;
-		else if(playlist[i].title) title += playlist[i].title;
-		//if(!title) title = "(no title)";
-		option.textContent = title;
-		if(firstTrack === null) firstTrack = option;
-		if(this.printTrack(track) <= this.startTrack) this.trackSelector.insertBefore(option, firstTrack);
-		else this.trackSelector.appendChild(option);
-	}
 };
 
 mediaPlayer.prototype.registerShortcuts = function() {
@@ -454,15 +425,16 @@ mediaPlayer.prototype.registerShortcuts = function() {
 			if(testShortcut(event, settings.toggleLoopingShortcut)) _this.toggleLooping();
 		});
 	}
-	if(this.trackSelector && settings.showTitleShortcut) {
+	if(settings.showTitleShortcut && (this.playlist[0].title || this.playlistControls)) {
 		this.addEventListener(settings.showTitleShortcut.type, function(event) {
+			if(_this.mediaElement.readyState === 0) return;
 			event.allowDefault = false;
 			if(testShortcut(event, settings.showTitleShortcut)) {
-				if(_this.trackSelector.style.display === "none") {
-					_this.showTrackSelector(false);
-					_this.trackSelector.focus();
+				if(_this.trackInfo.classList.contains("CTFhidden")) {
+					_this.showTrackInfo(false);
+					_this.trackInfo.lastChild.focus();
 				} else {
-					_this.hideTrackSelector();
+					_this.hideTrackInfo();
 					_this.containerElement.focus();
 				}
 			}

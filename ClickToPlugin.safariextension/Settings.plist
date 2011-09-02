@@ -123,6 +123,12 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>instantPlay</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
 		<integer>1080</integer>
 		<key>Key</key>
 		<string>maxResolution</string>
