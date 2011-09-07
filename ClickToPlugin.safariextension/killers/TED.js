@@ -1,12 +1,10 @@
-var killer = {};
-addKiller("TED", killer);
+addKiller("TED", {
 
-killer.canKill = function(data) {
-	if(data.plugin !== "Flash") return false;
+"canKill": function(data) {
 	return data.src.indexOf("http://video.ted.com/assets/player/swf") !== -1;
-};
+},
 
-killer.process = function(data, callback) {
+"process": function(data, callback) {
 	var url, siteInfo;
 	if(/^http:\/\/www\.ted\.com\/talks/.test(data.location)) {
 		url = data.location;
@@ -45,5 +43,6 @@ killer.process = function(data, callback) {
 		});
 	};
 	xhr.send(null);
-};
+}
 
+});

@@ -22,14 +22,14 @@ width
 
 /*
 Should pseudo-elements be reset as well? e.g.
-.CTFplaceholder ::before {content: none !important;}
+.CTPplaceholder ::before {content: none !important;}
 etc.
 */
 
-.CTFplaceholder,
-.CTFplaceholder *,
-.CTFmediaPlayer,
-.CTFmediaPlayer * {
+.CTPplaceholder,
+.CTPplaceholder *,
+.CTPmediaPlayer,
+.CTPmediaPlayer * {
 	-webkit-animation-name: none !important;
 	-webkit-appearance: none !important;
 	-webkit-box-reflect: none !important;
@@ -49,12 +49,12 @@ etc.
 	zoom: normal !important;
 }
 
-.CTFplaceholder *,
-.CTFmediaPlayer * {
+.CTPplaceholder *,
+.CTPmediaPlayer * {
 	-webkit-font-smoothing: subpixel-antialiased !important;
 	-webkit-marquee-style: none !important;
 	-webkit-text-stroke-width: 0 !important;
-	border-radius: 0 !important; /* WebKit not following the spec? */
+	border-radius: 0 !important;
 	bottom: auto !important;
 	clear: none !important;
 	direction: ltr !important;
@@ -86,21 +86,21 @@ etc.
 Placeholder element
 ******************/
 
-.CTFplaceholder {
+.CTPplaceholder {
 	display: inline-block !important;
 	background: none !important;
-	overflow: hidden !important;
+	overflow: visible !important;
 	visibility: visible !important;
 }
 
-.CTFplaceholder * {
+.CTPplaceholder * {
 	-webkit-transition-property: none !important;
 	width: auto !important;
 	height: auto !important;
 	left: auto !important;
 }
 
-.CTFplaceholder .CTFplaceholderContainer {
+.CTPplaceholder .CTPplaceholderContainer {
 	position: relative !important;
 	display: -webkit-box !important;
 	-webkit-box-align: center !important;
@@ -121,29 +121,29 @@ Placeholder element
 	width: inherit !important;
 }
 
-.CTFplaceholder.CTFnoimage .CTFplaceholderContainer {
+.CTPplaceholder.CTPnoimage .CTPplaceholderContainer {
 	background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(245, 245, 245, 1)), to(rgba(210, 210, 210, 1))) !important;
 }
 
-.CTFplaceholder.CTFnoimage:active .CTFplaceholderContainer {
+.CTPplaceholder.CTPnoimage:active .CTPplaceholderContainer {
 	background-image: -webkit-gradient(linear, left bottom, left top, from(rgba(235, 235, 235, 1)), to(rgba(220, 220, 220, 1))) !important;
 }
 
-.CTFplaceholder .CTFplaceholderContainer * {
+.CTPplaceholder .CTPplaceholderContainer * {
 	background: none !important;
 	opacity: 1 !important;
 }
 
-.CTFplaceholder .CTFlogoContainer {
+.CTPplaceholder .CTPlogoContainer {
 	position: relative !important;
 	display: block !important;
 	-webkit-box-flex: 0 !important;
-	/* Using float: none can change the vertical alignment of inline placeholders.
-	This is a bug since float must compute to initial on flexbox items. */
-	float: left !important;
+	/* float:left prevents the label from setting the baseline of the placeholder.
+	(In CSS2.1 this should not be needed because placeholder has overflow:hidden.) */
+	/* float: left !important; */ /* taken care of with vertical-align:baseline -> bottom in main.js */
 }
 
-.CTFplaceholder .CTFlogo {
+.CTPplaceholder .CTPlogo {
 	position: static !important;
 	display: block !important;
 	border: 3px solid rgba(240, 240, 240, 1) !important;
@@ -156,18 +156,18 @@ Placeholder element
 	text-shadow: 0 0 3px rgba(0, 0, 0, 1), 0 0 6px rgba(0, 0, 0, 0.6) !important;
 }
 
-.CTFplaceholder.CTFnoimage .CTFlogo {
+.CTPplaceholder.CTPnoimage .CTPlogo {
 	border: 3px solid rgba(0, 0, 0, 0.25) !important;
 	box-shadow: none !important;
 	color: rgba(0, 0, 0, 0.35) !important;
 	text-shadow: none !important;
 }
 
-.CTFplaceholder .CTFlogo.CTFinset {
+.CTPplaceholder .CTPlogo.CTPinset {
 	display: none !important;
 }
 
-.CTFplaceholder.CTFnoimage .CTFlogo.CTFinset {
+.CTPplaceholder.CTPnoimage .CTPlogo.CTPinset {
 	position: absolute !important;
 	display: block !important;
 	border-color: rgba(255, 255, 255, 0.45) !important;
@@ -175,24 +175,24 @@ Placeholder element
 	top: 1px !important;
 }
 
-.CTFplaceholder .CTFlogoContainer.CTFmini .CTFlogo,
-.CTFplaceholder .CTFlogoContainer.CTFhidden .CTFlogo.CTFtmp {
+.CTPplaceholder .CTPlogoContainer.CTPmini .CTPlogo,
+.CTPplaceholder .CTPlogoContainer.CTPhidden .CTPlogo.CTPtmp {
 	border-radius: 4px !important;
 	border-width: 2px !important;
 	font-size: 10px !important;
 	padding: 1px 2px 1px 2px !important;
 }
 
-.CTFplaceholder .CTFlogoContainer.CTFhidden .CTFlogo.CTFtmp {
+.CTPplaceholder .CTPlogoContainer.CTPhidden .CTPlogo.CTPtmp {
 	position: absolute !important;
 }
 
-.CTFplaceholder.CTFnoimage .CTFlogoContainer.CTFmini .CTFlogo {
+.CTPplaceholder.CTPnoimage .CTPlogoContainer.CTPmini .CTPlogo {
 	border-color: rgba(50, 50, 50, 0.25) !important;
 	color: rgba(50, 50, 50, 0.4) !important;
 }
 
-.CTFplaceholder.CTFnoimage .CTFlogoContainer.CTFmini .CTFlogo.CTFinset {
+.CTPplaceholder.CTPnoimage .CTPlogoContainer.CTPmini .CTPlogo.CTPinset {
 	border-color: rgba(255, 255, 255, 0.25) !important;
 	color: transparent !important;
 }
@@ -201,11 +201,11 @@ Placeholder element
 Media player
 ***********/
 
-.CTFmediaPlayer * {
+.CTPmediaPlayer * {
 	background: none !important;
 }
 
-.CTFmediaPlayer {
+.CTPmediaPlayer {
 	display: inline-block !important;
 	background-attachment: scroll !important;
 	background-clip: border-box !important;
@@ -217,7 +217,7 @@ Media player
 	visibility: visible !important;
 }
 
-.CTFmediaPlayer .CTFmediaElement {
+.CTPmediaPlayer .CTPmediaElement {
 	position: absolute !important;
 	display: block !important;
 	-webkit-transition-property: none !important;
@@ -229,7 +229,7 @@ Media player
 	top: 0 !important;
 }
 
-.CTFmediaPlayer .CTFtrackInfo {
+.CTPmediaPlayer .CTPtrackInfo {
 	position: absolute !important;
 	display: -webkit-box !important;
 	-webkit-appearance: media-controls-background !important;
@@ -247,14 +247,18 @@ Media player
 	right: 0 !important;
 }
 
-.CTFmediaPlayer .CTFstatusDisplay,
-.CTFmediaPlayer .CTFtrackSelector {
+.CTPmediaPlayer .CTPstatusDisplay,
+.CTPmediaPlayer .CTPtrackSelector {
 	position: static !important;
+	display: -webkit-box !important;
+	-webkit-box-align: start !important;
+	-webkit-box-orient: vertical !important;
+	-webkit-box-pack: center !important;
 	-webkit-transition-property: none !important;
 	color: white !important;
 	font: -webkit-small-control !important;
 	font-size: 10px !important;
-	height: auto !important;
+	height: inherit !important;
 	left: auto !important;
 	opacity: 1 !important;
 	text-shadow: black 0 1px 1px !important;
@@ -262,17 +266,13 @@ Media player
 	width: auto !important;
 }
 
-.CTFmediaPlayer .CTFstatusDisplay {
-	display: block;
+.CTPmediaPlayer .CTPstatusDisplay {
 	-webkit-box-flex: 0 !important;
 	pointer-events: none !important;
 }
 
-.CTFmediaPlayer .CTFtrackSelector {
-	display: -webkit-box !important;
-	-webkit-box-align: start !important;
+.CTPmediaPlayer .CTPtrackSelector {
 	-webkit-box-flex: 1 !important;
-	-webkit-box-orient: vertical !important;
 	-webkit-line-clamp: 1 !important;
 	overflow: hidden !important;
 	text-overflow: ellipsis !important;
@@ -282,7 +282,7 @@ Media player
 Source selector
 **************/
 
-.CTFsourceSelector * {
+.CTPsourceSelector * {
 	-webkit-transition-property: none !important;
 	background: none !important;
 	font: -webkit-small-control !important;
@@ -293,7 +293,7 @@ Source selector
 	text-shadow: black 0 1px 1px !important;
 }
 
-.CTFsourceSelector {
+.CTPsourceSelector {
 	position: absolute !important;
 	display: block !important;
 	-webkit-transition-delay: 0s !important;
@@ -319,14 +319,14 @@ Source selector
 	z-index: 2 !important;
 }
 
-.CTFsourceSelector:hover {
+.CTPsourceSelector:hover {
 	-webkit-transition-delay: 0s !important;
 	-webkit-transition-duration: .05s !important;
 	-webkit-transition-timing-function: linear !important;
 	opacity: 1 !important;
 }
 
-.CTFsourceSelector .CTFsourceList {
+.CTPsourceSelector .CTPsourceList {
 	position: static !important;
 	display: block !important;
 	border-radius: 5px !important;
@@ -336,7 +336,7 @@ Source selector
 	pointer-events: auto !important;
 }
 
-.CTFsourceSelector .CTFsourceItem {
+.CTPsourceSelector .CTPsourceItem {
 	position: static !important;
 	display: list-item !important;
 	color: #ADADAD !important;
@@ -346,24 +346,24 @@ Source selector
 	opacity: 1 !important;
 }
 
-.CTFsourceSelector .CTFsourceItem:hover,
-.CTFsourceSelector .CTFcurrentSource {
+.CTPsourceSelector .CTPsourceItem:hover,
+.CTPsourceSelector .CTPcurrentSource {
 	color: white !important;
 }
 
-.CTFsourceSelector .CTFsourceItem:active {
+.CTPsourceSelector .CTPsourceItem:active {
 	text-shadow: white 0 0 7px !important;
 }
 
-.CTFmediaPlayer .CTFcurrentSource:active {
+.CTPmediaPlayer .CTPcurrentSource:active {
 	text-shadow: none !important;
 }
 
-.CTFmediaPlayer .CTFcurrentSource {
+.CTPmediaPlayer .CTPcurrentSource {
 	cursor: default !important;
 }
 
-.CTFsourceSelector .CTFsourceLink {
+.CTPsourceSelector .CTPsourceLink {
 	position: static !important;
 	display: inline !important;
 	color: inherit !important;
@@ -373,11 +373,11 @@ Source selector
 }
 
 /* Should use CSS3 ::marker here */
-.CTFsourceSelector .CTFsourceItem::before {
+.CTPsourceSelector .CTPsourceItem::before {
 	content: "" !important;
 }
 
-.CTFmediaPlayer .CTFcurrentSource::before {
+.CTPmediaPlayer .CTPcurrentSource::before {
 	display: inline-block !important;
 	color: inherit !important;
 	content: "\2022" !important;
@@ -390,7 +390,7 @@ Source selector
 Invisible plugin object
 **********************/
 
-.CTFpluginLauncher {
+.CTPpluginLauncher {
 	position: absolute !important;
 	height: 0px !important;
 	width: 0px !important;
@@ -400,7 +400,7 @@ Invisible plugin object
 Stack element
 ************/
 
-#CTFstack {
+#CTPstack {
 	display: none !important;
 }
 
@@ -408,7 +408,7 @@ Stack element
 Settings pane
 ************/
 
-#CTFsettingsPane {
+#CTPsettingsPane {
 	position: fixed !important;
 	display: block !important;
 	-webkit-animation-name: none !important;
@@ -437,11 +437,11 @@ Settings pane
 Generic classes
 **************/
 
-.CTFnodisplay, .CTFplaceholder .CTFnodisplay, .CTFmediaPlayer .CTFnodisplay {
+.CTPnodisplay, .CTPplaceholder .CTPnodisplay, .CTPmediaPlayer .CTPnodisplay {
 	display: none !important;
 }
 
-.CTFhidden, .CTFplaceholder .CTFhidden, .CTFmediaPlayer .CTFhidden {
+.CTPhidden, .CTPplaceholder .CTPhidden, .CTPmediaPlayer .CTPhidden {
 	visibility: hidden !important;
 }
 

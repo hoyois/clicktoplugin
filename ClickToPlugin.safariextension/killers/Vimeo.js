@@ -1,12 +1,10 @@
-var killer = {};
-addKiller("Vimeo", killer);
+addKiller("Vimeo", {
 
-killer.canKill = function(data) {
-	if(data.plugin !== "Flash") return false;
+"canKill": function(data) {
 	return data.src.indexOf("vimeo.com/moogaloop") !== -1 || data.src.indexOf("vimeocdn.com/p/flash/moogalo") !== -1;
-};
+},
 
-killer.process = function(data, callback) {
+"process": function(data, callback) {
 	var videoID;
 	if(data.params.flashvars) videoID = parseFlashVariables(data.params.flashvars).clip_id;
 	if(!videoID) {
@@ -53,4 +51,6 @@ killer.process = function(data, callback) {
 		getMIMEType(url + "sd", handleMIMEType);
 	};
 	xhr.send(null);
-};
+}
+
+});

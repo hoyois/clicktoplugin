@@ -1,11 +1,10 @@
-var killer = {};
-addKiller("WindowsMedia", killer);
+addKiller("WindowsMedia", {
 
-killer.canKill = function(data) {
+"canKill": function(data) {
 	return data.plugin === "Windows Media" && canPlayWM;
-};
+},
 
-killer.process = function(data, callback) {
+"process": function(data, callback) {
 	var ext = extInfo(data.src);
 	if(!ext) return;
 	var sources = [{"url": data.src, "isNative": false, "mediaType": ext.mediaType}];
@@ -14,4 +13,6 @@ killer.process = function(data, callback) {
 		"playlist": [{"sources": sources}],
 		"isAudio": ext.mediaType === "audio"
 	});
-};
+}
+
+});

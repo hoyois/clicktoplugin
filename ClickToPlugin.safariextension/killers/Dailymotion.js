@@ -1,12 +1,10 @@
-var killer = {};
-addKiller("Dailymotion", killer);
+addKiller("Dailymotion", {
 
-killer.canKill = function(data) {
-	if(data.plugin !== "Flash") return false;
+"canKill": function(data) {
 	return (data.src.indexOf("/dmplayerv4/") !== -1 || data.src.indexOf("www.dailymotion.com") !== -1);
-};
+},
 
-killer.process = function(data, callback) {
+"process": function(data, callback) {
 	if(/^http:\/\/www\.dailymotion\.com\/hub\//.test(data.location)) {
 		var match = data.location.match(/#videoId=(.*)/);
 		if(match) this.processVideoID(match[1], callback);
@@ -17,9 +15,9 @@ killer.process = function(data, callback) {
 		var match = data.src.match(/\/swf\/([^&]+)/);
 		if(match) this.processVideoID(match[1], callback);
 	}
-};
+},
 
-killer.processSequence = function(sequence, callback) {
+"processSequence": function(sequence, callback) {
 	// NOTE: sequence.replace(/\\'/g, "'") is JSON but it's so messy that regexp search is easier
 	var posterURL, match;
 	var sources = [];
@@ -48,9 +46,9 @@ killer.processSequence = function(sequence, callback) {
 	if(match) title = unescape(match[1].replace(/\+/g, " ").replace(/\\u/g, "%u").replace(/\\["'\/\\]/g, function(s){return s.charAt(1);}));
 	
 	callback({"playlist": [{"title": title, "poster": posterURL, "sources": sources}]});
-};
+},
 
-killer.processVideoID = function(videoID, callback) {
+"processVideoID": function(videoID, callback) {
 	var sequenceMatch = /addVariable\(\"sequence\",\s*\"([^"]*)\"/;
 	var _this = this;
 	var xhr = new XMLHttpRequest();
@@ -66,4 +64,6 @@ killer.processVideoID = function(videoID, callback) {
 		}
 	};
 	xhr.send(null);
-};
+}
+
+});

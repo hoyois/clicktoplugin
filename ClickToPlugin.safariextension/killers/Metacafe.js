@@ -1,12 +1,10 @@
-var killer = {};
-addKiller("Metacafe", killer);
+addKiller("Metacafe", {
 
-killer.canKill = function(data) {
-	if(data.plugin !== "Flash") return false;
+"canKill": function(data) {
 	return (data.src.indexOf(".mcstatic.com/Flash/vp/") !== -1 || data.src.indexOf("metacafe.com/fplayer/") !== -1);
-};
+},
 
-killer.process = function(data, callback) {
+"process": function(data, callback) {
 	if(/(?:^|&)mediaData=/.test(data.params.flashvars)) {
 		this.processFlashVars(parseFlashVariables(data.params.flashvars), callback);
 	} else {
@@ -14,9 +12,9 @@ killer.process = function(data, callback) {
 		if(match) this.processVideoID(match[1], callback);
 		return;
 	}
-};
+},
 
-killer.processFlashVars = function(flashvars, callback) {
+"processFlashVars": function(flashvars, callback) {
 	if(!flashvars.mediaData) return;
 	var mediaList = JSON.parse(decodeURIComponent(flashvars.mediaData));
 	for(var type in mediaList) {
@@ -38,9 +36,9 @@ killer.processFlashVars = function(flashvars, callback) {
 	if(flashvars.title) title = decodeURIComponent(flashvars.title);
 	
 	callback({"playlist": [{"title": title, "sources": sources}]});
-};
+},
 
-killer.processVideoID = function(videoID, callback) {
+"processVideoID": function(videoID, callback) {
 	var xhr = new XMLHttpRequest();
 	var url = "http://www.metacafe.com/watch/" + videoID;
 	xhr.open('GET', url, true);
@@ -56,5 +54,6 @@ killer.processVideoID = function(videoID, callback) {
 		}
 	};
 	xhr.send(null);
-};
+}
 
+});

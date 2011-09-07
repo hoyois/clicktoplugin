@@ -6,7 +6,7 @@
 		<key>DefaultValue</key>
 		<integer>0</integer>
 		<key>Key</key>
-		<string>defaultTab</string>
+		<string>currentTab</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
@@ -131,7 +131,7 @@
 		<key>DefaultValue</key>
 		<integer>1080</integer>
 		<key>Key</key>
-		<string>maxResolution</string>
+		<string>defaultResolution</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
@@ -447,19 +447,7 @@
 		<key>DefaultValue</key>
 		<true/>
 		<key>Key</key>
-		<string>showPoster</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
 		<string>showTooltip</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
-		<string>showMediaTooltip</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>

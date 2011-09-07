@@ -41,7 +41,7 @@ function switchToTab(i) {
 		container.style.WebkitTransitionDuration = (.001*heightDelta) + "s";
 		container.style.height = newHeight + "px";
 	}
-	changeSetting("defaultTab", i);
+	changeSetting("currentTab", i);
 }
 
 function bindTab(i) {
@@ -284,7 +284,7 @@ function buildPluginMenu() {
 		var li = document.createElement("li");
 		var span = document.createElement("span");
 		span.className = "checkbox sub";
-		span.title = PLUGIN_FILENAME + ": " + plugins[i].filename + "\n" + PLUGIN_DESCRIPTION + ": " + plugins[i].description;
+		span.title = PLUGIN_FILENAME(plugins[i].filename) + "\n" + PLUGIN_DESCRIPTION(plugins[i].description);
 		span.innerHTML = "<input class=\"plugin\" type=\"checkbox\"><label></label>";
 		span.firstChild.id = "plugin/" + plugins[i].filename;
 		span.firstChild.addEventListener("change", handleChangeEvent, false);
@@ -324,7 +324,7 @@ function adjustLayout() {
 
 // Load settings
 function loadSettings(event) {
-	if(event.name !== "settings") return;
+	if(event.name !== "CTPsettings") return;
 	var settings = event.message;
 	
 	// Localize
@@ -336,22 +336,24 @@ function loadSettings(event) {
 	
 	// Plugins
 	buildPluginMenu();
-	for(var i = 0; i < settings.allowedPlugins.length; i++) {
-		var input = document.getElementById("plugin/" + settings.allowedPlugins[i]);
-		if(input) input.checked = true;
-		else {settings.allowedPlugins.splice(i, 1); --i;}
+	if(navigator.plugins.length > 0) {
+		for(var i = 0; i < settings.allowedPlugins.length; i++) {
+			var input = document.getElementById("plugin/" + settings.allowedPlugins[i]);
+			if(input) input.checked = true;
+			else {settings.allowedPlugins.splice(i, 1); --i;}
+		}
+		changeSetting("allowedPlugins", settings.allowedPlugins);
 	}
-	changeSetting("allowedPlugins", settings.allowedPlugins);
 	delete settings.allowedPlugins;
 	
 	// Adjust Layout
 	adjustLayout();
 	
 	// Set current tab
-	tabs[settings.defaultTab].className = "selected";
-	sections[settings.defaultTab].className = "selected";
-	currentTab = settings.defaultTab;
-	delete settings.defaultTab;
+	tabs[settings.currentTab].className = "selected";
+	sections[settings.currentTab].className = "selected";
+	currentTab = settings.currentTab;
+	delete settings.currentTab;
 	
 	// Other settings
 	for(var id in settings) {
@@ -397,7 +399,7 @@ function loadSettings(event) {
 		document.addEventListener("keydown", function(event) {
 			if((event.keyIdentifier === "U+0057" && event.metaKey === true && event.altKey === false && event.ctrlKey === false && event.shiftKey === false) || (settings.settingsShortcut && event.keyIdentifier === settings.settingsShortcut.keyIdentifier && event.metaKey === settings.settingsShortcut.metaKey && event.altKey === settings.settingsShortcut.altKey && event.ctrlKey === settings.settingsShortcut.ctrlKey && event.shiftKey === settings.settingsShortcut.shiftKey)) {
 				event.preventDefault();
-				safari.self.tab.dispatchMessage("toggleSettings", "");
+				safari.self.tab.dispatchMessage("hideSettings", "");
 			}
 		}, false);
 	}
@@ -410,7 +412,7 @@ function loadSettings(event) {
 
 container.addEventListener("click", function(event) {event.stopPropagation();}, false);
 document.body.addEventListener("click", function(event) {
-	safari.self.tab.dispatchMessage("toggleSettings", "");
+	safari.self.tab.dispatchMessage("hideSettings", "");
 }, false);
 
 safari.self.addEventListener("message", loadSettings, false);

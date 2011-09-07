@@ -1,13 +1,12 @@
-var killer = {};
-addKiller("QuickTime", killer);
+addKiller("QuickTime", {
 
-killer.canKill = function(data) {
+"canKill": function(data) {
 	// streaming is not yet supported by HTML5 video in Safari
 	return data.plugin === "QuickTime" && data.src.substring(0,4) === "http" && (!data.params.href || data.params.href.slice(0,5) !== "rtsp:");
-};
+},
 
 
-killer.process = function(data, callback) {
+"process": function(data, callback) {
 	var isAudio = true;
 	var playlist = [];
 	var addTrack = function(url) {
@@ -25,4 +24,6 @@ killer.process = function(data, callback) {
 		"playlist": playlist,
 		"isAudio": isAudio
 	});
-};
+}
+
+});

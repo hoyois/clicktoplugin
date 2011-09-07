@@ -1,12 +1,10 @@
-var killer = {};
-addKiller("Blip", killer);
+addKiller("Blip", {
 
-killer.canKill = function(data) {
-	if(data.plugin !== "Flash") return false;
+"canKill": function(data) {
 	return data.src.indexOf("blip.tv/") !== -1;
-};
+},
 
-killer.process = function(data, callback) {
+"process": function(data, callback) {
 	if(/stratos.swf/.test(data.src)) {
 		var url = parseFlashVariables(data.params.flashvars).file;
 		if(!url) {
@@ -19,9 +17,9 @@ killer.process = function(data, callback) {
 		var match = data.src.match(/blip\.tv\/play\/([^%]*)/);
 		if(match) this.processOldVideoID(match[1], callback);
 	}
-};
+},
 
-killer.processXML = function(url, callback) {
+"processXML": function(url, callback) {
 	var sources = [];
 	
 	var xhr = new XMLHttpRequest();
@@ -56,9 +54,9 @@ killer.processXML = function(url, callback) {
 		});
 	};
 	xhr.send(null);
-};
+},
 
-killer.processOldVideoID = function(videoID, callback) {
+"processOldVideoID": function(videoID, callback) {
 	var xhr = new XMLHttpRequest();
 	xhr.open('GET', "http://blip.tv/players/episode/" + videoID + "?skin=api", true);
 	var _this = this;
@@ -71,4 +69,6 @@ killer.processOldVideoID = function(videoID, callback) {
 		_this.processXML("http://blip.tv/rss/flash/" + xml.getElementsByTagName("id")[0].textContent, callbackForEmbed);
 	};
 	xhr.send(null);
-};
+}
+
+});

@@ -1,7 +1,6 @@
 addKiller("YouTube", {
 
 "canKill": function(data) {
-	if(data.plugin !== "Flash") return false;
 	if(data.src.indexOf("ytimg.com/") !== -1) {data.onsite = true; return true;}
 	if(data.src.search(/youtube(?:-nocookie)?\.com\//) !== -1) {data.onsite = false; return true;}
 	return false;

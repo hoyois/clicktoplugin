@@ -30,7 +30,7 @@
 				<string>functions.js</string>
 				<string>sourceSelector.js</string>
 				<string>mediaPlayer.js</string>
-				<string>ClickToPlugin.js</string>
+				<string>main.js</string>
 			</array>
 		</dict>
 		<key>Stylesheets</key>

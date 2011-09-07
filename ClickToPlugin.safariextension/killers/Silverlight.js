@@ -1,14 +1,13 @@
-var killer = {};
-addKiller("Silverlight", killer);
+addKiller("Silverlight", {
 
-killer.canKill = function(data) {
+"canKill": function(data) {
 	if(!data.plugin === "Silverlight") return false;
 	var match = /(?:^|,)(m|fileurl|mediaurl)=/.exec(data.params.initparams);
 	if(match) {data.file = match[1]; return true;}
 	return false;
-};
+},
 
-killer.process = function(data, callback) {
+"process": function(data, callback) {
 	var SLvars = parseSLVariables(data.params.initparams);
 	var mediaURL = decodeURIComponent(SLvars[data.file]);
 	var ext = extInfo(mediaURL);
@@ -23,4 +22,6 @@ killer.process = function(data, callback) {
 		"playlist": [{"poster": posterURL, "sources": sources}],
 		"isAudio": ext && ext.mediaType === "audio"
 	});
-};
+}
+
+});

@@ -1,9 +1,11 @@
 if(location.href !== "about:blank") {
 
+function hasParent(element) {
+	return element !== undefined && element.parentNode !== null;
+}
+
 function removeHTMLNode(node) {
-	while(node.parentNode.childNodes.length === 1) {
-		node = node.parentNode;
-	}
+	while(node.parentNode.parentNode && node.parentNode.childNodes.length === 1) node = node.parentNode;
 	node.parentNode.removeChild(node);
 }
 
@@ -36,7 +38,7 @@ function downloadURL(url) {
 function sendToDownloadManager(url) {
 	var DMObject = document.createElement("embed");
 	DMObject.allowedToLoad = true;
-	DMObject.className = "CTFpluginLauncher";
+	DMObject.className = "CTPpluginLauncher";
 	DMObject.setAttribute("type", "application/zip");
 	DMObject.setAttribute("width", "0");
 	DMObject.setAttribute("height", "0");
@@ -52,7 +54,7 @@ function openInQuickTimePlayer(url) {
 	url = anchor.href;
 	var QTObject = document.createElement("embed");
 	QTObject.allowedToLoad = true;
-	QTObject.className = "CTFpluginLauncher";
+	QTObject.className = "CTPpluginLauncher";
 	QTObject.setAttribute("type", "video/quicktime");
 	QTObject.setAttribute("width", "0");
 	QTObject.setAttribute("height", "0");
@@ -116,41 +118,6 @@ function directKill(element) {
 		"location": location.href,
 		"playlist": [{"poster": mediaElements[0].getAttribute("poster"), "sources": sources, "title": mediaElements[0].title}]
 	};
-}
-
-// Core functions
-function getData(event) {
-	var data = {};
-	var anchor = document.createElement("a");
-	
-	if(event.url) anchor.href = event.url;
-	data.src = anchor.href; // this also automatically trim spaces at beginning and end
-	data.type = event.target.type;
-	/* FIXME?: height/width for elements within display:none iframes
-	We'd need the CSS 2.1 'computed value' of height and width (and modify the arithmetic in mediaPlayer
-	to handle px and %), which might be possible using getMatchedCSSRules (returns matching rules in cascading order)
-	The 'auto' value will be a problem...
-	status: still see no feasible solution to this problem...
-	and getMatchedCSSRules is buggy as hell */
-	data.width = event.target.offsetWidth;
-	data.height = event.target.offsetHeight;
-	data.location = location.href;
-	data.params = getParams(event.target); // parameters passed to the plugin
-	
-	// Safari still uses the type param for backward compatibility
-	if(!data.type && data.params.type) data.type = data.params.type;
-	
-	// Silverlight and QuickTime sources
-	if(data.params.source) {
-		anchor.href = data.params.source;
-		data.source = anchor.href;
-	}
-	if(data.params.qtsrc !== undefined) {
-		anchor.href = data.params.qtsrc;
-		data.qtsrc = anchor.href;
-	}
-	
-	return data;
 }
 
 function getParams(element) {

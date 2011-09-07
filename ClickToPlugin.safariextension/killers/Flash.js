@@ -1,7 +1,6 @@
-var killer = {};
-addKiller("Flash", killer);
+addKiller("Flash", {
 
-killer.canKill = function(data) {
+"canKill": function(data) {
 	if(data.plugin !== "Flash") return false;
 	var match = /(?:^|&)(file|load|playlistfile|src|mp3|mp3url|soundFile|soundUrl|url|file_url)=/.exec(data.params.flashvars);
 	if(match) {data.file = match[1]; return true;}
@@ -9,9 +8,9 @@ killer.canKill = function(data) {
 	match = /[?&](file|mp3|playlist_url)=/.exec(data.src);
 	if(match) {data.hash = match[1]; return true;}
 	return false;
-};
+},
 
-killer.process = function(data, callback) {
+"process": function(data, callback) {
 	var flashvars = parseFlashVariables(data.params.flashvars);
 	if(/^rmtp/.test(flashvars.streamer)) return;
 	
@@ -88,12 +87,13 @@ killer.process = function(data, callback) {
 		"playlist": [{"poster": posterURL, "sources": sources}],
 		"isAudio": isAudio
 	});
-};
+},
 
-killer.processPlaylist = function(playlistURL, baseURL, posterURL, track, callback) {
+"processPlaylist": function(playlistURL, baseURL, posterURL, track, callback) {
 	var handlePlaylistData = function(playlistData) {
 		callback(playlistData);
 	};
 	parseXSPlaylist(playlistURL, baseURL, posterURL, track, handlePlaylistData);
-};
+}
 
+});

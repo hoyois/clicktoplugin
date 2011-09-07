@@ -1,14 +1,12 @@
-var killer = {};
-addKiller("Break", killer);
+addKiller("Break", {
 
-killer.canKill = function(data) {
-	if(data.plugin !== "Flash") return false;
+"canKill": function(data) {
 	if(data.src.indexOf(".break.com/static/") !== -1) {data.onsite = true; return true;}
 	if(data.src.indexOf("embed.break.com/") !== -1) {data.onsite = false; return true;}
 	return false;
-};
+},
 
-killer.process = function(data, callback) {
+"process": function(data, callback) {
 	var videoURL, posterURL, videoHash, url;
 	if(data.onsite) {
 		var flashvars = parseFlashVariables(data.params.flashvars);
@@ -66,4 +64,6 @@ killer.process = function(data, callback) {
 		callback({"playlist": [{"title": title, "poster": posterURL, "sources": sources, "siteInfo": siteInfo}]});
 	};
 	xhr.send(null);
-};
+}
+
+});

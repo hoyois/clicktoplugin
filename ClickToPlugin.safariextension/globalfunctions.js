@@ -17,6 +17,10 @@ function dispatchMessageToAllPages(name, message) {
 	}
 }
 
+function reloadTab(tab) {
+	if(tab.url) tab.url = tab.url; // lol
+}
+
 function matchList(list, string) {
 	var s;
 	for(var i = 0; i < list.length; i++) {
@@ -151,7 +155,7 @@ function chooseDefaultSource(sourceArray) {
 	}
 	
 	for(var h in resolutionMap) {
-		if(h > safari.extension.settings.maxResolution) {
+		if(h > safari.extension.settings.defaultResolution) {
 			if(defaultSource === undefined) defaultSource = resolutionMap[h];
 			break;
 		}
@@ -216,15 +220,43 @@ function parseXSPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlayli
 Plugin detection methods
 ***********************/
 
-// Some native MIME type exclusions
-/* TODO: review this, cf. platform/MIMETypeRegistry.cpp and WebFrameLoaderClient::ObjectContentType
-   Should contain supportedImageMimeTypes, but also we don't want to go MIME type sniffing on a typeless .html <object>...
-   Currently contains types from Info.plist, which are not relevant here! */
-// WATCH: Safari 5.1 cannot display pdfs in objects anymore...
-const nativeTypes = ["image/svg+xml", "image/png", "image/tiff", "image/gif", "image/jpeg", "image/jp2", "image/x-icon", "text/html", "text/xml", "application/xml", "application/xhtml+xml"];
-const nativeExts = ["svg", "png", "tif", "tiff", "gif", "jpg", "jpeg", "jp2", "ico", "html", "xml", "xhtml"];
+var pluginsDisabled = false; // The global page doesn't see that
+
+const nativePlugin = {};
+const nativeTypes = ["image/png", "image/tiff", "image/jpeg", "image/jp2", "image/gif", "image/bmp", "image/x-icon", "image/vnd.microsoft.icon", "image/pjpeg", "image/x-xbitmap"];
+const nativeExts = ["png", "jpeg", "jpg", "jfif", "tiff", "tif", "gif", "jp2", "bmp", "ico", "xbm"];
 function isNativeType(type) {return nativeTypes.indexOf(type) !== -1;}
 function isNativeExt(ext) {return nativeExts.indexOf(ext) !== -1;}
+
+/* EXPLANATION
+   If one of the above MIME type is specified, or no type but one of the extensions,
+   WebKit treats the resource in a special and complicated way, which depends on
+   the Content-Type header, the element name (object/embed), and the actual type of the resource.
+   These types correspond the the supportedImageMIMETypes in MIMETypeRegistry.cpp.
+   In most cases it just acts using the Content-Type (ignoring the decalared type), but not all cases. Examples:
+   1 Flash file, Content-Type flash, declared as jpg: object & embed -> Flash
+   2 Flash file, Content-Type flash, declared as png: object -> Flash, embed -> QuickTime
+   3 Jpeg file, Content-Type jpeg, decalred as jpg: object & embed -> load natively
+   4 Jpeg file, Content-Type flash or jpeg, declared as png: object -> load natively, embed -> QuickTime
+   5 Flash file, Content-type jpeg, declared as png: object -> fallback, embed -> QuickTime
+   6 Flash file, Content-type jpeg, declared as jpg: object -> fallback, embed -> load natively
+   As 4 shows, there is no hope of determining what WebKit does in all cases.
+   How are we handling this?
+   Assuming the declared types are the Content-Types, we can be safe by always allowing objects and blocking embeds normally.
+   Not assuming anything, we can only allow objects after checking Content-Type, and block embeds normally.
+   OPTIONS
+	1. Allow objects with native declared type (vulnerability)
+	2. Ignore this whole business and treat everything normally (vulnerability & extra block)
+	3. Allow objects with native Content-Type (no vulnerability, extra block, requires sniffing)
+	4. Block all these declared types (no vulnerability, extra block, no sniffing)
+	
+	Currently using 3, which is the best match, but maybe switch to 4?
+	
+	Oh, and MOREOVER, in all cases I've tested, objects use fallback content if blocked and restored, so must cloneNode.
+	
+	CONCLUSION
+	Simplest option with no vulnerability: block ALL, with "?" label, and clone original node.
+*/
 
 // cf. WebCore::mimeTypeFromDataURL
 function getTypeFromDataURI(url) {
@@ -233,16 +265,18 @@ function getTypeFromDataURI(url) {
 	else return "text/plain";
 }
 
-function getPluginForType(type) { // type is a string
+function getPluginForType(type) {
+	if(pluginsDisabled) return null;
 	for(var i = 0; i < navigator.plugins.length; i++) {
 		for(var j = 0; j < navigator.plugins[i].length; j++) {
 			if(navigator.plugins[i][j].type === type) return navigator.plugins[i];
 		}
 	}
-	return false;
+	return null;
 }
 
 function getPluginAndTypeForExt(ext) {
+	if(pluginsDisabled) return null;
 	for(var i = 0; i < navigator.plugins.length; i++) {
 		for(var j = 0; j < navigator.plugins[i].length; j++) {
 			if(navigator.plugins[i][j].suffixes === "") continue;
@@ -252,33 +286,27 @@ function getPluginAndTypeForExt(ext) {
 			}
 		}
 	}
-	return false;
+	return null;
 }
 
-function getPluginName(plugin, type) {
-	if(plugin) {
-		if(plugin.name === "Shockwave Flash") return "Flash";
-		if(plugin.name === "Silverlight Plug-In") return "Silverlight";
-		if(plugin.name.indexOf("QuickTime") !== -1) return "QuickTime";
-		if(plugin.name.indexOf("Flip4Mac") !== -1) return "Windows Media";
-		if(plugin.name.indexOf("Java") !== -1) return "Java";
-		if(plugin.name === "DivX Web Player") return "DivX";
-		if(plugin.name === "VideoLAN VLC Plug-in") return "VLC";
-		if(plugin.name === "RealPlayer Plugin.plugin") return "Real";
-		if(plugin.name === "Shockwave for Director") return "Shockwave";
-		if(plugin.name === "iPhotoPhotocast") return "iPhoto";
-		if(plugin.name === "Quartz Composer Plug-In") return "Quartz";
-		if(plugin.name === "Unity Player") return "Unity";
-		return plugin.name;
-	} else if(type) { // only so that killers can work with plugins not installed
-		if(type === "application/x-shockwave-flash" || type === "application/futuresplash") return "Flash";
-		if(type === "application/x-silverlight-2" || type === "application/x-silverlight") return "Silverlight";
-		if(/x-ms/.test(type) || type === "application/x-mplayer2" || type === "application/asx") return "Windows Media";
-		if(type === "video/divx") return "DivX";
-		//if(/x-java/.test(type)) return "Java";
-		//if(/x-pn/.test(type)) return "Real";
-		//if(type === "application/x-director") return "Shockwave";
-		//if(type === "application/vnd.unity") return "Unity";
-		return "";
-	} else return "";
+function adjustSource(data, plugin) {
+	if(plugin.name === "Silverlight Plug-In" && data.source) data.src = data.source;
+	if(plugin.name.indexOf("QuickTime") !== -1 && data.qtsrc) data.src = data.qtsrc;
+}
+
+function getPluginName(plugin) {
+	// Shorten names of some common plug-ins
+	if(plugin.name === "Shockwave Flash") return "Flash";
+	if(plugin.name === "Silverlight Plug-In") return "Silverlight";
+	if(plugin.name.indexOf("QuickTime") !== -1) return "QuickTime";
+	if(plugin.name.indexOf("Windows Media") !== -1) return "Windows Media";
+	if(plugin.name.indexOf("Java") !== -1) return "Java";
+	if(plugin.name === "DivX Web Player") return "DivX";
+	if(plugin.name === "VideoLAN VLC Plug-in") return "VLC";
+	if(plugin.name === "RealPlayer Plugin.plugin") return "Real";
+	if(plugin.name === "Shockwave for Director") return "Shockwave";
+	if(plugin.name === "iPhotoPhotocast") return "iPhoto";
+	if(plugin.name === "Quartz Composer Plug-In") return "Quartz";
+	if(plugin.name === "Unity Player") return "Unity";
+	return plugin.name;
 }

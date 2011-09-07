@@ -1,12 +1,10 @@
-var killer = {};
-addKiller("Facebook", killer);
+addKiller("Facebook", {
 
-killer.canKill = function(data) {
-	if(data.plugin !== "Flash") return false;
+"canKill": function(data) {
 	return /^https?:\/\/(?:s-static\.ak\.facebook\.com|b\.static\.ak\.fbcdn\.net|static\.ak\.fbcdn\.net)\/rsrc\.php\/v[1-9]\/[a-zA-Z0-9]{2}\/r\/[a-zA-Z0-9_-]*\.swf/.test(data.src) || data.src.indexOf("www.facebook.com/v/") !== -1;
-};
+},
 
-killer.process = function(data, callback) {
+"process": function(data, callback) {
 	if(data.params.flashvars) {
 		var flashvars = parseFlashVariables(data.params.flashvars);
 		if(flashvars.video_href && flashvars.video_id) this.processVideoID(flashvars.video_id, callback);
@@ -16,9 +14,9 @@ killer.process = function(data, callback) {
 	// Embedded video
 	var match = data.src.match(/\.com\/v\/([^&?]+)/);
 	if(match) this.processVideoID(match[1], callback);
-};
+},
 
-killer.processFlashVars = function(flashvars, callback) {
+"processFlashVars": function(flashvars, callback) {
 	var sources = [];
 	var isHD = flashvars.video_has_high_def === "1";
 	if(flashvars.highqual_src) {
@@ -33,9 +31,9 @@ killer.processFlashVars = function(flashvars, callback) {
 	if(flashvars.video_title) title = decodeURIComponent(flashvars.video_title).replace(/\+/g, " ");
 	
 	callback({"playlist": [{"title": title, "poster": posterURL, "sources": sources}]});
-};
+},
 
-killer.processVideoID = function(videoID, callback) {
+"processVideoID": function(videoID, callback) {
 	var _this = this;
 	var xhr = new XMLHttpRequest();
 	var url = "https://www.facebook.com/video/video.php?v=" + videoID;
@@ -49,5 +47,6 @@ killer.processVideoID = function(videoID, callback) {
 		_this.processFlashVars(parseWithRegExp(xhr.responseText, regex, unescapeUnicode), callbackForEmbed);
 	};
 	xhr.send(null);
-};
+}
 
+});

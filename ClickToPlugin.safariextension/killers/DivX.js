@@ -1,16 +1,16 @@
-var killer = {};
-addKiller("DivX", killer);
+addKiller("DivX", {
 
-killer.canKill = function(data) {
+"canKill": function(data) {
 	return data.plugin === "DivX" && canPlayDivX;
-};
+},
 
-
-killer.process = function(data, callback) {
+"process": function(data, callback) {
 	callback({
 		"playlist": [{
 			"poster": data.params.previewimage,
 			"sources": [{"url": data.src, "isNative": false, "mediaType": "video"}]
 		}]
 	});
-};
+}
+
+});
