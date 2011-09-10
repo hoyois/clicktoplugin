@@ -9,7 +9,7 @@ addKiller("Tumblr", {
 	if(audioURL) audioURL = audioURL[1] + "?plead=please-dont-download-this-or-our-lawyers-wont-let-us-host-audio"; // lol
 	
 	callback({
-		"playlist": [{"sources": [{"url": audioURL, "isNative": true, "mediaType": "audio"}]}],
+		"playlist": [{"sources": [{"url": audioURL, "isNative": true, "isAudio": true}]}],
 		"isAudio": true
 	});
 }

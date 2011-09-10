@@ -28,8 +28,8 @@
 			<key>Start</key>
 			<array>
 				<string>functions.js</string>
-				<string>sourceSelector.js</string>
-				<string>mediaPlayer.js</string>
+				<string>SourceSelector.js</string>
+				<string>MediaPlayer.js</string>
 				<string>main.js</string>
 			</array>
 		</dict>

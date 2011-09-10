@@ -28,22 +28,21 @@ addKiller("Blip", {
 		var xml = xhr.responseXML;
 		var media = xml.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "content");
 		
-		var url, ext, format, height, width, isNative, mediaType;
+		var url, ext, format, height, width, isNative, isAudio = false;
 		for(var i = 0; i < media.length; i++) {
-			mediaType = "video";
 			url = media[i].getAttribute("url");
 			ext = url.substr(url.lastIndexOf(".") + 1).toUpperCase();
 			if(ext === "MP4" || ext === "M4V" || ext === "MOV" || ext === "MPG" || ext === "MPEG") isNative = true;
-			else if(ext === "MP3") {isNative = true; mediaType = "audio";}
-			else if((ext === "FLV" && canPlayFLV) || (ext === "WMV" && canPlayWM)) isNative = false;
+			else if(ext === "MP3") {isNative = true; isAudio = true;}
+			else if((ext === "FLV" && HTML5.canPlayFLV) || (ext === "WMV" && HTML5.canPlayWM)) isNative = false;
 			else continue;
 			
 			format = media[i].getAttributeNS("http://blip.tv/dtd/blip/1.0", "role");
 			height = media[i].getAttribute("height");
 			width = media[i].getAttribute("width");
-			if(mediaType === "video") format += " (" + width + "x" + height + ")";
+			if(!isAudio) format += " (" + width + "x" + height + ")";
 			format += " " + ext;
-			sources.push({"url": url, "format": format, "isNative": isNative, "mediaType": mediaType, "height": parseInt(height)});
+			sources.push({"url": url, "format": format, "isNative": isNative, "isAudio": isAudio, "height": parseInt(height)});
 		}
 		callback({
 			"playlist": [{

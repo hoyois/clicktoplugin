@@ -89,7 +89,7 @@ Placeholder element
 .CTPplaceholder {
 	display: inline-block !important;
 	background: none !important;
-	overflow: visible !important;
+	overflow: hidden !important;
 	visibility: visible !important;
 }
 
@@ -122,11 +122,11 @@ Placeholder element
 }
 
 .CTPplaceholder.CTPnoimage .CTPplaceholderContainer {
-	background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(245, 245, 245, 1)), to(rgba(210, 210, 210, 1))) !important;
+	background-image: -webkit-linear-gradient(top, rgba(245, 245, 245, 1), rgba(210, 210, 210, 1)) !important;
 }
 
 .CTPplaceholder.CTPnoimage:active .CTPplaceholderContainer {
-	background-image: -webkit-gradient(linear, left bottom, left top, from(rgba(235, 235, 235, 1)), to(rgba(220, 220, 220, 1))) !important;
+	background-image: -webkit-linear-gradient(top, rgba(235, 235, 235, 1), rgba(220, 220, 220, 1)) !important;
 }
 
 .CTPplaceholder .CTPplaceholderContainer * {
@@ -302,7 +302,7 @@ Source selector
 	background-attachment: scroll !important;
 	background-clip: border-box !important;
 	background-color: transparent !important;
-	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(59, 59, 59, 0.9)), to(rgba(19, 19, 19, 0.9)), color-stop(.25, rgba(39, 39, 39, 0.9)), color-stop(.265, rgba(25, 25, 25, 0.9))) !important;
+	background-image: -webkit-linear-gradient(top, rgba(59, 59, 59, 0.9), rgba(39, 39, 39, 0.9) 25%, rgba(25, 25, 25, 0.9) 26.5%, rgba(19, 19, 19, 0.9)) !important;
 	background-origin: padding-box !important;
 	background-position: center !important;
 	background-repeat: repeat !important;

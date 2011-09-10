@@ -8,11 +8,12 @@ if(safari.extension.settings.version < 25) {
 if(safari.extension.settings.version < 27) {
 	// IS this check needed? i.e., what if you set a setting to undefined?
 	if(safari.extension.settings.maxResolution) safari.extension.settings.defaultResolution = safari.extension.settings.maxResolution;
+	safari.extension.settings.allowInvisible = safari.extension.settings.loadInvisible;
 	safari.extension.settings.removeItem("maxResolution");
+	safari.extension.settings.removeItem("loadInvisible");
 	safari.extension.settings.removeItem("showPoster");
 	safari.extension.settings.removeItem("showMediaTooltip");
 	safari.extension.settings.removeItem("defaultTab");
-	// RENAME loadInvisible setting...
 }
 safari.extension.settings.version = 27;
 
@@ -21,7 +22,7 @@ localize(GLOBAL_STRINGS, safari.extension.settings.language);
 localizeAsScript(INJECTED_STRINGS, safari.extension.settings.language);
 
 // SETTINGS
-const allSettings = ["language", "currentTab", "additionalScripts", "useFallbackMedia", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "showSourceSelector", "mediaAutoload", "mediaWhitelist", "initialBehavior", "instantPlay", "defaultResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "codecsPolicy", "volume", "useDownloadManager", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "sIFRPolicy", "opacity", "debug", "showTooltip"];
+const allSettings = ["language", "currentTab", "additionalScripts", "useFallbackMedia", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "showSourceSelector", "mediaAutoload", "mediaWhitelist", "initialBehavior", "instantPlay", "defaultResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "codecsPolicy", "volume", "useDownloadManager", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "allowInvisible", "sIFRPolicy", "opacity", "debug", "showTooltip"];
 
 /* Hidden settings:
 language (default: undefined)
@@ -72,12 +73,6 @@ function respondToMessage(event) {
 	case "canLoad":
 		event.message = canLoad(event.message, event.target);
 		break;
-	case "canLoadAsync":
-		canLoadAsync(event.message, event.target);
-		break
-	case "killPlugin":
-		killPlugin(event.message, event.target);
-		break;
 	case "loadAll":
 	case "hideAll":
 	case "showSettings":
@@ -101,70 +96,51 @@ function respondToMessage(event) {
 }
 
 function canLoad(data, tab) {
-	// no source & no type -> cannot instantiate plugin
-	if(!data.src && !data.type) return true;
-	
 	var response = {};
-	pluginsDisabled = data.pluginsDisabled; // plugins are never disabled in the global page
 	
-	// The following determination of plugin is based on WebKit's source
-	data.type = /^[^;]*/.exec(data.type)[0]; // ignore parameters in MIME type
-	var useFallback = false;
-	try{
-		if(data.type) {
-			if(isNativeType(data.type)) throw nativePlugin;
-			throw getPluginForType(data.type);
-		}
-		if(/^data:/.test(data.src)) {
-			data.type = getTypeFromDataURI(data.src);
-			data.src = "";
-			if(isNativeType(data.type)) return true;
-			var plugin = getPluginForType(data.type);
-			if(!plugin) return true;
-			throw plugin;
-		}
-		var ext = extractExt(data.src);
-		if(isNativeExt(ext)) throw nativePlugin;
-		var x = getPluginAndTypeForExt(ext);
-		if(x) {
-			data.type = x.type;
-			throw x.plugin;
-		}
-		// If no plugin is determined at this point, WebKit will create a new subframe to load the resource in.
-		// In particular it will create a new <embed> element if necessary, so we must
-		return true;
-		// WATCH: hopefully this behavior is adopted for nativePlugin in the future...
-	} catch(plugin) {
-		switch(plugin) {
-		case nativePlugin: // see globalfunctions.js
-			response.isNative = true;
-			break;
-		case null: // WebKit uses fallback content
-			useFallback = true;
-			break;
-		default:
-			if(isAllowed(plugin)) return true;
-			adjustSource(data, plugin);
-			response.plugin = getPluginName(plugin);
-		}
+	// Determine plugin
+	var plugin;
+	if(!data.src && !data.type) {
+		plugin = null;
+	} else if(data.type) {
+		data.type = stripParams(data.type).toLowerCase(); // ignore parameters in MIME type
+		plugin = getPluginForType(data);
+	} else if(isDataURI(data.src)) {
+		data.type = getTypeFromDataURI(data.src);
+		plugin = getPluginForType(data);
+	} else {
+		plugin = getPluginForExt(data);
 	}
-	
-	// e.g. QT killer would look like:
-	// if !data.plugin return HTML5.canPlayType(data.type) [is the if even necessary? Make general killer like that? Media.js]
-	// would work for WM, QT, but not DivX...
-	
 	// This is correct but really not worth it (classid is "java:...")
-	// if(data.params.classid && !/^application\/x-java-(?:applet|bean|vm)/.test(type)) return true;
+	// if(data.params.classid && !/^application\/x-java-(?:applet|bean|vm)/.test(type)) plugin = null;
+	
+	/* plugin is now either:
+	-> nativePlugin (see globalfunctions.js)
+	-> null (Safari will either load the resource directly or use fallback content)
+	-> the plugin object that Safari will use
+	*/
+	
+	if(plugin === nativePlugin) {
+		response.isNative = true;
+		plugin = resolveNativePlugin(data, tab);
+	}
+	if(isDataURI(data.src)) data.src = "";
+	
+	if(plugin !== null && plugin !== nativePlugin) {
+		if(isAllowed(plugin)) return true;
+		adjustSource(data, plugin);
+		response.plugin = getPluginName(plugin);
+	}
 	
 	// Check if invisible
 	if(data.width <= safari.extension.settings.maxInvisibleSize && data.height <= safari.extension.settings.maxInvisibleSize && data.width > 0 && data.height > 0) {
-		if(safari.extension.settings.loadInvisible) return true;
+		if(safari.extension.settings.allowInvisible) return true;
 		response.isInvisible = true;
 	}
 	
 	// Check control lists
 	if(safari.extension.settings.invertWhitelists !== (matchList(safari.extension.settings.locationsWhitelist, data.location) || matchList(safari.extension.settings.sourcesWhitelist, data.src))) return true;
-	if(safari.extension.settings.invertBlacklists !== (matchList(safari.extension.settings.locationsBlacklist, data.location) || matchList(safari.extension.settings.sourcesBlacklist, data.src))) return false;
+	if(plugin !== null && safari.extension.settings.invertBlacklists !== (matchList(safari.extension.settings.locationsBlacklist, data.location) || matchList(safari.extension.settings.sourcesBlacklist, data.src))) return false;
 	
 	// Check sIFR
 	if(/\bsIFR-flash\b/.test(data.params.class)) {
@@ -172,55 +148,46 @@ function canLoad(data, tab) {
 		if(safari.extension.settings.sIFRPolicy === "textonly") return "disableSIFR";
 	}
 	
-	// At this point we know we should block the element
-	
-	// Exception: ask the user what to do if a QT object would launch QTP
+	// Give user a chance to allow if a QT object would launch QTP
 	if(response.plugin === "QuickTime" && data.params.href && /^true$/i.test(data.params.autohref) && /^quicktimeplayer$/i.test(data.params.target)) {
 		if(/\bCTPallowedToLoad\b/.test(data.params.class)) return true; // for other extensions with open-in-QTP functionality
 		if(confirm(QT_CONFIRM_LAUNCH_DIALOG(data.params.href))) return true;
 	}
 	
-	if(data.needID) {
+	if(data.documentID === undefined) {
 		data.documentID = documentCount++;
 		response.documentID = data.documentID;
 		response.settings = getSettings(injectedSettings);
-		response.settings.hasKillers = safari.extension.settings.additionalScripts.length > 0; // ????
 	}
 	
 	response.src = data.src;
 	response.type = data.type;
 	
 	// Killers
-	if(!response.isNative) {
-		if(!kill(data, tab) && useFallback) return true;
-	}
+	if(plugin !== nativePlugin && !kill(data, tab) && plugin === null) return true;
 	
 	return response;
 }
 
-function canLoadAsync(data, tab) {
+function resolveNativePlugin(data, tab) {
+	if(isDataURI(data.src)) {
+		data.type = getTypeFromDataURI(data.src);
+		var plugin = getPluginForType(data);
+		if(plugin === nativePlugin) return null;
+		return plugin;
+	}
 	var handleMIMEType = function(type) {
-		data.type = /^[^;]*/.exec(type)[0];
+		data.type = stripParams(type);
 		var response = {"documentID": data.documentID, "elementID": data.elementID};
-		var useFallback = false;
-		var plugin = getPluginForType(data.type);
-		if(isNativeType(data.type) || (plugin && isAllowed(plugin))) {
-			tab.page.dispatchMessage("load", response);
-		} else {
-			response.killerID = findKillerFor(data);
-			if(plugin) {
-				response.plugin = getPluginName(plugin);
-				adjustSource(data, plugin);
-			} else {
-				useFallback = true;
-			}
-			response.src = data.src;
-			response.type = data.type;
-			if(!kill(data, tab) && useFallback) tab.page.dispatchMessage("load", response);
-			else tab.page.dispatchMessage("plugin", response);
+		var plugin = getPluginForType(data);
+		if(plugin === null || plugin === nativePlugin || isAllowed(plugin)) tab.page.dispatchMessage("load", response);
+		else { // Plugin-launching content was disguised as native image type...
+			response.plugin = getPluginName(plugin);
+			tab.page.dispatchMessage("plugin", response);
 		}
-	};
-	getMIMEType(data.src, handleMIMEType);
+	}
+	setTimeout(function() {getMIMEType(data.src, handleMIMEType);}, 0);
+	return nativePlugin;
 }
 
 function isAllowed(plugin) {
@@ -260,16 +227,14 @@ function handleContextMenu(event) {
 	else {
 		if(u.hasMedia) event.contextMenu.appendContextMenuItem("load", LOAD_PLUGIN(u.plugin));
 		event.contextMenu.appendContextMenuItem("hide", HIDE_PLUGIN(u.plugin));
-	}
-	if(u.hasMedia && u.source !== undefined) {
-		if(s.downloadContext) event.contextMenu.appendContextMenuItem(safari.extension.settings.useDownloadManager ? "downloadDM" : "download", u.mediaType === "audio" ? DOWNLOAD_AUDIO : DOWNLOAD_VIDEO);
-		if(u.siteInfo && s.viewOnSiteContext) event.contextMenu.appendContextMenuItem("viewOnSite", VIEW_ON_SITE(u.siteInfo.name));
-		if(s.viewInQTPContext) event.contextMenu.appendContextMenuItem("viewInQTP", VIEW_IN_QUICKTIME_PLAYER);
-	}
-	if(!u.isMedia) {
 		if(s.addToWhitelistContext && !s.invertWhitelists) event.contextMenu.appendContextMenuItem("sourcesWhitelist", ALWAYS_ALLOW_SOURCE);
 		if(s.addToBlacklistContext && !s.invertBlacklists) event.contextMenu.appendContextMenuItem("sourcesBlacklist", ALWAYS_HIDE_SOURCE);
 		if(s.debug) event.contextMenu.appendContextMenuItem("showInfo", GET_PLUGIN_INFO);
+	}
+	if(u.hasMedia && u.source !== undefined) {
+		if(s.downloadContext) event.contextMenu.appendContextMenuItem(safari.extension.settings.useDownloadManager ? "downloadDM" : "download", u.isAudio ? DOWNLOAD_AUDIO : DOWNLOAD_VIDEO);
+		if(u.siteInfo && s.viewOnSiteContext) event.contextMenu.appendContextMenuItem("viewOnSite", VIEW_ON_SITE(u.siteInfo.name));
+		if(s.viewInQTPContext) event.contextMenu.appendContextMenuItem("viewInQTP", VIEW_IN_QUICKTIME_PLAYER);
 	}
 }
 
@@ -372,24 +337,22 @@ function kill(data, tab) {
 		mediaData.elementID = data.elementID;
 		mediaData.documentID = data.documentID;
 		
-		if(!mediaData.loadAfter) {
-			var defaultSource = chooseDefaultSource(mediaData.playlist[0].sources);
-			mediaData.playlist[0].defaultSource = defaultSource;
-			mediaData.badgeLabel = makeLabel(mediaData.playlist[0].sources[defaultSource]);
-		}
-		for(var i = (mediaData.loadAfter ? 0 : 1); i < mediaData.playlist.length; i++) {
+		for(var i = 0; i < mediaData.playlist.length; i++) {
 			if(mediaData.playlist[i] === null) continue;
 			mediaData.playlist[i].defaultSource = chooseDefaultSource(mediaData.playlist[i].sources);
+			makeTitle(mediaData.playlist[i]);
 			if(mediaData.playlist[i].defaultSource === undefined) {
-				mediaData.playlist[i] = null;
+				if(i > 0 || mediaData.loadAfter) mediaData.playlist[i] = null;
 			}
 		}
-		
-		mediaData.autoplay = matchList(safari.extension.settings.mediaWhitelist, data.location);
-		mediaData.autoload = defaultSource !== undefined && safari.extension.settings.defaultPlayer === "html5" && (mediaData.autoplay || safari.extension.settings.mediaAutoload);
+		if(!mediaData.loadAfter) {
+			mediaData.badgeLabel = makeLabel(mediaData.playlist[0].sources[mediaData.playlist[0].defaultSource]);
+			mediaData.autoplay = matchList(safari.extension.settings.mediaWhitelist, data.location);
+			mediaData.autoload = mediaData.playlist[0].defaultSource !== undefined && safari.extension.settings.defaultPlayer === "html5" && (mediaData.autoplay || safari.extension.settings.mediaAutoload);
+		}
 		
 		tab.page.dispatchMessage("mediaData", mediaData);
-	}
+	};
 	
 	setTimeout(function() {killers[killerIDs[0]].process(data, callback);}, 0);
 	return true;

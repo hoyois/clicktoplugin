@@ -39,25 +39,25 @@ addKiller("YouTube", {
 		var x = parseFlashVariables(formatList[i]);
 		var videoURL = decodeURIComponent(x.url) + "&title=" + encodeURIComponent(flashvars.title);
 		if(x.itag === "38") {
-			sources.push({"url": videoURL, "format": "4K MP4", "height": 2304, "isNative": true, "mediaType": "video"});
+			sources.push({"url": videoURL, "format": "4K MP4", "height": 2304, "isNative": true});
 		} else if(x.itag === "37") {
-			sources.push({"url": videoURL, "format": "1080p MP4", "height": 1080, "isNative": true, "mediaType": "video"});
+			sources.push({"url": videoURL, "format": "1080p MP4", "height": 1080, "isNative": true});
 		} else if(x.itag === "22") {
-			sources.push({"url": videoURL, "format": "720p MP4", "height": 720, "isNative": true, "mediaType": "video"});
+			sources.push({"url": videoURL, "format": "720p MP4", "height": 720, "isNative": true});
 		} else if(x.itag === "18") {
-			sources.push({"url": videoURL, "format": "360p MP4", "height": 360, "isNative": true, "mediaType": "video"});
-		} else if(x.itag === "35" && canPlayFLV) {
-			sources.push({"url": videoURL, "format": "480p FLV", "height": 480, "isNative": false, "mediaType": "video"});
-		} else if(x.itag === "34" && canPlayFLV) {
-			sources.push({"url": videoURL, "format": "360p FLV", "height": 360, "isNative": false, "mediaType": "video"});
-		} else if(x.itag === "5" && canPlayFLV) {
-			sources.push({"url": videoURL, "format": "240p FLV", "height": 240, "isNative": false, "mediaType": "video"});
-		} /*else if(x.itag === "45" && canPlayWebM) {
-			sources.push({"url": videoURL, "format": "720p WebM", "height": 720, "isNative": false, "mediaType": "video"});
-		} else if(x.itag === "44" && canPlayWebM) {
-			sources.push({"url": videoURL, "format": "480p WebM", "height": 480, "isNative": false, "mediaType": "video"});
-		} else if(x.itag === "43" && canPlayWebM) {
-			sources.push({"url": videoURL, "format": "360p WebM", "height": 360, "isNative": false, "mediaType": "video"});
+			sources.push({"url": videoURL, "format": "360p MP4", "height": 360, "isNative": true});
+		} else if(HTML5.canPlayFLV && x.itag === "35") {
+			sources.push({"url": videoURL, "format": "480p FLV", "height": 480, "isNative": false});
+		} else if(HTML5.canPlayFLV && x.itag === "34") {
+			sources.push({"url": videoURL, "format": "360p FLV", "height": 360, "isNative": false});
+		} else if(HTML5.canPlayFLV && x.itag === "5") {
+			sources.push({"url": videoURL, "format": "240p FLV", "height": 240, "isNative": false});
+		} /*else if(HTML5.canPlayWebM && x.itag === "45") {
+			sources.push({"url": videoURL, "format": "720p WebM", "height": 720, "isNative": false});
+		} else if(HTML5.canPlayWebM && x.itag === "44") {
+			sources.push({"url": videoURL, "format": "480p WebM", "height": 480, "isNative": false});
+		} else if(HTML5.canPlayWebM && x.itag === "43") {
+			sources.push({"url": videoURL, "format": "360p WebM", "height": 360, "isNative": false});
 		}*/
 	}
 	

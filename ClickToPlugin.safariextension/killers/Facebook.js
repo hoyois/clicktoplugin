@@ -20,10 +20,10 @@ addKiller("Facebook", {
 	var sources = [];
 	var isHD = flashvars.video_has_high_def === "1";
 	if(flashvars.highqual_src) {
-		sources.push({"url": decodeURIComponent(flashvars.highqual_src), "format": isHD ? "720p MP4" : "HQ MP4", "height": isHD ? 720 : 600, "isNative": true, "mediaType": "video"});
-		if(flashvars.lowqual_src) sources.push({"url": decodeURIComponent(flashvars.lowqual_src), "format": "240p MP4", "height": 240, "isNative": true, "mediaType": "video"});
+		sources.push({"url": decodeURIComponent(flashvars.highqual_src), "format": isHD ? "720p MP4" : "HQ MP4", "height": isHD ? 720 : 600, "isNative": true});
+		if(flashvars.lowqual_src) sources.push({"url": decodeURIComponent(flashvars.lowqual_src), "format": "240p MP4", "height": 240, "isNative": true});
 	} else if(flashvars.video_src) {
-		sources.push({"url": decodeURIComponent(flashvars.video_src), "format": "240p MP4", "height": 240, "isNative": true, "mediaType": "video"});
+		sources.push({"url": decodeURIComponent(flashvars.video_src), "format": "240p MP4", "height": 240, "isNative": true});
 	} else return;
 	
 	var posterURL, title;

@@ -1,7 +1,7 @@
 addKiller("Break", {
 
 "canKill": function(data) {
-	if(data.src.indexOf(".break.com/static/") !== -1) {data.onsite = true; return true;}
+	if(/\.break\.com\/(?:static|break)\//.test(data.src)) {data.onsite = true; return true;}
 	if(data.src.indexOf("embed.break.com/") !== -1) {data.onsite = false; return true;}
 	return false;
 },
@@ -37,18 +37,18 @@ addKiller("Break", {
 		}
 		var match = xhr.responseText.match(/sGlobalFileNameHDD=['"]([^'"]*)['"]/);
 		if(match) {
-			sources.push({"url": match[1].replace(/\.flv$/, "").replace(/\.mp4$/, "") + ".mp4?" + videoHash, "format": "720p MP4", "height": 720, "isNative": true, "mediaType": "video"});
+			sources.push({"url": match[1].replace(/\.flv$/, "").replace(/\.mp4$/, "") + ".mp4?" + videoHash, "format": "720p MP4", "height": 720, "isNative": true});
 		}
 		match = xhr.responseText.match(/sGlobalFileNameHD=['"]([^'"]*)['"]/);
 		if(match) {
-			sources.push({"url": match[1].replace(/\.flv$/, "").replace(/\.mp4$/, "") + ".mp4?" + videoHash, "format": "480p MP4", "height": 480, "isNative": true, "mediaType": "video"});
+			sources.push({"url": match[1].replace(/\.flv$/, "").replace(/\.mp4$/, "") + ".mp4?" + videoHash, "format": "480p MP4", "height": 480, "isNative": true});
 		}
 		match = xhr.responseText.match(/sGlobalFileName=['"]([^'"]*)['"]/);
 		if(match) {
-			sources.push({"url": match[1].replace(/\.flv$/, "").replace(/\.mp4$/, "") + ".mp4?" + videoHash, "format": "360p MP4", "height": 360, "isNative": true, "mediaType": "video"});
+			sources.push({"url": match[1].replace(/\.flv$/, "").replace(/\.mp4$/, "") + ".mp4?" + videoHash, "format": "360p MP4", "height": 360, "isNative": true});
 		}
 		if(sources.length === 0) {
-			if(videoURL) sources.push({"url": videoURL.replace(/\.flv$/, "").replace(/\.mp4$/, "") + ".mp4?" + videoHash, "format": "360p MP4", "height": 360, "isNative": true, "mediaType": "video"});
+			if(videoURL) sources.push({"url": videoURL.replace(/\.flv$/, "").replace(/\.mp4$/, "") + ".mp4?" + videoHash, "format": "360p MP4", "height": 360, "isNative": true});
 			else return;
 		}
 		

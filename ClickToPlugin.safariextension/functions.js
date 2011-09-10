@@ -1,9 +1,5 @@
 if(location.href !== "about:blank") {
 
-function hasParent(element) {
-	return element !== undefined && element.parentNode !== null;
-}
-
 function removeHTMLNode(node) {
 	while(node.parentNode.parentNode && node.parentNode.childNodes.length === 1) node = node.parentNode;
 	node.parentNode.removeChild(node);
@@ -77,7 +73,6 @@ function simplifyWheelDelta(x, y) {
 }
 
 function testShortcut(event, shortcut) {
-	if(event.allowDefault) return false;
 	if(event.type === "mousewheel") {
 		if(simplifyWheelDelta(event.wheelDeltaX, event.wheelDeltaY) !== shortcut.direction) return false;
 		for(var x in shortcut) {
@@ -93,31 +88,19 @@ function testShortcut(event, shortcut) {
 	return true;
 }
 
-// Look for media fallback content
-function directKill(element) {
+// Look for usable media fallback content
+function mediaFallback(element) {
 	var mediaElements = element.getElementsByTagName("video");
-	var mediaType;
 	if(mediaElements.length === 0) {
 		mediaElements = element.getElementsByTagName("audio");
-		if(mediaElements.length === 0) return false;
-		else mediaType = "audio";
-	} else mediaType = "video";
-
-	var sources = [];
-	
-	if(!mediaElements[0].hasAttribute("src")) { // look for <source> tags
-		var sourceElements = mediaElements[0].getElementsByTagName("source");
-		for(var i = 0; i < sourceElements.length; i++) {
-			if(mediaElements[0].canPlayType(sourceElements[i].getAttribute("type"))) {
-				sources.push({"url": sourceElements[i].getAttribute("src"), "format": sourceElements[i].getAttribute("type").split(";")[0], "mediaType": mediaType});
-			}
-		}
-	} else sources.push({"url": mediaElements[0].getAttribute("src"), "format": mediaElements[0].getAttribute("type").split(";")[0], "mediaType": mediaType});
-	
-	return {
-		"location": location.href,
-		"playlist": [{"poster": mediaElements[0].getAttribute("poster"), "sources": sources, "title": mediaElements[0].title}]
-	};
+		if(mediaElements.length === 0) return null;
+	}
+	if(mediaElements[0].src) return mediaElements[0];
+	var sourceElements = mediaElements[0].getElementsByTagName("source");
+	for(var i = 0; i < sourceElements.length; i++) {
+		if(mediaElements[0].canPlayType(sourceElements[i].type)) return mediaElements[0];
+	}
+	return null;
 }
 
 function getParams(element) {

@@ -64,9 +64,7 @@
 			<string>killers/Tumblr.js</string>
 			<string>killers/Flash.js</string>
 			<string>killers/Silverlight.js</string>
-			<string>killers/QuickTime.js</string>
-			<string>killers/WindowsMedia.js</string>
-			<string>killers/DivX.js</string>
+			<string>killers/Generic.js</string>
 		</array>
 		<key>Key</key>
 		<string>additionalScripts</string>
@@ -417,7 +415,7 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>loadInvisible</string>
+		<string>allowInvisible</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>

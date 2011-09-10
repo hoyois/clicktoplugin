@@ -25,17 +25,17 @@ addKiller("Dailymotion", {
 	// hd720URL (720p)
 	match = sequence.match(/\"hd720URL\":\"([^"]*)\"/);
 	if(match) {
-		sources.push({"url": match[1].replace(/\\\//g,"/"), "format": "720p MP4", "height": 720, "isNative": true, "mediaType": "video"});
+		sources.push({"url": match[1].replace(/\\\//g,"/"), "format": "720p MP4", "height": 720, "isNative": true});
 	}
 	// hqURL
 	match = sequence.match(/\"hqURL\":\"([^"]*)\"/);
 	if(match) {
-		sources.push({"url": match[1].replace(/\\\//g,"/"), "format": "SD MP4", "height": 360, "isNative": true, "mediaType": "video"});
+		sources.push({"url": match[1].replace(/\\\//g,"/"), "format": "SD MP4", "height": 360, "isNative": true});
 	}
 	// sdURL
 	match = sequence.match(/\"sdURL\":\"([^"]*)\"/);
 	if(match) {
-		sources.push({"url": match[1].replace(/\\\//g,"/"), "format": "LD MP4", "height": 240, "isNative": true, "mediaType": "video"});
+		sources.push({"url": match[1].replace(/\\\//g,"/"), "format": "LD MP4", "height": 240, "isNative": true});
 	}
 	
 	match = sequence.match(/\"videoPreviewURL\":\"([^"]*)\"/);

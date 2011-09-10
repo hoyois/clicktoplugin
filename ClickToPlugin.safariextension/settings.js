@@ -83,7 +83,7 @@ function handleKeyPressEvent(event) {
 }
 for(var i = 0; i < textareas.length; i++) {
 	textareas[i].addEventListener("keypress", handleKeyPressEvent, false);
-	textareas[i].addEventListener("input", handleTextAreaInput, false);
+	textareas[i].addEventListener(textareas[i].id === "additionalScripts" ? "change" : "input", handleTextAreaInput, false);
 }
 
 // Killer reset

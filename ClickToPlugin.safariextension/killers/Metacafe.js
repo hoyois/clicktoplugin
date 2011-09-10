@@ -23,13 +23,13 @@ addKiller("Metacafe", {
 	var sources = [];
 	
 	if(mediaList.highDefinitionMP4) {
-		sources.push({"url": mediaList.highDefinitionMP4, "format": "HD MP4", "height": 720, "isNative": true, "mediaType": "video"});
+		sources.push({"url": mediaList.highDefinitionMP4, "format": "HD MP4", "height": 720, "isNative": true});
 	}
 	if(mediaList.MP4) {
-		sources.push({"url": mediaList.MP4, "format": "SD MP4", "height": 360, "isNative": true, "mediaType": "video"});
+		sources.push({"url": mediaList.MP4, "format": "SD MP4", "height": 360, "isNative": true});
 	}
-	if(canPlayFLV && mediaList.flv) {
-		sources.push({"url": mediaList.flv, "format": "SD FLV", "height": 360, "isNative": false, "mediaType": "video"});
+	if(HTML5.canPlayFLV && mediaList.flv) {
+		sources.push({"url": mediaList.flv, "format": "SD FLV", "height": 360, "isNative": false});
 	}
 	
 	var title;

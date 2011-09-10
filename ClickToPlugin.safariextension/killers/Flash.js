@@ -1,7 +1,7 @@
 addKiller("Flash", {
 
 "canKill": function(data) {
-	if(data.plugin !== "Flash") return false;
+	if(data.type !== "application/x-shockwave-flash") return false;
 	var match = /(?:^|&)(file|load|playlistfile|src|mp3|mp3url|soundFile|soundUrl|url|file_url)=/.exec(data.params.flashvars);
 	if(match) {data.file = match[1]; return true;}
 	// other video flashvars: wmvUrl/flvUrl (gvideoplayer.swf)
@@ -51,7 +51,7 @@ addKiller("Flash", {
 	}
 	
 	if(!sourceURL) return;
-	var isPlaylist = data.file === "playlistfile" || data.hash === "playlist_url" || hasExt("xml|xspf", sourceURL);
+	var isPlaylist = data.file === "playlistfile" || data.hash === "playlist_url" || /^(?:xml|xspf)$/i.test(extractExt(sourceURL));
 	
 	var baseURL = data.src; // used to resolve video URLs
 	if(flashvars.netstreambasepath) baseURL = decodeURIComponent(flashvars.netstreambasepath);
@@ -67,25 +67,29 @@ addKiller("Flash", {
 	sourceURL2 = flashvars["hd.file"];
 	
 	var sources = [];
-	var isAudio = true;
-	var ext;
+	var audioOnly = true;
+	var source;
 	if(sourceURL2) {
-		ext = extInfo(sourceURL2);
-		if(ext) {
-			sources.push({"url": makeAbsoluteURL(sourceURL2, baseURL), "format": "HD", "isNative": ext.isNative, "height": 720, "mediaType": ext.mediaType});
-			if(ext.mediaType === "video") isAudio = false;
+		source = HTML5.urlInfo(sourceURL2);
+		if(source) {
+			source.url = makeAbsoluteURL(sourceURL2, baseURL);
+			source.format = "HD " + source.format;
+			source.height = 720;
+			sources.push(source);
+			audioOnly = false;
 		}
 	}
 	
-	ext = extInfo(sourceURL);
-	if(ext) {
-		sources.push({"url": makeAbsoluteURL(sourceURL, baseURL), "format": sources[0] ? "SD" : "", "isNative": ext.isNative, "mediaType": ext.mediaType});
-		if(ext.mediaType === "video") isAudio = false;
+	source = HTML5.urlInfo(sourceURL);
+	if(source) {
+		source.url = makeAbsoluteURL(sourceURL, baseURL);
+		sources.push(source);
+		if(!source.isAudio) audioOnly = false;
 	}
 	
 	callback({
 		"playlist": [{"poster": posterURL, "sources": sources}],
-		"isAudio": isAudio
+		"audioOnly": audioOnly
 	});
 },
 

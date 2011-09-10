@@ -1,10 +1,10 @@
 if(location.href !== "about:blank") {
 
 /******************************
-sourceSelector class definition
+SourceSelector class definition
 *******************************/
 
-function sourceSelector(plugin, loadPlugin, viewInQTP, handleClickEvent, handleContextMenuEvent) {
+function SourceSelector(plugin, loadPlugin, viewInQTP, handleClickEvent, handleContextMenuEvent) {
 	this.containerElement = document.createElement("div");
 	this.containerElement.className = "CTPsourceSelector CTPhidden";
 	this.containerElement.innerHTML = "<ul class=\"CTPsourceList\"></ul>";
@@ -20,7 +20,7 @@ function sourceSelector(plugin, loadPlugin, viewInQTP, handleClickEvent, handleC
 	this.viewInQTP = viewInQTP;
 }
 
-sourceSelector.prototype.init = function(sources) {
+SourceSelector.prototype.init = function(sources) {
 	this.containerElement.firstChild.innerHTML = "";
 	this.sources = sources;
 	for(var i = 0; i < sources.length; i++) {
@@ -28,12 +28,13 @@ sourceSelector.prototype.init = function(sources) {
 	}
 	var _this = this;
 	// Plugin source item
-	if(settings.showPluginSourceItem) {
+	if(settings.showPluginSourceItem && this.plugin) {
 		this.pluginSourceItem = document.createElement("li");
 		this.pluginSourceItem.className = "CTPsourceItem";
-		this.pluginSourceItem.textContent = this.plugin ? this.plugin : "Plug-in";
+		this.pluginSourceItem.textContent = this.plugin;
 		this.pluginSourceItem.addEventListener("click", function(event) {
 			_this.loadPlugin(event);
+			event.preventDefault();
 			event.stopPropagation();
 		}, false);
 		this.pluginSourceItem.addEventListener("contextmenu", function(event) {
@@ -49,6 +50,7 @@ sourceSelector.prototype.init = function(sources) {
 		this.QTPSourceItem.textContent = "QuickTime Player";
 		this.QTPSourceItem.addEventListener("click", function(event) {
 			_this.viewInQTP(event);
+			event.preventDefault();
 			event.stopPropagation();
 		}, false);
 		this.QTPSourceItem.addEventListener("contextmenu", function(event) {
@@ -59,7 +61,7 @@ sourceSelector.prototype.init = function(sources) {
 	}
 };
 
-sourceSelector.prototype.appendSource = function(source) {
+SourceSelector.prototype.appendSource = function(source) {
 	var sourceItem = document.createElement("li");
 	sourceItem.className = "CTPsourceItem";
 	sourceItem.innerHTML = "<a class=\"CTPsourceLink\" href=\"" + this.sources[source].url + "\">" + (this.sources[source].format ? this.sources[source].format : "HTML5") + "</a>";
@@ -67,13 +69,14 @@ sourceSelector.prototype.appendSource = function(source) {
 	
 	sourceItem.firstChild.addEventListener("click", function(event) {
 		if(event.altKey) return; // to allow option-click download
-		event.preventDefault();
 		_this.handleClickEvent(event, source);
+		event.preventDefault();
 		event.stopImmediatePropagation(); // Needed for Facebook
 	}, false);
 	
 	sourceItem.addEventListener("click", function(event) {
 		_this.handleClickEvent(event, source);
+		event.preventDefault();
 		event.stopPropagation();
 	}, false);
 	sourceItem.addEventListener("contextmenu", function(event) {
@@ -83,7 +86,7 @@ sourceSelector.prototype.appendSource = function(source) {
 	this.containerElement.firstChild.appendChild(sourceItem);
 };
 
-sourceSelector.prototype.setCurrentSource = function(source) {
+SourceSelector.prototype.setCurrentSource = function(source) {
 	if(source === undefined) source = "plugin";
 	if(this.currentSource !== undefined) {
 		if(this.currentSource === "plugin") this.pluginSourceItem.className = "CTPsourceItem";
@@ -98,7 +101,7 @@ sourceSelector.prototype.setCurrentSource = function(source) {
 	this.currentSource = source;
 };
 
-sourceSelector.prototype.unhide = function(width, height) {
+SourceSelector.prototype.unhide = function(width, height) {
 	if(this.containerElement.offsetWidth + 10 < width && this.containerElement.offsetHeight + 10 < height) {
 		this.containerElement.className = "CTPsourceSelector";
 		return true;
@@ -106,7 +109,7 @@ sourceSelector.prototype.unhide = function(width, height) {
 	return false;
 };
 
-sourceSelector.prototype.hide = function() {
+SourceSelector.prototype.hide = function() {
 	this.containerElement.className = "CTPsourceSelector CTPhidden";
 };
 
