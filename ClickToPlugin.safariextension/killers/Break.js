@@ -20,8 +20,7 @@ addKiller("Break", {
 			else return;
 		}
 	} else {
-		// only works with the newer [0-9] IDs...
-		var match = data.src.match(/embed\.break\.com\/([^?]+)/);
+		var match = /embed\.break\.com\/([^?]+)/.exec(data.src);
 		if(match) url = "http://view.break.com/" + match[1];
 		else return;
 	}
@@ -31,19 +30,19 @@ addKiller("Break", {
 	xhr.onload = function() {
 		var sources = [];
 		if(!videoHash) {
-			match = xhr.responseText.match(/sGlobalToken=['"]([^'"]*)['"]/);
+			match = /sGlobalToken=['"]([^'"]*)['"]/.exec(xhr.responseText);
 			if(!match) return;
 			videoHash = match[1];
 		}
-		var match = xhr.responseText.match(/sGlobalFileNameHDD=['"]([^'"]*)['"]/);
+		var match = /sGlobalFileNameHDD=['"]([^'"]*)['"]/.exec(xhr.responseText);
 		if(match) {
 			sources.push({"url": match[1].replace(/\.flv$/, "").replace(/\.mp4$/, "") + ".mp4?" + videoHash, "format": "720p MP4", "height": 720, "isNative": true});
 		}
-		match = xhr.responseText.match(/sGlobalFileNameHD=['"]([^'"]*)['"]/);
+		match = /sGlobalFileNameHD=['"]([^'"]*)['"]/.exec(xhr.responseText);
 		if(match) {
 			sources.push({"url": match[1].replace(/\.flv$/, "").replace(/\.mp4$/, "") + ".mp4?" + videoHash, "format": "480p MP4", "height": 480, "isNative": true});
 		}
-		match = xhr.responseText.match(/sGlobalFileName=['"]([^'"]*)['"]/);
+		match = /sGlobalFileName=['"]([^'"]*)['"]/.exec(xhr.responseText);
 		if(match) {
 			sources.push({"url": match[1].replace(/\.flv$/, "").replace(/\.mp4$/, "") + ".mp4?" + videoHash, "format": "360p MP4", "height": 360, "isNative": true});
 		}
@@ -54,14 +53,19 @@ addKiller("Break", {
 		
 		var title, siteInfo;
 		if(!posterURL) {
-			match = xhr.responseText.match(/sGlobalThumbnailURL=['"]([^'"]*)['"]/);
+			match = /sGlobalThumbnailURL=['"]([^'"]*)['"]/.exec(xhr.responseText);
 			if(match) posterURL = match[1];
 		}
-		match = xhr.responseText.match(/!!!&amp;body=(.*?)%0d/);
+		match = /!!!&amp;body=(.*?)%0d/.exec(xhr.responseText);
 		if(match) title = decodeURIComponent(match[1]);
 		if(!data.onsite || data.location === "http://www.break.com/") siteInfo = {"name": "Break", "url": url};
 		
-		callback({"playlist": [{"title": title, "poster": posterURL, "sources": sources, "siteInfo": siteInfo}]});
+		callback({"playlist": [{
+			"title": title,
+			"poster": posterURL,
+			"sources": sources,
+			"siteInfo": siteInfo
+		}]});
 	};
 	xhr.send(null);
 }

@@ -1,30 +1,9 @@
-if(location.href !== "about:blank") { // rdar://9238075
-
-
-function time(event) {
-	return new Date().getTime() + " " + (E === event);
-}
-/*************************
-ClickToPlugin global scope
-*************************/
-
+"use strict";
 var _ = []; // main array
-
-// THOUGHTS
-// var _ = []; // main array
-// properties: element, data, placeholder, currentElement, mediaPlayer
-// currentElement being either element, placeholder, or mediaPlayer.containerElement
-// the case "element" only happens when Webkit uses fallback content
-// loadPlugin=restorePlugin replaces currentElement (ph or mp) by element
-// prepMedia replaces currentElement (el or ph) by placeholder
-// PROS: elegant
-// CONS: cannot use for(var i in placeholders)...
 
 var settings;
 var documentID;
-//var numberOfBlockedElements = 0; // simply use elementID = _.push({}); I LIKE THAT
-var stack; // should stack exists iff docID does, like settings?
-// OR use placeInStack function
+var stack;
 /* The stack is a <div> appended as a child of <body> in which the blocked elements are stored unmodified.
 This allows scripts that need to set custom JS properties to those elements (or otherwise modify them) to work.
 The stack itself has display:none so that plugins are not instantiated. */
@@ -41,42 +20,49 @@ document.addEventListener("contextmenu", function(event) {
 	});
 }, false);
 
+// Show/Hide preferences
+var showSettings;
+var hideSettings;
 if(window === top) {
-	function showSettings() {
+	showSettings = function() {
 		if(document.body.nodeName === "FRAMESET") {
 			// for HTML4 frameset documents, need to open settings in a new tab
 			safari.self.tab.dispatchMessage("openSettings", "");
 			return;
 		}
-		iframe = document.createElement("iframe");
+		var iframe = document.createElement("iframe");
 		iframe.id = "CTPsettingsPane";
 		iframe.className = "CTPhidden";
 		iframe.src = safari.extension.baseURI + "settings.html";
-		iframe.addEventListener("load", function(event) {event.target.className = "";}, false);
+		var handleLoadEvent = function(event) {
+			event.target.removeEventListener("load", handleLoadEvent, false);
+			event.target.className = "";
+		};
+		iframe.addEventListener("load", handleLoadEvent, false);
 		document.body.appendChild(iframe);
 	}
-	function hideSettings() {
+	hideSettings = function() {
 		document.body.removeChild(document.getElementById("CTPsettingsPane"));
 		focus();
 	}
 }
 
 function respondToMessage(event) {
-	// ignore messages for other documents
+	// Ignore messages for other documents
 	if(event.message.documentID !== undefined && event.message.documentID !== documentID) return;
-	// ignore messages for elements that have been cleared
+	// Ignore messages for elements that have been cleared
 	if(event.message.elementID !== undefined && _[event.message.elementID] === undefined) return;
 	
 	switch(event.name) {
 	case "mediaData":
-		prepMedia(event.message);
+		handleMediaData(event.message.elementID, event.message.data);
 		break;
 	case "load":
 		loadPlugin(event.message.elementID);
 		break;
 	case "plugin":
 		_[event.message.elementID].plugin = event.message.plugin;
-		displayBadge(event.message.elementID, event.message.plugin);
+		if(!_[event.message.elementID].player) displayBadge(event.message.elementID, event.message.plugin);
 		break;
 	case "hide":
 		hidePlugin(event.message.elementID);
@@ -85,16 +71,13 @@ function respondToMessage(event) {
 		restorePlugin(event.message.elementID);
 		break;
 	case "download":
-		downloadMedia(event.message.elementID, event.message.source, false);
-		break;
-	case "downloadDM":
-		downloadMedia(event.message.elementID, event.message.source, true);
+		_[event.message.elementID].player.download(event.message.source);
 		break;
 	case "viewInQTP":
-		viewInQuickTimePlayer(event.message.elementID, event.message.source);
+		_[event.message.elementID].player.viewInQTP(event.message.source);
 		break;
 	case "showInfo":
-		getPluginInfo(event.message.elementID);
+		showInfo(event.message.elementID);
 		break;
 	case "loadAll":
 		loadAll();
@@ -126,94 +109,40 @@ function respondToMessage(event) {
 	}
 }
 
-/*  IMPORTANT NOTE
-There are several sources of duplicate beforeload events:
-
-1. One type of duplicate event only concerns image types and kinda makes sense (see globalfunctions.js).
-In this case the 2nd beforeload is fired some time after the first has been handled.
-
-SOLUTION
-None. We have to leave the allowedToLoad property on indefinitely.
-
-2. The second, more common cause of duplicate beforeload is the following.
-The first handler starts, until it comes to .offsetWidth or, in case parentNode is an <object>,
-.parentNode.anything. This (under certain tbd conditions)
-calls updateWidget(), which causes the handler to pause and a new beforeload event
-to be fired AND handled, before the current handler can be resumed resumed.
-
-SOLUTION
-This is easy: we can set a property on event.target before evaluating these statements and remove it after.
-
-3. If 2 doesn't happen, all objects/embeds fire a second consecutive events if plugins are disabled.
-
-SOLUTION
-Again, impossible to detect.
+/* NOTE on duplicate beforeload events
+There are 3 different types (all bugs, see #44575)
+#1 within 1st handler: when accessing styles or ancestor <object> in handler
+#2 after 1st handler: only observed with plugins disabled and !#1
+#3 after 1st handler if allowed: caused by misdeclared image types (should not happen in real life)
 */
 
-var i = 0;
-var E;
-
-function handleBeforeLoadEvent2(event) {
-	if(i === undefined) i = 0;
-	if(!(event.target instanceof HTMLObjectElement || event.target instanceof HTMLEmbedElement)) return;
-	i++;
-	console.log(i + " before parentNode");
-	//event.target.parentNode.parentNode;
-	console.log(i + " after parentNode");
-}
-
 function handleBeforeLoadEvent(event) {
-	if(!(event.target instanceof HTMLObjectElement || event.target instanceof HTMLEmbedElement)) return;
+	if(event.target instanceof HTMLObjectElement) {
+		// cf. HTMLObjectElement::hasValidClassId
+		if(event.target.getAttribute("classid") && !/^java:/.test(event.target.getAttribute("classid"))) return;
+	} else if(!(event.target instanceof HTMLEmbedElement)) return;
 	
-	if(event.target.ignoreBeforeLoad) return; // duplicate event of type #2
+	if(event.target.ignoreBeforeLoad) return; // duplicate #1
 	
-	if(event.target.isInStack) { // duplicate event of type #3 (or external script messing with the extension...)
-		// We don't check parentNode.className because that can dispatch a new beforeload...
+	if(event.target.isInStack) { // duplicate #2 or external script modifying the stack
 		event.preventDefault();
 		return;
 	}
 	
-	i++;
-	console.log(event);
-	console.log( i + ": beforeload with length " + _.length +  "" + time(event))
-	//event.target.parentNode.parentNode;
-	console.log(i)
-	//if(E === undefined) E = event;
+	// NOTE: allowedToLoad property should be deleted, but we can't because of duplicates #2 and #3
+	// This is an unfixable vulnerability
+	if(event.target.allowedToLoad) return;
 	
-	if(event.target.allowedToLoad) {
-		// delete event.target.allowedToLoad; // can't because of consecutive duplicate
-		console.log("allowedToLoad");
-		return;
-	}
-	
-	console.log(i+"before data at " + time(event));
 	// Gather element data
 	var data = {};
 	var anchor = document.createElement("a"); // URL resolver
 	
-	// cf. HTMLObjectElement::hasValidClassId
-	data.isObject = event.target instanceof HTMLObjectElement;
-	if(data.isObject && event.target.getAttribute("classid") && event.target.getAttribute("classid").slice(0,5) !== "java:") return;
-	
-	// Source and type
+	// Plugin data
 	if(event.url) anchor.href = event.url;
 	data.src = anchor.href;
 	data.type = event.target.type;
-	
-	// Dimensions of element
-	/* FIXME?: Is it possible to get eventual height/width within display:none iframes?
-	Thoughts: We'd need the CSS 2.1 'computed value' of height and width.
-	This would be possible using getMatchedCSSRules (returns matching rules in cascading order)
-	if 1) it actually worked and 2) didn't have cross-origin restriction.
-	Even then, values like 'auto' would be a problem...
-	The only other solution I can think of involves mutation events and lots of messages...
-	The problem disappears if placeholders are not used, but that's not currently possible. */
-	event.target.ignoreBeforeLoad = true;
-	data.width = event.target.offsetWidth; // causes beforeload dispatch in some cases (bug #44575)
-	delete event.target.ignoreBeforeLoad;
-	data.height = event.target.offsetHeight;
-	
 	data.location = location.href;
+	data.isObject = event.target instanceof HTMLObjectElement;
 	data.params = getParams(event.target); // parameters passed to the plugin
 	
 	// WebKit still uses the type param as last resort (!HTML5)
@@ -222,6 +151,12 @@ function handleBeforeLoadEvent(event) {
 	// Silverlight and QuickTime sources
 	if(data.params.source) {anchor.href = data.params.source; data.source = anchor.href;}
 	if(data.params.qtsrc !== undefined) {anchor.href = data.params.qtsrc; data.qtsrc = anchor.href;}
+	
+	// Dimensions of element
+	event.target.ignoreBeforeLoad = true;
+	data.width = event.target.offsetWidth; // can cause beforeload dispatch (bug #44575)
+	delete event.target.ignoreBeforeLoad;
+	data.height = event.target.offsetHeight;
 	
 	// Additional data for killers
 	data.title = document.title;
@@ -262,40 +197,24 @@ function handleBeforeLoadEvent(event) {
 	if(settings.debug) {
 		var e = event.target, positionX = 0, positionY = 0;
 		do {positionX += e.offsetLeft; positionY += e.offsetTop;} while(e = e.offsetParent);
-		if(!confirm("ClickToPlugin is about to block an element:\n\nType: " + (response.plugin ? response.plugin : "to be determined") + "\nLocation: " + location.href + "\nSource: " + response.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + data.width + "x" + data.height)) return;
+		if(!confirm("ClickToPlugin is about to block an element:\n\nType: " + (response.plugin ? response.plugin : "?") + "\nLocation: " + location.href + "\nSource: " + response.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + data.width + "×" + data.height)) return;
 	}
 	
 	// Block resource
 	event.preventDefault();
-	event.stopImmediatePropagation(); // for compatibility with other extensions
+	event.stopImmediatePropagation(); // make beforeload invisible to other extensions
 	
 	// Don't create placeholders for the temporary Flash objects created by swfObject
 	if(event.target.outerHTML === "<object type=\"application/x-shockwave-flash\"></object>") return;
 	
 	// Media fallbacks
-	if(data.isObject && settings.useFallbackMedia) {
+	if(data.isObject && settings.useFallbackMedia && response.plugin) {
 		var mediaElement = mediaFallback(event.target);
-		if(mediaElement && event.target.parentNode) {
+		if(mediaElement) {
 			event.target.parentNode.replaceChild(mediaElement, event.target);
 			return;
 		}
 	}
-	
-	/* NOTES on placeholders
-	1. Why don't we use the blocked element itself as placeholder? This would actually
-	work very elegantly: set display to -webkit(-inline)-box with box-pack/align:center,
-	store the label in a dataset attribute, and use content CSS property to set the label
-	(currently only possible in a ::before). This actually works fine on divs.
-	Problems are, the ::before pseudoelts are not rendered on objects and embeds, and,
-	the deal-breaker, the context menu is not shown on these elements. When the latter is fixed
-	and WebKit fully adopts the CSS3 content property, this will be possible.
-	2. Why don't we leave the element where it is and put the placeholder after it? This causes
-	problems with some initialization scripts that mess with the element's neighborhood. For
-	example, in some cases the placeholder element ends up being removed from the document.
-	Placing the element in the stack is much safer.
-	(A problem of a different kind that could be worked around is that YouTube replacements
-	with no Flash only work because the element is removed from the document right away.)
-	*/
 	
 	// Create the placeholder element
 	var placeholder = document.createElement("div");
@@ -306,22 +225,14 @@ function handleBeforeLoadEvent(event) {
 	if(response.isInvisible) placeholder.classList.add("CTPinvisible");
 	
 	// Copy CSS box & positioning properties that have an effect on page layout
-	// Note: 'display' is set to 'inline-block', which is always correct for "replaced elements"
+	// NOTE: 'display' is set to 'inline-block' which is always correct for "replaced elements"
+	// WATCH: properties that may be supported soon: CSS3 baseline properties
 	var style = getComputedStyle(event.target, null);
-	var properties = ["top", "right", "bottom", "left", "z-index", "clear", "float", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-before-collapse", "-webkit-margin-after-collapse"];
+	var properties = ["top", "right", "bottom", "left", "z-index", "clear", "float", "vertical-align", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-before-collapse", "-webkit-margin-after-collapse"];
 	// position: static -> relative (for source selector positioning)
 	if(style.getPropertyValue("position") === "static") placeholder.style.setProperty("position", "relative", "important");
 	else properties.push("position");
-	// vertical-align: baseline -> bottom (= the original baseline: the actual baseline of the placeholder is set by the label; which btw is incorrect since placeholder has overflow:hidden)
-	if(style.getPropertyValue("vertical-align") === "baseline") placeholder.style.setProperty("vertical-align", "bottom", "important");
-	else properties.push("vertical-align");
-	
 	applyCSS(placeholder, style, properties);
-	
-	if(event.target.parentNode === null) { // Should never happen, if I understand Javascript no-multithreading correctly
-		console.log("No parentNode!");
-		//return;
-	}
 	
 	// Replace and stack
 	event.target.parentNode.replaceChild(placeholder, event.target);
@@ -331,67 +242,39 @@ function handleBeforeLoadEvent(event) {
 		if(stack === undefined || stack.parentNode !== document.body) {
 			stack = document.createElement("div");
 			stack.id = "CTPstack";
-			stack.className = "CTPnodisplay";
-			stack.style.display = "none !important";
-			stack.innerHTML = "<div class=\"CTPnodisplay\"><div class=\"CTPnodisplay\"></div></div>";
+			stack.style.display = "none !important"; // in case the extension is disabled
+			stack.innerHTML = "<div><div></div></div>";
 			document.body.appendChild(stack);
 		}
 		try {
 			stack.firstChild.firstChild.appendChild(event.target);
 		} catch(e) {
-			stack.innerHTML = "<div class=\"CTPnodisplay\"><div class=\"CTPnodisplay\"></div></div>";
+			stack.innerHTML = "<div><div></div></div>";
 			stack.firstChild.firstChild.appendChild(event.target);
 		}
-		console.log(i+"Placed in stack: " + event.target.parentNode.className + " " + time(event));
 	}
 	
 	// Fill the main array
 	var elementID = data.elementID;
-	console.log(i+"Filling arrays with ID:" + elementID + " and length: " + _.length + " at " + time(event));
 	_[elementID] = {
 		"element": response.isNative ? event.target.cloneNode(true) : event.target,
 		"placeholder": placeholder,
 		"width": data.width,
 		"height": data.height,
-		"src": response.src
+		"src": response.src,
+		"plugin": response.isNative ? "?" : response.plugin
 	};
 	
-	// Event listeners
+	// Event listeners (not in this scope to prevent unwanted closure)
 	registerLocalShortcuts(elementID);
-	placeholder.addEventListener("click", function(event) {
-		clickPlaceholder(elementID);
-		event.preventDefault();
-		event.stopPropagation();
-	}, false);
-	placeholder.addEventListener("contextmenu", function(event) {
-		var contextInfo = {
-			"documentID": documentID,
-			"elementID": elementID,
-			"src": _[elementID].src,
-			"plugin": _[elementID].plugin
-		};
-		if(hasMedia(elementID)) {
-			_[elementID].player.setContextInfo(event, contextInfo);
-			event.stopPropagation();
-		} else {
-			safari.self.tab.setContextMenuEventUserInfo(event, contextInfo);
-			event.stopPropagation();
-		}
-	}, false);
+	addListeners(elementID);
 	
 	// Fill the placeholder
 	placeholder.innerHTML = "<div class=\"CTPplaceholderContainer\"><div class=\"CTPlogoContainer CTPnodisplay\"><div class=\"CTPlogo\"></div><div class=\"CTPlogo CTPinset\"></div></div></div>";
 	placeholder.firstChild.style.opacity = settings.opacity + " !important";
 	
 	// Display the badge
-	if(response.plugin) {
-		_[elementID].plugin = response.plugin;
-		displayBadge(elementID, response.plugin);
-	} else if(response.isNative) {
-		displayBadge(elementID, "?");
-	} //else { // No plugin but waiting to be killed
-		//displayBadge(elementID, "…");
-	//}
+	if(_[elementID].plugin) displayBadge(elementID, _[elementID].plugin);
 }
 
 function loadPlugin(elementID) {
@@ -406,7 +289,6 @@ function loadPlugin(elementID) {
 function hidePlugin(elementID) {
 	if(_[elementID].placeholder.parentNode) {
 		removeHTMLNode(_[elementID].placeholder);
-		delete _[elementID].element.isInStack;
 		delete _[elementID];
 	}
 }
@@ -414,7 +296,7 @@ function hidePlugin(elementID) {
 function restorePlugin(elementID) {
 	delete _[elementID].element.isInStack;
 	_[elementID].element.allowedToLoad = true;
-	_[elementID].player.containerElement.parentNode.replaceChild(_[elementID].element, _[elementID].player.containerElement);
+	_[elementID].player.container.parentNode.replaceChild(_[elementID].element, _[elementID].player.container);
 	delete _[elementID];
 }
 
@@ -444,124 +326,71 @@ function loadInvisible() {
 	}
 }
 
-function hasMedia(elementID) {
-	return _[elementID].player && _[elementID].player.startTrack !== undefined && _[elementID].player.currentSource !== undefined;
-}
-
-function prepMedia(mediaData) {
-	var elementID = mediaData.elementID;
-	if(_[elementID].player === undefined) _[elementID].player = new MediaPlayer();
-	
-	_[elementID].player.handleMediaData(mediaData);
-	if(mediaData.loadAfter) return;
-
-	// Check if we should load video at once
-	if(mediaData.autoload) {
-		loadMedia(elementID, mediaData.autoplay);
-		return;
-	}
-	
-	if(mediaData.playlist[0].poster) {
-		// show poster as background image
-		_[elementID].placeholder.firstChild.style.opacity = "1 !important";
-		_[elementID].placeholder.firstChild.style.backgroundImage = "url('" + mediaData.playlist[0].poster + "') !important";
-		_[elementID].placeholder.classList.remove("CTPnoimage"); // remove 'noimage' class
-	}
-	if(mediaData.playlist[0].title) _[elementID].placeholder.title = mediaData.playlist[0].title; // set tooltip
-	else _[elementID].placeholder.removeAttribute("title");
-	
-	if(settings.showSourceSelector) {
-		var hasSourceSelector = initializeSourceSelector(elementID, mediaData.playlist[0]);
-	}
-	
-	if(mediaData.badgeLabel) displayBadge(elementID, mediaData.badgeLabel);
-	else if(hasSourceSelector) displayBadge(elementID, _[elementID].plugin + "*");
-}
-
-function initializeSourceSelector(elementID, media) {
-	if(media.sources.length === 0) return false;
-	
-	var selector = new SourceSelector(_[elementID].plugin,
-		function(event) {loadPlugin(elementID);},
-		media.defaultSource === undefined ? undefined : function(event) {viewInQuickTimePlayer(elementID, media.defaultSource);},
-		function(event, source) {
-			_[elementID].player.currentSource = source;
-			loadMedia(elementID);
-		},
-		function(event, source) {
-			var contextInfo = {
-				"documentID": documentID,
-				"elementID": elementID,
-				"src": _[elementID].src,
-				"plugin": _[elementID].plugin
-			};
-			_[elementID].player.setContextInfo(event, contextInfo, source);
-		}
-	);
-	
-	selector.init(media.sources);
-	selector.setCurrentSource(settings.defaultPlayer === "html5" ? media.defaultSource : settings.defaultPlayer);
-	
-	_[elementID].placeholder.appendChild(selector.containerElement);
-	return selector.unhide(_[elementID].width, _[elementID].height);
-}
-
-function loadMedia(elementID, autoplay) {
-	var source = _[elementID].player.currentSource;
-	
-	var contextInfo = {
+function handleMediaData(elementID, mediaData) {
+	if(_[elementID].player === undefined) _[elementID].player = new MediaPlayer(_[elementID].width, _[elementID].height, {
 		"documentID": documentID,
 		"elementID": elementID,
+		"src": _[elementID].src,
 		"plugin": _[elementID].plugin
-	};
+	});
 	
+	// Pass media data to the player
+	_[elementID].player.handleMediaData(mediaData);
+	if(mediaData.loadAfter) return;
+	
+	if(mediaData.autoload) loadMedia(elementID, mediaData.autoplay);
+	else initMedia(elementID, mediaData.playlist[0]);
+}
+
+function initMedia(elementID, media) {
+	// Set poster & tooltip
+	if(media.poster) {
+		_[elementID].placeholder.firstChild.style.opacity = "1 !important";
+		_[elementID].placeholder.firstChild.style.backgroundImage = "url('" + media.poster + "') !important";
+		_[elementID].placeholder.classList.remove("CTPnoimage");
+	}
+	if(media.title) _[elementID].placeholder.title = media.title;
+	else _[elementID].placeholder.removeAttribute("title");
+	
+	if(media.sources.length === 0) return;
+	
+	if(settings.showSourceSelector) {
+		_[elementID].player.sourceSelector.update();
+		_[elementID].player.sourceSelector.attachTo(_[elementID].placeholder);
+	}
+	
+	// Update badge
+	var label;
+	if(media.defaultSource !== undefined) {
+		if(settings.defaultPlayer === "html5") label = "HTML5";
+		else if(settings.defaultPlayer === "qtp") label = "QTP";
+	}
+	if(label) displayBadge(elementID, label);
+	else displayBadge(elementID, (_[elementID].plugin ? _[elementID].plugin : "∅") + "*");
+}
+
+function loadMedia(elementID, focus) {
 	// Initialize player
-	_[elementID].player.init(_[elementID].width, _[elementID].height, getComputedStyle(_[elementID].placeholder, null), contextInfo);
+	_[elementID].player.init(getComputedStyle(_[elementID].placeholder, null));
 	
-	// Insert media player and load first track
-	_[elementID].placeholder.parentNode.replaceChild(_[elementID].player.containerElement, _[elementID].placeholder);
-	_[elementID].player.initializeShadowDOM(); // this can only be done after insertion
-	_[elementID].player.loadTrack(0, !autoplay);
-	if(autoplay === undefined || autoplay) _[elementID].player.containerElement.focus();
-	// delete _[elementID].placeholder; // Is this really worth it? not doing that would simplify checks elsewhere.
+	// Load player
+	_[elementID].placeholder.parentNode.replaceChild(_[elementID].player.container, _[elementID].placeholder);
+	_[elementID].player.initShadowDOM(); // this can only be done after insertion
+	_[elementID].player.loadFirstTrack();
+	
+	if(focus) _[elementID].player.container.focus();
+	_[elementID].placeholder = {};
 }
 
-function downloadMedia(elementID, source, useDownloadManager) {
-	var track = _[elementID].player.currentTrack;
-	if(track === undefined) track = 0;
-	if(source === undefined) {
-		source = _[elementID].player.currentSource;
-		if(source === undefined) return;
-	}
-	var download = downloadURL;
-	if(useDownloadManager) download = sendToDownloadManager;
-	download(_[elementID].player.playlist[track].sources[source].url);
-}
-
-function viewInQuickTimePlayer(elementID, source) {
-	var track = _[elementID].player.currentTrack;
-	if(track === undefined) track = 0;
-	else _[elementID].player.mediaElement.pause();
-	if(source === undefined) {
-		source = _[elementID].player.currentSource;
-		if(source === undefined) return;
-	}
-	openInQuickTimePlayer(_[elementID].player.playlist[track].sources[source].url);
-}
-
-function getPluginInfo(elementID) {
-	alert("Plug-in: " + (_[elementID].plugin ? _[elementID].plugin : "?") + " (" + _[elementID].width + "x" + _[elementID].height + ")\nLocation: " + location.href + "\nSource: " + _[elementID].src + "\n\nEmbed code:\n" + new XMLSerializer().serializeToString(_[elementID].element));
-}
-
-function displayBadge(elementID, badgeLabel) {
+function displayBadge(elementID, label) {
 	var logoContainer = _[elementID].placeholder.firstChild.firstChild;
 	
 	// Hide the badge
 	logoContainer.className = "CTPlogoContainer CTPhidden";
 	logoContainer.lastChild.className = "CTPlogo CTPtmp";
 	// Set the new label
-	logoContainer.firstChild.textContent = badgeLabel;
-	logoContainer.lastChild.textContent = badgeLabel;
+	logoContainer.firstChild.textContent = label;
+	logoContainer.lastChild.textContent = label;
 	
 	// Unhide
 	if(logoContainer.firstChild.offsetWidth <= _[elementID].width - 4 && logoContainer.firstChild.offsetHeight <= _[elementID].height - 4) logoContainer.className = "CTPlogoContainer";
@@ -571,19 +400,23 @@ function displayBadge(elementID, badgeLabel) {
 }
 
 function clickPlaceholder(elementID) {
-	if(hasMedia(elementID)) {
+	if(_[elementID].player && _[elementID].player.currentSource !== undefined) {
 		switch(settings.defaultPlayer) {
 		case "html5": 
-			loadMedia(elementID);
+			loadMedia(elementID, true);
 			break;
 		case "qtp":
-			viewInQuickTimePlayer(elementID);
+			_[elementID].player.viewInQTP();
 			break;
 		case "plugin":
 			loadPlugin(elementID);
 			break;
 		}
 	} else loadPlugin(elementID);
+}
+
+function showInfo(elementID) {
+	alert("Plug-in: " + (_[elementID].plugin ? _[elementID].plugin : "∅") + " (" + _[elementID].width + "×" + _[elementID].height + ")\nLocation: " + location.href + "\nSource: " + _[elementID].src + "\n\nHTML:\n" + new XMLSerializer().serializeToString(_[elementID].element));
 }
 
 function registerGlobalShortcuts() {
@@ -610,4 +443,23 @@ function registerLocalShortcuts(elementID) {
 	}
 }
 
+function addListeners(elementID) {
+	_[elementID].placeholder.addEventListener("click", function(event) {
+		clickPlaceholder(elementID);
+		event.preventDefault();
+		event.stopPropagation();
+	}, false);
+	_[elementID].placeholder.addEventListener("contextmenu", function(event) {
+		if(_[elementID].player) {
+			_[elementID].player.setContextInfo(event);
+		} else {
+			safari.self.tab.setContextMenuEventUserInfo(event, {
+				"documentID": documentID,
+				"elementID": elementID,
+				"src": _[elementID].src,
+				"plugin": _[elementID].plugin
+			});
+		}
+		event.stopPropagation();
+	}, false);
 }

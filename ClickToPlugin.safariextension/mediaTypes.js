@@ -1,33 +1,32 @@
-const HTML5 = document.createElement("video");
-
-HTML5.typeInfo = function(type) {
+"use strict";
+function typeInfo(type) {
 	type = stripParams(type).toLowerCase();
-	if(!/^audio|^video/.test(type)) return null;
-	if(this.nativeMIMETypes[type]) return {"isNative": true, "isAudio": /^audio/.test(type), "format": this.nativeMIMETypes[type].format};
-	if(this.addedMIMETypes[type]) return {"isNative": false, "isAudio": /^audio/.test(type), "format": this.addedMIMETypes[type].format};
+	if(nativeMediaTypes[type]) return {"isNative": true, "isAudio": /^audio/.test(type), "format": nativeMediaTypes[type].format};
+	if(addedMediaTypes[type]) return {"isNative": false, "isAudio": /^audio/.test(type), "format": addedMediaTypes[type].format};
 	return null;
-};
+}
 
-HTML5.urlInfo = function(url) {
-	url = extractExt(url).toLowerCase();
+function urlInfo(url) {
+	url = extractExt(url);
 	if(url === "") return null;
-	for(var type in this.nativeMIMETypes) {
-		if(this.nativeMIMETypes[type].exts.indexOf(url) !== -1) return {"isNative": true, "isAudio": /^audio/.test(type), "format": this.nativeMIMETypes[type].format};
+	for(var type in nativeMediaTypes) {
+		if(nativeMediaTypes[type].exts.indexOf(url) !== -1) return {"isNative": true, "isAudio": /^audio/.test(type), "format": nativeMediaTypes[type].format};
 	}
-	for(var type in this.addedMIMETypes) {
-		if(this.addedMIMETypes[type].exts.indexOf(url) !== -1) return {"isNative": false, "isAudio": /^audio/.test(type), "format": this.addedMIMETypes[type].format};
+	for(var type in addedMediaTypes) {
+		if(addedMediaTypes[type].exts.indexOf(url) !== -1) return {"isNative": false, "isAudio": /^audio/.test(type), "format": addedMediaTypes[type].format};
 	}
 	return null;
-};
+}
 
 // Shortcuts for common types
-HTML5.canPlayOgg = HTML5.canPlayType("video/ogg");
-HTML5.canPlayWebM = HTML5.canPlayType("video/webm");
-HTML5.canPlayFLV = HTML5.canPlayType("video/x-flv");
-HTML5.canPlayWM = HTML5.canPlayType("video/x-ms-wmv");
-// HTML.canPlayFLAC cannot be checked
+var video = document.createElement("video");
+var canPlayOgg = video.canPlayType("video/ogg");
+var canPlayWebM = video.canPlayType("video/webm");
+var canPlayFLV = video.canPlayType("video/x-flv");
+var canPlayWM = video.canPlayType("video/x-ms-wmv");
+// canPlayFLAC cannot be checked
 
-HTML5.nativeMIMETypes = {
+var nativeMediaTypes = {
 	"video/3gpp": {"exts": ["3gp", "3gpp"], "format": "3GPP"},
 	"video/3gpp2": {"exts": ["3g2", "3gp2"], "format": "3GPP2"},
 	"video/avi": {"exts": ["avi", "vfw"], "format": "AVI"},
@@ -39,8 +38,6 @@ HTML5.nativeMIMETypes = {
 	"video/x-m4v": {"exts": ["m4v"], "format": "M4V"},
 	"video/x-mpeg": {"exts": [], "format": "MPEG"},
 	"video/x-msvideo": {"exts": [], "format": "AVI"},
-	"application/mp4": {"exts": [], "format": "MP4"},
-	"application/vnd.apple.mpegurl": {"exts": ["m3u8"], "format": "M3U8"},
 	"audio/3gpp": {"exts": [], "format": "3GPP"},
 	"audio/3gpp2": {"exts": [], "format": "3GPP2"},
 	"audio/amr": {"exts": ["amr"], "format": "AMR"},
@@ -56,7 +53,7 @@ HTML5.nativeMIMETypes = {
 	"audio/mpg": {"exts": [], "format": "MPEG"},
 	"audio/scpls": {"exts": ["pls"], "format": "PLS"},
 	"audio/wav": {"exts": ["wav", "bwf"], "format": "WAV"},
-	"audio/wave": {"exts": [??], "format": "WAV"},
+	"audio/wave": {"exts": [], "format": "WAV"},
 	"audio/x-aac": {"exts": [], "format": "AAC"},
 	"audio/x-ac3": {"exts": [], "format": "AC3"},
 	"audio/x-aiff": {"exts": [], "format": "AIFF"},
@@ -70,18 +67,20 @@ HTML5.nativeMIMETypes = {
 	"audio/x-mpeg": {"exts": [], "format": "MPEG"},
 	"audio/x-mpeg3": {"exts": [], "format": "MP3"},
 	"audio/x-mpegurl": {"exts": [], "format": "M3U"},
-	"audio/x-mpg": {"exts": [??], "format": "MPEG"},
+	"audio/x-mpg": {"exts": [], "format": "MPEG"},
 	"audio/x-scpls": {"exts": [], "format": "PLS"},
-	"audio/x-wav": {"exts": [], "format": "WAV"}
+	"audio/x-wav": {"exts": [], "format": "WAV"},
+	"application/mp4": {"exts": [], "format": "MP4"},
+	"application/vnd.apple.mpegurl": {"exts": ["m3u8"], "format": "M3U8"}
 };
 
-HTML5.addedMIMETypes = {};
-HTML5.addMIMETypes = function(types) {
-	for(var type in types) this.addedMIMETypes[type] = types[type];
-};
+var addedMediaTypes = {};
+function addMediaTypes(types) {
+	for(var type in types) addedMediaTypes[type] = types[type];
+}
 
 // Perian
-if(HTML5.canPlayFLV) HTML5.addMIMETypes({
+if(canPlayFLV) addMediaTypes({
 	"video/avi": {"exts": ["gvi", "vp6"], "format": "AVI"},
 	"video/divx": {"exts": ["divx"], "format": "DivX"},
 	"video/msvideo": {"exts": [], "format": "AVI"},
@@ -94,7 +93,7 @@ if(HTML5.canPlayFLV) HTML5.addMIMETypes({
 	"audio/x-tta": {"exts": ["tta"], "format": "TTA"}
 });
 // Xiph
-if(HTML5.canPlayOgg) HTML5.addMIMETypes({
+if(canPlayOgg) addMediaTypes({
 	"video/annodex": {"exts": ["axv"], "format": "AXV"},
 	"video/ogg": {"exts": ["ogv"], "format": "Ogg"},
 	"video/x-annodex": {"exts": [], "format": "AXV"},
@@ -107,7 +106,7 @@ if(HTML5.canPlayOgg) HTML5.addMIMETypes({
 	"audio/x-speex": {"exts": [], "format": "Ogg"}
 });
 // Flip4Mac
-if(HTML5.canPlayWM) HTML5.addMIMETypes({
+if(canPlayWM) addMediaTypes({
 	"video/x-ms-asf": {"exts": ["asf"], "format": "WMV"},
 	"video/x-ms-asx": {"exts": ["asx"], "format": "WMV"},
 	"video/x-ms-wm": {"exts": ["wm"], "format": "WMV"},

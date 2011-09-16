@@ -12,7 +12,7 @@ addKiller("Facebook", {
 		return;
 	}
 	// Embedded video
-	var match = data.src.match(/\.com\/v\/([^&?]+)/);
+	var match = /\.com\/v\/([^&?]+)/.exec(data.src);
 	if(match) this.processVideoID(match[1], callback);
 },
 
@@ -28,7 +28,7 @@ addKiller("Facebook", {
 	
 	var posterURL, title;
 	if(flashvars.thumb_url) posterURL = decodeURIComponent(flashvars.thumb_url);
-	if(flashvars.video_title) title = decodeURIComponent(flashvars.video_title).replace(/\+/g, " ");
+	if(flashvars.video_title) title = decodeURIComponent(flashvars.video_title.replace(/\+/g, " "));
 	
 	callback({"playlist": [{"title": title, "poster": posterURL, "sources": sources}]});
 },

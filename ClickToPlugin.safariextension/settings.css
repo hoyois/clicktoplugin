@@ -168,7 +168,7 @@ textarea {
 	 margin: 0;
 	 vertical-align: top;
 	 min-width: 300px;
-	 /* white-space: nowrap; */ /* This makes pasted line breaks invisible in .value! Only wrap="off" works. */
+	 /* white-space: pre; */ /* Doesn't work correctly. Only nonstandard wrap="off" works. */
 }
 
 input[type="text"] {

@@ -15,7 +15,7 @@ addKiller("YouTube", {
 		else if(flashvars.t && flashvars.url_encoded_fmt_stream_map) this.processFlashVars(flashvars, callback);
 		else if(flashvars.video_id) this.processVideoID(flashvars.video_id, callback);
 	} else { // Embedded YT video
-		var match = data.src.match(/\.com\/([vpe])\/([^&?]+)/);
+		var match = /\.com\/([vpe])\/([^&?]+)/.exec(data.src);
 		if(match) {
 			if(match[1] === "p") this.processPlaylistID("PL" + match[2], {}, callback);
 			else this.processVideoID(match[2], callback);
@@ -46,17 +46,17 @@ addKiller("YouTube", {
 			sources.push({"url": videoURL, "format": "720p MP4", "height": 720, "isNative": true});
 		} else if(x.itag === "18") {
 			sources.push({"url": videoURL, "format": "360p MP4", "height": 360, "isNative": true});
-		} else if(HTML5.canPlayFLV && x.itag === "35") {
+		} else if(canPlayFLV && x.itag === "35") {
 			sources.push({"url": videoURL, "format": "480p FLV", "height": 480, "isNative": false});
-		} else if(HTML5.canPlayFLV && x.itag === "34") {
+		} else if(canPlayFLV && x.itag === "34") {
 			sources.push({"url": videoURL, "format": "360p FLV", "height": 360, "isNative": false});
-		} else if(HTML5.canPlayFLV && x.itag === "5") {
+		} else if(canPlayFLV && x.itag === "5") {
 			sources.push({"url": videoURL, "format": "240p FLV", "height": 240, "isNative": false});
-		} /*else if(HTML5.canPlayWebM && x.itag === "45") {
+		} /*else if(canPlayWebM && x.itag === "45") {
 			sources.push({"url": videoURL, "format": "720p WebM", "height": 720, "isNative": false});
-		} else if(HTML5.canPlayWebM && x.itag === "44") {
+		} else if(canPlayWebM && x.itag === "44") {
 			sources.push({"url": videoURL, "format": "480p WebM", "height": 480, "isNative": false});
-		} else if(HTML5.canPlayWebM && x.itag === "43") {
+		} else if(canPlayWebM && x.itag === "43") {
 			sources.push({"url": videoURL, "format": "360p WebM", "height": 360, "isNative": false});
 		}*/
 	}
@@ -116,7 +116,7 @@ addKiller("YouTube", {
 			for(var i = 0; i < entries.length; i++) {
 				try{ // being lazy
 					videoIDList.push(/\?v=([^&?']+)/.exec(entries[i].getElementsByTagNameNS("http://search.yahoo.com/mrss/", "player")[0].getAttribute("url"))[1]);
-				} catch(err) {}
+				} catch(e) {}
 			}
 			if(xhr.responseXML.querySelector("link[rel='next']") === null) processList();
 			else loadAPIList(playlistURL, startIndex + 50);
@@ -170,7 +170,6 @@ addKiller("YouTube", {
 		if(imax > 3) imax = 3; // load by groups of 3
 		var mediaData = {"loadAfter": true, "playlist": []};
 		var next = function(data) {
-			// this actually works!! feels like TeXing...
 			if(data.playlist.length > 0) {
 				data.playlist[0].siteInfo.url += "&list=" + playlistID;
 				mediaData.playlist.push(data.playlist[0]);

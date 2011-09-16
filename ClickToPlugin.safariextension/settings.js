@@ -1,3 +1,4 @@
+"use strict";
 var container = document.getElementById("container");
 var main = document.getElementById("main");
 var nav = document.getElementById("nav");
@@ -83,11 +84,11 @@ function handleKeyPressEvent(event) {
 }
 for(var i = 0; i < textareas.length; i++) {
 	textareas[i].addEventListener("keypress", handleKeyPressEvent, false);
-	textareas[i].addEventListener(textareas[i].id === "additionalScripts" ? "change" : "input", handleTextAreaInput, false);
+	textareas[i].addEventListener(textareas[i].id === "additionalScripts" ? "blur" : "input", handleTextAreaInput, false);
 }
 
 // Killer reset
-var defaultKillers = "killers/YouTube.js\nkillers/Vimeo.js\nkillers/Dailymotion.js\nkillers/Facebook.js\nkillers/Break.js\nkillers/Blip.js\nkillers/Metacafe.js\nkillers/TED.js\nkillers/Tumblr.js\nkillers/Flash.js\nkillers/Silverlight.js\nkillers/QuickTime.js\nkillers/WindowsMedia.js\nkillers/DivX.js";
+var defaultKillers = "killers/YouTube.js\nkillers/Vimeo.js\nkillers/Dailymotion.js\nkillers/Facebook.js\nkillers/Break.js\nkillers/Blip.js\nkillers/Metacafe.js\nkillers/TED.js\nkillers/Tumblr.js\nkillers/Flash.js\nkillers/Silverlight.js\nkillers/Generic.js";
 document.getElementById("reset_killers").addEventListener("click", function() {
 	var textarea = document.getElementById("additionalScripts");
 	textarea.value = defaultKillers;
@@ -95,7 +96,7 @@ document.getElementById("reset_killers").addEventListener("click", function() {
 	resizeTextArea(textarea);
 }, false);
 
-// Bind 'change' events
+// Bind change events
 function changeSetting(setting, value) {
 	safari.self.tab.dispatchMessage("changeSetting", {"setting": setting, "value": value});
 }
@@ -222,6 +223,7 @@ function showShortcut(shortcut) {
 document.getElementById("showSourceSelector").addEventListener("change", function(event) {
 	document.getElementById("showPluginSourceItem").disabled = event.target.value !== "on";
 	document.getElementById("showQTPSourceItem").disabled = event.target.value !== "on";
+	document.getElementById("showSiteSourceItem").disabled = event.target.value !== "on";
 }, false);
 document.getElementById("defaultPlayer").addEventListener("change", function(event) {
 	if(this.value === "html5") {
@@ -239,11 +241,11 @@ function localizeSettings() {
 	var strings = document.getElementsByClassName("string");
 	var options = document.getElementsByTagName("option");
 	while(strings.length > 0) {
-		strings[0].parentNode.replaceChild(document.createTextNode(this[strings[0].title]), strings[0]);
+		strings[0].parentNode.replaceChild(document.createTextNode(window[strings[0].title]), strings[0]);
 	}
 	for(var i = 0; i < options.length; i++) {
 		if(options[i].hasAttribute("title")) {
-			options[i].appendChild(document.createTextNode(this[options[i].title]));
+			options[i].appendChild(document.createTextNode(window[options[i].title]));
 			options[i].removeAttribute("title");
 		}
 	}
@@ -390,6 +392,7 @@ function loadSettings(event) {
 	if(!settings.showSourceSelector) {
 		document.getElementById("showPluginSourceItem").disabled = true;
 		document.getElementById("showQTPSourceItem").disabled = true;
+		document.getElementById("showSiteSourceItem").disabled = true;
 	}
 	if(settings.defaultPlayer !== "html5") document.getElementById("mediaAutoload").disabled = true;
 	if(!settings.settingsShortcut) document.getElementById("settingsContext").disabled = true;

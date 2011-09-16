@@ -1,49 +1,9 @@
-/***********************
-Plugin detection methods
-***********************/
-
-const nativePlugin = {};
-const superNativeTypes = ["image/jpeg", "image/gif", "image/bmp", "image/x-icon", "image/vnd.microsoft.icon", "image/pjpeg", "image/x-xbitmap"];
-const nativeTypes = superNativeTypes.concat(["image/png", "image/tiff", "image/jp2"]);
-const superNativeExts = ["jpeg", "jpg", "gif", "bmp", "ico", "xbm"];
-const nativeExts = superNativeExts.concat(["png", "tiff", "tif", "jp2"]);
-
-/* NOTE on native image types
-The algorithm for native types (same for exts if type is not specified) is the following.
-(This is obviously not an intended algorithm, but is what happens anyway)
-CASE EMBED
-if type is super-native
-	load directly
-else
-	proceed normally.
-CASE OBJECT
-if type is native
-	try
-		load directly
-	catch
-		if Content-Type is native
-			use fallback
-		else
-			choose plugin according to Content-Type
-else
-	proceed normally
-END
-The try statement imply that it's impossible to determine what plugin WebKit is going to use in general.
-However, it is possible to not let any plugin through with minimal error, by sniffing the Content-Type
-when an object elements has native type. I doubt there exists a single web page out there where this is not correct.
-That would require, e.g., a jpeg image being decalred as image/jpeg but served with a Flash MIME type. In this
-case WebKit will just load the jpeg file, while this extension will treat the object as Flash. But clicking
-the Flash placeholder will load the image correctly.
-
-The catch case also creates a pretty late duplicate beforeload event, which means we can't remove the
-'allowedToLoad' property when it's there. THAT MEANS SPECIFYING A NATIVE TYPE AND NATIVE CONTENT_TYPE
-FOR AN UNSOPPORTED RESOURCE CAN BE USED AS A TRAMPOLINE TO LOAD ANY PLUGIN, AND NOTHING CAN BE DONE ABOUT IT!!!
-
-Another bug is that fallback content is always used when restoring such objects, so we need
-to clone them before reinsertion.
-
-Finally, I don't understand where the difference between embed and object types comes from.
-*/
+"use strict";
+var nativePlugin = {};
+var superNativeTypes = ["image/jpeg", "image/gif", "image/bmp", "image/x-icon", "image/vnd.microsoft.icon", "image/pjpeg", "image/x-xbitmap"];
+var nativeTypes = superNativeTypes.concat(["image/png", "image/tiff", "image/jp2"]);
+var superNativeExts = ["jpeg", "jpg", "gif", "bmp", "ico", "xbm"];
+var nativeExts = superNativeExts.concat(["png", "tiff", "tif", "jp2"]);
 
 function isDataURI(url) {
 	return /^data:/.test(url);

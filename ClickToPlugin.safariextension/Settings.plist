@@ -97,6 +97,12 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
+		<string>showSiteSourceItem</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
 		<string>hideRewindButton</string>
 	</dict>
 	<dict>
@@ -123,7 +129,7 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>instantPlay</string>
+		<string>instantAutoplay</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
@@ -409,7 +415,7 @@
 			<string>keydown</string>
 		</dict>
 		<key>Key</key>
-		<string>showTitleShortcut</string>
+		<string>trackSelectorShortcut</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>

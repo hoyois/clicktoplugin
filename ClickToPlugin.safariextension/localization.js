@@ -1,12 +1,13 @@
+"use strict";
 // ClickToPlugin localization file
 // Save with encoding: UTF-8
 
-const PREFERENCES_STRINGS = {
+var PREFERENCES_STRINGS = {
 	"PREFERENCES_LAYOUT": {
 		"en-us": ["nav{padding-right:1px;}", "#general li > span:first-child{max-width:150px;}"],
 		"fr-fr": ["#media_player li > span:first-child{max-width:220px;}"],
-		"es-es": ["nav{padding-right:1px;}", "#media_player li > span.textarea_label > label{width:200px;}"],
-		"de-de": ["nav{padding-right:1px;}", "#general li > span:first-child{max-width:160px;}", "#media_player li > span.textarea_label > label{width:180px;}"],
+		"es-es": ["nav{padding-right:1px;}", "#media_player li > span.textarea_label > label{max-width:200px;}"],
+		"de-de": ["#general li > span:first-child{max-width:160px;}", "#media_player li > span.textarea_label > label{max-width:180px;}"],
 		"ja-jp": ["nav{padding-right:1px;}", "#general li > span:first-child{max-width:250px;}"],
 		"zh-tw": ["nav{padding-right:1px;}"],
 		"zh-cn": []
@@ -302,7 +303,7 @@ const PREFERENCES_STRINGS = {
 		"en-us": "Show plug-ins on these sites:",
 		"fr-fr": "Afficher les plugins sur ces sites :",
 		"es-es": "Mostrar los complementos en estos sitios:",
-		"de-de": "Plug-Ins auf folgenden Seiten zeigen:",
+		"de-de": "Plug-Ins auf folgenden Seiten anzeigen:",
 		"ja-jp": "これらのサイトならプラグインを表示する：",
 		"zh-tw": "顯示包含這些網址的外掛模組：",
 		"zh-cn": "显示这些地址的插件:"
@@ -311,7 +312,7 @@ const PREFERENCES_STRINGS = {
 		"en-us": "Show plug-ins from these sources:",
 		"fr-fr": "Afficher les plugins provenant de :",
 		"es-es": "Mostrar los complementos en los archivos:",
-		"de-de": "Plug-Ins von folgenden Quellen zeigen:",
+		"de-de": "Plug-Ins von folgenden Quellen anzeigen:",
 		"ja-jp": "これらのソースならプラグインを表示する：",
 		"zh-tw": "顯示這些來源的外掛模組：",
 		"zh-cn": "永远显示这些来源的插件:"
@@ -392,7 +393,7 @@ const PREFERENCES_STRINGS = {
 		"zh-cn": "初始動作:"
 	},
 	"INITIAL_NO_BUFFER": {
-		"en-us": "Do nothing",
+		"en-us": "Do not preload",
 		"fr-fr": "Aucune",
 		"es-es": "No precargar",
 		"de-de": "Nicht puffern",
@@ -402,7 +403,7 @@ const PREFERENCES_STRINGS = {
 	},
 	"INITIAL_BUFFER": {
 		"en-us": "Preload",
-		"fr-fr": "Téléchargement",
+		"fr-fr": "Préchargement",
 		"es-es": "Emprezar la precarga",
 		"de-de": "Puffern",
 		"ja-jp": "バッファリングを始めます",
@@ -499,23 +500,14 @@ const PREFERENCES_STRINGS = {
 		"zh-tw": "包括 QuickTime Player",
 		"zh-cn": "包含 QuickTime Player"
 	},
-	"SHOW_POSTER": { // UNUSED
-		"en-us": "Show preview image",
-		"fr-fr": "Afficher un aperçu de la vidéo",
-		"es-es": "Mostrar la imagen de previsualización",
-		"de-de": "Vorschau anzeigen",
-		"ja-jp": "プレビューを有効にする",
-		"zh-tw": "啟用預覽",
-		"zh-cn": "显示缩图"
-	},
-	"SHOW_MEDIA_TOOLTIP": { // UNUSED
-		"en-us": "Show video title as tooltip",
-		"fr-fr": "Afficher le titre de la vidéo en infobulle",
-		"es-es": "Mostrar el título del vídeo como mensaje de ayuda contextual",
-		"de-de": "Videotitel als Tooltip anzeigen",
-		"ja-jp": "ツールチップとしてビデオのタイトルを示す",
-		"zh-tw": "以快顯視窗顯示影片標題",
-		"zh-cn": "视频题目在工具提示控件显示"
+	"SHOW_SITE_SOURCE": {
+		"en-us": "Include the video’s web page",
+		"fr-fr": "Inclure la page web de la vidéo",
+		"es-es": "Incluir",
+		"de-de": "Einschließlich ???",
+		"ja-jp": "",
+		"zh-tw": "",
+		"zh-cn": ""
 	},
 	"HIDE_REWIND_BUTTON": {
 		"en-us": "Hide “Rewind” button",
@@ -622,15 +614,15 @@ const PREFERENCES_STRINGS = {
 		"en-us": "View on Site",
 		"fr-fr": "Voir la vidéo sur le site",
 		"es-es": "Ver en la página web",
-		"de-de": "Auf Seite ansehen",
+		"de-de": "Auf Seite wiedergeben",
 		"ja-jp": "サイトで開く",
 		"zh-tw": "於網站上檢視",
 		"zh-cn": "在网站上查看"
 	},
 	"VIEW_IN_QTP_CONTEXT": {
-		"en-us": "View in QuickTime Player",
-		"fr-fr": "Ouvrir avec QuickTime Player",
-		"es-es": "Ver con QuickTime Player",
+		"en-us": "Open in QuickTime Player",
+		"fr-fr": "Ouvrir dans QuickTime Player",
+		"es-es": "Abrir en QuickTime Player",
 		"de-de": "Im QuickTime-Player öffnen",
 		"ja-jp": "QuickTime プレーヤーで開く",
 		"zh-tw": "於 QuickTime Player 檢視",
@@ -766,7 +758,7 @@ const PREFERENCES_STRINGS = {
 	}
 };
 
-const GLOBAL_STRINGS = {
+var GLOBAL_STRINGS = {
 	// Context menu items
 	"PREFERENCES": {
 		"en-us": "ClickToPlugin Preferences…",
@@ -862,7 +854,7 @@ const GLOBAL_STRINGS = {
 		"en-us": "Show Plug-ins on Domain",
 		"fr-fr": "Afficher les plugins sur ce domaine",
 		"es-es": "Mostrar los complementos en del dominio",
-		"de-de": "Plug-Ins auf dieser Domäne zeigen",
+		"de-de": "Plug-Ins auf dieser Domäne anzeigen",
 		"ja-jp": "このドメインならプラグインを表示",
 		"zh-tw": "顯示包含這個域名的外掛模組",
 		"zh-cn": "显示包含这个域名的插件"
@@ -895,9 +887,9 @@ const GLOBAL_STRINGS = {
 		"zh-cn": "下载音频"
 	},
 	"VIEW_IN_QUICKTIME_PLAYER": {
-		"en-us": "View in QuickTime Player",
-		"fr-fr": "Ouvrir avec QuickTime Player",
-		"es-es": "Ver con QuickTime Player",
+		"en-us": "Open in QuickTime Player",
+		"fr-fr": "Ouvrir dans QuickTime Player",
+		"es-es": "Abrir en QuickTime Player",
 		"de-de": "Im QuickTime-Player öffnen",
 		"ja-jp": "QuickTime プレーヤーで開く",
 		"zh-tw": "於 QuickTime Player 檢視",
@@ -943,7 +935,7 @@ const GLOBAL_STRINGS = {
 		"en-us": function(site) {return "View on " + site;},
 		"fr-fr": function(site) {return "Voir la vidéo sur " + site;},
 		"es-es": function(site) {return "Ver en " + site;},
-		"de-de": function(site) {return "Auf " + site + " ansehen";},
+		"de-de": function(site) {return "Auf " + site + " wiedergeben";},
 		"ja-jp": function(site) {return site + " で開く";},
 		"zh-tw": function(site) {return "於 " + site + " 檢視";},
 		"zh-cn": function(site) {return "在 " + site + " 查看";}
@@ -961,7 +953,7 @@ const GLOBAL_STRINGS = {
 	}
 };
 
-const INJECTED_STRINGS = {
+var INJECTED_STRINGS = {
 	"LOADING": {
 		"en-us": "Loading...",
 		"fr-fr": "Chargement…",
@@ -970,6 +962,15 @@ const INJECTED_STRINGS = {
 		"ja-jp": "読み込み中...",
 		"zh-tw": "載入中⋯",
 		"zh-cn": "正在载入…"
+	},
+	"QT_PLAYER": {
+		"en-us": "QT Player",
+		"fr-fr": "QT Player",
+		"es-es": "QT Player",
+		"de-de": "QT-Player",
+		"ja-jp": "QT プレーヤー",
+		"zh-tw": "QT Player",
+		"zh-cn": "QT Player"
 	}
 };
 
@@ -993,7 +994,7 @@ function localizeAsScript(strings, language) {
 		else script += JSON.stringify(strings[string][lang]);
 		script += ";";
 	}
-	return safari.extension.addContentScript(script, [], [], false);
+	return script;
 }
 
 function fallback(lang) {

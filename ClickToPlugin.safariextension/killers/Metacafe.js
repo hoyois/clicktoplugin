@@ -8,7 +8,7 @@ addKiller("Metacafe", {
 	if(/(?:^|&)mediaData=/.test(data.params.flashvars)) {
 		this.processFlashVars(parseFlashVariables(data.params.flashvars), callback);
 	} else {
-		var match = data.src.match(/metacafe\.com\/fplayer\/([0-9]*)\//);
+		var match = /metacafe\.com\/fplayer\/([0-9]*)\//.exec(data.src);
 		if(match) this.processVideoID(match[1], callback);
 		return;
 	}
@@ -28,7 +28,7 @@ addKiller("Metacafe", {
 	if(mediaList.MP4) {
 		sources.push({"url": mediaList.MP4, "format": "SD MP4", "height": 360, "isNative": true});
 	}
-	if(HTML5.canPlayFLV && mediaList.flv) {
+	if(canPlayFLV && mediaList.flv) {
 		sources.push({"url": mediaList.flv, "format": "SD FLV", "height": 360, "isNative": false});
 	}
 	
@@ -39,12 +39,12 @@ addKiller("Metacafe", {
 },
 
 "processVideoID": function(videoID, callback) {
+	var _this = this;
 	var xhr = new XMLHttpRequest();
 	var url = "http://www.metacafe.com/watch/" + videoID;
 	xhr.open('GET', url, true);
-	var _this = this;
 	xhr.onload = function() {
-		var match = xhr.responseText.match(/name=\"flashvars\"\svalue=\"([^"]*)\"/);
+		var match = /name=\"flashvars\"\svalue=\"([^"]*)\"/.exec(xhr.responseText);
 		if(match) {
 			var callbackForEmbed = function(videoData) {
 				videoData.playlist[0].siteInfo = {"name": "Metacafe", "url": url};

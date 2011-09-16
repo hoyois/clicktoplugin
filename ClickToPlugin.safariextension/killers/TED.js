@@ -23,19 +23,16 @@ addKiller("TED", {
 		var xml = new DOMParser().parseFromString(xhr.responseText, "text/xml");
 		
 		var sources = [];
-		var downloads = xml.getElementsByClassName("downloads");
-		var anchor = downloads[1].getElementsByTagName("a")[2];
-		if(anchor) sources.push({"url": anchor.href, "format": "480p MP4", "height": 480, "isNative": true});
-		anchor = downloads[1].getElementsByTagName("a")[0];
-		sources.push({"url": anchor.href, "format": "360p MP4", "height": 360, "isNative": true});
-		anchor = downloads[0].getElementsByTagName("a")[0];
-		if(anchor) sources.push({"url": anchor.href, "format": "Audio MP3", "height": 0, "isNative": true, "isAudio": true});
-		
-		var posterURL = xml.getElementById("embedCode").getAttribute("value").match(/&su=([^&]*)&/)[1];
+		var audio = xml.getElementsByClassName("downloads")[0].getElementsByTagName("a");
+		var video = xml.getElementsByClassName("downloads")[1].getElementsByTagName("a");
+		if(video[2]) sources.push({"url": video[2].href, "format": "480p MP4", "height": 480, "isNative": true});
+		sources.push({"url": video[0].href, "format": "360p MP4", "height": 360, "isNative": true});
+		if(video[3]) sources.push({"url": video[3].href, "format": "270p MP4", "height": 270, "isNative": true});
+		if(audio[0]) sources.push({"url": audio[0].href, "format": "Audio MP3", "height": 0, "isNative": true, "isAudio": true});
 		
 		callback({
 			"playlist": [{
-				"poster": posterURL,
+				"poster": /&su=([^&]*)&/.exec(xml.getElementById("embedCode").getAttribute("value"))[1],
 				"title": xml.getElementById("altHeadline").textContent,
 				"sources": sources,
 				"siteInfo": siteInfo

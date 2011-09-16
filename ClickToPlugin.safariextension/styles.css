@@ -40,7 +40,7 @@ etc.
 	border: none !important;
 	box-shadow: none !important;
 	box-sizing: content-box !important;
-	/* This is incorrectly computed as rect(0px,0px,0px,0px) on video elements, which screws things up */
+	/* This is incorrectly computed as rect(0px,0px,0px,0px) on video elements */
 	/* clip: auto !important; */
 	cursor: default !important; /* not default */
 	outline: none !important;
@@ -138,9 +138,9 @@ Placeholder element
 	position: relative !important;
 	display: block !important;
 	-webkit-box-flex: 0 !important;
-	/* float:left prevents the label from setting the baseline of the placeholder.
-	(In CSS2.1 this should not be needed because placeholder has overflow:hidden.) */
-	/* float: left !important; */ /* taken care of with vertical-align:baseline -> bottom in main.js */
+	float: left !important;
+	/* The only effect of float:left is to prevent the label from setting the baseline of the placeholder.
+	This should already be taken care of by overflow:hidden, but WebKit computes the baseline incorrectly. */
 }
 
 .CTPplaceholder .CTPlogo {
@@ -229,7 +229,7 @@ Media player
 	top: 0 !important;
 }
 
-.CTPmediaPlayer .CTPtrackInfo {
+.CTPmediaPlayer .CTPtrackSelector {
 	position: absolute !important;
 	display: -webkit-box !important;
 	-webkit-appearance: media-controls-background !important;
@@ -242,13 +242,14 @@ Media player
 	box-sizing: border-box !important;
 	height: 25px !important;
 	opacity: 1 !important;
+	overflow: hidden !important;
 	padding: 0 7px !important;
 	pointer-events: visible !important;
 	right: 0 !important;
 }
 
 .CTPmediaPlayer .CTPstatusDisplay,
-.CTPmediaPlayer .CTPtrackSelector {
+.CTPmediaPlayer .CTPtrackList {
 	position: static !important;
 	display: -webkit-box !important;
 	-webkit-box-align: start !important;
@@ -271,16 +272,12 @@ Media player
 	pointer-events: none !important;
 }
 
-.CTPmediaPlayer .CTPtrackSelector {
+.CTPmediaPlayer .CTPtrackList {
 	-webkit-box-flex: 1 !important;
 	-webkit-line-clamp: 1 !important;
 	overflow: hidden !important;
 	text-overflow: ellipsis !important;
 }
-
-/**************
-Source selector
-**************/
 
 .CTPsourceSelector * {
 	-webkit-transition-property: none !important;
@@ -320,7 +317,6 @@ Source selector
 }
 
 .CTPsourceSelector:hover {
-	-webkit-transition-delay: 0s !important;
 	-webkit-transition-duration: .05s !important;
 	-webkit-transition-timing-function: linear !important;
 	opacity: 1 !important;
@@ -347,7 +343,7 @@ Source selector
 }
 
 .CTPsourceSelector .CTPsourceItem:hover,
-.CTPsourceSelector .CTPcurrentSource {
+.CTPsourceSelector .CTPsourceItem.CTPcurrentSource {
 	color: white !important;
 }
 
@@ -355,21 +351,12 @@ Source selector
 	text-shadow: white 0 0 7px !important;
 }
 
-.CTPmediaPlayer .CTPcurrentSource:active {
+.CTPmediaPlayer .CTPsourceItem.CTPcurrentSource:active {
 	text-shadow: none !important;
 }
 
-.CTPmediaPlayer .CTPcurrentSource {
+.CTPmediaPlayer .CTPsourceItem.CTPcurrentSource {
 	cursor: default !important;
-}
-
-.CTPsourceSelector .CTPsourceLink {
-	position: static !important;
-	display: inline !important;
-	color: inherit !important;
-	cursor: inherit !important;
-	opacity: 1 !important;
-	text-shadow: inherit !important;
 }
 
 /* Should use CSS3 ::marker here */
@@ -377,30 +364,20 @@ Source selector
 	content: "" !important;
 }
 
-.CTPmediaPlayer .CTPcurrentSource::before {
+.CTPmediaPlayer .CTPsourceItem.CTPcurrentSource::before {
 	display: inline-block !important;
 	color: inherit !important;
-	content: "\2022" !important;
+	content: "•" !important;
 	margin-left: -7px !important;
 	opacity: 1 !important;
 	width: 7px !important;
-}
-
-/**********************
-Invisible plugin object
-**********************/
-
-.CTPpluginLauncher {
-	position: absolute !important;
-	height: 0px !important;
-	width: 0px !important;
 }
 
 /************
 Stack element
 ************/
 
-#CTPstack {
+#CTPstack * {
 	display: none !important;
 }
 
@@ -431,6 +408,16 @@ Settings pane
 	width: 100% !important;
 	z-index: 2147483647 !important;
 	zoom: normal !important;
+}
+
+/**********************
+Invisible plugin object
+**********************/
+
+.CTPpluginLauncher {
+	position: absolute !important;
+	height: 0px !important;
+	width: 0px !important;
 }
 
 /**************

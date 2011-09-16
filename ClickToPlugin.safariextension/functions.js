@@ -1,5 +1,4 @@
-if(location.href !== "about:blank") {
-
+"use strict";
 function removeHTMLNode(node) {
 	while(node.parentNode.parentNode && node.parentNode.childNodes.length === 1) node = node.parentNode;
 	node.parentNode.removeChild(node);
@@ -23,7 +22,8 @@ function applyCSS(element, style, properties) {
 }
 
 function downloadURL(url) {
-	// NOTE: QuickTime plugin with autohref="true" target="" is another way to download automatically
+	// NOTE: This function should not work according to DOM Events 3
+	// Another (nasty) way would be QuickTime plugin with autohref="true" and target=""
 	var downloadLink = document.createElement("a");
 	downloadLink.href = url;
 	var event = document.createEvent("MouseEvents");
@@ -76,7 +76,7 @@ function testShortcut(event, shortcut) {
 	if(event.type === "mousewheel") {
 		if(simplifyWheelDelta(event.wheelDeltaX, event.wheelDeltaY) !== shortcut.direction) return false;
 		for(var x in shortcut) {
-			if(event[x] !== shortcut[x] && x !== "direction") return false;
+			if(x !== "direction" && event[x] !== shortcut[x]) return false;
 		}
 	} else {
 		for(var x in shortcut) {
@@ -84,7 +84,7 @@ function testShortcut(event, shortcut) {
 		}
 	}
 	event.preventDefault();
-	event.stopPropagation(); // immediate?
+	event.stopPropagation();
 	return true;
 }
 
@@ -118,6 +118,4 @@ function getParams(element) {
 		}
 	}
 	return params;
-}
-
 }
