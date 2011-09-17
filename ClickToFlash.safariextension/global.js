@@ -1,282 +1,345 @@
+"use strict";
 // UPDATE
-if(safari.extension.settings.version < 25) {
-	safari.extension.settings.removeItem("enabledKillers");
-	safari.extension.settings.removeItem("usePlaylists");
-	safari.extension.settings.removeItem("language");
-	safari.extension.settings.defaultTab = 0;
-	safari.extension.settings.maxInvisibleSize = 8;
+if(settings.version < 25) {
+	settings.removeItem("enabledKillers");
+	settings.removeItem("usePlaylists");
+	settings.removeItem("language");
+	settings.maxInvisibleSize = 8;
 }
-safari.extension.settings.version = 26;
+if(settings.version < 27) {
+	settings.defaultResolution = settings.maxResolution;
+	settings.removeItem("maxResolution");
+	settings.allowInvisible = settings.loadInvisible;
+	settings.removeItem("loadInvisible");
+	settings.trackSelectorShortcut = settings.showTitleShortcut;
+	settings.removeItem("showTitleShortcut");	
+	settings.removeItem("showPoster");
+	settings.removeItem("showMediaTooltip");
+	settings.removeItem("defaultTab");
+}
+settings.version = 27;
 
 // LOCALIZATION
-localize(GLOBAL_STRINGS, safari.extension.settings.language);
+localize(GLOBAL_STRINGS, settings.language);
+var localizationScript = localizeAsScript(INJECTED_STRINGS, settings.language);
+safari.extension.addContentScript(localizationScript, [], [], false);
 
 // SETTINGS
-const allSettings = ["language", "defaultTab", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "additionalScripts", "useFallbackMedia", "showSourceSelector", "mediaAutoload", "mediaWhitelist", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "codecsPolicy", "volume", "useDownloadManager", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "loadInvisible", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+var allSettings = ["language", "currentTab", "additionalScripts", "useFallbackMedia", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "showSourceSelector", "mediaAutoload", "mediaWhitelist", "initialBehavior", "instantAutoplay", "defaultResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showSiteSourceItem", "hideRewindButton", "codecsPolicy", "volume", "useDownloadManager", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "trackSelectorShortcut", "allowInvisible", "sIFRPolicy", "opacity", "debug", "showTooltip"];
 
 /* Hidden settings:
 language (default: undefined)
 maxInvisibleSize (default: 8)
-zeroIsInvisible: (default: undefined)
 */
 
-const injectedSettings = ["additionalScripts", "useFallbackMedia", "showSourceSelector", "initialBehavior", "maxResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "hideRewindButton", "volume", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "showTitleShortcut", "sIFRPolicy", "opacity", "debug", "showPoster", "showTooltip", "showMediaTooltip"];
+var injectedSettings = ["useFallbackMedia", "showSourceSelector", "initialBehavior", "instantAutoplay", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showSiteSourceItem", "hideRewindButton", "volume", "useDownloadManager", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "trackSelectorShortcut", "sIFRPolicy", "opacity", "debug", "showTooltip"];
 
 function getSettings(array) {
-	var s = new Object();
+	var s = {};
 	for(var i = 0; i < array.length; i++) {
-		s[array[i]] = safari.extension.settings[array[i]];
+		s[array[i]] = settings[array[i]];
 	}
 	return s;
 }
 
-// The shortcuts to open the prefs and to whitelist a page must work on all pages
+// Some shortcuts must work on all pages
 // To avoid messaging, we use a dynamic content script to register them
-var dynamicScriptURL;
-function updateGlobalShortcuts() {
-	safari.extension.removeContentScript(dynamicScriptURL);
+var shortcutScript;
+function injectGlobalShortcuts() {
+	safari.extension.removeContentScript(shortcutScript);
 	var script = "";
-	if(safari.extension.settings.settingsShortcut) script += "document.addEventListener(\"" + safari.extension.settings.settingsShortcut.type + "\",function(e){if(testShortcut(e," + JSON.stringify(safari.extension.settings.settingsShortcut) + "))safari.self.tab.dispatchMessage(\"toggleSettings\", \"\");},false);";
-	if(safari.extension.settings.addToWhitelistShortcut) script += "document.addEventListener(\"" + safari.extension.settings.addToWhitelistShortcut.type + "\",function(e){if(testShortcut(e," + JSON.stringify(safari.extension.settings.addToWhitelistShortcut) + "))safari.self.tab.dispatchMessage(\"whitelist\",location.href);},false);";
-	if(script) dynamicScriptURL =  safari.extension.addContentScript(script, [], [safari.extension.baseURI + "*"], false);
+	if(settings.settingsShortcut) script += "document.addEventListener(\"" + settings.settingsShortcut.type + "\",function(e){if(testShortcut(e," + JSON.stringify(settings.settingsShortcut) + "))safari.self.tab.dispatchMessage(\"showSettings\", \"\");},false);";
+	if(settings.addToWhitelistShortcut) script += "document.addEventListener(\"" + settings.addToWhitelistShortcut.type + "\",function(e){if(testShortcut(e," + JSON.stringify(settings.addToWhitelistShortcut) + "))safari.self.tab.dispatchMessage(\"whitelist\",location.href);},false);";
+	if(script) shortcutScript =  safari.extension.addContentScript(script, [], [safari.extension.baseURI + "*"], false);
 }
-updateGlobalShortcuts();
+injectGlobalShortcuts();
+
+function changeSetting(key, value) {
+	settings[key] = value;
+	switch(key) {
+	case "settingsShortcut":
+	case "addToWhitelistShortcut":
+		injectGlobalShortcuts();
+		break;
+	case "additionalScripts": // reload killers
+		killers = {};
+		loadScripts.apply(this, settings.additionalScripts);
+		break;
+	}
+}
 
 // CORE
-var documentID = 0;
+var documentCount = 0;
 
 function respondToMessage(event) {
 	switch(event.name) {
-		case "canLoad":
-			event.message = respondToCanLoad(event.message);
-			break;
-		case "killPlugin":
-			killPlugin(event.message, event.target);
-			break;
-		case "checkMIMEType":
-			checkMIMEType(event.message, event.target);
-			break;
-		case "loadAll":
-			event.target.page.dispatchMessage("loadAll", event.message);
-			break;
-		case "whitelist":
-			handleWhitelisting("locationsWhitelist", extractDomain(event.message));
-			break;
-		case "toggleSettings":
-			event.target.page.dispatchMessage("toggleSettings", "");
-			break;
-		case "openSettings":
-			openSettings(safari.application.activeBrowserWindow.openTab("foreground"));
-			break;
-		case "changeSetting":
-			safari.extension.settings[event.message.setting] = event.message.value;
-			if(event.message.setting === "settingsShortcut" || event.message.setting === "addToWhitelistShortcut") updateGlobalShortcuts();
-			break;
-		case "getSettings":
-			event.target.page.dispatchMessage("settings", getSettings(allSettings));
-			break;
+	case "canLoad":
+		event.message = canLoad(event.message, event.target);
+		break;
+	case "loadAll":
+	case "hideAll":
+	case "showSettings":
+	case "hideSettings":
+		event.target.page.dispatchMessage(event.name, "");
+		break;
+	case "whitelist":
+		handleWhitelisting("locationsWhitelist", extractDomain(event.message));
+		break;
+	case "openTab":
+		openTab(event.message);
+		break;
+	case "openSettings":
+		openTab(safari.extension.baseURI + "settings.html");
+		break;
+	case "changeSetting":
+		changeSetting(event.message.setting, event.message.value);
+		break;
+	case "getSettings":
+		event.target.page.dispatchMessage("CTPsettings", getSettings(allSettings));
+		break;
 	}
 }
 
-function respondToCanLoad(message) {
-	// Make checks in correct order for optimal performance
-	if(message.location !== undefined) return blockOrAllow(message);
-	if(message === "getSettings") return getSettings(injectedSettings);
-	if(message === "getDocumentID") return ++documentID;
-}
-
-function blockOrAllow(data) {
-	// returns true if element can be loaded, false if it must be hidden,
-	// and data on the plugin object otherwise
+function canLoad(data, tab) {
+	var response = {};
 	
-	// no source & no type -> cannot instantiate plugin
-	if(!data.src && !data.type) return true;
+	// Determine plugin
+	var plugin;
+	if(!data.src && !data.type) {
+		plugin = null;
+	} else if(data.type) {
+		data.type = stripParams(data.type).toLowerCase();
+		plugin = getPluginForType(data);
+	} else if(isDataURI(data.src)) {
+		data.type = getTypeFromDataURI(data.src);
+		plugin = getPluginForType(data);
+	} else {
+		plugin = getPluginForExt(data);
+	}
+	// This is correct but really not worth it (classid is "java:...")
+	// if(data.params.classid && !/^application\/x-java-(?:applet|bean|vm)$/.test(type)) plugin = null;
+	
+	/* plugin is now either:
+	-> null: Safari will not use a plugin
+	-> nativePlugin: Safari will try to load the resource directly but use a plugin for Content-Type in case of failure
+	-> the plugin object that Safari will use
+	*/
+	
+	if(plugin === nativePlugin) {
+		response.isNative = true;
+		plugin = resolveNativePlugin(data, tab);
+	}
+	if(isDataURI(data.src)) data.src = "";
+	
+	if(plugin !== null && plugin !== nativePlugin) {
+		if(isAllowed(plugin)) return true;
+		adjustSource(data, plugin);
+		response.plugin = getPluginName(plugin);
+	}
 	
 	// Check if invisible
-	if(data.width <= safari.extension.settings.maxInvisibleSize && data.height <= safari.extension.settings.maxInvisibleSize && (data.width > 0 && data.height > 0) || safari.extension.settings.zeroIsInvisible) {
-		if(safari.extension.settings.loadInvisible) return true;
-		var isInvisible = true;
+	if(data.width <= settings.maxInvisibleSize && data.height <= settings.maxInvisibleSize && data.width > 0 && data.height > 0) {
+		if(settings.allowInvisible) return true;
+		response.isInvisible = true;
 	}
 	
-	// Check whitelists
-	if(safari.extension.settings.invertWhitelists !== (matchList(safari.extension.settings.locationsWhitelist, data.location) || matchList(safari.extension.settings.sourcesWhitelist, data.src))) return true;
-	// Check blacklists
-	if(safari.extension.settings.invertBlacklists !== (matchList(safari.extension.settings.locationsBlacklist, data.location) || matchList(safari.extension.settings.sourcesBlacklist, data.src))) return false;
-
-	if(data.type === "application/x-shockwave-flash" || data.type === "application/futuresplash") return {"isInvisible": isInvisible};
-	else if(data.type) return true;
-	if(/^data:/.test(data.src)) return true;
+	// Check control lists
+	if(settings.invertWhitelists !== (matchList(settings.locationsWhitelist, data.location) || matchList(settings.sourcesWhitelist, data.src))) return true;
+	if(settings.invertBlacklists !== (matchList(settings.locationsBlacklist, data.location) || matchList(settings.sourcesBlacklist, data.src))) return false;
 	
-	var ext = extractExt(data.src);
-	if(ext === "swf" || ext === "spl") return {"isInvisible": isInvisible};
-	else if(isNativeExt(ext)) return true;
+	// Check sIFR
+	if(/\bsIFR-flash\b/.test(data.params.class)) {
+		if(settings.sIFRPolicy === "autoload") return true;
+		if(settings.sIFRPolicy === "textonly") return "disableSIFR";
+	}
 	
-	return {"isInvisible": isInvisible, "unknownType": true};
+	// Give user a chance to allow if a QT object would launch QTP
+	if(response.plugin === "QuickTime" && data.params.href && /^true$/i.test(data.params.autohref) && /^quicktimeplayer$/i.test(data.params.target)) {
+		if(/\bCTPallowedToLoad\b/.test(data.params.class)) return true; // for other extensions with open-in-QTP functionality
+		if(confirm(QT_CONFIRM_LAUNCH_DIALOG(data.params.href))) return true;
+	}
+	
+	if(data.documentID === undefined) {
+		data.documentID = documentCount++;
+		response.documentID = data.documentID;
+		response.settings = getSettings(injectedSettings);
+	}
+	response.src = data.src;
+	
+	// Killers
+	if(plugin !== nativePlugin && !kill(data, tab) && plugin === null) return true;
+	
+	return response;
 }
 
-function checkMIMEType(data, tab) {
+function resolveNativePlugin(data, tab) {
+	if(isDataURI(data.src)) {
+		data.type = getTypeFromDataURI(data.src);
+		var plugin = getPluginForType(data);
+		if(plugin === nativePlugin) return null;
+		return plugin;
+	}
 	var handleMIMEType = function(type) {
-		if(type === "application/x-shockwave-flash" || type === "application/futuresplash") {
-			tab.page.dispatchMessage("loadContent", {"documentID": data.documentID, "elementID": data.elementID, "command": "changeLabel"});
-		} else {
-			tab.page.dispatchMessage("loadContent", {"documentID": data.documentID, "elementID": data.elementID, "command": "plugin"});
+		data.type = stripParams(type);
+		var response = {"documentID": data.documentID, "elementID": data.elementID};
+		var plugin = getPluginForType(data);
+		if(plugin === null || plugin === nativePlugin || isAllowed(plugin)) tab.page.dispatchMessage("load", response);
+		else { // Plugin-launching content disguised as native image type
+			response.plugin = getPluginName(plugin);
+			tab.page.dispatchMessage("plugin", response);
 		}
-	};
-	getMIMEType(data.url, handleMIMEType);
+	}
+	setTimeout(function() {getMIMEType(data.src, handleMIMEType);}, 0);
+	return nativePlugin;
+}
+
+function isAllowed(plugin) {
+	return plugin.name !== "Shockwave Flash";
 }
 
 // CONTEXT MENU
 function handleContextMenu(event) {
-	var s = safari.extension.settings;
 	var u = event.userInfo;
+	var c = event.contextMenu;
 	if(u === null) {
-		if(s.disableEnableContext && event.target.url) event.contextMenu.appendContextMenuItem("switchOn", SWITCH_ON);
-		else if(s.settingsContext) event.contextMenu.appendContextMenuItem("settings", PREFERENCES + "\u2026");
+		if(safari.extension.disabled) {
+			if(settings.disableEnableContext) c.appendContextMenuItem("switchOn", SWITCH_ON);
+		} else {
+			if(settings.settingsContext && !event.target.url) c.appendContextMenuItem("settings", PREFERENCES);
+		}
 		return;
 	}
 	if(u.location === safari.extension.baseURI + "settings.html") return;
 	
 	if(u.elementID === undefined) { // Generic menu
-		if(s.disableEnableContext) event.contextMenu.appendContextMenuItem("switchOff", SWITCH_OFF);
-		if(s.loadAllContext && u.blocked > 0 && (u.blocked > u.invisible || !s.loadInvisibleContext)) event.contextMenu.appendContextMenuItem("loadAll", LOAD_ALL_PLUGINS + " (" + u.blocked + ")");
-		if(s.loadInvisibleContext && u.invisible > 0) event.contextMenu.appendContextMenuItem("loadInvisible", LOAD_INVISIBLE_PLUGINS + " (" + u.invisible + ")");
-		if(s.addToWhitelistContext && !matchList(s.locationsWhitelist, u.location)) event.contextMenu.appendContextMenuItem("locationsWhitelist", s.invertWhitelists ? ALWAYS_BLOCK_ON_DOMAIN : ALWAYS_ALLOW_ON_DOMAIN);
-		if(s.addToBlacklistContext && !matchList(s.locationsBlacklist, u.location)) event.contextMenu.appendContextMenuItem("locationsBlacklist", s.invertBlacklists ? ALWAYS_SHOW_ON_DOMAIN : ALWAYS_HIDE_ON_DOMAIN);
-		if(s.settingsContext) event.contextMenu.appendContextMenuItem("settings", PREFERENCES + "\u2026");
+		if(settings.loadAllContext && u.blocked > 0 && (u.blocked > u.invisible || !settings.loadInvisibleContext)) c.appendContextMenuItem("loadAll", LOAD_ALL_PLUGINS + " (" + u.blocked + ")");
+		if(settings.loadInvisibleContext && u.invisible > 0) c.appendContextMenuItem("loadInvisible", LOAD_INVISIBLE_PLUGINS + " (" + u.invisible + ")");
+		if(settings.addToWhitelistContext && !matchList(settings.locationsWhitelist, u.location)) c.appendContextMenuItem("locationsWhitelist", settings.invertWhitelists ? ALWAYS_BLOCK_ON_DOMAIN : ALWAYS_ALLOW_ON_DOMAIN);
+		if(settings.addToBlacklistContext && !matchList(settings.locationsBlacklist, u.location)) c.appendContextMenuItem("locationsBlacklist", settings.invertBlacklists ? ALWAYS_SHOW_ON_DOMAIN : ALWAYS_HIDE_ON_DOMAIN);
+		if(settings.disableEnableContext) c.appendContextMenuItem("switchOff", SWITCH_OFF);
+		if(settings.settingsContext) c.appendContextMenuItem("settings", PREFERENCES);
 		return;
 	}
 	
-	if(u.isMedia) event.contextMenu.appendContextMenuItem("reload", RESTORE_PLUGIN("Flash"));
+	if(u.isMedia) c.appendContextMenuItem("restore", RESTORE_PLUGIN(u.plugin));
 	else {
-		if(u.hasMedia) event.contextMenu.appendContextMenuItem("plugin", LOAD_PLUGIN("Flash"));
-		event.contextMenu.appendContextMenuItem("remove", HIDE_PLUGIN("Flash"));
+		if(u.hasMedia) c.appendContextMenuItem("load", LOAD_PLUGIN(u.plugin));
+		c.appendContextMenuItem("hide", HIDE_PLUGIN(u.plugin));
+		if(settings.addToWhitelistContext && !settings.invertWhitelists && u.src) c.appendContextMenuItem("sourcesWhitelist", ALWAYS_ALLOW_SOURCE);
+		if(settings.addToBlacklistContext && !settings.invertBlacklists && u.src) c.appendContextMenuItem("sourcesBlacklist", ALWAYS_HIDE_SOURCE);
+		if(settings.debug) c.appendContextMenuItem("showInfo", GET_PLUGIN_INFO);
 	}
-	if(u.hasMedia && u.source !== undefined) {
-		if(s.downloadContext) event.contextMenu.appendContextMenuItem(safari.extension.settings.useDownloadManager ? "downloadDM" : "download", u.mediaType === "audio" ? DOWNLOAD_AUDIO : DOWNLOAD_VIDEO);
-		if(u.siteInfo && s.viewOnSiteContext) event.contextMenu.appendContextMenuItem("viewOnSite", VIEW_ON_SITE(u.siteInfo.name));
-		if(s.viewInQTPContext) event.contextMenu.appendContextMenuItem("viewInQTP", VIEW_IN_QUICKTIME_PLAYER);
+	if(u.source !== undefined) {
+		if(settings.downloadContext) c.appendContextMenuItem("download", u.isAudio ? DOWNLOAD_AUDIO : DOWNLOAD_VIDEO);
+		if(settings.viewInQTPContext) c.appendContextMenuItem("viewInQTP", OPEN_IN_QUICKTIME_PLAYER);
 	}
-	if(!u.isMedia) {
-		if(s.addToWhitelistContext && !s.invertWhitelists) event.contextMenu.appendContextMenuItem("sourcesWhitelist", ALWAYS_ALLOW_SOURCE);
-		if(s.addToBlacklistContext && !s.invertBlacklists) event.contextMenu.appendContextMenuItem("sourcesBlacklist", ALWAYS_HIDE_SOURCE);
-		if(s.debug) event.contextMenu.appendContextMenuItem("info", GET_PLUGIN_INFO);
-	}
+	if(u.siteInfo && settings.viewOnSiteContext) c.appendContextMenuItem("viewOnSite", VIEW_ON_SITE(u.siteInfo.name));
 }
 
 function doCommand(event) {
+	var tab = safari.application.activeBrowserWindow.activeTab;
 	switch(event.command) {
-		case "viewOnSite":
-			var newTab = safari.application.activeBrowserWindow.openTab("foreground");
-			newTab.url = event.userInfo.siteInfo.url;
-			break;
-		case "locationsWhitelist":
-		case "locationsBlacklist":
-			handleWhitelisting(event.command, extractDomain(event.userInfo.location));
-			break;
-		case "sourcesWhitelist":
-		case "sourcesBlacklist":
-			handleWhitelisting(event.command, event.userInfo.src.split(/[?#]/)[0]);
-			break;
-		case "switchOff":
-			switchOff();
-			break;
-		case "switchOn":
-			switchOn();
-			break;
-		case "settings":
-			openSettings(safari.application.activeBrowserWindow.activeTab);
-			break;
-		default:
-			safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("loadContent", {"documentID": event.userInfo.documentID, "elementID": event.userInfo.elementID, "source": event.userInfo.source, "command": event.command});
-			break;
+	case "viewOnSite":
+		openTab(event.userInfo.siteInfo.url);
+		break;
+	case "locationsWhitelist":
+	case "locationsBlacklist":
+		handleWhitelisting(event.command, extractDomain(event.userInfo.location));
+		break;
+	case "sourcesWhitelist":
+	case "sourcesBlacklist":
+		handleWhitelisting(event.command, event.userInfo.src.split(/[?#]/)[0]);
+		break;
+	case "switchOff":
+		switchOff();
+		break;
+	case "switchOn":
+		switchOn();
+		break;
+	case "settings":
+		if(!tab.url) tab.url = safari.extension.baseURI + "settings.html";
+		else tab.page.dispatchMessage("showSettings", "");
+		break;
+	default:
+		tab.page.dispatchMessage(event.command, event.userInfo);
+		break;
 	}
-}
-
-function openSettings(tab) {
-	if(!tab.url) tab.url = safari.extension.baseURI + "settings.html";
-	else tab.page.dispatchMessage("toggleSettings", "");
 }
 
 function switchOff() {
 	safari.extension.removeContentScripts();
-	safari.application.activeBrowserWindow.activeTab.url = safari.application.activeBrowserWindow.activeTab.url;
+	safari.extension.disabled = true;
+	reloadTab(safari.application.activeBrowserWindow.activeTab);
 }
 
 function switchOn() {
 	safari.extension.removeContentScripts();
 	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "functions.js");
-	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "sourceSelector.js");
-	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "mediaPlayer.js");
-	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "ClickToFlash.js");
-	updateGlobalShortcuts();
-	safari.application.activeBrowserWindow.activeTab.url = safari.application.activeBrowserWindow.activeTab.url;
+	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "MediaPlayer.js");
+	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "main.js");
+	safari.extension.addContentScript(localizationScript, [], [], false);
+	injectGlobalShortcuts();
+	safari.extension.disabled = false;
+	reloadTab(safari.application.activeBrowserWindow.activeTab);
 }
 
 function handleWhitelisting(list, newWLString) {
-	safari.extension.settings[list] = safari.extension.settings[list].concat(newWLString); // push doesn't work
+	settings[list] = settings[list].concat(newWLString); // push doesn't work
 	// load targeted content at once
 	switch(list) {
-		case "locationsWhitelist":
-			if(!safari.extension.settings.invertWhitelists) dispatchMessageToAllPages("loadLocation", newWLString);
-			else safari.application.activeBrowserWindow.activeTab.url = safari.application.activeBrowserWindow.activeTab.url;
-			break;
-		case "sourcesWhitelist":
-			dispatchMessageToAllPages("loadSource", newWLString);
-			break;
-		case "locationsBlacklist":
-			if(!safari.extension.settings.invertBlacklists) dispatchMessageToAllPages("hideLocation", newWLString);
-			else safari.application.activeBrowserWindow.activeTab.url = safari.application.activeBrowserWindow.activeTab.url;
-			break;
-		case "sourcesBlacklist":
-			dispatchMessageToAllPages("hideSource", newWLString);
-			break;
+	case "locationsWhitelist":
+		if(!settings.invertWhitelists) dispatchMessageToAllPages("loadLocation", newWLString);
+		else reloadTab(safari.application.activeBrowserWindow.activeTab);
+		break;
+	case "sourcesWhitelist":
+		dispatchMessageToAllPages("loadSource", newWLString);
+		break;
+	case "locationsBlacklist":
+		if(!settings.invertBlacklists) dispatchMessageToAllPages("hideLocation", newWLString);
+		else reloadTab(safari.application.activeBrowserWindow.activeTab);
+		break;
+	case "sourcesBlacklist":
+		dispatchMessageToAllPages("hideSource", newWLString);
+		break;
 	}
 }
 
 // KILLERS
-var killers = new Object();
+var killers = {};
 function addKiller(name, killer) {killers[name] = killer;}
 function hasKiller(name) {return killers[name] !== undefined;}
 function getKiller(name) {return killers[name];}
+// TODO: negative killer callbacks: return fail();
 
-function findKillerFor(data) {
+function kill(data, tab) {
+	var killerID;
 	for(var name in killers) {
-		if(killers[name].canKill(data)) return killers[name];
+		if(killers[name].canKill(data)) {
+			killerID = name;
+			break;
+		}
 	}
-	return null;
-}
-
-function killPlugin(data, tab) {
+	if(killerID === undefined) return false;
+	
 	var callback = function(mediaData) {
+		if(!tab.page) return; // user has closed tab
 		if(mediaData.playlist.length === 0) return;
-		mediaData.elementID = data.elementID;
-		mediaData.documentID = data.documentID;
 		
-		if(!mediaData.loadAfter) {
-			var defaultSource = chooseDefaultSource(mediaData.playlist[0].sources);
-			mediaData.playlist[0].defaultSource = defaultSource;
-			mediaData.badgeLabel = makeLabel(mediaData.playlist[0].sources[defaultSource]);
-		}
-		for(var i = (mediaData.loadAfter ? 0 : 1); i < mediaData.playlist.length; i++) {
+		for(var i = 0; i < mediaData.playlist.length; i++) {
+			if(mediaData.playlist[i] === null) continue;
 			mediaData.playlist[i].defaultSource = chooseDefaultSource(mediaData.playlist[i].sources);
-			if(mediaData.playlist[i].defaultSource === undefined) {
-				if(mediaData.missed !== undefined) ++mediaData.missed;
-				mediaData.playlist.splice(i--, 1);
-			}
+			if(mediaData.playlist[i].defaultSource === undefined && (i > 0 || mediaData.loadAfter)) mediaData.playlist[i] = null;
+		}
+		if(!mediaData.loadAfter) {
+			mediaData.autoplay = matchList(settings.mediaWhitelist, data.location);
+			mediaData.autoload = mediaData.playlist[0].defaultSource !== undefined && settings.defaultPlayer === "html5" && (mediaData.autoplay || settings.mediaAutoload);
 		}
 		
-		mediaData.autoplay = matchList(safari.extension.settings.mediaWhitelist, data.location);
-		mediaData.autoload = defaultSource !== undefined && safari.extension.settings.defaultPlayer === "html5" && (mediaData.autoplay || safari.extension.settings.mediaAutoload);
-		
-		tab.page.dispatchMessage("mediaData", mediaData);
+		tab.page.dispatchMessage("mediaData", {"documentID": data.documentID, "elementID": data.elementID, "data": mediaData});
 	};
 	
-	if(data.playlist) callback(data);
-	else {
-		var killer = findKillerFor(data);
-		if(killer === null) return;
-		killer.process(data, callback);
-	}
+	setTimeout(function() {killers[killerID].process(data, callback);}, 0);
+	return true;
 }
 
 // EVENT LISTENERS
@@ -285,5 +348,5 @@ safari.application.addEventListener("contextmenu", handleContextMenu, false);
 safari.application.addEventListener("command", doCommand, false);
 
 // ADDITIONAL SCRIPTS
-loadScripts.apply(this, safari.extension.settings.additionalScripts);
+loadScripts.apply(this, settings.additionalScripts);
 

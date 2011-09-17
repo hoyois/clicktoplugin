@@ -6,7 +6,7 @@
 		<key>DefaultValue</key>
 		<integer>0</integer>
 		<key>Key</key>
-		<string>defaultTab</string>
+		<string>currentTab</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
@@ -89,6 +89,12 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
+		<string>showSiteSourceItem</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
 		<string>hideRewindButton</string>
 	</dict>
 	<dict>
@@ -113,9 +119,15 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>instantAutoplay</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
 		<integer>1080</integer>
 		<key>Key</key>
-		<string>maxResolution</string>
+		<string>defaultResolution</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
@@ -386,7 +398,7 @@
 			<key>ctrlKey</key>
 			<false/>
 			<key>keyIdentifier</key>
-			<string>U+005C</string>
+			<string>Enter</string>
 			<key>metaKey</key>
 			<false/>
 			<key>shiftKey</key>
@@ -395,13 +407,13 @@
 			<string>keydown</string>
 		</dict>
 		<key>Key</key>
-		<string>showTitleShortcut</string>
+		<string>trackSelectorShortcut</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>loadInvisible</string>
+		<string>allowInvisible</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
@@ -431,19 +443,7 @@
 		<key>DefaultValue</key>
 		<true/>
 		<key>Key</key>
-		<string>showPoster</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
 		<string>showTooltip</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<true/>
-		<key>Key</key>
-		<string>showMediaTooltip</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>

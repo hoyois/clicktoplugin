@@ -13,9 +13,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.4.1</string>
+	<string>2.5</string>
 	<key>CFBundleVersion</key>
-	<string>26</string>
+	<string>27</string>
 	<key>Chrome</key>
 	<dict>
 		<key>Global Page</key>
@@ -28,9 +28,8 @@
 			<key>Start</key>
 			<array>
 				<string>functions.js</string>
-				<string>sourceSelector.js</string>
-				<string>mediaPlayer.js</string>
-				<string>ClickToFlash.js</string>
+				<string>MediaPlayer.js</string>
+				<string>main.js</string>
 			</array>
 		</dict>
 		<key>Stylesheets</key>

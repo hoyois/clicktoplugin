@@ -8,7 +8,7 @@
 <body><div id="container" class="hidden init">
 	<nav><ul id="nav">
 		<li><span><span class="string" title="GENERAL_TAB"></span></span></li>
-		<li><span><span class="string" title="WHITELISTS_TAB"></span></span></li>
+		<li><span><span class="string" title="CONTROL_LISTS_TAB"></span></span></li>
 		<li><span><span class="string" title="MEDIA_TAB"></span></span></li>
 		<li><span><span class="string" title="CONTEXT_MENU_TAB"></span></span></li>
 		<li><span><span class="string" title="SHORTCUTS_TAB"></span></span></li>
@@ -30,7 +30,7 @@
 				<option value="autoload" title="SIFR_AUTOLOAD"></option>
 			</select></span></li>
 			<li class="glue"></li>
-			<li><span></span><span class="checkbox"><input id="loadInvisible" class="setting" type="checkbox"><label for="loadInvisible"><span class="string" title="ALLOW_INVISIBLE_PLUGINS"></span></label></span></li>
+			<li><span></span><span class="checkbox"><input id="allowInvisible" class="setting" type="checkbox"><label for="allowInvisible"><span class="string" title="ALLOW_INVISIBLE_PLUGINS"></span></label></span></li>
 			<li><span></span><span class="checkbox"><input id="debug" class="setting" type="checkbox"><label for="debug"><span class="string" title="DEBUG_MODE"></span></label></span></li>
 		</menu>
 	</section>
@@ -52,8 +52,9 @@
 				<option value="qtp" title="QUICKTIME_PLAYER"></option>
 				<option value="plugin" title="PLUGIN_PLAYER"></option>
 			</select></span></li>
+			<li><span></span><span class="checkbox"><input id="mediaAutoload" class="setting" type="checkbox"><label for="mediaAutoload"><span class="string" title="AUTOLOAD_MEDIA_PLAYER"></span></label></span></li>
 			<li class="glue"></li>
-			<li><span><label for="maxResolution"><span class="string" title="MAX_RESOLUTION"></span></label></span><span><select id="maxResolution" class="setting hfil">
+			<li><span><label for="defaultResolution"><span class="string" title="DEFAULT_RESOLUTION"></span></label></span><span><select id="defaultResolution" class="setting hfil">
 				<option value="360">360p</option>
 				<option value="480">480p</option>
 				<option value="720">720p</option>
@@ -66,21 +67,18 @@
 				<option value="3" title="NONNATIVE_USE_FREELY"></option>
 			</select></span></li>
 			<li class="glue"></li>
-			<li><span></span><span class="checkbox"><input id="mediaAutoload" class="setting" type="checkbox"><label for="mediaAutoload"><span class="string" title="AUTOLOAD_MEDIA_PLAYER"></span></label></span></li>
 			<li><span><label for="initialBehavior"><span class="string" title="INITIAL_BEHAVIOR"></span></label></span><span><select id="initialBehavior" class="setting hfil">
 				<option value="none" title="INITIAL_NO_BUFFER"></option>
 				<option value="buffer" title="INITIAL_BUFFER"></option>
 				<option value="autoplay" title="INITIAL_AUTOPLAY"></option>
 			</select></span></li>
-			<li class="glue"></li>
-			<li><span></span><span class="checkbox"><input id="showPoster" class="setting" type="checkbox"><label for="showPoster"><span class="string" title="SHOW_POSTER"></span></label></span></li>
-			<li><span></span><span class="checkbox"><input id="showMediaTooltip" class="setting" type="checkbox"><label for="showMediaTooltip"><span class="string" title="SHOW_MEDIA_TOOLTIP"></span></label></span></li>
+			<li><span></span><span class="checkbox"><input id="instantAutoplay" class="setting" type="checkbox"><label for="instantAutoplay"><span class="string" title="INSTANT_AUTOPLAY"></span></label></span></li>
 			<li class="glue"></li>
 			<li><span></span><span class="checkbox"><input id="hideRewindButton" class="setting" type="checkbox"><label for="hideRewindButton"><span class="string" title="HIDE_REWIND_BUTTON"></span></label></span></li>
-			<li class="glue"></li>
 			<li><span></span><span class="checkbox"><input id="showSourceSelector" class="setting" type="checkbox"><label for="showSourceSelector"><span class="string" title="SHOW_SOURCE_SELECTOR"></span></label></span></li>
 			<li><span></span><span class="checkbox sub"><input id="showPluginSourceItem" class="setting" type="checkbox"><label for="showPluginSourceItem"><span class="string" title="SHOW_PLUGIN_SOURCE"></span></label></span></li>
 			<li><span></span><span class="checkbox sub"><input id="showQTPSourceItem" class="setting" type="checkbox"><label for="showQTPSourceItem"><span class="string" title="SHOW_QTP_SOURCE"></span></label></span></li>
+			<li><span></span><span class="checkbox sub"><input id="showSiteSourceItem" class="setting" type="checkbox"><label for="showSiteSourceItem"><span class="string" title="SHOW_SITE_SOURCE"></span></label></span></li>
 			<li class="glue"></li>
 			<li><span><label for="volume"><span class="string" title="SOUND_VOLUME"></span></label></span><span><input id="volume" class="setting hfil" type="range" min="0" max="100" step="1"></span></li>
 			<li><span class="textarea_label"><label for="mediaWhitelist"><span class="string" title="AUTOPLAY_LOCATIONS"></span></label></span><textarea id="mediaWhitelist" class="hfil" wrap="off"></textarea></li>
@@ -95,7 +93,7 @@
 			<li><span class="checkbox sub"><input id="loadInvisibleContext" class="setting" type="checkbox"><label for="loadInvisibleContext"><span class="string" title="LOAD_INVISIBLE_CONTEXT"></span></label></span></li>
 			<li class="glue"></li>
 			<li><span class="checkbox sub"><input id="downloadContext" class="setting" type="checkbox"><label for="downloadContext"><span class="string" title="DOWNLOAD_CONTEXT"></span></label></span></li>
-			<li><span class="checkbox sub"><input id="viewInQTPContext" class="setting" type="checkbox"><label for="viewInQTPContext"><span class="string" title="VIEW_IN_QTP_CONTEXT"></span></label></span></li>
+			<li><span class="checkbox sub"><input id="viewInQTPContext" class="setting" type="checkbox"><label for="viewInQTPContext"><span class="string" title="OPEN_IN_QTP_CONTEXT"></span></label></span></li>
 			<li><span class="checkbox sub"><input id="viewOnSiteContext" class="setting" type="checkbox"><label for="viewOnSiteContext"><span class="string" title="VIEW_ON_SITE_CONTEXT"></span></label></span></li>
 			<li class="glue"></li>
 			<li><span class="checkbox sub"><input id="settingsContext" class="setting" type="checkbox"><label for="settingsContext"><span class="string" title="SETTINGS_CONTEXT"></span></label></span></li>
@@ -115,7 +113,7 @@
 			<li><span><label for="volumeDownShortcut"><span class="string" title="VOLUME_DOWN_SHORTCUT"></span></label></span><span><input id="volumeDownShortcut" class="keyboard" type="text"><span class="mouse"></span><input class="shortcut_clear" type="button"></span></li>
 			<li><span><label for="prevTrackShortcut"><span class="string" title="PREV_TRACK_SHORTCUT"></span></label></span><span><input id="prevTrackShortcut" class="keyboard" type="text"><span class="mouse"></span><input class="shortcut_clear" type="button"></span></li>
 			<li><span><label for="nextTrackShortcut"><span class="string" title="NEXT_TRACK_SHORTCUT"></span></label></span><span><input id="nextTrackShortcut" class="keyboard" type="text"><span class="mouse"></span><input class="shortcut_clear" type="button"></span></li>
-			<li><span><label for="showTitleShortcut"><span class="string" title="SHOW_TITLE_SHORTCUT"></span></label></span><span><input id="showTitleShortcut" class="keyboard" type="text"><span class="mouse"></span><input class="shortcut_clear" type="button"></span></li>
+			<li><span><label for="trackSelectorShortcut"><span class="string" title="TRACK_SELECTOR_SHORTCUT"></span></label></span><span><input id="trackSelectorShortcut" class="keyboard" type="text"><span class="mouse"></span><input class="shortcut_clear" type="button"></span></li>
 			<li><span><label for="toggleLoopingShortcut"><span class="string" title="TOGGLE_LOOPING_SHORTCUT"></span></label></span><span><input id="toggleLoopingShortcut" class="keyboard" type="text"><span class="mouse"></span><input class="shortcut_clear" type="button"></span></li>
 			<li class="glue"></li>
 			<li><span><label for="settingsShortcut"><span class="string" title="SETTINGS_SHORTCUT"></span></label></span><span><input id="settingsShortcut" class="keyboard" type="text"><span class="mouse disabled"></span><input class="shortcut_clear" type="button"></span></li>
