@@ -424,7 +424,7 @@ var PREFERENCES_STRINGS = {
 		"fr-fr": "Lecture instantanée",
 		"es-es": "Reproducción sin esperas",
 		"de-de": "Sofortige Wiedergabe",
-		"ja-jp": "インスタントプレイ",
+		"ja-jp": "直接に再生",
 		"zh-tw": "即時播放",
 		"zh-cn": "立即播放"
 	},
@@ -503,11 +503,11 @@ var PREFERENCES_STRINGS = {
 	"SHOW_SITE_SOURCE": {
 		"en-us": "Include the video’s web page",
 		"fr-fr": "Inclure la page web de la vidéo",
-		"es-es": "Incluir",
-		"de-de": "Einschließlich ???",
-		"ja-jp": "",
-		"zh-tw": "",
-		"zh-cn": ""
+		"es-es": "Incluir la página web del video",
+		"de-de": "Einschließlich Video-Seite",
+		"ja-jp": "ビデオのリンク先を含む",
+		"zh-tw": "包括影片的來源頁",
+		"zh-cn": "包含视频原先的页面"
 	},
 	"HIDE_REWIND_BUTTON": {
 		"en-us": "Hide “Rewind” button",
@@ -619,7 +619,7 @@ var PREFERENCES_STRINGS = {
 		"zh-tw": "於網站上檢視",
 		"zh-cn": "在网站上查看"
 	},
-	"VIEW_IN_QTP_CONTEXT": {
+	"OPEN_IN_QTP_CONTEXT": {
 		"en-us": "Open in QuickTime Player",
 		"fr-fr": "Ouvrir dans QuickTime Player",
 		"es-es": "Abrir en QuickTime Player",
@@ -886,7 +886,7 @@ var GLOBAL_STRINGS = {
 		"zh-tw": "下載音頻",
 		"zh-cn": "下载音频"
 	},
-	"VIEW_IN_QUICKTIME_PLAYER": {
+	"OPEN_IN_QUICKTIME_PLAYER": {
 		"en-us": "Open in QuickTime Player",
 		"fr-fr": "Ouvrir dans QuickTime Player",
 		"es-es": "Abrir en QuickTime Player",

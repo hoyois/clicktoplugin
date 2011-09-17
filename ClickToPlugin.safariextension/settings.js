@@ -6,10 +6,6 @@ var tabs = nav.children;
 var sections = document.getElementsByTagName("section");
 var menus = document.getElementsByTagName("menu");
 
-var inputs = document.getElementsByClassName("setting");
-var keyboardInputs = document.getElementsByClassName("keyboard");
-var mouseInputs = document.getElementsByClassName("mouse");
-var textareas = document.getElementsByTagName("textarea");
 var clearShortcutButtons = document.getElementsByClassName("shortcut_clear");
 var pluginInputs = document.getElementsByClassName("plugin");
 
@@ -45,14 +41,15 @@ function switchToTab(i) {
 	changeSetting("currentTab", i);
 }
 
-function bindTab(i) {
-	tabs[i].firstChild.addEventListener("click", function(event) {
-		if(currentTab !== i) switchToTab(i);
-	}, false);
-}
-for(var i = 0; i < tabs.length; i++) {
-	bindTab(i);
-}
+nav.addEventListener("click", function(event) {
+	if(event.target.nodeName !== "SPAN") return;
+	for(var i = 0; i < tabs.length; i++) {
+		if(event.target === tabs[i].firstChild) {
+			if(currentTab !== i) switchToTab(i);
+			break;
+		}
+	}
+}, false);
 
 // Textareas
 function resizeTextArea(textarea) {
@@ -72,6 +69,7 @@ function parseTextList(text) {
 	else return s.split("\n");
 }
 function handleKeyPressEvent(event) {
+	if(event.target.nodeName !== "TEXTAREA") return;
 	if(event.keyCode === 32) {
 		event.preventDefault();
 		var position = event.target.selectionStart;
@@ -82,10 +80,11 @@ function handleKeyPressEvent(event) {
 		event.target.dispatchEvent(e);
 	}
 }
-for(var i = 0; i < textareas.length; i++) {
-	textareas[i].addEventListener("keypress", handleKeyPressEvent, false);
-	textareas[i].addEventListener(textareas[i].id === "additionalScripts" ? "blur" : "input", handleTextAreaInput, false);
-}
+main.addEventListener("keypress", handleKeyPressEvent, false);
+main.addEventListener("input", function(event) {
+	if(event.target.nodeName === "TEXTAREA" && event.target.id !== "additionalScripts") handleTextAreaInput(event);
+}, false);
+document.getElementById("additionalScripts").addEventListener("blur", handleTextAreaInput, false);
 
 // Killer reset
 var defaultKillers = "killers/YouTube.js\nkillers/Vimeo.js\nkillers/Dailymotion.js\nkillers/Facebook.js\nkillers/Break.js\nkillers/Blip.js\nkillers/Metacafe.js\nkillers/TED.js\nkillers/Tumblr.js\nkillers/Flash.js\nkillers/Silverlight.js\nkillers/Generic.js";
@@ -96,19 +95,44 @@ document.getElementById("reset_killers").addEventListener("click", function() {
 	resizeTextArea(textarea);
 }, false);
 
-// Bind change events
+// Bind change event
 function changeSetting(setting, value) {
 	safari.self.tab.dispatchMessage("changeSetting", {"setting": setting, "value": value});
 }
 
-function bindChangeEvent(input) {
+main.addEventListener("change", function(event) {
+	// Settings dependencies
+	switch(event.target.id) {
+	case "invertWhitelists":
+		updateWhitelistLabels(event.target.value === "on");
+		break;
+	case "invertBlacklists":
+		updateBlacklistLabels(event.target.value === "on");
+		break;
+	case "showSourceSelector":
+		document.getElementById("showPluginSourceItem").disabled = event.target.value !== "on";
+		document.getElementById("showQTPSourceItem").disabled = event.target.value !== "on";
+		document.getElementById("showSiteSourceItem").disabled = event.target.value !== "on";
+		break;
+	case "defaultPlayer":
+		if(event.target.value === "html5") {
+			document.getElementById("mediaAutoload").disabled = false;
+		} else {
+			document.getElementById("mediaAutoload").disabled = true;
+			document.getElementById("mediaAutoload").checked = false;
+			changeSetting("mediaAutoload", false);
+		}
+		break;
+	}
+	// Settings change
+	if(!event.target.classList.contains("setting")) return;
 	var parseValue;
-	switch(input.nodeName) {
+	switch(event.target.nodeName) {
 	case "SELECT":
 		parseValue = function(value) {if(isNaN(parseInt(value))) return value; else return parseInt(value);}
 		break;
 	case "INPUT":
-		switch(input.type) {
+		switch(event.target.type) {
 		case "range":
 			parseValue = function(value) {return parseInt(value)*.01}
 			break;
@@ -118,26 +142,24 @@ function bindChangeEvent(input) {
 		}
 		break;
 	}
-	input.addEventListener("change", function(event) {
-		changeSetting(event.target.id, parseValue(event.target.value));
-	}, false);
-}
-for(var i = 0; i < inputs.length; i++) {
-	bindChangeEvent(inputs[i]);
-}
-
-document.getElementById("invertWhitelists").addEventListener("change", function(event) {
-	updateWhitelistLabels(event.target.value === "on");
-}, false);
-document.getElementById("invertBlacklists").addEventListener("change", function(event) {
-	updateBlacklistLabels(event.target.value === "on");
+	changeSetting(event.target.id, parseValue(event.target.value));
 }, false);
 
 // Shortcuts input
-for(var i = 0; i < keyboardInputs.length; i++) {
-	keyboardInputs[i].addEventListener("keydown", handleKeyboardEvent, false);
-	clearShortcutButtons[i].addEventListener("click", clearShortcut, false);
-}
+var shortcutsMenu = document.getElementById("keyboard_shortcuts")
+shortcutsMenu.addEventListener("keydown", function(event) {
+	if(event.target.classList.contains("keyboard")) handleKeyboardEvent(event);
+}, false);
+shortcutsMenu.addEventListener("click", function(event) {
+	if(event.target.classList.contains("shortcut_clear")) clearShortcut(event);
+	else if(event.target.classList.contains("mouse")) handleClickEvent(event);
+}, false);
+shortcutsMenu.addEventListener("dblclick", function(event) {
+	if(event.target.classList.contains("mouse")) handleClickEvent(event);
+}, false);
+shortcutsMenu.addEventListener("mousewheel", function(event) {
+	if(event.target.classList.contains("mouse")) handleWheelEvent(event);
+}, false);
 function clearShortcut(event) {
 	var textField = event.target.previousSibling.previousSibling;
 	textField.value = "";
@@ -153,12 +175,6 @@ function handleKeyboardEvent(event) {
 	event.stopPropagation();
 	if(event.keyIdentifier === "Shift" || event.keyIdentifier === "Control" || event.keyIdentifier === "Alt" || event.keyIdentifier === "Meta") return;
 	registerShortcut({"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "keyIdentifier": event.keyIdentifier}, event.target);
-}
-
-for(var i = 0; i < mouseInputs.length; i++) {
-	mouseInputs[i].addEventListener("click", handleClickEvent, false);
-	mouseInputs[i].addEventListener("dblclick", handleClickEvent, false);
-	mouseInputs[i].addEventListener("mousewheel", handleWheelEvent, false);
 }
 function handleClickEvent(event) {
 	event.preventDefault();
@@ -219,22 +235,6 @@ function showShortcut(shortcut) {
 	if(shortcut.type === "mousewheel") return prefix + "[wheel" + shortcut.direction + "]";
 }
 
-// Bind settings dependencies
-document.getElementById("showSourceSelector").addEventListener("change", function(event) {
-	document.getElementById("showPluginSourceItem").disabled = event.target.value !== "on";
-	document.getElementById("showQTPSourceItem").disabled = event.target.value !== "on";
-	document.getElementById("showSiteSourceItem").disabled = event.target.value !== "on";
-}, false);
-document.getElementById("defaultPlayer").addEventListener("change", function(event) {
-	if(this.value === "html5") {
-		document.getElementById("mediaAutoload").disabled = false;
-	} else {
-		document.getElementById("mediaAutoload").disabled = true;
-		document.getElementById("mediaAutoload").checked = false;
-		changeSetting("mediaAutoload", false);
-	}
-}, false);
-
 // Localization
 function localizeSettings() {
 	document.title = PREFERENCES_TITLE;
@@ -266,6 +266,9 @@ function updateBlacklistLabels(invert) {
 // List of plugins
 function buildPluginMenu() {
 	var pluginMenu = document.getElementById("plug-ins");
+	pluginMenu.addEventListener("change", function() {
+		changeSetting("allowedPlugins", checkedPlugins());
+	}, false);
 	var span = pluginMenu.children[0].children[0];
 	if(navigator.plugins.length === 0) {
 		span.textContent = NO_PLUGINS_NOTICE;
@@ -279,9 +282,6 @@ function buildPluginMenu() {
 		if(p > q) return 1;
 		return 0;
 	});
-	var handleChangeEvent = function() {
-		changeSetting("allowedPlugins", checkedPlugins());
-	};
 	for(var i = 0; i < plugins.length; i++) {
 		var li = document.createElement("li");
 		var span = document.createElement("span");
@@ -289,7 +289,6 @@ function buildPluginMenu() {
 		span.title = PLUGIN_FILENAME(plugins[i].filename) + "\n" + PLUGIN_DESCRIPTION(plugins[i].description);
 		span.innerHTML = "<input class=\"plugin\" type=\"checkbox\"><label></label>";
 		span.firstChild.id = "plugin/" + plugins[i].filename;
-		span.firstChild.addEventListener("change", handleChangeEvent, false);
 		span.lastChild.htmlFor = "plugin/" + plugins[i].filename;
 		span.lastChild.textContent = plugins[i].name;
 		li.appendChild(span);

@@ -236,7 +236,7 @@ function handleContextMenu(event) {
 	}
 	if(u.source !== undefined) {
 		if(settings.downloadContext) c.appendContextMenuItem("download", u.isAudio ? DOWNLOAD_AUDIO : DOWNLOAD_VIDEO);
-		if(settings.viewInQTPContext) c.appendContextMenuItem("viewInQTP", VIEW_IN_QUICKTIME_PLAYER);
+		if(settings.viewInQTPContext) c.appendContextMenuItem("viewInQTP", OPEN_IN_QUICKTIME_PLAYER);
 	}
 	if(u.siteInfo && settings.viewOnSiteContext) c.appendContextMenuItem("viewOnSite", VIEW_ON_SITE(u.siteInfo.name));
 }

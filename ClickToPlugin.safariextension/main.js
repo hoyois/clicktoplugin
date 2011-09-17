@@ -176,7 +176,7 @@ function handleBeforeLoadEvent(event) {
 	if(response === false) { // hide plugin
 		event.preventDefault();
 		event.stopImmediatePropagation();
-		if(event.target.parentNode) removeHTMLNode(event.target);
+		removeHTMLNode(event.target);
 		return;
 	}
 	if(response === "disableSIFR") {
@@ -197,7 +197,7 @@ function handleBeforeLoadEvent(event) {
 	if(settings.debug) {
 		var e = event.target, positionX = 0, positionY = 0;
 		do {positionX += e.offsetLeft; positionY += e.offsetTop;} while(e = e.offsetParent);
-		if(!confirm("ClickToPlugin is about to block an element:\n\nType: " + (response.plugin ? response.plugin : "?") + "\nLocation: " + location.href + "\nSource: " + response.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + data.width + "×" + data.height)) return;
+		if(!confirm("Should ClickToPlugin block this element?\n\nPlug-in: " + (response.plugin ? response.plugin : "") + "\nLocation: " + location.href + "\nSource: " + response.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + data.width + "×" + data.height)) return;
 	}
 	
 	// Block resource
