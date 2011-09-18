@@ -542,6 +542,7 @@ MediaPlayer.prototype.initTrackSelector = function() {
 			var title = "[" + player.printTrack(track) + "/" + player.playlistLength + "]\u2002";
 			if(playlist[i].title) title += playlist[i].title;
 			option.textContent = title;
+			if(firstTrack === null) firstTrack = option;
 			if(player.printTrack(track) <= player.startTrack) selector.insertBefore(option, firstTrack);
 			else selector.appendChild(option);
 		}

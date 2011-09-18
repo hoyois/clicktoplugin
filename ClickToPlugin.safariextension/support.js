@@ -1,12 +1,22 @@
 "use strict";
 var settings = safari.extension.settings;
 
-function loadScripts() { // add scripts to the global page
-	for(var i = 0; i < arguments.length; i++) {
+function loadScripts() { // add scripts to the global page in order
+	var i = 0;
+	var args = arguments;
+	var load = function() {
 		var scriptElement = document.createElement("script");
-		scriptElement.src = makeAbsoluteURL(arguments[i], safari.extension.baseURI);
+		scriptElement.src = args[i];
+		scriptElement.addEventListener("load", next, false);
+		scriptElement.addEventListener("error", next, false);
 		document.head.appendChild(scriptElement);
-	}
+	};
+	var next = function(event) {
+		event.target.removeEventListener("load", next, false);
+		event.target.removeEventListener("error", next, false);
+		if(++i < args.length) load();
+	};
+	load();
 }
 
 function dispatchMessageToAllPages(name, message) {

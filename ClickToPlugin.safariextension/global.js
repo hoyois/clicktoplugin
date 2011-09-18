@@ -17,7 +17,23 @@ if(settings.version < 27) {
 	settings.removeItem("showMediaTooltip");
 	settings.removeItem("defaultTab");
 }
-settings.version = 27;
+if(settings.version < 28) {
+	var tmpArray = [];
+	for(var i = 0; i < settings.additionalScripts.length; i++) {
+		switch(settings.additionalScripts[i]) {
+		case "killers/QuickTime.js":
+		case "killers/DivX.js":
+		case "killers/WindowsMedia.js":
+		case "killers/Generic.js":
+			break;
+		default:
+			tmpArray.push(settings.additionalScripts[i]);
+		}
+	}
+	tmpArray.push("killers/Generic.js");
+	settings.additionalScripts = tmpArray;
+}
+settings.version = 28;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);

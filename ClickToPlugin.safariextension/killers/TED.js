@@ -19,7 +19,7 @@ addKiller("TED", {
 	var xhr = new XMLHttpRequest();
 	xhr.open('GET', url, true);
 	xhr.onload = function() {
-		// response is XML as "text/html"
+		// response is invalid XML but error comes late enough
 		var xml = new DOMParser().parseFromString(xhr.responseText, "text/xml");
 		
 		var sources = [];

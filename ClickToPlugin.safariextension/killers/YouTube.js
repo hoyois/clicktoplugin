@@ -11,7 +11,7 @@ addKiller("YouTube", {
 		var flashvars = parseFlashVariables(data.params.flashvars);
 		if(/\s-\sYouTube$/.test(data.title)) flashvars.title = data.title.slice(0, -10);
 		
-		if(flashvars.list && /^PL|^UL|^AV/.test(flashvars.list)) this.processPlaylistID(flashvars.list, flashvars, callback);
+		if(flashvars.list && /^PL|^SP|^UL|^AV/.test(flashvars.list)) this.processPlaylistID(flashvars.list, flashvars, callback);
 		else if(flashvars.t && flashvars.url_encoded_fmt_stream_map) this.processFlashVars(flashvars, callback);
 		else if(flashvars.video_id) this.processVideoID(flashvars.video_id, callback);
 	} else { // Embedded YT video
@@ -94,9 +94,15 @@ addKiller("YouTube", {
 	var _this = this;
 	
 	var init = function() {
-		if(playlistID.charAt(0) === "P") loadAPIList("https://gdata.youtube.com/feeds/api/playlists/" + playlistID.substr(2), 1);
-		else if(playlistID.charAt(0) === "A") loadArtistList("https://www.youtube.com/artist?a=" + playlistID.substr(2));
-		else { // charAt(0) === "U"
+		switch(playlistID.substr(0,2)) {
+		case "PL":
+		case "SP":
+			loadAPIList("https://gdata.youtube.com/feeds/api/playlists/" + playlistID.substr(2), 1);
+			break;
+		case "AV":
+			loadArtistList("https://www.youtube.com/artist?a=" + playlistID.substr(2));
+			break;
+		case "UL":
 			if(flashvars.creator) loadAPIList("https://gdata.youtube.com/feeds/api/users/" + flashvars.creator + "/uploads", 1);
 			else if(flashvars.ptchn) loadAPIList("https://gdata.youtube.com/feeds/api/users/" + flashvars.ptchn + "/uploads", 1);
 			else {
@@ -105,6 +111,7 @@ addKiller("YouTube", {
 				xhr.onload = function() {loadAPIList("https://gdata.youtube.com/feeds/api/users/" + parseFlashVariables(xhr.responseText).author + "/uploads", 1);};
 				xhr.send(null);
 			}
+			break;
 		}
 	};
 	
