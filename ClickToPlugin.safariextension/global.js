@@ -33,7 +33,11 @@ if(settings.version < 28) {
 	tmpArray.push("killers/Generic.js");
 	settings.additionalScripts = tmpArray;
 }
-settings.version = 28;
+if(settings.version < 29) {
+	settings.openInQTPContext = settings.viewInQTPContext;
+	settings.removeItem("viewInQTPContext");
+}
+settings.version = 29;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
@@ -41,21 +45,26 @@ var localizationScript = localizeAsScript(INJECTED_STRINGS, settings.language);
 safari.extension.addContentScript(localizationScript, [], [], false);
 
 // SETTINGS
-var allSettings = ["language", "currentTab", "additionalScripts", "useFallbackMedia", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "showSourceSelector", "mediaAutoload", "mediaWhitelist", "initialBehavior", "instantAutoplay", "defaultResolution", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showSiteSourceItem", "hideRewindButton", "codecsPolicy", "volume", "useDownloadManager", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "viewInQTPContext", "settingsShortcut", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "trackSelectorShortcut", "allowInvisible", "sIFRPolicy", "opacity", "debug", "showTooltip"];
+var ALL_SETTINGS = ["language", "currentTab", "additionalScripts", "loadIfNotKilled", "useFallbackMedia", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "showSourceSelector", "mediaAutoload", "mediaWhitelist", "initialBehavior", "instantAutoplay", "defaultResolution", "defaultPlayer", "showPluginSource", "showQTPSource", "showAirPlaySource", "showSiteSource", "showPoster", "hideRewindButton", "codecsPolicy", "volume", "useDownloadManager", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "openInQTPContext", "airplayContext", "settingsShortcut", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "trackSelectorShortcut", "allowInvisible", "sIFRPolicy", "opacity", "debug", "showTooltip", "airplayHostname", "airplayPassword"];
+var SECURE_SETTINGS = ["airplayPassword"];
 
 /* Hidden settings:
 language (default: undefined)
 maxInvisibleSize (default: 8)
 */
 
-var injectedSettings = ["useFallbackMedia", "showSourceSelector", "initialBehavior", "instantAutoplay", "defaultPlayer", "showPluginSourceItem", "showQTPSourceItem", "showSiteSourceItem", "hideRewindButton", "volume", "useDownloadManager", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "trackSelectorShortcut", "sIFRPolicy", "opacity", "debug", "showTooltip"];
+var INJECTED_SETTINGS = ["useFallbackMedia", "showSourceSelector", "initialBehavior", "instantAutoplay", "defaultPlayer", "showPluginSource", "showQTPSource", "showAirPlaySource", "showSiteSource", "showPoster", "hideRewindButton", "volume", "useDownloadManager", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "trackSelectorShortcut", "sIFRPolicy", "opacity", "debug", "showTooltip"];
 
 function getSettings(array) {
 	var s = {};
-	for(var i = 0; i < array.length; i++) {
-		s[array[i]] = settings[array[i]];
-	}
+	array.forEach(function(key) {
+		s[key] = (isSecureSetting(key) ? secureSettings : settings)[key];
+	});
 	return s;
+}
+
+function isSecureSetting(key) {
+	return SECURE_SETTINGS.indexOf(key) !== -1;
 }
 
 // Some shortcuts must work on all pages
@@ -71,7 +80,7 @@ function injectGlobalShortcuts() {
 injectGlobalShortcuts();
 
 function changeSetting(key, value) {
-	settings[key] = value;
+	(isSecureSetting(key) ? secureSettings : settings)[key] = value;
 	switch(key) {
 	case "settingsShortcut":
 	case "addToWhitelistShortcut":
@@ -79,7 +88,7 @@ function changeSetting(key, value) {
 		break;
 	case "additionalScripts": // reload killers
 		killers = {};
-		loadScripts.apply(this, settings.additionalScripts);
+		loadScripts.apply(this, value);
 		break;
 	}
 }
@@ -104,6 +113,9 @@ function respondToMessage(event) {
 	case "openTab":
 		openTab(event.message);
 		break;
+	case "airplay":
+		airplay(event.message);
+		break;
 	case "openSettings":
 		openTab(safari.extension.baseURI + "settings.html");
 		break;
@@ -111,7 +123,7 @@ function respondToMessage(event) {
 		changeSetting(event.message.setting, event.message.value);
 		break;
 	case "getSettings":
-		event.target.page.dispatchMessage("CTPsettings", getSettings(allSettings));
+		event.target.page.dispatchMessage("CTPsettings", getSettings(ALL_SETTINGS));
 		break;
 	}
 }
@@ -178,12 +190,16 @@ function canLoad(data, tab) {
 	if(data.documentID === undefined) {
 		data.documentID = documentCount++;
 		response.documentID = data.documentID;
-		response.settings = getSettings(injectedSettings);
+		response.settings = getSettings(INJECTED_SETTINGS);
 	}
 	response.src = data.src;
 	
 	// Killers
-	if(plugin !== nativePlugin && !kill(data, tab) && plugin === null) return true;
+	if(plugin === nativePlugin) {
+		if(settings.loadIfNotKilled) return true;
+	} else {
+		if(!kill(data, tab) && (plugin === null || settings.loadIfNotKilled)) return true;
+	}
 	
 	return response;
 }
@@ -252,7 +268,8 @@ function handleContextMenu(event) {
 	}
 	if(u.source !== undefined) {
 		if(settings.downloadContext) c.appendContextMenuItem("download", u.isAudio ? DOWNLOAD_AUDIO : DOWNLOAD_VIDEO);
-		if(settings.viewInQTPContext) c.appendContextMenuItem("viewInQTP", OPEN_IN_QUICKTIME_PLAYER);
+		if(settings.openInQTPContext) c.appendContextMenuItem("openInQTP", OPEN_IN_QUICKTIME_PLAYER);
+		if(settings.airplayContext) c.appendContextMenuItem("airplay", SEND_VIA_AIRPLAY);
 	}
 	if(u.siteInfo && settings.viewOnSiteContext) c.appendContextMenuItem("viewOnSite", VIEW_ON_SITE(u.siteInfo.name));
 }
@@ -260,9 +277,9 @@ function handleContextMenu(event) {
 function doCommand(event) {
 	var tab = safari.application.activeBrowserWindow.activeTab;
 	switch(event.command) {
-	case "viewOnSite":
+	/*case "viewOnSite":
 		openTab(event.userInfo.siteInfo.url);
-		break;
+		break;*/
 	case "locationsWhitelist":
 	case "locationsBlacklist":
 		handleWhitelisting(event.command, extractDomain(event.userInfo.location));
@@ -330,7 +347,6 @@ var killers = {};
 function addKiller(name, killer) {killers[name] = killer;}
 function hasKiller(name) {return killers[name] !== undefined;}
 function getKiller(name) {return killers[name];}
-// TODO: negative killer callbacks: return fail();
 
 function kill(data, tab) {
 	var killerID;
@@ -344,6 +360,12 @@ function kill(data, tab) {
 	
 	var callback = function(mediaData) {
 		if(!tab.page) return; // user has closed tab
+		/* TODO?: implement this
+		if(mediaData === null) { // killer failed
+			if(++k < killerIDs.length) killers[killerIDs[k]].process(data, callback);
+			else if(settings.loadIfNotKilled) tab.page.dispatchMessage("load", {"documentID": data.documentID, "elementID": data.elementID});
+			return;
+		}*/
 		if(mediaData.playlist.length === 0) return;
 		
 		for(var i = 0; i < mediaData.playlist.length; i++) {
@@ -352,6 +374,7 @@ function kill(data, tab) {
 			if(mediaData.playlist[i].defaultSource === undefined && (i > 0 || mediaData.loadAfter)) mediaData.playlist[i] = null;
 		}
 		if(!mediaData.loadAfter) {
+			if(mediaData.playlist[0] === null) return;
 			mediaData.autoplay = matchList(settings.mediaWhitelist, data.location);
 			mediaData.autoload = mediaData.playlist[0].defaultSource !== undefined && settings.defaultPlayer === "html5" && (mediaData.autoplay || settings.mediaAutoload);
 		}

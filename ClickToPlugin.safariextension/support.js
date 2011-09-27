@@ -1,5 +1,6 @@
 "use strict";
 var settings = safari.extension.settings;
+var secureSettings = safari.extension.secureSettings;
 
 function loadScripts() { // add scripts to the global page in order
 	var i = 0;
@@ -36,6 +37,13 @@ function reloadTab(tab) {
 
 function openTab(url) {
 	safari.application.activeBrowserWindow.openTab("foreground").url = url;
+}
+
+function airplay(url) {
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", "http://" + settings.airplayHostname + ":7000/play", true, "AirPlay", secureSettings.getItem("airplayPassword"));
+	var content = "Content-Location:" + url + "\nStart-Position:0\n";
+	xhr.send("Content-Length:" + content.length + "\nUser-Agent:Media-Control/1.0\n" + content);
 }
 
 function matchList(list, string) {

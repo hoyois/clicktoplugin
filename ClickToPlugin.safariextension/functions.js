@@ -1,5 +1,6 @@
 "use strict";
 function removeHTMLNode(node) {
+	if(!node.parentNode) return;
 	while(node.parentNode.parentNode && node.parentNode.childNodes.length === 1) node = node.parentNode;
 	node.parentNode.removeChild(node);
 }

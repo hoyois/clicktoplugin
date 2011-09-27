@@ -4,7 +4,7 @@
 
 var PREFERENCES_STRINGS = {
 	"PREFERENCES_LAYOUT": {
-		"en-us": ["nav{padding-right:1px;}", "#general li > span:first-child{max-width:150px;}"],
+		"en-us": ["nav{padding-right:1px;}", "#general li > span:first-child{max-width:160px;}"],
 		"fr-fr": ["#media_player li > span:first-child{max-width:220px;}"],
 		"es-es": ["nav{padding-right:1px;}", "#media_player li > span.textarea_label > label{max-width:200px;}"],
 		"de-de": ["#general li > span:first-child{max-width:160px;}", "#media_player li > span.textarea_label > label{max-width:180px;}"],
@@ -169,6 +169,15 @@ var PREFERENCES_STRINGS = {
 		"zh-tw": "使用預設值",
 		"zh-cn": "还原默认值"
 	},
+	"LOAD_PLUGIN_IF_NOT_KILLED": {
+		"en-us": "Load plug-in if HTML5 conversion fails",
+		"fr-fr": "Charger le plugin si la conversion en HTML5 échoue",
+		"es-es": "Cargar el complemento si la conversión a HTML5 falla",
+		"de-de": "Lade Plug-in wenn HTML5-Umwandlung fehlschlägt",
+		"ja-jp": "HTML5の置き換えに問題が発生する場合はプラグインに戻す",
+		"zh-tw": "當外掛模組不能被轉換成 HTML5 時重新載入外掛模組",
+		"zh-cn": "当HTML5替代失败时重新加载插件"
+	},
 	"USE_FALLBACK_MEDIA": {
 		"en-us": "Use HTML5 media fallbacks",
 		"fr-fr": "Utiliser les replis HTML5",
@@ -182,7 +191,7 @@ var PREFERENCES_STRINGS = {
 		"en-us": "Downloading:",
 		"fr-fr": "Téléchargements :",
 		"es-es": "Descargas:",
-		"de-de": "Lade:",
+		"de-de": "Download:",
 		"ja-jp": "ダウンロード：",
 		"zh-tw": "下載：",
 		"zh-cn": "下载:"
@@ -195,6 +204,24 @@ var PREFERENCES_STRINGS = {
 		"ja-jp": "ダウンロードマネージャーを使う",
 		"zh-tw": "啟用下載管理程式",
 		"zh-cn": "启用下载管理工具"
+	},
+	"AIRPLAY_HOSTNAME": {
+		"en-us": "AirPlay device hostname:",
+		"fr-fr": "Périphérique AirPlay :",
+		"es-es": "Nombre del dispositivo AirPlay:",
+		"de-de": "AirPlay-Geräte-Hostname:",
+		"ja-jp": "AirPlay ホスト名：",
+		"zh-tw": "AirPlay 主機名稱：",
+		"zh-cn": "AirPlay 主机名称:"
+	},
+	"AIRPLAY_PASSWORD": {
+		"en-us": "AirPlay password:",
+		"fr-fr": "Mot de passe AirPlay :",
+		"es-es": "Contraseña para AirPlay:",
+		"de-de": "AirPlay-Passwort:",
+		"ja-jp": "AirPlay パスワード：",
+		"zh-tw": "AirPlay 密碼：",
+		"zh-cn": "AirPlay 密码:"
 	},
 	
 	// Plug-ins tab
@@ -337,15 +364,7 @@ var PREFERENCES_STRINGS = {
 		"zh-tw": "預設播放器：",
 		"zh-cn": "默认播放器:"
 	},
-	"HTML5_PLAYER": {
-		"en-us": "HTML5",
-		"fr-fr": "HTML5",
-		"es-es": "HTML5",
-		"de-de": "HTML5",
-		"ja-jp": "HTML5",
-		"zh-tw": "HTML5",
-		"zh-cn": "HTML5"
-	},
+	// "HTML5_PLAYER": {} // "HTML5"
 	"QUICKTIME_PLAYER": {
 		"en-us": "QuickTime Player",
 		"fr-fr": "QuickTime Player",
@@ -355,6 +374,7 @@ var PREFERENCES_STRINGS = {
 		"zh-tw": "QuickTime Player",
 		"zh-cn": "QuickTime Player"
 	},
+	// "AIRPLAY_PLAYER": {} // "AirPlay"
 	"PLUGIN_PLAYER": {
 		"en-us": "Plug-in",
 		"fr-fr": "Plugin",
@@ -473,20 +493,29 @@ var PREFERENCES_STRINGS = {
 		"zh-tw": "任意使用",
 		"zh-cn": "自由使用"
 	},
-	"SHOW_SOURCE_SELECTOR": {
-		"en-us": "Show list of available sources",
-		"fr-fr": "Afficher la liste des formats disponibles",
-		"es-es": "Mostrar una lista de los formatos disponibles",
-		"de-de": "Liste der verfügbaren Quellen anzeigen",
-		"ja-jp": "複数のソースがある場合はリストを表示する",
-		"zh-tw": "顯示可用來源列表",
-		"zh-cn": "显示可用的来源菜单"
+	"SOURCE_SELECTOR": {
+		"en-us": "Source selector:",
+		"fr-fr": "Sélecteur de médias :",
+		"es-es": "Selector de fuentes:",
+		"de-de": "Quellenauswahl:",
+		"ja-jp": "ソースセレクタ：",
+		"zh-tw": "來源選取器：",
+		"zh-cn": "来源选择器:"
+	},
+	"SHOW_MEDIA_SOURCES": {
+		"en-us": "Include media sources",
+		"fr-fr": "Inclure les formats disponibles",
+		"es-es": "Incluir fuentes multimedia",
+		"de-de": "Medienquellen anzeigen",
+		"ja-jp": "メディアのソースを含む",
+		"zh-tw": "包括媒體來源",
+		"zh-cn": "包含媒体的来源"
 	},
 	"SHOW_PLUGIN_SOURCE": {
 		"en-us": "Include plug-in",
 		"fr-fr": "Inclure le plugin",
 		"es-es": "Incluir el complemento",
-		"de-de": "Einschließlich Plug-In",
+		"de-de": "Plug-In anzeigen",
 		"ja-jp": "プラグインを含む",
 		"zh-tw": "包括外掛模組",
 		"zh-cn": "包含插件"
@@ -495,19 +524,37 @@ var PREFERENCES_STRINGS = {
 		"en-us": "Include QuickTime Player",
 		"fr-fr": "Inclure QuickTime Player",
 		"es-es": "Incluir QuickTime Player",
-		"de-de": "Einschließlich QuickTime-Player",
+		"de-de": "QuickTime-Player anzeigen",
 		"ja-jp": "QuickTime プレーヤーを含む",
 		"zh-tw": "包括 QuickTime Player",
 		"zh-cn": "包含 QuickTime Player"
+	},
+	"SHOW_AIRPLAY_SOURCE": {
+		"en-us": "Include AirPlay",
+		"fr-fr": "Inclure AirPlay",
+		"es-es": "Incluir AirPlay",
+		"de-de": "AirPlay anzeigen",
+		"ja-jp": "AirPlay を含む",
+		"zh-tw": "包括 AirPlay",
+		"zh-cn": "包含 AirPlay"
 	},
 	"SHOW_SITE_SOURCE": {
 		"en-us": "Include the video’s web page",
 		"fr-fr": "Inclure la page web de la vidéo",
 		"es-es": "Incluir la página web del video",
-		"de-de": "Einschließlich Video-Seite",
-		"ja-jp": "ビデオのリンク先を含む",
+		"de-de": "Video-Seite anzeigen",
+		"ja-jp": "ビデオの参照元URLを含む",
 		"zh-tw": "包括影片的來源頁",
 		"zh-cn": "包含视频原先的页面"
+	},
+	"SHOW_POSTER": {
+		"en-us": "Show preview image",
+		"fr-fr": "Afficher un aperçu de la vidéo",
+		"es-es": "Mostrar la imagen de previsualización",
+		"de-de": "Vorschau anzeigen",
+		"ja-jp": "プレビューを有効にする",
+		"zh-tw": "啟用預覽",
+		"zh-cn": "显示缩图"
 	},
 	"HIDE_REWIND_BUTTON": {
 		"en-us": "Hide “Rewind” button",
@@ -627,6 +674,15 @@ var PREFERENCES_STRINGS = {
 		"ja-jp": "QuickTime プレーヤーで開く",
 		"zh-tw": "於 QuickTime Player 檢視",
 		"zh-cn": "在 QuickTime Player 查看"
+	},
+	"SEND_VIA_AIRPLAY_CONTEXT": {
+		"en-us": "Send via AirPlay",
+		"fr-fr": "Ouvrir dans QuickTime Player",
+		"es-es": "Enviar vía AirPlay",
+		"de-de": "An AirPlay-Gerät senden",
+		"ja-jp": "AirPlay を経由で出力",
+		"zh-tw": "經由 AirPlay 輸出",
+		"zh-cn": "通过 AirPlay 输出"
 	},
 	
 	// Keyboard shortcuts tab
@@ -894,6 +950,15 @@ var GLOBAL_STRINGS = {
 		"ja-jp": "QuickTime プレーヤーで開く",
 		"zh-tw": "於 QuickTime Player 檢視",
 		"zh-cn": "在 QuickTime Player 查看"
+	},
+	"SEND_VIA_AIRPLAY": {
+		"en-us": "Send via AirPlay",
+		"fr-fr": "Ouvrir dans QuickTime Player",
+		"es-es": "Enviar vía AirPlay",
+		"de-de": "An AirPlay-Gerät senden",
+		"ja-jp": "AirPlay を経由で出力",
+		"zh-tw": "經由 AirPlay 輸出",
+		"zh-cn": "通过 AirPlay 输出"
 	},
 	"GET_PLUGIN_INFO": {
 		"en-us": "Get Plug-in Info",

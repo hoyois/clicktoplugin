@@ -83,7 +83,7 @@ addKiller("YouTube", {
 			};
 			_this.processFlashVars(flashvars, callbackForEmbed);
 		} else { // happens if YT just removed content and didn't update its playlists yet
-			callback({"playlist": []});
+			callback({"playlist": [null]});
 		}
 	};
 	xhr.send(null);
@@ -159,7 +159,6 @@ addKiller("YouTube", {
 		var callbackForPlaylist = function(mediaData) {
 			mediaData.playlistLength = length;
 			mediaData.startTrack = track;
-			if(mediaData.playlist[0].siteInfo) mediaData.playlist[0].siteInfo.url += "&list=" + playlistID;
 			callback(mediaData);
 		};
 		
@@ -177,10 +176,7 @@ addKiller("YouTube", {
 		if(imax > 3) imax = 3; // load by groups of 3
 		var mediaData = {"loadAfter": true, "playlist": []};
 		var next = function(data) {
-			if(data.playlist.length > 0) {
-				data.playlist[0].siteInfo.url += "&list=" + playlistID;
-				mediaData.playlist.push(data.playlist[0]);
-			} else mediaData.playlist.push(null);
+			mediaData.playlist.push(data.playlist[0]);
 			++i;
 			if(i === imax) {
 				callback(mediaData);
