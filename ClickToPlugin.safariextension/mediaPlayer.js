@@ -241,7 +241,8 @@ MediaPlayer.prototype.addListeners = function() {
 	if(this.playlistLength > 1) this.mediaElement.addEventListener("ended", function() {
 		if(!_this.isLastTrack()) _this.nextTrack();
 	}, false);
-	this.mediaElement.addEventListener("loadedmetadata", function(event) {
+
+	this.mediaElement.addEventListener("loadeddata", function(event) {
 		var seek = _this.playlist[_this.currentTrack].seek || 0;
 		if (seek) {
 			_this.mediaElement.currentTime = seek;
