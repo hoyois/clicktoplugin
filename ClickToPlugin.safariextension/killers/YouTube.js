@@ -6,7 +6,7 @@ addKiller("YouTube", {
 	return false;
 },
 
-"processSeekTime": function(flashvars, url, callback) {
+"processSeekTime": function(url, callback) {
 	var seekTime = NaN;
 	var match = /(?:#|&)t=(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?/.exec(url);
 	if (match) {
@@ -33,7 +33,7 @@ addKiller("YouTube", {
 		var flashvars = parseFlashVariables(data.params.flashvars);
 		if(/\s-\sYouTube$/.test(data.title)) flashvars.title = data.title.slice(0, -10);
 
-		callback = this.processSeekTime(flashvars, data.location, callback);
+		callback = this.processSeekTime(data.location, callback);
 
 		if(flashvars.list && /^PL|^SP|^UL|^AV/.test(flashvars.list)) this.processPlaylistID(flashvars.list, flashvars, callback);
 		else if(flashvars.t && flashvars.url_encoded_fmt_stream_map) this.processFlashVars(flashvars, callback);
