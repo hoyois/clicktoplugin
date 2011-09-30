@@ -56,8 +56,9 @@ addKiller("Break", {
 			match = /sGlobalThumbnailURL=['"]([^'"]*)['"]/.exec(xhr.responseText);
 			if(match) posterURL = match[1];
 		}
-		match = /!!!&amp;body=(.*?)%0d/.exec(xhr.responseText);
-		if(match) title = decodeURIComponent(match[1]);
+		
+		match = /id=\"vid_title\" content=\"([^"]*)\"/.exec(xhr.responseText);
+		if(match) title = unescapeHTML(match[1]);
 		if(!data.onsite || data.location === "http://www.break.com/") siteInfo = {"name": "Break", "url": url};
 		
 		callback({"playlist": [{

@@ -8,30 +8,32 @@ function MediaPlayer(width, height, contextInfo) {
 	this.width = width;
 	this.height = height;
 	this.contextInfo = contextInfo;
+	this.currentTrack = 0;
 }
 
-MediaPlayer.prototype.getTrack = function() {
-	var track = this.currentTrack;
-	if(track === undefined) track = 0;
-	return this.playlist[track];
-};
-
-MediaPlayer.prototype.getSource = function(source) {
+MediaPlayer.prototype.getURL = function(source) {
 	if(source === undefined) source = this.currentSource;
-	return this.getTrack().sources[source];
+	return this.playlist[this.currentTrack].sources[source].url;
 };
 
 MediaPlayer.prototype.download = function(source) {
-	(settings.useDownloadManager ? sendToDownloadManager : downloadURL)(this.getSource(source).url);
+	(settings.useDownloadManager ? sendToDownloadManager : downloadURL)(this.getURL(source));
 };
 
-MediaPlayer.prototype.viewInQTP = function(source) {
+MediaPlayer.prototype.openInQTP = function(source) {
 	if(this.mediaElement) this.mediaElement.pause();
-	openInQuickTimePlayer(this.getSource(source).url);
+	openInQuickTimePlayer(this.getURL(source));
+};
+
+MediaPlayer.prototype.airplay = function(source) {
+	if(this.mediaElement) this.mediaElement.pause();
+	var anchor = document.createElement("a");
+	anchor.href = this.getURL(source);
+	safari.self.tab.dispatchMessage("airplay", anchor.href);
 };
 
 MediaPlayer.prototype.viewOnSite = function() {
-	safari.self.tab.dispatchMessage("openTab", this.getTrack().siteInfo.url);
+	safari.self.tab.dispatchMessage("openTab", this.playlist[this.currentTrack].siteInfo.url);
 };
 
 MediaPlayer.prototype.handleMediaData = function(mediaData) {
@@ -48,7 +50,7 @@ MediaPlayer.prototype.handleMediaData = function(mediaData) {
 		else this.playlistLength = mediaData.playlistLength ? mediaData.playlistLength : mediaData.playlist.length;
 		this.initialBehavior = mediaData.autoplay ? "autoplay" : settings.initialBehavior;
 		this.audioOnly = mediaData.audioOnly;
-		if(settings.showSourceSelector) this.initSourceSelector();
+		this.initSourceSelector();
 	}
 };
 
@@ -68,7 +70,8 @@ MediaPlayer.prototype.init = function(style) {
 		this.mediaElement.preload = "auto";
 		break;
 	case "autoplay":
-		this.autoplay();
+		this.mediaElement.preload = "auto";
+		this.mediaElement.autoplay = true;
 		break;
 	}
 	this.container.appendChild(this.mediaElement);
@@ -183,18 +186,12 @@ MediaPlayer.prototype.load = function(track, source, autoplay, updatePoster) {
 	this.currentSource = source;
 	this.mediaElement.src = this.playlist[track].sources[source].url;
 	if(updatePoster) this.updatePoster(); // must be done after setting src (#67900)
-	if(autoplay) this.autoplay();
+	if(autoplay) {
+		this.mediaElement.preload = "auto";
+		this.mediaElement.autoplay = true;
+	}
 	this.trackSelector.update();
-};
-
-MediaPlayer.prototype.autoplay = function() {
-	this.mediaElement.preload = "auto";
-	var type = settings.instantAutoplay ? "canplay" : "canplaythrough";
-	var handleCanPlayEvent = function(event) {
-		event.target.removeEventListener(type, handleCanPlayEvent, false);
-		event.target.play();
-	};
-	this.mediaElement.addEventListener(type, handleCanPlayEvent, false);
+	if(settings.instantAutoplay && this.mediaElement.autoplay) this.mediaElement.play();
 };
 
 MediaPlayer.prototype.updatePoster = function() {
@@ -216,14 +213,14 @@ MediaPlayer.prototype.printTrack = function(track) {
 };
 
 MediaPlayer.prototype.setContextInfo = function(event) {
-	var media = this.getTrack();
+	var media = this.playlist[this.currentTrack];
 	var source = event.source;
 	if(source === undefined) source = this.currentSource;
 	
 	var contextInfo = this.contextInfo;
-	contextInfo.siteInfo = media.siteInfo;
+	if(media.siteInfo) contextInfo.site = media.siteInfo.name;
 	contextInfo.hasMedia = true;
-	contextInfo.isMedia = this.currentTrack !== undefined;
+	contextInfo.isMedia = this.mediaElement !== undefined;
 	contextInfo.source = source;
 	if(source !== undefined) contextInfo.isAudio = media.sources[source].isAudio;
 	safari.self.tab.setContextMenuEventUserInfo(event, contextInfo);
@@ -413,7 +410,8 @@ MediaPlayer.prototype.initSourceSelector = function() {
 		loadMedia(player.contextInfo.elementID, true);
 	};
 	var clickPlugin = function() {loadPlugin(player.contextInfo.elementID);};
-	var clickQTP = function() {player.viewInQTP();};
+	var clickQTP = function() {player.openInQTP();};
+	var clickAirPlay = function() {player.airplay();};
 	var clickSite = function() {player.viewOnSite();};
 	
 	this.sourceSelector = {
@@ -431,18 +429,21 @@ MediaPlayer.prototype.initSourceSelector = function() {
 		"update": function() {
 			container.classList.add("CTPhidden");
 			list.innerHTML = "";
-			var media = player.getTrack();
-			for(var i = 0; i < media.sources.length; i++) {
-				var format = media.sources[i].format;
-				append(format ? format : "HTML5", clickSource, media.sources[i].url, i);
+			var media = player.playlist[player.currentTrack];
+			if(settings.showMediaSources) {
+				for(var i = 0; i < media.sources.length; i++) {
+					var format = media.sources[i].format;
+					append(format ? format : "HTML5", clickSource, media.sources[i].url, i);
+				}
+				if(player.currentSource !== undefined) list.childNodes[player.currentSource].classList.add("CTPcurrentSource");
 			}
-			if(player.currentSource !== undefined) list.childNodes[player.currentSource].classList.add("CTPcurrentSource");
-			if(settings.showPluginSourceItem && player.contextInfo.plugin) append(player.contextInfo.plugin, clickPlugin, player.contextInfo.src);
-			if(settings.showQTPSourceItem && player.currentSource !== undefined) append(QT_PLAYER, clickQTP);
-			if(settings.showSiteSourceItem && media.siteInfo) append(media.siteInfo.name, clickSite, media.siteInfo.url);
+			if(settings.showPluginSource && player.contextInfo.plugin) append(player.contextInfo.plugin, clickPlugin, player.contextInfo.src);
+			if(settings.showSiteSource && media.siteInfo) append(media.siteInfo.name, clickSite, media.siteInfo.url);
+			if(settings.showQTPSource && player.currentSource !== undefined) append(QT_PLAYER, clickQTP);
+			if(settings.showAirPlaySource && player.currentSource !== undefined) append("AirPlay", clickAirPlay);
 
 			// Unhide if it doesn't overflow
-			if(container.offsetWidth + 10 < player.width && container.offsetHeight + 35 < player.height) container.classList.remove("CTPhidden");
+			if(list.childNodes.length > 0 && container.offsetWidth + 10 < player.width && container.offsetHeight + (player.mediaElement ? 35 : 10) < player.height) container.classList.remove("CTPhidden");
 		},
 
 		"setSource": function(i) {
@@ -542,6 +543,7 @@ MediaPlayer.prototype.initTrackSelector = function() {
 			var title = "[" + player.printTrack(track) + "/" + player.playlistLength + "]\u2002";
 			if(playlist[i].title) title += playlist[i].title;
 			option.textContent = title;
+			if(firstTrack === null) firstTrack = option;
 			if(player.printTrack(track) <= player.startTrack) selector.insertBefore(option, firstTrack);
 			else selector.appendChild(option);
 		}
