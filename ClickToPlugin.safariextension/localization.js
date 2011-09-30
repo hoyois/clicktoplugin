@@ -4,13 +4,13 @@
 
 var PREFERENCES_STRINGS = {
 	"PREFERENCES_LAYOUT": {
-		"en-us": ["nav{padding-right:1px;}", "#general li > span:first-child{max-width:160px;}"],
-		"fr-fr": ["#media_player li > span:first-child{max-width:220px;}"],
-		"es-es": ["nav{padding-right:1px;}", "#media_player li > span.textarea_label > label{max-width:200px;}"],
-		"de-de": ["#general li > span:first-child{max-width:160px;}", "#media_player li > span.textarea_label > label{max-width:180px;}"],
-		"ja-jp": ["nav{padding-right:1px;}", "#general li > span:first-child{max-width:250px;}"],
-		"zh-tw": ["nav{padding-right:1px;}"],
-		"zh-cn": []
+		"en-us": ["#general li > span:first-child{max-width:160px;}"],
+		"fr-fr": ["nav{padding-right:1px;}", "#media_player li > span:first-child{max-width:220px;}"],
+		"es-es": ["#media_player li > span.textarea_label > label{max-width:200px;}"],
+		"de-de": ["nav{padding-right:1px;}", "#general li > span:first-child{max-width:170px;}", "#media_player li > span.textarea_label > label{max-width:180px;}"],
+		"ja-jp": ["#general li > span:first-child{max-width:250px;}"],
+		"zh-tw": [],
+		"zh-cn": ["nav{padding-right:1px;}"]
 	},
 	"PREFERENCES_TITLE": {
 		"en-us": "ClickToPlugin Preferences",
@@ -365,6 +365,15 @@ var PREFERENCES_STRINGS = {
 		"zh-cn": "默认播放器:"
 	},
 	// "HTML5_PLAYER": {} // "HTML5"
+	"PLUGIN_PLAYER": {
+		"en-us": "Plug-in",
+		"fr-fr": "Plugin",
+		"es-es": "Complemento",
+		"de-de": "Plug-In",
+		"ja-jp": "プラグイン",
+		"zh-tw": "外掛模組",
+		"zh-cn": "插件"
+	},
 	"QUICKTIME_PLAYER": {
 		"en-us": "QuickTime Player",
 		"fr-fr": "QuickTime Player",
@@ -375,15 +384,6 @@ var PREFERENCES_STRINGS = {
 		"zh-cn": "QuickTime Player"
 	},
 	// "AIRPLAY_PLAYER": {} // "AirPlay"
-	"PLUGIN_PLAYER": {
-		"en-us": "Plug-in",
-		"fr-fr": "Plugin",
-		"es-es": "Complemento",
-		"de-de": "Plug-In",
-		"ja-jp": "プラグイン",
-		"zh-tw": "外掛模組",
-		"zh-cn": "插件"
-	},
 	"AUTOLOAD_MEDIA_PLAYER": {
 		"en-us": "Load media player automatically",
 		"fr-fr": "Charger le lecteur automatiquement",
@@ -677,7 +677,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SEND_VIA_AIRPLAY_CONTEXT": {
 		"en-us": "Send via AirPlay",
-		"fr-fr": "Ouvrir dans QuickTime Player",
+		"fr-fr": "Envoyer par AirPlay",
 		"es-es": "Enviar vía AirPlay",
 		"de-de": "An AirPlay-Gerät senden",
 		"ja-jp": "AirPlay を経由で出力",
@@ -953,7 +953,7 @@ var GLOBAL_STRINGS = {
 	},
 	"SEND_VIA_AIRPLAY": {
 		"en-us": "Send via AirPlay",
-		"fr-fr": "Ouvrir dans QuickTime Player",
+		"fr-fr": "Envoyer par AirPlay",
 		"es-es": "Enviar vía AirPlay",
 		"de-de": "An AirPlay-Gerät senden",
 		"ja-jp": "AirPlay を経由で出力",

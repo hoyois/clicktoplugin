@@ -1,5 +1,11 @@
 "use strict";
 // UPDATE
+if(settings.version === undefined) {
+	var tab;
+	if(safari.application.activeBrowserWindow) tab = safari.application.activeBrowserWindow.openTab("foreground");
+	else tab = safari.application.openBrowserWindow().activeTab;
+	tab.url = safari.extension.baseURI + "settings.html";
+}
 if(settings.version < 25) {
 	settings.removeItem("enabledKillers");
 	settings.removeItem("usePlaylists");
@@ -36,6 +42,11 @@ if(settings.version < 28) {
 if(settings.version < 29) {
 	settings.openInQTPContext = settings.viewInQTPContext;
 	settings.removeItem("viewInQTPContext");
+	settings.showMediaSources = settings.showSourceSelector;
+	settings.showPluginSource = settings.showSourceSelector;
+	settings.removeItem("showSourceSelector");
+	settings.killer = settings.additionalScripts;
+	settings.removeItem("additionalScripts");
 }
 settings.version = 29;
 
@@ -45,15 +56,13 @@ var localizationScript = localizeAsScript(INJECTED_STRINGS, settings.language);
 safari.extension.addContentScript(localizationScript, [], [], false);
 
 // SETTINGS
-var ALL_SETTINGS = ["language", "currentTab", "additionalScripts", "loadIfNotKilled", "useFallbackMedia", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "showSourceSelector", "mediaAutoload", "mediaWhitelist", "initialBehavior", "instantAutoplay", "defaultResolution", "defaultPlayer", "showPluginSource", "showQTPSource", "showAirPlaySource", "showSiteSource", "showPoster", "hideRewindButton", "codecsPolicy", "volume", "useDownloadManager", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "openInQTPContext", "airplayContext", "settingsShortcut", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "trackSelectorShortcut", "allowInvisible", "sIFRPolicy", "opacity", "debug", "showTooltip", "airplayHostname", "airplayPassword"];
+var ALL_SETTINGS = ["language", "currentTab", "killers", "loadIfNotKilled", "useFallbackMedia", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "mediaAutoload", "mediaWhitelist", "initialBehavior", "instantAutoplay", "defaultResolution", "defaultPlayer", "showMediaSources", "showPluginSource", "showQTPSource", "showAirPlaySource", "showSiteSource", "showPoster", "hideRewindButton", "codecsPolicy", "volume", "useDownloadManager", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "openInQTPContext", "airplayContext", "settingsShortcut", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "trackSelectorShortcut", "allowInvisible", "sIFRPolicy", "opacity", "debug", "showTooltip", "airplayHostname", "airplayPassword"];
 var SECURE_SETTINGS = ["airplayPassword"];
+var INJECTED_SETTINGS = ["useFallbackMedia", "initialBehavior", "instantAutoplay", "defaultPlayer", "showMediaSources", "showPluginSource", "showQTPSource", "showAirPlaySource", "showSiteSource", "showPoster", "hideRewindButton", "volume", "useDownloadManager", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "trackSelectorShortcut", "sIFRPolicy", "opacity", "debug", "showTooltip"];
 
 /* Hidden settings:
 language (default: undefined)
-maxInvisibleSize (default: 8)
-*/
-
-var INJECTED_SETTINGS = ["useFallbackMedia", "showSourceSelector", "initialBehavior", "instantAutoplay", "defaultPlayer", "showPluginSource", "showQTPSource", "showAirPlaySource", "showSiteSource", "showPoster", "hideRewindButton", "volume", "useDownloadManager", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "trackSelectorShortcut", "sIFRPolicy", "opacity", "debug", "showTooltip"];
+maxInvisibleSize (default: 8) */
 
 function getSettings(array) {
 	var s = {};
@@ -70,23 +79,23 @@ function isSecureSetting(key) {
 // Some shortcuts must work on all pages
 // To avoid messaging, we use a dynamic content script to register them
 var shortcutScript;
-function injectGlobalShortcuts() {
+function updateGlobalShortcuts() {
 	safari.extension.removeContentScript(shortcutScript);
 	var script = "";
 	if(settings.settingsShortcut) script += "document.addEventListener(\"" + settings.settingsShortcut.type + "\",function(e){if(testShortcut(e," + JSON.stringify(settings.settingsShortcut) + "))safari.self.tab.dispatchMessage(\"showSettings\", \"\");},false);";
 	if(settings.addToWhitelistShortcut) script += "document.addEventListener(\"" + settings.addToWhitelistShortcut.type + "\",function(e){if(testShortcut(e," + JSON.stringify(settings.addToWhitelistShortcut) + "))safari.self.tab.dispatchMessage(\"whitelist\",location.href);},false);";
 	if(script) shortcutScript =  safari.extension.addContentScript(script, [], [safari.extension.baseURI + "*"], false);
 }
-injectGlobalShortcuts();
+updateGlobalShortcuts();
 
 function changeSetting(key, value) {
 	(isSecureSetting(key) ? secureSettings : settings)[key] = value;
 	switch(key) {
 	case "settingsShortcut":
 	case "addToWhitelistShortcut":
-		injectGlobalShortcuts();
+		updateGlobalShortcuts();
 		break;
-	case "additionalScripts": // reload killers
+	case "killers": // reload killers
 		killers = {};
 		loadScripts.apply(this, value);
 		break;
@@ -266,20 +275,17 @@ function handleContextMenu(event) {
 		if(settings.addToBlacklistContext && !settings.invertBlacklists && u.src) c.appendContextMenuItem("sourcesBlacklist", ALWAYS_HIDE_SOURCE);
 		if(settings.debug) c.appendContextMenuItem("showInfo", GET_PLUGIN_INFO);
 	}
+	if(u.site && settings.viewOnSiteContext) c.appendContextMenuItem("viewOnSite", VIEW_ON_SITE(u.site));
 	if(u.source !== undefined) {
 		if(settings.downloadContext) c.appendContextMenuItem("download", u.isAudio ? DOWNLOAD_AUDIO : DOWNLOAD_VIDEO);
 		if(settings.openInQTPContext) c.appendContextMenuItem("openInQTP", OPEN_IN_QUICKTIME_PLAYER);
 		if(settings.airplayContext) c.appendContextMenuItem("airplay", SEND_VIA_AIRPLAY);
 	}
-	if(u.siteInfo && settings.viewOnSiteContext) c.appendContextMenuItem("viewOnSite", VIEW_ON_SITE(u.siteInfo.name));
 }
 
 function doCommand(event) {
 	var tab = safari.application.activeBrowserWindow.activeTab;
 	switch(event.command) {
-	/*case "viewOnSite":
-		openTab(event.userInfo.siteInfo.url);
-		break;*/
 	case "locationsWhitelist":
 	case "locationsBlacklist":
 		handleWhitelisting(event.command, extractDomain(event.userInfo.location));
@@ -316,7 +322,7 @@ function switchOn() {
 	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "MediaPlayer.js");
 	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "main.js");
 	safari.extension.addContentScript(localizationScript, [], [], false);
-	injectGlobalShortcuts();
+	updateGlobalShortcuts();
 	safari.extension.disabled = false;
 	reloadTab(safari.application.activeBrowserWindow.activeTab);
 }
@@ -391,6 +397,6 @@ safari.application.addEventListener("message", respondToMessage, false);
 safari.application.addEventListener("contextmenu", handleContextMenu, false);
 safari.application.addEventListener("command", doCommand, false);
 
-// ADDITIONAL SCRIPTS
-loadScripts.apply(this, settings.additionalScripts);
+// LOAD KILLERS
+loadScripts.apply(this, settings.killers);
 

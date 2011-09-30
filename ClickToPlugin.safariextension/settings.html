@@ -29,7 +29,7 @@
 				<option value="autoload" title="SIFR_AUTOLOAD"></option>
 			</select></span></li>
 			<li class="glue"></li>
-			<li><span class="textarea_label"><label for="additionalScripts"><span class="string" title="KILLER_SCRIPTS"></span></label><br><input id="reset_killers" type="button"></span><span><textarea id="additionalScripts" class="hfil" wrap="off"></textarea></span></li>
+			<li><span class="textarea_label"><label for="killers"><span class="string" title="KILLER_SCRIPTS"></span></label><br><input id="reset_killers" type="button"></span><span><textarea id="killers" class="hfil" wrap="off"></textarea></span></li>
 			<li><span></span><span class="checkbox"><input id="loadIfNotKilled" class="setting" type="checkbox"><label for="loadIfNotKilled"><span class="string" title="LOAD_PLUGIN_IF_NOT_KILLED"></span></label></span></li>
 			<li><span></span><span class="checkbox"><input id="useFallbackMedia" class="setting" type="checkbox"><label for="useFallbackMedia"><span class="string" title="USE_FALLBACK_MEDIA"></span></label></span></li>
 			<li class="glue"></li>
@@ -59,9 +59,9 @@
 		<menu id="media_player" class="two_column">
 			<li><span><label for="defaultPlayer"><span class="string" title="DEFAULT_PLAYER"></span></label></span><span><select id="defaultPlayer" class="setting hfil">
 				<option value="html5">HTML5</option>
+				<option value="plugin" title="PLUGIN_PLAYER"></option>
 				<option value="qtp" title="QUICKTIME_PLAYER"></option>
 				<option value="airplay">AirPlay</option>
-				<option value="plugin" title="PLUGIN_PLAYER"></option>
 			</select></span></li>
 			<li><span></span><span class="checkbox"><input id="mediaAutoload" class="setting" type="checkbox"><label for="mediaAutoload"><span class="string" title="AUTOLOAD_MEDIA_PLAYER"></span></label></span></li>
 			<li><span></span><span class="checkbox"><input id="showPoster" class="setting" type="checkbox"><label for="showPoster"><span class="string" title="SHOW_POSTER"></span></label></span></li>
@@ -86,11 +86,11 @@
 			</select></span></li>
 			<li><span></span><span class="checkbox"><input id="instantAutoplay" class="setting" type="checkbox"><label for="instantAutoplay"><span class="string" title="INSTANT_AUTOPLAY"></span></label></span></li>
 			<li class="glue"></li>
-			<li><span><span class="string" title="SOURCE_SELECTOR"></span></span><span class="checkbox"><input id="showSourceSelector" class="setting" type="checkbox"><label for="showSourceSelector"><span class="string" title="SHOW_MEDIA_SOURCES"></span></label></span></li>
+			<li><span><span class="string" title="SOURCE_SELECTOR"></span></span><span class="checkbox"><input id="showMediaSources" class="setting" type="checkbox"><label for="showMediaSources"><span class="string" title="SHOW_MEDIA_SOURCES"></span></label></span></li>
 			<li><span></span><span class="checkbox"><input id="showPluginSource" class="setting" type="checkbox"><label for="showPluginSource"><span class="string" title="SHOW_PLUGIN_SOURCE"></span></label></span></li>
+			<li><span></span><span class="checkbox"><input id="showSiteSource" class="setting" type="checkbox"><label for="showSiteSource"><span class="string" title="SHOW_SITE_SOURCE"></span></label></span></li>
 			<li><span></span><span class="checkbox"><input id="showQTPSource" class="setting" type="checkbox"><label for="showQTPSource"><span class="string" title="SHOW_QTP_SOURCE"></span></label></span></li>
 			<li><span></span><span class="checkbox"><input id="showAirPlaySource" class="setting" type="checkbox"><label for="showAirPlaySource"><span class="string" title="SHOW_AIRPLAY_SOURCE"></span></label></span></li>
-			<li><span></span><span class="checkbox"><input id="showSiteSource" class="setting" type="checkbox"><label for="showSiteSource"><span class="string" title="SHOW_SITE_SOURCE"></span></label></span></li>
 			<li class="glue"></li>
 			<li><span></span><span class="checkbox"><input id="hideRewindButton" class="setting" type="checkbox"><label for="hideRewindButton"><span class="string" title="HIDE_REWIND_BUTTON"></span></label></span></li>
 			<li class="glue"></li>
@@ -106,10 +106,10 @@
 			<li><span class="checkbox sub"><input id="loadAllContext" class="setting" type="checkbox"><label for="loadAllContext"><span class="string" title="LOAD_ALL_CONTEXT"></span></label></span></li>
 			<li><span class="checkbox sub"><input id="loadInvisibleContext" class="setting" type="checkbox"><label for="loadInvisibleContext"><span class="string" title="LOAD_INVISIBLE_CONTEXT"></span></label></span></li>
 			<li class="glue"></li>
+			<li><span class="checkbox sub"><input id="viewOnSiteContext" class="setting" type="checkbox"><label for="viewOnSiteContext"><span class="string" title="VIEW_ON_SITE_CONTEXT"></span></label></span></li>
 			<li><span class="checkbox sub"><input id="downloadContext" class="setting" type="checkbox"><label for="downloadContext"><span class="string" title="DOWNLOAD_CONTEXT"></span></label></span></li>
 			<li><span class="checkbox sub"><input id="openInQTPContext" class="setting" type="checkbox"><label for="openInQTPContext"><span class="string" title="OPEN_IN_QTP_CONTEXT"></span></label></span></li>
 			<li><span class="checkbox sub"><input id="airplayContext" class="setting" type="checkbox"><label for="airplayContext"><span class="string" title="SEND_VIA_AIRPLAY_CONTEXT"></span></label></span></li>
-			<li><span class="checkbox sub"><input id="viewOnSiteContext" class="setting" type="checkbox"><label for="viewOnSiteContext"><span class="string" title="VIEW_ON_SITE_CONTEXT"></span></label></span></li>
 			<li class="glue"></li>
 			<li><span class="checkbox sub"><input id="settingsContext" class="setting" type="checkbox"><label for="settingsContext"><span class="string" title="SETTINGS_CONTEXT"></span></label></span></li>
 			<li><span class="checkbox sub"><input id="disableEnableContext" class="setting" type="checkbox"><label for="disableEnableContext"><span class="string" title="DISABLE_ENABLE_CONTEXT"></span></label></span></li>

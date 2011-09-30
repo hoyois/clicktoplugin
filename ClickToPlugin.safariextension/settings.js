@@ -10,7 +10,7 @@ var clearShortcutButtons = document.getElementsByClassName("shortcut_clear");
 var pluginInputs = document.getElementsByClassName("plugin");
 
 // Bind tabs to sections
-var currentTab = 0;
+var currentTab;
 
 container.addEventListener("webkitTransitionEnd", function(event) {
 	event.target.className = "";
@@ -83,18 +83,17 @@ main.addEventListener("keypress", handleKeyPressEvent, false);
 main.addEventListener("input", function(event) {
 	if(event.target.nodeName !== "TEXTAREA") return;
 	handleTextAreaInput(event);
-	if(event.target.id !== "additionalScripts") changeSetting(event.target.id, parseTextList(event.target.value));
+	if(event.target.id === "killers") updatedKillers = true; // we only update killers when settings are closed
+	else changeSetting(event.target.id, parseTextList(event.target.value));
 }, false);
-document.getElementById("additionalScripts").addEventListener("blur", function(event) {
-	changeSetting(event.target.id, parseTextList(event.target.value));
-}, false);
+var updatedKillers = false;
 
 // Killer reset
 var defaultKillers = "killers/YouTube.js\nkillers/Vimeo.js\nkillers/Dailymotion.js\nkillers/Facebook.js\nkillers/Break.js\nkillers/Blip.js\nkillers/Metacafe.js\nkillers/TED.js\nkillers/Tumblr.js\nkillers/Flash.js\nkillers/Silverlight.js\nkillers/Generic.js";
 document.getElementById("reset_killers").addEventListener("click", function() {
-	var textarea = document.getElementById("additionalScripts");
+	var textarea = document.getElementById("killers");
 	textarea.value = defaultKillers;
-	changeSetting("additionalScripts", parseTextList(defaultKillers));
+	changeSetting("killers", parseTextList(defaultKillers));
 	resizeTextArea(textarea);
 }, false);
 
@@ -342,7 +341,7 @@ function loadSettings(event) {
 	
 	// Plugins
 	buildPluginMenu();
-	if(navigator.plugins.length > 0) {
+	if(navigator.plugins.length > 0 && settings.allowedPlugins.length > 0) {
 		for(var i = 0; i < settings.allowedPlugins.length; i++) {
 			var input = document.getElementById("plugin/" + settings.allowedPlugins[i]);
 			if(input) input.checked = true;
@@ -364,7 +363,10 @@ function loadSettings(event) {
 	// Other settings
 	for(var id in settings) {
 		var input = document.getElementById(id);
-		if(!input) continue; // to be removed
+		if(!input) {
+			changeSetting(id, undefined);
+			continue;
+		}
 		switch(input.nodeName) {
 		case "TEXTAREA":
 			input.value = settings[id].join("\n");
@@ -411,6 +413,12 @@ function loadSettings(event) {
 			}
 		}, false);
 	}
+	
+	var handleClose = function() {
+		if(updatedKillers) changeSetting("killers", parseTextList(document.getElementById("killers").value));
+	}
+	window.addEventListener("beforeunload", handleClose, true); // when tab is closed
+	window.addEventListener("pagehide", handleClose, true); // when iframe is removed
 	
 	focus();
 	

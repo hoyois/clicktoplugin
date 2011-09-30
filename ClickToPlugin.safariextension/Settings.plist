@@ -67,7 +67,7 @@
 			<string>killers/Generic.js</string>
 		</array>
 		<key>Key</key>
-		<string>additionalScripts</string>
+		<string>killers</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
@@ -85,13 +85,19 @@
 		<key>DefaultValue</key>
 		<true/>
 		<key>Key</key>
-		<string>showSourceSelector</string>
+		<string>showMediaSources</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<true/>
 		<key>Key</key>
 		<string>showPluginSource</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>showSiteSource</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
@@ -104,12 +110,6 @@
 		<false/>
 		<key>Key</key>
 		<string>showAirPlaySource</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<false/>
-		<key>Key</key>
-		<string>showSiteSource</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>

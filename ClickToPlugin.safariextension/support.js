@@ -42,8 +42,7 @@ function openTab(url) {
 function airplay(url) {
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", "http://" + settings.airplayHostname + ":7000/play", true, "AirPlay", secureSettings.getItem("airplayPassword"));
-	var content = "Content-Location:" + url + "\nStart-Position:0\n";
-	xhr.send("Content-Length:" + content.length + "\nUser-Agent:Media-Control/1.0\n" + content);
+	xhr.send("Content-Location:" + url + "\nStart-Position:0\n");
 }
 
 function matchList(list, string) {

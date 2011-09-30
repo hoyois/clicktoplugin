@@ -50,7 +50,7 @@ MediaPlayer.prototype.handleMediaData = function(mediaData) {
 		else this.playlistLength = mediaData.playlistLength ? mediaData.playlistLength : mediaData.playlist.length;
 		this.initialBehavior = mediaData.autoplay ? "autoplay" : settings.initialBehavior;
 		this.audioOnly = mediaData.audioOnly;
-		if(settings.showSourceSelector) this.initSourceSelector();
+		this.initSourceSelector();
 	}
 };
 
@@ -218,7 +218,7 @@ MediaPlayer.prototype.setContextInfo = function(event) {
 	if(source === undefined) source = this.currentSource;
 	
 	var contextInfo = this.contextInfo;
-	contextInfo.siteInfo = media.siteInfo;
+	if(media.siteInfo) contextInfo.site = media.siteInfo.name;
 	contextInfo.hasMedia = true;
 	contextInfo.isMedia = this.mediaElement !== undefined;
 	contextInfo.source = source;
@@ -430,18 +430,20 @@ MediaPlayer.prototype.initSourceSelector = function() {
 			container.classList.add("CTPhidden");
 			list.innerHTML = "";
 			var media = player.playlist[player.currentTrack];
-			for(var i = 0; i < media.sources.length; i++) {
-				var format = media.sources[i].format;
-				append(format ? format : "HTML5", clickSource, media.sources[i].url, i);
+			if(settings.showMediaSources) {
+				for(var i = 0; i < media.sources.length; i++) {
+					var format = media.sources[i].format;
+					append(format ? format : "HTML5", clickSource, media.sources[i].url, i);
+				}
+				if(player.currentSource !== undefined) list.childNodes[player.currentSource].classList.add("CTPcurrentSource");
 			}
-			if(player.currentSource !== undefined) list.childNodes[player.currentSource].classList.add("CTPcurrentSource");
 			if(settings.showPluginSource && player.contextInfo.plugin) append(player.contextInfo.plugin, clickPlugin, player.contextInfo.src);
+			if(settings.showSiteSource && media.siteInfo) append(media.siteInfo.name, clickSite, media.siteInfo.url);
 			if(settings.showQTPSource && player.currentSource !== undefined) append(QT_PLAYER, clickQTP);
 			if(settings.showAirPlaySource && player.currentSource !== undefined) append("AirPlay", clickAirPlay);
-			if(settings.showSiteSource && media.siteInfo) append(media.siteInfo.name, clickSite, media.siteInfo.url);
 
 			// Unhide if it doesn't overflow
-			if(container.offsetWidth + 10 < player.width && container.offsetHeight + (player.mediaElement ? 35 : 10) < player.height) container.classList.remove("CTPhidden");
+			if(list.childNodes.length > 0 && container.offsetWidth + 10 < player.width && container.offsetHeight + (player.mediaElement ? 35 : 10) < player.height) container.classList.remove("CTPhidden");
 		},
 
 		"setSource": function(i) {

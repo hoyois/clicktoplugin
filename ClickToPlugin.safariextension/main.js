@@ -182,7 +182,7 @@ function handleBeforeLoadEvent(event) {
 	if(response === false) { // hide plugin
 		event.preventDefault();
 		event.stopImmediatePropagation();
-		removeHTMLNode(event.target);
+		if(event.target.parentNode) removeHTMLNode(event.target);
 		return;
 	}
 	if(response === "disableSIFR") {
@@ -263,8 +263,7 @@ function handleBeforeLoadEvent(event) {
 	}
 	
 	// Fill the main array
-	var elementID = data.elementID;
-	_[elementID] = {
+	_[data.elementID] = {
 		"element": response.isNative ? event.target.cloneNode(true) : event.target,
 		"placeholder": placeholder,
 		"width": data.width,
@@ -274,15 +273,15 @@ function handleBeforeLoadEvent(event) {
 	};
 	
 	// Event listeners (not in this scope to prevent unwanted closure)
-	registerLocalShortcuts(elementID);
-	addListeners(elementID);
+	registerLocalShortcuts(data.elementID);
+	addListeners(data.elementID);
 	
 	// Fill the placeholder
 	placeholder.innerHTML = "<div class=\"CTPplaceholderContainer\"><div class=\"CTPlogoContainer CTPnodisplay\"><div class=\"CTPlogo\"></div><div class=\"CTPlogo CTPinset\"></div></div></div>";
 	placeholder.firstChild.style.opacity = settings.opacity + " !important";
 	
 	// Display the badge
-	if(_[elementID].plugin) displayBadge(elementID, _[elementID].plugin);
+	if(_[data.elementID].plugin) displayBadge(data.elementID, _[data.elementID].plugin);
 }
 
 function loadPlugin(elementID) {
@@ -362,10 +361,8 @@ function initMedia(elementID, media) {
 	
 	if(media.sources.length === 0) return;
 	
-	if(settings.showSourceSelector) {
-		_[elementID].player.sourceSelector.attachTo(_[elementID].placeholder);
-		_[elementID].player.sourceSelector.update();
-	}
+	_[elementID].player.sourceSelector.attachTo(_[elementID].placeholder);
+	_[elementID].player.sourceSelector.update();
 	
 	// Update badge
 	var label;
