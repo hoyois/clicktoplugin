@@ -216,13 +216,7 @@ function handleBeforeLoadEvent(event) {
 	if(!event.target.parentNode) return;
 	
 	// Media fallbacks
-	if(data.isObject && settings.useFallbackMedia && response.plugin) {
-		var mediaElement = mediaFallback(event.target);
-		if(mediaElement) {
-			event.target.parentNode.replaceChild(mediaElement, event.target);
-			return;
-		}
-	}
+	if(data.isObject && settings.useFallbackMedia && response.plugin && hasMediaFallback(event.target)) return;
 	
 	// Create the placeholder element
 	var placeholder = document.createElement("div");
