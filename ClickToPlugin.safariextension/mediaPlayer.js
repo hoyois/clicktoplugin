@@ -238,6 +238,14 @@ MediaPlayer.prototype.addListeners = function() {
 	if(this.playlistLength > 1) this.mediaElement.addEventListener("ended", function() {
 		if(!_this.isLastTrack()) _this.nextTrack();
 	}, false);
+
+	this.mediaElement.addEventListener("loadeddata", function(event) {
+		var seek = _this.playlist[_this.currentTrack].seek || 0;
+		if (seek) {
+			_this.mediaElement.currentTime = seek;
+		}
+		delete _this.playlist[_this.currentTrack].seek;
+	}, false);
 	// Cancel mouseout to source selector
 	if(this.sourceSelector) this.container.addEventListener("mouseout", function(event) {
 		if(event.target === _this.mediaElement && event.relatedTarget && event.relatedTarget.compareDocumentPosition(this) === 10) event.preventDefault();
