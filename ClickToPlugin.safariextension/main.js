@@ -73,8 +73,14 @@ function respondToMessage(event) {
 	case "download":
 		_[event.message.elementID].player.download(event.message.source);
 		break;
-	case "viewInQTP":
-		_[event.message.elementID].player.viewInQTP(event.message.source);
+	case "openInQTP":
+		_[event.message.elementID].player.openInQTP(event.message.source);
+		break;
+	case "airplay":
+		_[event.message.elementID].player.airplay(event.message.source);
+		break;
+	case "viewOnSite":
+		_[event.message.elementID].player.viewOnSite();
 		break;
 	case "showInfo":
 		showInfo(event.message.elementID);
@@ -176,7 +182,7 @@ function handleBeforeLoadEvent(event) {
 	if(response === false) { // hide plugin
 		event.preventDefault();
 		event.stopImmediatePropagation();
-		removeHTMLNode(event.target);
+		if(event.target.parentNode) removeHTMLNode(event.target);
 		return;
 	}
 	if(response === "disableSIFR") {
@@ -206,15 +212,11 @@ function handleBeforeLoadEvent(event) {
 	
 	// Don't create placeholders for the temporary Flash objects created by swfObject
 	if(event.target.outerHTML === "<object type=\"application/x-shockwave-flash\"></object>") return;
+	// Maybe the element has been removed from the document by a previous beforeload handler
+	if(!event.target.parentNode) return;
 	
 	// Media fallbacks
-	if(data.isObject && settings.useFallbackMedia && response.plugin) {
-		var mediaElement = mediaFallback(event.target);
-		if(mediaElement) {
-			event.target.parentNode.replaceChild(mediaElement, event.target);
-			return;
-		}
-	}
+	if(data.isObject && settings.useFallbackMedia && response.plugin && hasMediaFallback(event.target)) return;
 	
 	// Create the placeholder element
 	var placeholder = document.createElement("div");
@@ -255,8 +257,7 @@ function handleBeforeLoadEvent(event) {
 	}
 	
 	// Fill the main array
-	var elementID = data.elementID;
-	_[elementID] = {
+	_[data.elementID] = {
 		"element": response.isNative ? event.target.cloneNode(true) : event.target,
 		"placeholder": placeholder,
 		"width": data.width,
@@ -266,15 +267,15 @@ function handleBeforeLoadEvent(event) {
 	};
 	
 	// Event listeners (not in this scope to prevent unwanted closure)
-	registerLocalShortcuts(elementID);
-	addListeners(elementID);
+	registerLocalShortcuts(data.elementID);
+	addListeners(data.elementID);
 	
 	// Fill the placeholder
 	placeholder.innerHTML = "<div class=\"CTPplaceholderContainer\"><div class=\"CTPlogoContainer CTPnodisplay\"><div class=\"CTPlogo\"></div><div class=\"CTPlogo CTPinset\"></div></div></div>";
 	placeholder.firstChild.style.opacity = settings.opacity + " !important";
 	
 	// Display the badge
-	if(_[elementID].plugin) displayBadge(elementID, _[elementID].plugin);
+	if(_[data.elementID].plugin) displayBadge(data.elementID, _[data.elementID].plugin);
 }
 
 function loadPlugin(elementID) {
@@ -344,7 +345,7 @@ function handleMediaData(elementID, mediaData) {
 
 function initMedia(elementID, media) {
 	// Set poster & tooltip
-	if(media.poster) {
+	if(settings.showPoster && media.poster) {
 		_[elementID].placeholder.firstChild.style.opacity = "1 !important";
 		_[elementID].placeholder.firstChild.style.backgroundImage = "url('" + media.poster + "') !important";
 		_[elementID].placeholder.classList.remove("CTPnoimage");
@@ -354,16 +355,15 @@ function initMedia(elementID, media) {
 	
 	if(media.sources.length === 0) return;
 	
-	if(settings.showSourceSelector) {
-		_[elementID].player.sourceSelector.update();
-		_[elementID].player.sourceSelector.attachTo(_[elementID].placeholder);
-	}
+	_[elementID].player.sourceSelector.attachTo(_[elementID].placeholder);
+	_[elementID].player.sourceSelector.update();
 	
 	// Update badge
 	var label;
 	if(media.defaultSource !== undefined) {
 		if(settings.defaultPlayer === "html5") label = "HTML5";
-		else if(settings.defaultPlayer === "qtp") label = "QTP";
+		else if(settings.defaultPlayer === "qtp") label = QT_PLAYER;
+		else if(settings.defaultPlayer === "airplay") label = "AirPlay";
 	}
 	if(label) displayBadge(elementID, label);
 	else displayBadge(elementID, (_[elementID].plugin ? _[elementID].plugin : "∅") + "*");
@@ -406,7 +406,10 @@ function clickPlaceholder(elementID) {
 			loadMedia(elementID, true);
 			break;
 		case "qtp":
-			_[elementID].player.viewInQTP();
+			_[elementID].player.openInQTP();
+			break;
+		case "airplay":
+			_[elementID].player.airplay();
 			break;
 		case "plugin":
 			loadPlugin(elementID);

@@ -38,9 +38,9 @@ addKiller("Flash", {
 	}
 	
 	// YouTube redirection
-	// In JW player, flashvars.provider === "youtube"
-	if(/^http:\/\/(?:www.)?youtube.com\/watch/.test(sourceURL)) {
-		var match = /[?&]v=([^&]*)/.exec(sourceURL);
+	// (sometimes with flashvars.provider === "youtube")
+	if(/^http:\/\/(?:www.)?youtube.com/.test(sourceURL)) {
+		match = /[?&\/]v[=\/]([^?&\/]*)/.exec(sourceURL);
 		if(match) {
 			if(!hasKiller("YouTube")) return;
 			var YTcallback = callback;

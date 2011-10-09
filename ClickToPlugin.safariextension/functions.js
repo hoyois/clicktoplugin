@@ -32,15 +32,15 @@ function downloadURL(url) {
 }
 
 function sendToDownloadManager(url) {
-	var DMObject = document.createElement("embed");
-	DMObject.allowedToLoad = true;
-	DMObject.className = "CTPpluginLauncher";
-	DMObject.setAttribute("type", "application/zip");
-	DMObject.setAttribute("width", "0");
-	DMObject.setAttribute("height", "0");
-	DMObject.setAttribute("src", url);
-	document.body.appendChild(DMObject);
-	setTimeout(function() {document.body.removeChild(DMObject);}, 5000);
+	var embed = document.createElement("embed");
+	embed.allowedToLoad = true;
+	embed.className = "CTPpluginLauncher";
+	embed.setAttribute("type", "application/zip");
+	embed.setAttribute("width", "0");
+	embed.setAttribute("height", "0");
+	embed.setAttribute("src", url);
+	document.body.appendChild(embed);
+	setTimeout(function() {document.body.removeChild(embed);}, 5000);
 }
 
 function openInQuickTimePlayer(url) {
@@ -48,20 +48,20 @@ function openInQuickTimePlayer(url) {
 	var anchor = document.createElement("a");
 	anchor.href = url;
 	url = anchor.href;
-	var QTObject = document.createElement("embed");
-	QTObject.allowedToLoad = true;
-	QTObject.className = "CTPpluginLauncher";
-	QTObject.setAttribute("type", "video/quicktime");
-	QTObject.setAttribute("width", "0");
-	QTObject.setAttribute("height", "0");
+	var embed = document.createElement("embed");
+	embed.allowedToLoad = true;
+	embed.className = "CTPpluginLauncher";
+	embed.setAttribute("type", "video/quicktime");
+	embed.setAttribute("width", "0");
+	embed.setAttribute("height", "0");
 	// need an external URL for source, since QT plugin doesn't accept safari-extension:// protocol
 	// Apple has a small 1px image for this same purpose
-	QTObject.setAttribute("src", "http://images.apple.com/apple-events/includes/qtbutton.mov");
-	QTObject.setAttribute("href", url);
-	QTObject.setAttribute("target", "quicktimeplayer");
-	QTObject.setAttribute("autohref", "true");
-	document.body.appendChild(QTObject);
-	setTimeout(function() {document.body.removeChild(QTObject);}, 5000);
+	embed.setAttribute("src", "http://images.apple.com/apple-events/includes/qtbutton.mov");
+	embed.setAttribute("href", url);
+	embed.setAttribute("target", "quicktimeplayer");
+	embed.setAttribute("autohref", "true");
+	document.body.appendChild(embed);
+	setTimeout(function() {document.body.removeChild(embed);}, 5000);
 }
 
 // Shortcuts
@@ -89,18 +89,18 @@ function testShortcut(event, shortcut) {
 }
 
 // Look for usable media fallback content
-function mediaFallback(element) {
+function hasMediaFallback(element) {
 	var mediaElements = element.getElementsByTagName("video");
 	if(mediaElements.length === 0) {
 		mediaElements = element.getElementsByTagName("audio");
-		if(mediaElements.length === 0) return null;
+		if(mediaElements.length === 0) return false;
 	}
-	if(mediaElements[0].src) return mediaElements[0];
+	if(mediaElements[0].src) return true;
 	var sourceElements = mediaElements[0].getElementsByTagName("source");
 	for(var i = 0; i < sourceElements.length; i++) {
-		if(mediaElements[0].canPlayType(sourceElements[i].type)) return mediaElements[0];
+		if(mediaElements[0].canPlayType(sourceElements[i].type)) return true;
 	}
-	return null;
+	return false;
 }
 
 function getParams(element) {

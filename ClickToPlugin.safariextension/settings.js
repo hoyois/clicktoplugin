@@ -10,7 +10,7 @@ var clearShortcutButtons = document.getElementsByClassName("shortcut_clear");
 var pluginInputs = document.getElementsByClassName("plugin");
 
 // Bind tabs to sections
-var currentTab = 0;
+var currentTab;
 
 container.addEventListener("webkitTransitionEnd", function(event) {
 	event.target.className = "";
@@ -35,7 +35,7 @@ function switchToTab(i) {
 		container.style.height = "intrinsic";
 	} else {
 		container.style.WebkitTransitionProperty = "height";
-		container.style.WebkitTransitionDuration = (.001*heightDelta) + "s";
+		container.style.WebkitTransitionDuration = (.0008*heightDelta) + "s";
 		container.style.height = newHeight + "px";
 	}
 	changeSetting("currentTab", i);
@@ -60,7 +60,6 @@ function resizeTextArea(textarea) {
 }
 function handleTextAreaInput(event) {
 	event.target.value = event.target.value.replace(/[\t ]+/g, "\n");
-	changeSetting(event.target.id, parseTextList(event.target.value));
 	resizeTextArea(event.target);
 }
 function parseTextList(text) {
@@ -82,16 +81,19 @@ function handleKeyPressEvent(event) {
 }
 main.addEventListener("keypress", handleKeyPressEvent, false);
 main.addEventListener("input", function(event) {
-	if(event.target.nodeName === "TEXTAREA" && event.target.id !== "additionalScripts") handleTextAreaInput(event);
+	if(event.target.nodeName !== "TEXTAREA") return;
+	handleTextAreaInput(event);
+	if(event.target.id === "killers") updatedKillers = true; // we only update killers when settings are closed
+	else changeSetting(event.target.id, parseTextList(event.target.value));
 }, false);
-document.getElementById("additionalScripts").addEventListener("blur", handleTextAreaInput, false);
+var updatedKillers = false;
 
 // Killer reset
 var defaultKillers = "killers/YouTube.js\nkillers/Vimeo.js\nkillers/Dailymotion.js\nkillers/Facebook.js\nkillers/Break.js\nkillers/Blip.js\nkillers/Metacafe.js\nkillers/TED.js\nkillers/Tumblr.js\nkillers/Flash.js\nkillers/Silverlight.js\nkillers/Generic.js";
 document.getElementById("reset_killers").addEventListener("click", function() {
-	var textarea = document.getElementById("additionalScripts");
+	var textarea = document.getElementById("killers");
 	textarea.value = defaultKillers;
-	changeSetting("additionalScripts", parseTextList(defaultKillers));
+	changeSetting("killers", parseTextList(defaultKillers));
 	resizeTextArea(textarea);
 }, false);
 
@@ -109,11 +111,6 @@ main.addEventListener("change", function(event) {
 	case "invertBlacklists":
 		updateBlacklistLabels(event.target.value === "on");
 		break;
-	case "showSourceSelector":
-		document.getElementById("showPluginSourceItem").disabled = event.target.value !== "on";
-		document.getElementById("showQTPSourceItem").disabled = event.target.value !== "on";
-		document.getElementById("showSiteSourceItem").disabled = event.target.value !== "on";
-		break;
 	case "defaultPlayer":
 		if(event.target.value === "html5") {
 			document.getElementById("mediaAutoload").disabled = false;
@@ -122,6 +119,9 @@ main.addEventListener("change", function(event) {
 			document.getElementById("mediaAutoload").checked = false;
 			changeSetting("mediaAutoload", false);
 		}
+		break;
+	case "mediaAutoload":
+		document.getElementById("showPoster").disabled = event.target.value === "on";
 		break;
 	}
 	// Settings change
@@ -133,11 +133,15 @@ main.addEventListener("change", function(event) {
 		break;
 	case "INPUT":
 		switch(event.target.type) {
-		case "range":
-			parseValue = function(value) {return parseInt(value)*.01}
-			break;
 		case "checkbox":
 			parseValue = function(value) {return value === "on";}
+			break;
+		case "text":
+		case "password":
+			parseValue = function(value) {return value;}
+			break;
+		case "range":
+			parseValue = function(value) {return parseInt(value)*.01}
 			break;
 		}
 		break;
@@ -310,7 +314,7 @@ function adjustLayout() {
 		minWidth += tabs[i].offsetWidth;
 	}
 	nav.style.minWidth = minWidth + "px";
-	main.style.maxHeight = (.85*document.body.offsetHeight - 20) + "px";
+	main.style.maxHeight = (document.body.offsetHeight - 80) + "px";
 
 	var stylesheet = document.getElementsByTagName("style")[0].sheet;
 	for(var i = 0; i < PREFERENCES_LAYOUT.length; i++) {
@@ -337,11 +341,11 @@ function loadSettings(event) {
 	
 	// Plugins
 	buildPluginMenu();
-	if(navigator.plugins.length > 0) {
+	if(navigator.plugins.length > 0 && settings.allowedPlugins.length > 0) {
 		for(var i = 0; i < settings.allowedPlugins.length; i++) {
 			var input = document.getElementById("plugin/" + settings.allowedPlugins[i]);
 			if(input) input.checked = true;
-			else {settings.allowedPlugins.splice(i, 1); --i;}
+			else settings.allowedPlugins.splice(i--, 1);
 		}
 		changeSetting("allowedPlugins", settings.allowedPlugins);
 	}
@@ -359,7 +363,10 @@ function loadSettings(event) {
 	// Other settings
 	for(var id in settings) {
 		var input = document.getElementById(id);
-		if(!input) continue; // to be removed
+		if(!input) {
+			changeSetting(id, undefined);
+			continue;
+		}
 		switch(input.nodeName) {
 		case "TEXTAREA":
 			input.value = settings[id].join("\n");
@@ -372,12 +379,17 @@ function loadSettings(event) {
 			}
 			break;
 		case "INPUT":
+			if(input.classList.contains("keyboard")) {
+				input.value = showShortcut(settings[id]);
+				break;
+			}
 			switch(input.type) {
 			case "range":
 				input.value = settings[id]*100;
 				break;
 			case "text":
-				input.value = showShortcut(settings[id]);
+			case "password":
+				if(settings[id]) input.value = settings[id];
 				break;
 			case "checkbox":
 				if(settings[id]) input.checked = true;
@@ -388,12 +400,8 @@ function loadSettings(event) {
 	}
 	
 	// Dependencies
-	if(!settings.showSourceSelector) {
-		document.getElementById("showPluginSourceItem").disabled = true;
-		document.getElementById("showQTPSourceItem").disabled = true;
-		document.getElementById("showSiteSourceItem").disabled = true;
-	}
 	if(settings.defaultPlayer !== "html5") document.getElementById("mediaAutoload").disabled = true;
+	else if(settings.mediaAutoload) document.getElementById("showPoster").disabled = true;
 	if(!settings.settingsShortcut) document.getElementById("settingsContext").disabled = true;
 	
 	// Intercept Cmd+W & pref-pane shortcut to close the pref pane
@@ -405,6 +413,12 @@ function loadSettings(event) {
 			}
 		}, false);
 	}
+	
+	var handleClose = function() {
+		if(updatedKillers) changeSetting("killers", parseTextList(document.getElementById("killers").value));
+	}
+	window.addEventListener("beforeunload", handleClose, true); // when tab is closed
+	window.addEventListener("pagehide", handleClose, true); // when iframe is removed
 	
 	focus();
 	

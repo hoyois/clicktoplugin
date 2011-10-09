@@ -20,7 +20,7 @@ body {
 	-webkit-transition-timing-function: linear;
 	background-color: #EDEDED;
 	border: 1px solid #9B9B9B;
-	top: 10%;
+	top: 40px;
 	margin: auto;
 	width: intrinsic;
 	border-radius: 5px;
@@ -108,7 +108,7 @@ menu {
 }
 
 menu#keyboard_shortcuts {
-	-webkit-border-vertical-spacing: 0;
+	-webkit-border-vertical-spacing: 3px;
 }
 
 menu li {
@@ -171,8 +171,9 @@ textarea {
 	 /* white-space: pre; */ /* Doesn't work correctly. Only nonstandard wrap="off" works. */
 }
 
-input[type="text"] {
+input[type="text"], input[type="password"] {
 	-webkit-appearance: textarea;
+	margin: 0;
 }
 
 span.textarea_label {

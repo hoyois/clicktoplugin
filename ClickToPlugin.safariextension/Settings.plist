@@ -4,7 +4,7 @@
 <array>
 	<dict>
 		<key>DefaultValue</key>
-		<integer>0</integer>
+		<real>0.0</real>
 		<key>Key</key>
 		<string>currentTab</string>
 	</dict>
@@ -67,7 +67,13 @@
 			<string>killers/Generic.js</string>
 		</array>
 		<key>Key</key>
-		<string>additionalScripts</string>
+		<string>killers</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>loadIfNotKilled</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
@@ -79,25 +85,37 @@
 		<key>DefaultValue</key>
 		<true/>
 		<key>Key</key>
-		<string>showSourceSelector</string>
+		<string>showMediaSources</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<true/>
 		<key>Key</key>
-		<string>showPluginSourceItem</string>
+		<string>showPluginSource</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>showQTPSourceItem</string>
+		<string>showSiteSource</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>showSiteSourceItem</string>
+		<string>showQTPSource</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>showAirPlaySource</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>showPoster</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
@@ -133,7 +151,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<integer>1080</integer>
+		<real>1080</real>
 		<key>Key</key>
 		<string>defaultResolution</string>
 	</dict>
@@ -145,7 +163,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<integer>2</integer>
+		<real>2</real>
 		<key>Key</key>
 		<string>codecsPolicy</string>
 	</dict>
@@ -207,7 +225,13 @@
 		<key>DefaultValue</key>
 		<false/>
 		<key>Key</key>
-		<string>viewInQTPContext</string>
+		<string>openInQTPContext</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>airplayContext</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
@@ -252,7 +276,7 @@
 			<key>altKey</key>
 			<true/>
 			<key>button</key>
-			<integer>0</integer>
+			<real>0.0</real>
 			<key>ctrlKey</key>
 			<false/>
 			<key>metaKey</key>
@@ -385,7 +409,7 @@
 			<key>altKey</key>
 			<false/>
 			<key>button</key>
-			<integer>0</integer>
+			<real>0.0</real>
 			<key>ctrlKey</key>
 			<false/>
 			<key>metaKey</key>
@@ -443,7 +467,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<integer>8</integer>
+		<real>8</real>
 		<key>Key</key>
 		<string>maxInvisibleSize</string>
 	</dict>
@@ -458,6 +482,18 @@
 		<false/>
 		<key>Key</key>
 		<string>useDownloadManager</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string>apple-tv.local</string>
+		<key>Key</key>
+		<string>airplayHostname</string>
+	</dict>
+	<dict>
+		<key>Key</key>
+		<string>airplayPassword</string>
+		<key>Secure</key>
+		<true/>
 	</dict>
 </array>
 </plist>
