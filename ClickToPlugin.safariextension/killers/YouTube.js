@@ -11,7 +11,10 @@ addKiller("YouTube", {
 		var flashvars = parseFlashVariables(data.params.flashvars);
 		if(/\s-\sYouTube$/.test(data.title)) flashvars.title = data.title.slice(0, -10);
 		
-		if(flashvars.list && /^PL|^SP|^UL|^AV/.test(flashvars.list)) this.processPlaylistID(flashvars.list, flashvars, callback);
+		var feature = /[?&]feature=([^&]*)/.exec(data.location);
+		if(feature) feature = feature[1];
+		
+		if(flashvars.list && feature !== "mfu_in_order" && /^PL|^SP|^UL|^AV/.test(flashvars.list)) this.processPlaylistID(flashvars.list, flashvars, callback);
 		else if(flashvars.t && flashvars.url_encoded_fmt_stream_map) this.processFlashVars(flashvars, callback);
 		else if(flashvars.video_id) this.processVideoID(flashvars.video_id, callback);
 	} else { // Embedded YT video
@@ -153,6 +156,11 @@ addKiller("YouTube", {
 			while(videoIDList[0] !== flashvars.video_id && track < length) {
 				++track;
 				videoIDList.push(videoIDList.shift());
+			}
+			if(track + 1 === length) {
+				videoIDList.unshift(flashvars.video_id);
+				++length;
+				track = 0;
 			}
 		}
 
