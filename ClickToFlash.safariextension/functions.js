@@ -89,18 +89,18 @@ function testShortcut(event, shortcut) {
 }
 
 // Look for usable media fallback content
-function mediaFallback(element) {
+function hasMediaFallback(element) {
 	var mediaElements = element.getElementsByTagName("video");
 	if(mediaElements.length === 0) {
 		mediaElements = element.getElementsByTagName("audio");
-		if(mediaElements.length === 0) return null;
+		if(mediaElements.length === 0) return false;
 	}
-	if(mediaElements[0].src) return mediaElements[0];
+	if(mediaElements[0].src) return true;
 	var sourceElements = mediaElements[0].getElementsByTagName("source");
 	for(var i = 0; i < sourceElements.length; i++) {
-		if(mediaElements[0].canPlayType(sourceElements[i].type)) return mediaElements[0];
+		if(mediaElements[0].canPlayType(sourceElements[i].type)) return true;
 	}
-	return null;
+	return false;
 }
 
 function getParams(element) {

@@ -7,7 +7,6 @@ var sections = document.getElementsByTagName("section");
 var menus = document.getElementsByTagName("menu");
 
 var clearShortcutButtons = document.getElementsByClassName("shortcut_clear");
-var pluginInputs = document.getElementsByClassName("plugin");
 
 // Bind tabs to sections
 var currentTab;
