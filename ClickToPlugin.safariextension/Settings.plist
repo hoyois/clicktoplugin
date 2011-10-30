@@ -65,6 +65,7 @@
 			<string>killers/Flash.js</string>
 			<string>killers/Silverlight.js</string>
 			<string>killers/Generic.js</string>
+			<string>killers/Brightcove.js</string>
 		</array>
 		<key>Key</key>
 		<string>killers</string>

@@ -48,7 +48,10 @@ if(settings.version < 29) {
 	settings.killer = settings.additionalScripts;
 	settings.removeItem("additionalScripts");
 }
-settings.version = 29;
+if(settings.version < 31) {
+	settings.killer.push("killers/Brightcove.js");
+}
+settings.version = 31;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
@@ -319,7 +322,7 @@ function switchOff() {
 function switchOn() {
 	safari.extension.removeContentScripts();
 	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "functions.js");
-	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "MediaPlayer.js");
+	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "mediaPlayer.js");
 	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "main.js");
 	safari.extension.addContentScript(localizationScript, [], [], false);
 	updateGlobalShortcuts();
