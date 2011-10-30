@@ -495,5 +495,31 @@
 		<key>Secure</key>
 		<true/>
 	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>openSettings</string>
+		<key>Title</key>
+		<string>ClickToPlugin Settings</string>
+		<key>Titles</key>
+		<array/>
+		<key>TrueValue</key>
+		<false/>
+		<key>Type</key>
+		<string>Group</string>
+		<key>Values</key>
+		<array/>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>openSettings</string>
+		<key>Title</key>
+		<string>Check to configure ClickToPlugin.</string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
 </array>
 </plist>

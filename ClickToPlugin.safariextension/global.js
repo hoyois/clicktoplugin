@@ -48,7 +48,7 @@ if(settings.version < 29) {
 	settings.killer = settings.additionalScripts;
 	settings.removeItem("additionalScripts");
 }
-settings.version = 30;
+settings.version = 31;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
@@ -99,6 +99,16 @@ function changeSetting(key, value) {
 		killers = {};
 		loadScripts.apply(this, value);
 		break;
+	}
+}
+
+// Allow the user to open settings from the Extensions preferences.
+function prefpaneSettingsChanged(event) {
+	// Show the settings tab again if they ask for it.
+	if (event.key == "openSettings")
+	{
+		openTab(safari.extension.baseURI + "settings.html");
+		return false;
 	}
 }
 
@@ -396,6 +406,7 @@ function kill(data, tab) {
 safari.application.addEventListener("message", respondToMessage, false);
 safari.application.addEventListener("contextmenu", handleContextMenu, false);
 safari.application.addEventListener("command", doCommand, false);
+safari.extension.settings.addEventListener("change", prefpaneSettingsChanged, false);
 
 // LOAD KILLERS
 loadScripts.apply(this, settings.killers);
