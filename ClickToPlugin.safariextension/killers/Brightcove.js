@@ -1,25 +1,35 @@
 addKiller("Brightcove", {
+	
 "canKill": function(data) {
 	return data.isObject && data.params["class"] == "BrightcoveExperience";
 },
 
 "process": function(data, callback) {
-try
-{
+//try {
 	// Load Brightcove's loader JavaScript
-	var request = new XMLHttpRequest();
-	request.open("GET", "http://admin.brightcove.com/js/BrightcoveExperiences.js", false);
-	request.send(null);
+	if (this.brightcove === undefined)
+	{
+		var request = new XMLHttpRequest();
+		request.open("GET", "https://sadmin.brightcove.com/js/BrightcoveExperiences.js", false);
+		request.send(null);
+		eval(request.responseText);
+		this.brightcove = brightcove;
+		
+		// Override this function so we always get an HTML5 player.
+		this.brightcove.determinePlayerType = function () { return brightcove.playerType.HTML };
+	}
 	
 	// Reconstruct the "experience" object.
-	var parent = document.createElement("div");
-
+	var outer = document.createElement("div");
 	var exp = document.createElement("object");
 	exp.className = "BrighcoveExperience";
-	parent.appendChild(exp);
+	outer.appendChild(exp);
 
 	if (!data.params.hasOwnProperty("pubCode"))
 		data.params["pubCode"] = "";
+	
+	// Use HTTPS always
+	data.params["secureConnections"] = "true";
 
 	for (var p in data.params)
 	{
@@ -30,15 +40,17 @@ try
 		exp.appendChild(param);
 	}
 	
-	// Ask Brightcove's loader to process it
-	eval(request.responseText);
-	brightcove.collectExperiences = function () { return new Array(exp) };
-	brightcove.determinePlayerType = function () { return brightcove.playerType.HTML };
-	brightcove.createExperiences(null, null);
+	// Ask Brightcove's loader to process it.
+	this.brightcove.collectExperiences = function () { return new Array(exp) };
+	this.brightcove.createExperiences(null, null);
 	
-	// Request the source of the iframe's page
+	// Unfortunately we can't just reach into the resulting iframe, so we have
+	// to make a subsequent XMLHttpRequest for it.
+	if (outer.childElementCount == 0 || !(outer.firstChild instanceof HTMLIFrameElement))
+		return;
+	
 	var request = new XMLHttpRequest();
-	request.open("GET", parent.firstChild.getAttribute("src"), false);
+	request.open("GET", outer.firstChild.getAttribute("src"), false);
 	request.send(null);
 	
 	// Grab the useful JSON data out of it
@@ -49,33 +61,34 @@ try
 	// Now we can build up the result for the callback.
 	var result = {
 		"playlist": [{
-			"poster": experienceJSON.data.configuredProperties.backgroundImage,
+			"poster": "",
 			"sources": [ ]
 		}]
 	};
 	
-	var renditions = experienceJSON.data.programmedContent.videoPlayer.mediaDTO.renditions;
-	for (var i = 0; i < renditions.length; i ++)
-	{
-		var r = renditions[i];
-		var urlinfo = urlInfo(r.defaultURL);
-		
-		var s = { };
-		s["url"] = r.defaultURL;
-		s["isAudio"] = r.audioOnly;
-		s["height"] = r.frameHeight;
-		s["format"] = r.videoCodec;
-		s["isNative"] = urlinfo ? urlinfo.isNative : "false";
-		result.playlist[0].sources.push(s);
-	}
+	// Can't guarantee the format of the JSON; use a try block.
+	try {
+		result.playlist[0].poster = experienceJSON.data.configuredProperties.backgroundImage;
+	
+		var renditions = experienceJSON.data.programmedContent.videoPlayer.mediaDTO.renditions;
+		for (var i = 0; i < renditions.length; i ++)
+		{
+			var r = renditions[i];
+			var urlinfo = urlInfo(r.defaultURL);
+			
+			var s = { };
+			s["url"] = r.defaultURL;
+			s["isAudio"] = r.audioOnly;
+			s["height"] = r.frameHeight;
+			s["format"] = r.videoCodec;
+			s["isNative"] = urlinfo ? urlinfo.isNative : "false";
+			result.playlist[0].sources.push(s);
+		}
+	} catch(e) { }
 	
 	// Yay, we're done.
 	callback(result);
-	
-} catch(err)
-{
-	alert("Error " + err.toString() + " on line " + err.lineNumber);
-}
+//} catch(err) { alert("Error " + err.toString()); }
 },
 
 // ClickToPlugin passes us param names in lowercase, but Brightcove is picky.
