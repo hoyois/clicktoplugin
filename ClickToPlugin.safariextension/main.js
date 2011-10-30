@@ -159,10 +159,15 @@ function handleBeforeLoadEvent(event) {
 	if(data.params.qtsrc !== undefined) {anchor.href = data.params.qtsrc; data.qtsrc = anchor.href;}
 	
 	// Dimensions of element
-	event.target.ignoreBeforeLoad = true;
-	data.width = event.target.offsetWidth; // can cause beforeload dispatch (bug #44575)
-	delete event.target.ignoreBeforeLoad;
-	data.height = event.target.offsetHeight;
+	if(data.params.hasOwnProperty("width") && data.params.hasOwnProperty("height")) {
+		data.width = data.params.width;
+		data.height = data.params.height;
+	} else {
+		event.target.ignoreBeforeLoad = true;
+		data.width = event.target.offsetWidth; // can cause beforeload dispatch (bug #44575)
+		delete event.target.ignoreBeforeLoad;
+		data.height = event.target.offsetHeight;
+	}
 	
 	// Additional data for killers
 	data.title = document.title;
