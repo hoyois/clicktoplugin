@@ -48,6 +48,10 @@ if(settings.version < 29) {
 	settings.killer = settings.additionalScripts;
 	settings.removeItem("additionalScripts");
 }
+if(settings.version < 31)
+{
+	settings.killer.push("killers/Brightcove.js");
+}
 settings.version = 31;
 
 // LOCALIZATION
@@ -105,7 +109,7 @@ function changeSetting(key, value) {
 // Allow the user to open settings from the Extensions preferences.
 function prefpaneSettingsChanged(event) {
 	// Show the settings tab again if they ask for it.
-	if (event.key == "openSettings")
+	if(event.key == "openSettings")
 	{
 		openTab(safari.extension.baseURI + "settings.html");
 		return false;
@@ -329,7 +333,7 @@ function switchOff() {
 function switchOn() {
 	safari.extension.removeContentScripts();
 	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "functions.js");
-	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "MediaPlayer.js");
+	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "mediaPlayer.js");
 	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "main.js");
 	safari.extension.addContentScript(localizationScript, [], [], false);
 	updateGlobalShortcuts();
