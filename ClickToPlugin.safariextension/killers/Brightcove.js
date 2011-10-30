@@ -80,8 +80,8 @@ addKiller("Brightcove", {
 			
 			var source = { };
 			source.url = r.defaultURL;
-			source.isAudio = r.audioOnly || (urlinfo ? urlinfo.isAudio : "false");
-			source.isNative = (urlinfo ? urlinfo.isNative : "false");
+			source.isAudio = r.audioOnly || (urlinfo ? urlinfo.isAudio : false);
+			source.isNative = (urlinfo ? urlinfo.isNative : false);
 			source.format = r.videoCodec || (urlinfo ? urlinfo.format : "unknown");
 			
 			if (r.hasOwnProperty("frameHeight"))
@@ -96,7 +96,7 @@ addKiller("Brightcove", {
 	
 	// Yay, we're done.
 	callback(mediadata);
-//} catch(e) { alert("Error " + err.toString()); }
+//} catch(e) { alert("Error " + e.toString()); }
 },
 
 // ClickToPlugin passes us param names in lowercase, but Brightcove is picky.
