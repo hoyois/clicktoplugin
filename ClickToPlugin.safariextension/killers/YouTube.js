@@ -29,8 +29,8 @@ addKiller("YouTube", {
 		var startTime = this.processStartTime(data.location);
 
 		if(flashvars.list && feature !== "mfu_in_order" && /^PL|^SP|^UL|^AV/.test(flashvars.list)) this.processPlaylistID(flashvars.list, flashvars, callback);
-		else if(flashvars.t && flashvars.url_encoded_fmt_stream_map) this.processFlashVars(flashvars, callback, startTime);
-		else if(flashvars.video_id) this.processVideoID(flashvars.video_id, callback, startTime);
+		else if(flashvars.t && flashvars.url_encoded_fmt_stream_map) this.processFlashVars(flashvars, callback, true, startTime);
+		else if(flashvars.video_id) this.processVideoID(flashvars.video_id, callback, true, startTime);
 	} else { // Embedded YT video
 		var match = /\.com\/([vpe])\/([^&?]+)/.exec(data.src);
 		if(match) {
@@ -40,7 +40,32 @@ addKiller("YouTube", {
 	}
 },
 
-"processFlashVars": function(flashvars, callback, startTime) {
+"pageInitScript": (function(mediaElementId) {
+	setTimeout(function() {
+		var element = document.getElementById(mediaElementId);
+
+		if (element) {
+			var oldSeek = window.yt.www.watch.player.seekTo;
+
+			element.addEventListener("ctpdestroy", function(event) {
+				window.yt.www.watch.player.seekTo = oldSeek;
+			}, false);
+
+			window.yt.www.watch.player.seekTo = function(time) {
+				element.dataset.ctpCommandName = 'seekTo';
+				element.dataset.ctpCommandArgument = JSON.stringify(time);
+
+				var e = document.createEvent('Event');
+				e.initEvent('ctpcommand', false, false);
+				element.dispatchEvent(e);
+
+				window.scrollTo(0, 0);
+			};
+		}
+	}, 0);
+}).toString(),
+
+"processFlashVars": function(flashvars, callback, useInitScript, startTime) {
 	if(!flashvars.url_encoded_fmt_stream_map || flashvars.ps === "live") return;
 	var formatList = decodeURIComponent(flashvars.url_encoded_fmt_stream_map).split(",");
 		
@@ -85,6 +110,10 @@ addKiller("YouTube", {
 
 	var result = {"playlist": [{"title": flashvars.title, "poster": posterURL, "sources": sources}]};
 
+	if (useInitScript) {
+		result.initScript = this.pageInitScript;
+	}
+
 	if (startTime) {
 		result.playlist[0].startTime = startTime;
 	}
@@ -92,7 +121,7 @@ addKiller("YouTube", {
 	callback(result);
 },
 
-"processVideoID": function(videoID, callback, startTime) {
+"processVideoID": function(videoID, callback, useInitScript, startTime) {
 	var _this = this;
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", "https://www.youtube.com/get_video_info?&video_id=" + videoID + "&eurl=http%3A%2F%2Fwww%2Eyoutube%2Ecom%2F", true);
@@ -104,7 +133,7 @@ addKiller("YouTube", {
 				videoData.playlist[0].siteInfo = {"name": "YouTube", "url": "http://www.youtube.com/watch?v=" + videoID};
 				callback(videoData);
 			};
-			_this.processFlashVars(flashvars, callbackForEmbed, startTime);
+			_this.processFlashVars(flashvars, callbackForEmbed, useInitScript, startTime);
 		} else { // happens if YT just removed content and didn't update its playlists yet
 			callback({"playlist": [null]});
 		}
