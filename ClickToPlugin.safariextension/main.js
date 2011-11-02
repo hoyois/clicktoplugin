@@ -297,6 +297,7 @@ function hidePlugin(elementID) {
 function restorePlugin(elementID) {
 	delete _[elementID].element.isInStack;
 	_[elementID].element.allowedToLoad = true;
+	_[elementID].player.destroy();
 	_[elementID].player.container.parentNode.replaceChild(_[elementID].element, _[elementID].player.container);
 	delete _[elementID];
 }

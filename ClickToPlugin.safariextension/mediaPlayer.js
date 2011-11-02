@@ -43,6 +43,7 @@ MediaPlayer.prototype.handleMediaData = function(mediaData) {
 		if(this.trackSelector) this.trackSelector.add(mediaData.playlist);
 	} else { // initial mediaData
 		if(this.startTrack !== undefined) return;
+		this.initScript = mediaData.initScript;
 		this.playlist = mediaData.playlist.concat(this.playlist);
 		this.startTrack = mediaData.startTrack ? mediaData.startTrack : 0;
 		this.currentSource = mediaData.playlist[0].defaultSource;
@@ -99,6 +100,14 @@ MediaPlayer.prototype.init = function(style) {
 	this.registerShortcuts();
 };
 
+MediaPlayer.prototype.destroy = function() {
+	if (this.mediaElement) {
+		var event = document.createEvent('Event');
+		event.initEvent('ctpdestroy', false, false);
+		this.mediaElement.dispatchEvent(event);
+	}
+};
+
 MediaPlayer.prototype.initPlaylistControls = function() {
 	var _this = this;
 	var x = settings.hideRewindButton ? 0 : 26;
@@ -148,6 +157,20 @@ MediaPlayer.prototype.normalizeTrack = function(track) {
 };
 
 MediaPlayer.prototype.loadFirstTrack = function() {
+	if (this.initScript) {
+		var initScript = this.initScript;
+		var scriptText = "(" + this.initScript + ")('" + this.mediaElement.id + "');";
+
+		var s = document.createElement('script');
+		s.innerHTML = scriptText;
+		document.body.appendChild(s);
+		setTimeout(function() {
+			document.body.removeChild(s);
+		}, 0);
+
+		delete this.initScript;
+	}
+
 	this.load(0, this.currentSource, false, true);
 	if(this.sourceSelector) this.sourceSelector.update();
 };
@@ -259,6 +282,21 @@ MediaPlayer.prototype.addListeners = function() {
 	// Cancel mouseout to source selector
 	if(this.sourceSelector) this.container.addEventListener("mouseout", function(event) {
 		if(event.target === _this.mediaElement && event.relatedTarget && event.relatedTarget.compareDocumentPosition(this) === 10) event.preventDefault();
+	}, false);
+
+	var commandHandlers = {
+		"seekTo": function(time) {
+			_this.seekTo(time);
+		}
+	};
+	this.mediaElement.addEventListener("ctpcommand", function(event) {
+		var commandName = _this.mediaElement.dataset.ctpCommandName;
+		var commandArgs = JSON.parse(_this.mediaElement.dataset.ctpCommandArgument);
+
+		delete _this.mediaElement.dataset.ctpCommandName;
+		delete _this.mediaElement.dataset.ctpCommandArgument;
+
+		commandHandlers[commandName](commandArgs);
 	}, false);
 };
 
