@@ -158,22 +158,34 @@ MediaPlayer.prototype.loadTrack = function(track) {
 	if(this.sourceSelector) this.sourceSelector.update();
 };
 
+MediaPlayer.prototype.seekTo = function(time) {
+	if (this.mediaElement.readyState > this.mediaElement.HAVE_METADATA) {
+		this.mediaElement.currentTime = time;
+	} else {
+		var _this = this;
+		if (!this.hasOwnProperty("seekTime")) {
+			var listener = function(event) {
+				event.target.currentTime = _this.seekTime;
+				event.target.removeEventListener("loadeddata", listener, false);
+				delete _this.seekTime;
+			};
+			this.mediaElement.addEventListener("loadeddata", listener, false);
+		}
+		this.seekTime = time;
+	}
+}
+
 MediaPlayer.prototype.switchSource = function(source) {
 	if(source === this.currentSource) return;
 	
-	var currentTime = this.mediaElement.currentTime;
-	var setInitialTime = function(event) {
-		event.target.removeEventListener("loadedmetadata", setInitialTime, false);
-		event.target.currentTime = currentTime;
-	};
-	
 	if(this.sourceSelector) this.sourceSelector.setSource(source);
 	
-	this.load(this.currentTrack, source, true, !this.playlist[this.currentTrack].sources[this.currentSource].isAudio !== !this.playlist[this.currentTrack].sources[source].isAudio);
-	this.mediaElement.addEventListener("loadedmetadata", setInitialTime, false);
+	var updatePoster = !this.playlist[this.currentTrack].sources[this.currentSource].isAudio !== !this.playlist[this.currentTrack].sources[source].isAudio;
+
+	this.load(this.currentTrack, source, true, updatePoster, this.mediaElement.currentTime);
 };
 
-MediaPlayer.prototype.load = function(track, source, autoplay, updatePoster) {
+MediaPlayer.prototype.load = function(track, source, autoplay, updatePoster, startTime) {
 	if(updatePoster) {
 		// Remove poster early so that it doesn't show before the new poster is loaded
 		this.mediaElement.removeAttribute("poster");
@@ -185,6 +197,12 @@ MediaPlayer.prototype.load = function(track, source, autoplay, updatePoster) {
 	this.currentTrack = track;
 	this.currentSource = source;
 	this.mediaElement.src = this.playlist[track].sources[source].url;
+
+	var seekTime = startTime || this.playlist[track].startTime;
+	if (seekTime) {
+		this.seekTo(seekTime);
+	}
+
 	if(updatePoster) this.updatePoster(); // must be done after setting src (#67900)
 	if(autoplay) {
 		this.mediaElement.preload = "auto";
