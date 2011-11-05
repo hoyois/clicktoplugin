@@ -41,28 +41,55 @@ addKiller("YouTube", {
 },
 
 "pageInitScript": (function(mediaElementId) {
-	setTimeout(function() {
-		var element = document.getElementById(mediaElementId);
+	var element = document.getElementById(mediaElementId);
 
-		if (element) {
-			var oldSeek = window.yt.www.watch.player.seekTo;
+	if (element) {
+		function safeGet(from, path) {
+			if (path.length === 0) {
+				return from;
+			} else {
+				var name = path.shift();
+				if (from.hasOwnProperty(name)) {
+					return safeGet(from[name], path);
+				} else {
+					return null;
+				}
+			}
+		};
 
-			element.addEventListener("ctpdestroy", function(event) {
-				window.yt.www.watch.player.seekTo = oldSeek;
-			}, false);
+		var tries = 0;
+		var cancelled = false;
 
-			window.yt.www.watch.player.seekTo = function(time) {
-				element.dataset.ctpCommandName = 'seekTo';
-				element.dataset.ctpCommandArgument = JSON.stringify(time);
+		element.addEventListener("ctpdestroy", function(event) {
+			cancelled = true;
+		}, false);
 
-				var e = document.createEvent('Event');
-				e.initEvent('ctpcommand', false, false);
-				element.dispatchEvent(e);
+		function replace() {
+			if (!cancelled) {
+				var oldSeek = safeGet(window, "yt.www.watch.player.seekTo".split("."));
+				if (oldSeek) {
+					element.addEventListener("ctpdestroy", function(event) {
+						window.yt.www.watch.player.seekTo = oldSeek;
+					}, false);
 
-				window.scrollTo(0, 0);
-			};
-		}
-	}, 0);
+					window.yt.www.watch.player.seekTo = function(time) {
+						element.dataset.ctpCommandName = 'seekTo';
+						element.dataset.ctpCommandArgument = JSON.stringify(time);
+
+						var e = document.createEvent('Event');
+						e.initEvent('ctpcommand', false, false);
+						element.dispatchEvent(e);
+
+						window.scrollTo(0, 0);
+					};
+				} else if (tries <= 300) {
+					tries++;
+					setTimeout(replace, 100);
+				}
+			}
+		};
+		replace();
+	}
 }).toString(),
 
 "processFlashVars": function(flashvars, callback, useInitScript, startTime) {
