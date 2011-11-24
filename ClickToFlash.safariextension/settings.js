@@ -105,10 +105,10 @@ main.addEventListener("change", function(event) {
 	// Settings dependencies
 	switch(event.target.id) {
 	case "invertWhitelists":
-		updateWhitelistLabels(event.target.value === "on");
+		updateWhitelistLabels(event.target.checked);
 		break;
 	case "invertBlacklists":
-		updateBlacklistLabels(event.target.value === "on");
+		updateBlacklistLabels(event.target.checked);
 		break;
 	case "defaultPlayer":
 		if(event.target.value === "html5") {
@@ -120,32 +120,33 @@ main.addEventListener("change", function(event) {
 		}
 		break;
 	case "mediaAutoload":
-		document.getElementById("showPoster").disabled = event.target.value === "on";
+		document.getElementById("showPoster").disabled = event.target.checked;
 		break;
 	}
 	// Settings change
 	if(!event.target.classList.contains("setting")) return;
-	var parseValue;
+	var value;
 	switch(event.target.nodeName) {
 	case "SELECT":
-		parseValue = function(value) {if(isNaN(parseInt(value))) return value; else return parseInt(value);}
+		value = parseInt(event.target.value);
+		if(isNaN(value)) value = event.target.value;
 		break;
 	case "INPUT":
 		switch(event.target.type) {
 		case "checkbox":
-			parseValue = function(value) {return value === "on";}
+			value = event.target.checked;
 			break;
 		case "text":
 		case "password":
-			parseValue = function(value) {return value;}
+			value = event.target.value;
 			break;
 		case "range":
-			parseValue = function(value) {return parseInt(value)*.01}
+			value = parseInt(event.target.value)*.01;
 			break;
 		}
 		break;
 	}
-	changeSetting(event.target.id, parseValue(event.target.value));
+	changeSetting(event.target.id, value);
 }, false);
 
 // Shortcuts input

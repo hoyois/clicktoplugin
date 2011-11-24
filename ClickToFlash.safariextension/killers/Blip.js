@@ -9,7 +9,7 @@ addKiller("Blip", {
 		var isEmbed = false;
 		var url = parseFlashVariables(data.params.flashvars).file;
 		if(!url) {
-			var match = /[?&]file=([^&]*)/.exec(data.src);
+			var match = /[?&#]file=([^&]*)/.exec(data.src);
 			if(!match) return;
 			url = match[1];
 			isEmbed = true;

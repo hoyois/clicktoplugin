@@ -32,7 +32,7 @@ if(settings.version < 29) {
 	settings.killer = settings.additionalScripts;
 	settings.removeItem("additionalScripts");
 }
-settings.version = 30;
+settings.version = 31;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
@@ -175,7 +175,7 @@ function canLoad(data, tab) {
 	}
 	
 	// Give user a chance to allow if a QT object would launch QTP
-	if(response.plugin === "QuickTime" && data.params.href && /^true$/i.test(data.params.autohref) && /^quicktimeplayer$/i.test(data.params.target)) {
+	if(response.plugin === "QuickTime" && data.params.href && data.params.autohref !== undefined && /^quicktimeplayer$/i.test(data.params.target)) {
 		if(/\bCTPallowedToLoad\b/.test(data.params.class)) return true; // for other extensions with open-in-QTP functionality
 		if(confirm(QT_CONFIRM_LAUNCH_DIALOG(data.params.href))) return true;
 	}
