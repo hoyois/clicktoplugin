@@ -59,7 +59,7 @@ function openInQuickTimePlayer(url) {
 	embed.setAttribute("src", "http://images.apple.com/apple-events/includes/qtbutton.mov");
 	embed.setAttribute("href", url);
 	embed.setAttribute("target", "quicktimeplayer");
-	embed.setAttribute("autohref", "true");
+	embed.setAttribute("autohref", "autohref");
 	document.body.appendChild(embed);
 	setTimeout(function() {document.body.removeChild(embed);}, 5000);
 }
