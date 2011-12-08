@@ -319,7 +319,7 @@ function switchOff() {
 function switchOn() {
 	safari.extension.removeContentScripts();
 	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "functions.js");
-	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "MediaPlayer.js");
+	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "mediaPlayer.js");
 	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "main.js");
 	safari.extension.addContentScript(localizationScript, [], [], false);
 	updateGlobalShortcuts();
