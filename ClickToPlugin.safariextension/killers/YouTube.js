@@ -6,17 +6,31 @@ addKiller("YouTube", {
 	return false;
 },
 
+"processStartTime": function(url) {
+	var match = /(?:#|&)t=(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?/.exec(url);
+	if (match) {
+		var hours = parseInt(match[1], 10) || 0;
+		var minutes = parseInt(match[2], 10) || 0;
+		var seconds = parseInt(match[3], 10) || 0;
+		return 3600 * hours + 60 * minutes + seconds;
+	} else {
+		return null;
+	}
+},
+
 "process": function(data, callback) {
 	if(data.onsite) {
 		var flashvars = parseFlashVariables(data.params.flashvars);
 		if(/\s-\sYouTube$/.test(data.title)) flashvars.title = data.title.slice(0, -10);
-		
+
 		var feature = /[?&]feature=([^&]*)/.exec(data.location);
 		if(feature) feature = feature[1];
-		
+
+		var startTime = this.processStartTime(data.location);
+
 		if(flashvars.list && feature !== "mfu_in_order" && /^PL|^SP|^UL|^AV/.test(flashvars.list)) this.processPlaylistID(flashvars.list, flashvars, callback);
-		else if(flashvars.t && flashvars.url_encoded_fmt_stream_map) this.processFlashVars(flashvars, callback);
-		else if(flashvars.video_id) this.processVideoID(flashvars.video_id, callback);
+		else if(flashvars.t && flashvars.url_encoded_fmt_stream_map) this.processFlashVars(flashvars, callback, true, startTime);
+		else if(flashvars.video_id) this.processVideoID(flashvars.video_id, callback, true, startTime);
 	} else { // Embedded YT video
 		var match = /\.com\/([vpe])\/([^&?]+)/.exec(data.src);
 		if(match) {
@@ -26,7 +40,59 @@ addKiller("YouTube", {
 	}
 },
 
-"processFlashVars": function(flashvars, callback) {
+"pageInitScript": (function(mediaElementId) {
+	var element = document.getElementById(mediaElementId);
+
+	if (element) {
+		function safeGet(from, path) {
+			if (path.length === 0) {
+				return from;
+			} else {
+				var name = path.shift();
+				if (from.hasOwnProperty(name)) {
+					return safeGet(from[name], path);
+				} else {
+					return null;
+				}
+			}
+		};
+
+		var tries = 0;
+		var cancelled = false;
+
+		element.addEventListener("ctpdestroy", function(event) {
+			cancelled = true;
+		}, false);
+
+		function replace() {
+			if (!cancelled) {
+				var oldSeek = safeGet(window, "yt.www.watch.player.seekTo".split("."));
+				if (oldSeek) {
+					element.addEventListener("ctpdestroy", function(event) {
+						window.yt.www.watch.player.seekTo = oldSeek;
+					}, false);
+
+					window.yt.www.watch.player.seekTo = function(time) {
+						element.dataset.ctpCommandName = 'seekTo';
+						element.dataset.ctpCommandArgument = JSON.stringify(time);
+
+						var e = document.createEvent('Event');
+						e.initEvent('ctpcommand', false, false);
+						element.dispatchEvent(e);
+
+						window.scrollTo(0, 0);
+					};
+				} else if (tries <= 300) {
+					tries++;
+					setTimeout(replace, 100);
+				}
+			}
+		};
+		replace();
+	}
+}).toString(),
+
+"processFlashVars": function(flashvars, callback, useInitScript, startTime) {
 	if(!flashvars.url_encoded_fmt_stream_map || flashvars.ps === "live") return;
 	var formatList = decodeURIComponent(flashvars.url_encoded_fmt_stream_map).split(",");
 		
@@ -68,11 +134,21 @@ addKiller("YouTube", {
 	if(flashvars.iurlmaxres) posterURL = decodeURIComponent(flashvars.iurlmaxres);
 	else if(flashvars.iurlsd) posterURL = decodeURIComponent(flashvars.iurlsd);
 	else posterURL = "https://i.ytimg.com/vi/" + flashvars.video_id + "/hqdefault.jpg";
+
+	var result = {"playlist": [{"title": flashvars.title, "poster": posterURL, "sources": sources}]};
+
+	if (useInitScript) {
+		result.initScript = this.pageInitScript;
+	}
+
+	if (startTime) {
+		result.playlist[0].startTime = startTime;
+	}
 	
-	callback({"playlist": [{"title": flashvars.title, "poster": posterURL, "sources": sources}]});
+	callback(result);
 },
 
-"processVideoID": function(videoID, callback) {
+"processVideoID": function(videoID, callback, useInitScript, startTime) {
 	var _this = this;
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", "https://www.youtube.com/get_video_info?&video_id=" + videoID + "&eurl=http%3A%2F%2Fwww%2Eyoutube%2Ecom%2F", true);
@@ -84,7 +160,7 @@ addKiller("YouTube", {
 				videoData.playlist[0].siteInfo = {"name": "YouTube", "url": "http://www.youtube.com/watch?v=" + videoID};
 				callback(videoData);
 			};
-			_this.processFlashVars(flashvars, callbackForEmbed);
+			_this.processFlashVars(flashvars, callbackForEmbed, useInitScript, startTime);
 		} else { // happens if YT just removed content and didn't update its playlists yet
 			callback({"playlist": [null]});
 		}
