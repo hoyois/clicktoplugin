@@ -222,8 +222,8 @@ function handleBeforeLoadEvent(event) {
 	var placeholder = document.createElement("div");
 	if(settings.showTooltip) placeholder.title = response.src; // tooltip
 	placeholder.className = "CTPnoimage CTPplaceholder";
-	placeholder.style.width = data.width + "px !important";
-	placeholder.style.height = data.height + "px !important";
+	placeholder.style.setProperty("width", data.width + "px", "important");
+	placeholder.style.setProperty("height", data.height + "px", "important");
 	if(response.isInvisible) placeholder.classList.add("CTPinvisible");
 	
 	// Copy CSS box & positioning properties that have an effect on page layout
@@ -244,7 +244,7 @@ function handleBeforeLoadEvent(event) {
 		if(stack === undefined || stack.parentNode !== document.body) {
 			stack = document.createElement("div");
 			stack.id = "CTPstack";
-			stack.style.display = "none !important"; // in case the extension is disabled
+			stack.style.setProperty("display", "none", "important"); // in case the extension is disabled
 			stack.innerHTML = "<div><div></div></div>";
 			document.body.appendChild(stack);
 		}
@@ -272,7 +272,7 @@ function handleBeforeLoadEvent(event) {
 	
 	// Fill the placeholder
 	placeholder.innerHTML = "<div class=\"CTPplaceholderContainer\"><div class=\"CTPlogoContainer CTPnodisplay\"><div class=\"CTPlogo\"></div><div class=\"CTPlogo CTPinset\"></div></div></div>";
-	placeholder.firstChild.style.opacity = settings.opacity + " !important";
+	placeholder.firstChild.style.setProperty("opacity", settings.opacity, "important");
 	
 	// Display the badge
 	if(_[data.elementID].plugin) displayBadge(data.elementID, _[data.elementID].plugin);
@@ -298,6 +298,7 @@ function restorePlugin(elementID) {
 	delete _[elementID].element.isInStack;
 	_[elementID].element.allowedToLoad = true;
 	_[elementID].player.container.parentNode.replaceChild(_[elementID].element, _[elementID].player.container);
+	_[elementID].player.destroy();
 	delete _[elementID];
 }
 
@@ -346,8 +347,8 @@ function handleMediaData(elementID, mediaData) {
 function initMedia(elementID, media) {
 	// Set poster & tooltip
 	if(settings.showPoster && media.poster) {
-		_[elementID].placeholder.firstChild.style.opacity = "1 !important";
-		_[elementID].placeholder.firstChild.style.backgroundImage = "url('" + media.poster + "') !important";
+		_[elementID].placeholder.firstChild.style.setProperty("opacity", "1", "important");
+		_[elementID].placeholder.firstChild.style.setProperty("background-image", "url('" + media.poster + "')", "important");
 		_[elementID].placeholder.classList.remove("CTPnoimage");
 	}
 	if(media.title) _[elementID].placeholder.title = media.title;
