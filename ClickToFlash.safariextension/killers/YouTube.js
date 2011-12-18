@@ -14,6 +14,25 @@ addKiller("YouTube", {
 		var feature = /[?&]feature=([^&]*)/.exec(data.location);
 		if(feature) feature = feature[1];
 		
+		var match = /[#&?]t=(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?/.exec(data.location);
+		if (match) {
+			var hours = parseInt(match[1], 10) || 0;
+			var minutes = parseInt(match[2], 10) || 0;
+			var seconds = parseInt(match[3], 10) || 0;
+			flashvars.startTime = 3600 * hours + 60 * minutes + seconds;
+		}
+		
+		flashvars.initScript = "\
+			yt.www.watch.player.oldSeekTo = yt.www.watch.player.seekTo;\
+			yt.www.watch.player.seekTo = function(time){\
+				var mediaElement = document.getElementById(...);\
+				mediaElement.pause();\
+				mediaElement.currentTime = time;\
+				mediaElement.play();\
+				mediaElement.parentNode.focus();\
+			};";
+		flashvars.restoreScript = "yt.www.watch.player.seekTo = yt.www.watch.player.oldSeekTo;";
+		
 		if(flashvars.list && feature !== "mfu_in_order" && /^PL|^SP|^UL|^AV/.test(flashvars.list)) this.processPlaylistID(flashvars.list, flashvars, callback);
 		else if(flashvars.t && flashvars.url_encoded_fmt_stream_map) this.processFlashVars(flashvars, callback);
 		else if(flashvars.video_id) this.processVideoID(flashvars.video_id, callback);
@@ -69,7 +88,12 @@ addKiller("YouTube", {
 	else if(flashvars.iurlsd) posterURL = decodeURIComponent(flashvars.iurlsd);
 	else posterURL = "https://i.ytimg.com/vi/" + flashvars.video_id + "/hqdefault.jpg";
 	
-	callback({"playlist": [{"title": flashvars.title, "poster": posterURL, "sources": sources}]});
+	callback({
+		"playlist": [{"title": flashvars.title, "poster": posterURL, "sources": sources}],
+		"startTime": flashvars.startTime,
+		"initScript": flashvars.initScript,
+		"restoreScript": flashvars.restoreScript
+	});
 },
 
 "processVideoID": function(videoID, callback) {
