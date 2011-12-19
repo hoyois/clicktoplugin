@@ -21,6 +21,12 @@ function applyCSS(element, style, properties) {
 	}
 }
 
+function injectScript(script) {
+	var element = document.createElement("script");
+	element.text = script;
+	document.body.appendChild(element);
+}
+
 function downloadURL(url) {
 	// NOTE: This function should not work according to DOM Events 3
 	// Another (nasty) way would be QuickTime plugin with autohref="true" and target=""

@@ -44,10 +44,10 @@ MediaPlayer.prototype.handleMediaData = function(mediaData) {
 	} else { // initial mediaData
 		if(this.startTrack !== undefined) return;
 		this.playlist = mediaData.playlist.concat(this.playlist);
-		this.startTrack = mediaData.startTrack ? mediaData.startTrack : 0;
 		this.startTime = mediaData.startTime;
 		this.initScript = mediaData.initScript;
 		this.restoreScript = mediaData.restoreScript;
+		this.startTrack = mediaData.startTrack ? mediaData.startTrack : 0;
 		this.currentSource = mediaData.playlist[0].defaultSource;
 		if(this.currentSource === undefined) this.playlistLength = 1;
 		else this.playlistLength = mediaData.playlistLength ? mediaData.playlistLength : mediaData.playlist.length;
@@ -63,6 +63,7 @@ MediaPlayer.prototype.init = function(style) {
 	this.container.tabIndex = -1; // make focusable
 	
 	this.mediaElement = document.createElement(this.audioOnly ? "audio" : "video");
+	this.mediaElement.id = "CTPmediaElement" + this.contextInfo.elementID;
 	this.mediaElement.className = "CTPmediaElement";
 	this.mediaElement.controls = true;
 	switch(this.initialBehavior) {
@@ -100,21 +101,10 @@ MediaPlayer.prototype.init = function(style) {
 	// Set listeners
 	this.addListeners();
 	this.registerShortcuts();
-	
-	// Insert killer script
-	if(this.initScript) {
-		var scriptElement = document.createElement("script");
-		scriptElement.text = "try{" + this.initScript.replace(/\.{3}/g, "\"CTPmediaElement" + this.contextInfo.elementID + "\"") + "}catch(e){}";
-		document.body.appendChild(scriptElement);
-	}
 };
 
 MediaPlayer.prototype.destroy = function() {
-	if(this.restoreScript) {
-		var scriptElement = document.createElement("script");
-		scriptElement.text = "try{" + this.restoreScript + "}catch(e){}";
-		document.body.appendChild(scriptElement);
-	}
+	if(this.restoreScript) injectScript("(function(){" + this.restoreScript + "})();");
 };
 
 MediaPlayer.prototype.initPlaylistControls = function() {
@@ -166,11 +156,13 @@ MediaPlayer.prototype.normalizeTrack = function(track) {
 };
 
 MediaPlayer.prototype.loadFirstTrack = function() {
+	this.initShadowDOM();
+	if(this.initScript) injectScript("(function(){var mediaElement=document.getElementById(\"" + this.mediaElement.id + "\");" + this.initScript + "})();");
 	if(this.startTime) {
-		var time = this.startTime;
+		var _this = this;
 		var setInitialTime = function(event) {
 			event.target.removeEventListener("loadeddata", setInitialTime, false);
-			event.target.currentTime = time;
+			if(_this.currentTrack === 0) event.target.currentTime = _this.startTime;
 		};
 		this.mediaElement.addEventListener("loadeddata", setInitialTime, false);
 	}
@@ -189,14 +181,14 @@ MediaPlayer.prototype.switchSource = function(source) {
 	
 	var currentTime = this.mediaElement.currentTime;
 	var setInitialTime = function(event) {
-		event.target.removeEventListener("loadedmetadata", setInitialTime, false);
+		event.target.removeEventListener("loadeddata", setInitialTime, false);
 		event.target.currentTime = currentTime;
 	};
 	
 	if(this.sourceSelector) this.sourceSelector.setSource(source);
 	
 	this.load(this.currentTrack, source, true, !this.playlist[this.currentTrack].sources[this.currentSource].isAudio !== !this.playlist[this.currentTrack].sources[source].isAudio);
-	this.mediaElement.addEventListener("loadedmetadata", setInitialTime, false);
+	this.mediaElement.addEventListener("loadeddata", setInitialTime, false);
 };
 
 MediaPlayer.prototype.load = function(track, source, autoplay, updatePoster) {
@@ -365,17 +357,16 @@ ShadowDOM interface
 ******************/
 
 MediaPlayer.prototype.initShadowDOM = function() {
-	this.mediaElement.id = "CTPmediaElement" + this.contextInfo.elementID; // use scoped CSS instead when supported
 	var sheet = this.container.appendChild(document.createElement("style")).sheet;
 	
 	// Status display is provided by trackSelector
-	sheet.insertRule("#CTPmediaElement" + this.contextInfo.elementID + "::-webkit-media-controls-status-display{display:none;}", 0);
+	sheet.insertRule("#" + this.mediaElement.id + "::-webkit-media-controls-status-display{display:none;}", 0);
 	
 	var pseudoElements = {"controlsPanel": "-webkit-media-controls-panel", "playButton": "-webkit-media-controls-play-button", "muteButton": "-webkit-media-controls-mute-button", "volumeSliderContainer": "-webkit-media-controls-volume-slider-container", "rewindButton": "-webkit-media-controls-rewind-button", "fullscreenButton": "-webkit-media-controls-fullscreen-button", "timelineContainer": "-webkit-media-controls-timeline-container", "seekBackButton": "-webkit-media-controls-seek-back-button", "seekForwardButton": "-webkit-media-controls-seek-forward-button"};
 	
 	this.shadowDOM = {};
 	for(var e in pseudoElements) {
-		sheet.insertRule("#CTPmediaElement" + this.contextInfo.elementID + ":not(:-webkit-full-screen)::" + pseudoElements[e] + "{}", 0);
+		sheet.insertRule("#" + this.mediaElement.id + ":not(:-webkit-full-screen)::" + pseudoElements[e] + "{}", 0);
 		this.shadowDOM[e] = sheet.cssRules[0];
 	}
 	
@@ -532,7 +523,7 @@ MediaPlayer.prototype.initTrackSelector = function() {
 		container.classList.add("CTPhidden");
 		player.shadowDOM.controlsPanel.style.removeProperty("display");
 	};
-
+	
 	this.trackSelector = {
 		"toggle": function() {
 			if(container.classList.contains("CTPhidden")) show();
