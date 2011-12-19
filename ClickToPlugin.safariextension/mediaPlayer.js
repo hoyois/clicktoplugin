@@ -55,14 +55,7 @@ MediaPlayer.prototype.handleMediaData = function(mediaData) {
 	}
 };
 
-MediaPlayer.prototype.init = function(style) {
-	this.container = document.createElement("div");
-	this.container.className = "CTPmediaPlayer";
-	this.container.tabIndex = -1; // make focusable
-	
-	this.mediaElement = document.createElement(this.audioOnly ? "audio" : "video");
-	this.mediaElement.className = "CTPmediaElement";
-	this.mediaElement.controls = true;
+MediaPlayer.prototype.restorePreload = function() {
 	switch(this.initialBehavior) {
 	case "none":
 		this.mediaElement.preload = "none";
@@ -75,6 +68,17 @@ MediaPlayer.prototype.init = function(style) {
 		this.mediaElement.autoplay = true;
 		break;
 	}
+};
+
+MediaPlayer.prototype.init = function(style) {
+	this.container = document.createElement("div");
+	this.container.className = "CTPmediaPlayer";
+	this.container.tabIndex = -1; // make focusable
+
+	this.mediaElement = document.createElement(this.audioOnly ? "audio" : "video");
+	this.mediaElement.className = "CTPmediaElement";
+	this.mediaElement.controls = true;
+	this.restorePreload();
 	this.container.appendChild(this.mediaElement);
 	
 	// Set styles
@@ -203,20 +207,28 @@ MediaPlayer.prototype.loadTrack = function(track) {
 	if(this.sourceSelector) this.sourceSelector.update();
 };
 
-MediaPlayer.prototype.seekTo = function(time) {
+MediaPlayer.prototype.seekTo = function(time, startPlaying) {
 	if (this.mediaElement.readyState > this.mediaElement.HAVE_METADATA) {
 		this.mediaElement.currentTime = time;
 	} else {
 		var _this = this;
-		if (!this.hasOwnProperty("seekTime")) {
-			var listener = function(event) {
-				event.target.currentTime = _this.seekTime;
-				event.target.removeEventListener("loadeddata", listener, false);
-				delete _this.seekTime;
-			};
-			this.mediaElement.addEventListener("loadeddata", listener, false);
+		if (this.hasOwnProperty("seekHandler")) {
+			this.mediaElement.removeEventListener("loadeddata", this.seekHandler, false);
+			delete this.seekHandler;
 		}
-		this.seekTime = time;
+		var handler = function(event) {
+			_this.mediaElement.currentTime = time;
+			if (startPlaying) {
+				_this.mediaElement.play();
+			}
+			this.mediaElement.removeEventListener("loadeddata", handler, false);
+			delete _this.seekHandler;
+		}
+		this.mediaElement.addEventListener("loadeddata", handler, false);
+		this.seekHandler = handler;
+		if (startPlaying && this.mediaElement.preload === "none") {
+			this.mediaElement.preload = "buffer";
+		}
 	}
 }
 
@@ -239,6 +251,9 @@ MediaPlayer.prototype.load = function(track, source, autoplay, updatePoster, sta
 	// Pause first to prevent undesirable sound quirks
 	// Conditional needed, otherwise Webkit fails to reset autoplaying flag on initial load
 	if(!this.mediaElement.paused) this.mediaElement.pause();
+
+	this.restorePreload();
+
 	this.currentTrack = track;
 	this.currentSource = source;
 	this.mediaElement.src = this.playlist[track].sources[source].url;
@@ -307,8 +322,8 @@ MediaPlayer.prototype.addListeners = function() {
 	}, false);
 
 	var commandHandlers = {
-		"seekTo": function(time) {
-			this.seekTo(time);
+		"seekTo": function(time, startPlaying) {
+			this.seekTo(time, startPlaying);
 		}
 	};
 	this.mediaElement.addEventListener("ctpcommand", function(event) {

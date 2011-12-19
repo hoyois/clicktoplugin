@@ -70,7 +70,7 @@ addKiller("YouTube", {
 				});
 
 				window.yt.www.watch.player.seekTo = function(time) {
-					ctpApi.call("seekTo", time);
+					ctpApi.call("seekTo", time, true);
 					window.scrollTo(0, 0);
 				};
 			} else if (tries <= 300) {
