@@ -212,7 +212,7 @@ MediaPlayer.prototype.seekTo = function(time, startPlaying) {
 		this.mediaElement.currentTime = time;
 	} else {
 		var _this = this;
-		if (this.hasOwnProperty("seekHandler")) {
+		if (this.seekHandler !== undefined) {
 			this.mediaElement.removeEventListener("loadeddata", this.seekHandler, false);
 			delete this.seekHandler;
 		}
@@ -261,6 +261,9 @@ MediaPlayer.prototype.load = function(track, source, autoplay, updatePoster, sta
 	var seekTime = startTime || this.playlist[track].startTime;
 	if (seekTime) {
 		this.seekTo(seekTime);
+	} else if (this.seekHandler !== undefined) {
+		this.mediaElement.removeEventListener("loadeddata", handler, false);
+		delete _this.seekHandler;
 	}
 
 	if(updatePoster) this.updatePoster(); // must be done after setting src (#67900)
