@@ -159,10 +159,32 @@ MediaPlayer.prototype.normalizeTrack = function(track) {
 MediaPlayer.prototype.loadFirstTrack = function() {
 	if (this.initScript) {
 		var initScript = this.initScript;
-		var scriptText = "(" + this.initScript + ")('" + this.mediaElement.id + "');";
+		var ctpInitFn = function(mediaElementId, initFn) {
+			var element = document.getElementById(mediaElementId);
+			if (element) {
+				var apiObject = {
+					call: function() {
+						var cmd = arguments[0];
+						var args = JSON.stringify(Array.prototype.slice.call(arguments, 1));
 
+						element.dataset.ctpCommandName = cmd;
+						element.dataset.ctpCommandArgument = args;
+
+						var event = document.createEvent("Event");
+						event.initEvent("ctpcommand", false, false);
+						element.dispatchEvent(event);
+					},
+					onDestroy: function(handler) {
+						element.addEventListener("ctpdestroy", handler, false);
+					}
+				};
+				initFn(apiObject);
+			}
+		};
+
+		var initScriptText = "(" + ctpInitFn + ")('" + this.mediaElement.id + "', " + this.initScript + ");";
 		var s = document.createElement('script');
-		s.innerHTML = scriptText;
+		s.innerHTML = initScriptText;
 		document.body.appendChild(s);
 		setTimeout(function() {
 			document.body.removeChild(s);
@@ -286,17 +308,17 @@ MediaPlayer.prototype.addListeners = function() {
 
 	var commandHandlers = {
 		"seekTo": function(time) {
-			_this.seekTo(time);
+			this.seekTo(time);
 		}
 	};
 	this.mediaElement.addEventListener("ctpcommand", function(event) {
 		var commandName = _this.mediaElement.dataset.ctpCommandName;
-		var commandArgs = JSON.parse(_this.mediaElement.dataset.ctpCommandArgument);
+		var commandArguments = JSON.parse(_this.mediaElement.dataset.ctpCommandArgument);
 
 		delete _this.mediaElement.dataset.ctpCommandName;
 		delete _this.mediaElement.dataset.ctpCommandArgument;
 
-		commandHandlers[commandName](commandArgs);
+		commandHandlers[commandName].apply(_this, commandArguments);
 	}, false);
 };
 
