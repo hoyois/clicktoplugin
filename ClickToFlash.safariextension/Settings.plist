@@ -487,5 +487,15 @@
 		<key>Secure</key>
 		<true/>
 	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>settingsSwitch</string>
+		<key>Title</key>
+		<string>Click this checkbox to access the settings</string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
 </array>
 </plist>

@@ -1,10 +1,7 @@
 "use strict";
 // UPDATE
 if(settings.version === undefined) {
-	var tab;
-	if(safari.application.activeBrowserWindow) tab = safari.application.activeBrowserWindow.openTab("foreground");
-	else tab = safari.application.openBrowserWindow().activeTab;
-	tab.url = safari.extension.baseURI + "settings.html";
+	openTab(safari.extension.baseURI + "settings.html");
 }
 if(settings.version < 25) {
 	settings.removeItem("enabledKillers");
@@ -32,7 +29,7 @@ if(settings.version < 29) {
 	settings.killer = settings.additionalScripts;
 	settings.removeItem("additionalScripts");
 }
-settings.version = 32;
+settings.version = 33;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
@@ -83,6 +80,13 @@ function changeSetting(key, value) {
 		killers = {};
 		loadScripts.apply(this, value);
 		break;
+	}
+}
+
+function handleChangeEvent(event) {
+	if(event.key === "settingsSwitch" && event.newValue === true) {
+		safari.extension.settings.settingsSwitch = false;
+		openTab(safari.extension.baseURI + "settings.html");
 	}
 }
 
@@ -375,6 +379,7 @@ function kill(data, tab) {
 safari.application.addEventListener("message", respondToMessage, false);
 safari.application.addEventListener("contextmenu", handleContextMenu, false);
 safari.application.addEventListener("command", doCommand, false);
+safari.extension.settings.addEventListener("change", handleChangeEvent, false);
 
 // LOAD KILLERS
 loadScripts.apply(this, settings.killers);

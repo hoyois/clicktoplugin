@@ -376,7 +376,6 @@ function loadMedia(elementID, focus) {
 	
 	// Load player
 	_[elementID].placeholder.parentNode.replaceChild(_[elementID].player.container, _[elementID].placeholder);
-	_[elementID].player.initShadowDOM(); // this can only be done after insertion
 	_[elementID].player.loadFirstTrack();
 	
 	if(focus) _[elementID].player.container.focus();
