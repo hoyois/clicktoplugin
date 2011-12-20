@@ -26,6 +26,7 @@ addKiller("YouTube", {
 			var tries = 0;\
 			var intervalID = setInterval(function() {\
 				try{\
+					if(!mediaElement.parentNode) throw null;\
 					yt.www.watch.player.oldSeekTo = yt.www.watch.player.seekTo;\
 					yt.www.watch.player.seekTo = function(time) {\
 						var seek = function() {\
@@ -44,10 +45,13 @@ addKiller("YouTube", {
 					};\
 					clearInterval(intervalID);\
 				} catch(e) {\
-					if(++tries > 100) clearInterval(intervalID);\
+					if(++tries > 100 || e === null) clearInterval(intervalID);\
 				}\
 			}, 100);";
-		flashvars.restoreScript = "yt.www.watch.player.seekTo = yt.www.watch.player.oldSeekTo;";
+		flashvars.restoreScript = "\
+			try{\
+				if(yt.www.watch.player.oldSeekTo) yt.www.watch.player.seekTo = yt.www.watch.player.oldSeekTo;\
+			} catch(e) {}";
 		
 		if(flashvars.list && feature !== "mfu_in_order" && /^PL|^SP|^UL|^AV/.test(flashvars.list)) this.processPlaylistID(flashvars.list, flashvars, callback);
 		else if(flashvars.t && flashvars.url_encoded_fmt_stream_map) this.processFlashVars(flashvars, callback);

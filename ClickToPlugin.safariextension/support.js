@@ -36,7 +36,10 @@ function reloadTab(tab) {
 }
 
 function openTab(url) {
-	safari.application.activeBrowserWindow.openTab("foreground").url = url;
+	var tab;
+	if(safari.application.activeBrowserWindow) tab = safari.application.activeBrowserWindow.openTab("foreground");
+	else tab = safari.application.openBrowserWindow().activeTab;
+	tab.url = url;
 }
 
 function airplay(url) {
