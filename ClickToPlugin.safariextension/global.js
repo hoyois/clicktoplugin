@@ -45,7 +45,7 @@ if(settings.version < 29) {
 	settings.killer = settings.additionalScripts;
 	settings.removeItem("additionalScripts");
 }
-settings.version = 33;
+settings.version = 34;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
