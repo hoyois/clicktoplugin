@@ -201,7 +201,7 @@ addKiller("YouTube", {
 				++track;
 				videoIDList.push(videoIDList.shift());
 			}
-			if(track + 1 === length) {
+			if(track === length) {
 				videoIDList.unshift(flashvars.video_id);
 				++length;
 				track = 0;
