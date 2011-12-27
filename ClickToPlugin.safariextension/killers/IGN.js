@@ -15,6 +15,17 @@ addKiller("IGN", {
 	
 	if ( flashvars.url ) {
 		configUrl = decodeURIComponent(flashvars.url) + ".config";
+	} else if ( flashvars.config ) {
+		config = JSON.parse(flashvars.config);
+		sources = this.processPlaylist(config.playlist[0]);
+		
+		callback({
+			"playlist": [{
+				"title": data.title,
+				"sources": sources
+		 }]});
+
+		return;
 	}
 	
 	_this = this;
@@ -35,6 +46,8 @@ addKiller("IGN", {
 
 	return;
 },
+
+
 
 "processPlaylist": function(playlist) {
 	var sources = [];
