@@ -5,7 +5,6 @@ addKiller("BBC", {
 },
 
 "process": function(data, callback) {
-	
 	if( !this.videoInfo )
 		this.videoInfo = data.params.externalidentifier;
 	
@@ -43,14 +42,13 @@ addKiller("BBC", {
 				if( typeof(connection['protocol']) != undefined && connection.protocol != 'http' )
 					return;
 
-				if( connection.href )
+				if( connection.href && media.bitrate && media.height )
 				   sources.push({"url": connection.href , "format":  media.bitrate + "k MP4", "height": media.height, "isNative": true});		
 			});
 			
 			callback({
 				"loadAfter": false,
 				"playlist": [{
-					"siteInfo": { "name": "BBC", "url": url  },
 					"title": title,
 					"poster": posterURL,
 					"sources": sources				

@@ -5,12 +5,13 @@ addKiller("Eurogamer", {
 },
 
 "process": function(data, callback) {
-	console.log(data);
 	var flashvars = parseFlashVariables(data.params.flashvars);
-	console.log(flashvars);
-	console.log( decodeURIComponent(flashvars.playlist) );
-	var payload = /\[\[JSON\]\]\[(.*?)\]/.exec(decodeURIComponent(flashvars.playlist))[1];		
-	payload = JSON.parse(payload);
+	var matches = /\[\[JSON\]\]\[(.*?)\]/.exec(decodeURIComponent(flashvars.playlist));
+	
+	if( !matches || matches < 2 )
+		return;
+				
+	var payload = JSON.parse(matches[1]);
 	
 	var sources = [];
 	
