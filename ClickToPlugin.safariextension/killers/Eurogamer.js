@@ -19,9 +19,22 @@ addKiller("Eurogamer", {
 		sources.push({"url": payload['hd.file'] , "format":  "HD", "height": 720, "isNative": 			true});					
 	
 	if( payload['hd.original'] )
-		sources.push({"url": payload['hd.original'] , "format":  "SD", "height": 406, "isNative": 			true});					
-
+		sources.push({"url": payload['hd.original'] , "format":  "SD", "height": 406, "isNative": 			true});		
+	
+	var initScript = '\
+		if( Playlist && Playlist.width ) {\
+			mediaElement.parentElement.style.setProperty("width", Playlist.width + "px", "important");\
+			mediaElement.style.setProperty("width", Playlist.width + "px", "important");\
+		}\
+		\
+		if( Playlist && Playlist.height ) {\
+			mediaElement.parentElement.style.setProperty("height", Playlist.height + "px", "important");\
+			mediaElement.style.setProperty("height", Playlist.height + "px", "important");\
+		}\
+	';
+	
 	callback({
+		"initScript": initScript,
 		"playlist": [{
 			"title": data.title,
 			"poster": payload.image,
