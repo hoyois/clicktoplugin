@@ -5,17 +5,12 @@ addKiller("BBC", {
 },
 
 "process": function(data, callback) {
-	if( !this.videoInfo )
-		this.videoInfo = data.params.externalidentifier;
-	
 	if(!/emp.swf/.test(data.src)) {
 		return;
 	}
 	
 	var flashvars = parseFlashVariables(data.params.flashvars);
-
-	var url = "http://open.live.bbc.co.uk/mediaselector/4/jsfunc/stream/" + this.videoInfo + "/processJSON/";
-	this.videoInfo = null;
+	var url = "http://open.live.bbc.co.uk/mediaselector/4/jsfunc/stream/" + data.params.externalidentifier + "/processJSON/";
 	
 	var processJSON = this.processJSON;
 	var posterURL = decodeURIComponent(flashvars.holdingImage);	
