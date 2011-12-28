@@ -45,7 +45,10 @@ if(settings.version < 29) {
 	settings.killer = settings.additionalScripts;
 	settings.removeItem("additionalScripts");
 }
-settings.version = 34;
+if(settings.version < 35) {
+	settings.additionalScripts.concat("killers/IGN.js");
+}
+settings.version = 35;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
