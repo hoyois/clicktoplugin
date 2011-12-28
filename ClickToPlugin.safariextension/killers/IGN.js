@@ -11,7 +11,7 @@ addKiller("IGN", {
 	if(flashvars.config) {
 		url = JSON.parse(decodeURIComponent(flashvars.config)).plugins.igncontrolbar.doc_referer;
 	} else if(flashvars.url) {
-		url = decodeURIComponent(flashvars.url);
+		url = decodeURIComponent(flashvars.url.replace(/[?#].*/g, ""));
 	} else return;
 	
 	var siteInfo;
