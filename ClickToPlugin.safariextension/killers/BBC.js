@@ -21,7 +21,6 @@ addKiller("BBC", {
 },
 "externalidentifiers": {},
 "process": function(data, callback) {
-
 	var identifier = data.params.id;
 	if( identifier && !this.externalidentifiers[identifier] && data.params.externalidentifier ){
 		this.externalidentifiers[identifier] = data.params.externalidentifier;
@@ -35,7 +34,7 @@ addKiller("BBC", {
 	}
 
 	var flashvars = parseFlashVariables(data.params.flashvars);
-	var url = "http://open.live.bbc.co.uk/mediaselector/4/jsfunc/stream/" + data.params.externalidentifier + "/processJSON/";
+	var url = "http://open.live.bbc.co.uk/mediaselector/4/jsfunc/stream/" + videoInfo + "/processJSON/";
 
 	var processJSON = this.processJSON;
 	var posterURL = decodeURIComponent(flashvars.holdingImage);
