@@ -1,7 +1,7 @@
 addKiller("IGN", {
 
 "canKill": function(data) {
-	return data.src.indexOf("media.ign.com/ev/prod/embed.swf") !== -1;
+	return /media.ign.com\/ev\/\w+\/embed\.swf/.test(data.src);
 },
 
 "process": function(data, callback) {
