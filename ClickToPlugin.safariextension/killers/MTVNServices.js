@@ -64,7 +64,8 @@ addKiller("MTVNetworks", {
 	return data.src && data.src.indexOf("media.mtvnservices.com") !== -1;
 },
 "process": function(data, callback) {
-	console.log(data);
+//	console.log(data);
+
 	var flashvars = parseFlashVariables(data.params.flashvars);
 	var matches = /mgid:(.*?\.\w+:)[-\w]+/.exec(data.src);
 	var mgid = matches[0];
@@ -77,10 +78,6 @@ addKiller("MTVNetworks", {
 	// E.g., this URL (which is the data.src): http://media.mtvnservices.com/mgid:cms:video:colbertnation.com:404447
 	// redirects to this:
 	// http://media.mtvnservices.com/player/prime/mediaplayerprime.1.11.3.swf?uri=mgid:cms:video:colbertnation.com:404447&type=normal&ref=None&geo=GB&group=entertainment&&CONFIG_URL=http%3a%2f%2fmedia.mtvnservices.com%2fpmt%2fe1%2fplayers%2fmgid%3acms%3avideo%3acolbertnation.com%3a%2fcontext3%2fconfig.xml%3furi%3dmgid%3acms%3avideo%3acolbertnation.com%3a404447%26type%3dnormal%26ref%3dNone%26geo%3dGB%26group%3dentertainment%2
-	//
-	// Depending on your GEO location, you'll either be provided with a context number
-	// that works or one that doesn't.  E.g., colbert episodes provides me with a context
-	// of 7 in the US but 5 in the UK.  context5 doesn't work.
 	//
 	// You can see in the URL immediately above that the CONFIG_URL is there, but how do
 	// I grab it?
@@ -95,6 +92,12 @@ addKiller("MTVNetworks", {
 	// with the info available in the data var and the knowledge that I've acquired
 	// when visiting each of the supported sites.
 
+	// I've discovered that the context number given in the CONFIG_URL varies depending on
+	// your geo location, you'll either be provided with a context number
+	// that works or one that doesn't.  E.g., colbert episodes provides me with a context
+	// of 7 in the US but 5 in the UK. context5 doesn't work.
+	// So it's perhaps better that we don't derive it but instead hardcode it.
+
 	// Try to get a context, if we can't lets set it to context1, it might work.  Better
 	// than nothing.
 	var context = this.contexts[matches[1]];
@@ -105,7 +108,7 @@ addKiller("MTVNetworks", {
 	if( mgid.indexOf('mtv.com') >= 0 )
 		configURL = 'http://www.mtv.com/player/embed/AS3/configuration.jhtml?uri=' + mgid + '&type=network&ref=www.mtv.com';
 
-	console.log(configURL);
+//	console.log(configURL);
 
 	var callbackData = {"playlist": []};
 	var _this = this;
