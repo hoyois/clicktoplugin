@@ -1,7 +1,7 @@
 addKiller("IGN", {
 
 "canKill": function(data) {
-	return data.src.indexOf("media.ign.com/ev/prod/embed.swf") !== -1;
+	return /media.ign.com\/ev\/\w+\/embed\.swf/.test(data.src);
 },
 
 "process": function(data, callback) {
@@ -11,8 +11,11 @@ addKiller("IGN", {
 	if(flashvars.config) {
 		url = JSON.parse(decodeURIComponent(flashvars.config)).plugins.igncontrolbar.doc_referer;
 	} else if(flashvars.url) {
-		url = decodeURIComponent(flashvars.url.replace(/[?#].*/g, ""));
+		url = decodeURIComponent(flashvars.url);
 	} else return;
+	
+	// clear the querystring from the URL in all cases
+	url = url.replace(/[?#].*/g, "");
 	
 	var siteInfo;
 	if(!/^http:\/\/www\.ign\.com\/videos\//.test(data.location)) siteInfo = {"name": "IGN", "url": url};
