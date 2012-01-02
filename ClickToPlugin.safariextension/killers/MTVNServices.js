@@ -141,7 +141,7 @@ addKiller("MTVNetworks", {
 "getRenditionsURLsFromDoc": function( doc, data, callbackData, callback) {
 
 	var items = doc.getElementsByTagName('item');
-	var item, renditionsURLs, siteInfo, poster, title;
+	var item, renditionsURLs, poster, title;
 
 	renditionsURLs = [];
 
@@ -161,18 +161,12 @@ addKiller("MTVNetworks", {
 
 			renditionsURLs.push( renditionURL );
 			playlistItem = {};
-			playlistItem.siteInfo = {};
-
-			if( item.getElementsByTagName('link').length > 0 )
-				playlistItem.siteInfo.url = item.getElementsByTagName('link')[0].textContent;
 
 			if( item.getElementsByTagNameNS('http://search.yahoo.com/mrss/','thumbnail').length > 0 )
 				playlistItem.poster = (item.getElementsByTagNameNS('http://search.yahoo.com/mrss/','thumbnail')[0]).getAttribute('url');
 
 			if( item.getElementsByTagName('title').length > 0 )
 				playlistItem.title = (item.getElementsByTagName('title')[0]).textContent;
-
-			playlistItem.siteInfo.name = data.siteName;
 
 			playlistItem.sources = [];
 			callbackData.playlist.push(playlistItem);
