@@ -1,7 +1,7 @@
 addKiller("IGN", {
 
 "canKill": function(data) {
-	return data.src.indexOf("media.ign.com/ev/prod/embed.swf") !== -1;
+	return /media.ign.com\/ev\/\w+\/embed\.swf/.test(data.src);
 },
 
 "process": function(data, callback) {
@@ -11,11 +11,13 @@ addKiller("IGN", {
 	if(flashvars.config) {
 		url = JSON.parse(decodeURIComponent(flashvars.config)).plugins.igncontrolbar.doc_referer;
 	} else if(flashvars.url) {
-		url = decodeURIComponent(flashvars.url.replace(/[?#].*/g, ""));
+		url = decodeURIComponent(flashvars.url);
 	} else return;
 	
+	url = url.replace(/[?#].*/g, "");
+	
 	var siteInfo;
-	if(!/^http:\/\/www\.ign\.com\/videos\//.test(data.location)) siteInfo = {"name": "IGN", "url": url};
+	if(!/^http:\/\/www\.ign\.com\/videos\//.test(data.location) && /^http:\/\/www\.ign\.com/.test(url)) siteInfo = {"name": "IGN", "url": url};
 	
 	var _this = this;
 	var xhr = new XMLHttpRequest();
@@ -32,7 +34,7 @@ addKiller("IGN", {
 	var sources = [];
 	config.playlist[1].bitrates.forEach(function(bitrate) {
 		if(bitrate.height && bitrate.url)
-			sources.push({"url": bitrate.url.replace(/mp4:/,"http://assets.ign.com/") , "format":  bitrate.height + "p MP4", "height": bitrate.height, "isNative": true});
+			sources.unshift({"url": bitrate.url.replace(/mp4:/,"http://assets.ign.com/") , "format":  bitrate.height + "p MP4", "height": bitrate.height, "isNative": true});
 	});
 	
 	callback({

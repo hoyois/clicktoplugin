@@ -46,7 +46,7 @@ if(settings.version < 29) {
 	settings.removeItem("additionalScripts");
 }
 if(settings.version < 35) {
-	settings.additionalScripts.concat("killers/IGN.js");
+	settings.additionalScripts.concat("killers/IGN.js", "killers/MTVNetworks.js", "killers/BBC.js");
 }
 settings.version = 35;
 
