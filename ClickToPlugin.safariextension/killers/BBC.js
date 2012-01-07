@@ -79,7 +79,7 @@ addKiller("BBC", {
 					   sources.push({"url": connection.href , "format":  media.bitrate + "k MP4", "height": media.height, "isNative": true});
 				});
 
-				callback({
+				if(sources.length > 0) callback({
 					"playlist": [{
 						"title": title,
 						"poster": poster,

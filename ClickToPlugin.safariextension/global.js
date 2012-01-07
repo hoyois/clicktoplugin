@@ -3,39 +3,6 @@
 if(settings.version === undefined) {
 	openTab(safari.extension.baseURI + "settings.html");
 }
-if(settings.version < 25) {
-	settings.removeItem("enabledKillers");
-	settings.removeItem("usePlaylists");
-	settings.removeItem("language");
-	settings.maxInvisibleSize = 8;
-}
-if(settings.version < 27) {
-	settings.defaultResolution = settings.maxResolution;
-	settings.removeItem("maxResolution");
-	settings.allowInvisible = settings.loadInvisible;
-	settings.removeItem("loadInvisible");
-	settings.trackSelectorShortcut = settings.showTitleShortcut;
-	settings.removeItem("showTitleShortcut");	
-	settings.removeItem("showPoster");
-	settings.removeItem("showMediaTooltip");
-	settings.removeItem("defaultTab");
-}
-if(settings.version < 28) {
-	var tmpArray = [];
-	for(var i = 0; i < settings.additionalScripts.length; i++) {
-		switch(settings.additionalScripts[i]) {
-		case "killers/QuickTime.js":
-		case "killers/DivX.js":
-		case "killers/WindowsMedia.js":
-		case "killers/Generic.js":
-			break;
-		default:
-			tmpArray.push(settings.additionalScripts[i]);
-		}
-	}
-	tmpArray.push("killers/Generic.js");
-	settings.additionalScripts = tmpArray;
-}
 if(settings.version < 29) {
 	settings.openInQTPContext = settings.viewInQTPContext;
 	settings.removeItem("viewInQTPContext");
@@ -46,7 +13,23 @@ if(settings.version < 29) {
 	settings.removeItem("additionalScripts");
 }
 if(settings.version < 35) {
-	settings.additionalScripts.concat("killers/IGN.js", "killers/MTVNetworks.js", "killers/BBC.js");
+	var tmpArray = [];
+	for(var i = 0; i < settings.killers.length; i++) {
+		switch(settings.killers[i]) {
+		case "killers/IGN.js":
+		case "killers/MTVNetworks.js":
+		case "killers/BBC.js":
+		case "killers/Tumblr.js":
+		case "killers/Flash.js":
+		case "killers/Silverlight.js":
+		case "killers/Generic.js":
+			break;
+		default:
+			tmpArray.push(settings.killers[i]);
+		}
+	}
+	tmpArray.push("killers/IGN.js", "killers/MTVNetworks.js", "killers/BBC.js", "killers/Tumblr.js", "killers/Flash.js", "killers/Silverlight.js", "killers/Generic.js");
+	settings.killers = tmpArray;
 }
 settings.version = 35;
 
