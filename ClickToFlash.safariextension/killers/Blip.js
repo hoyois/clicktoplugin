@@ -12,7 +12,7 @@ addKiller("Blip", {
 			var match = /[?&#]file=([^&]*)/.exec(data.src);
 			if(!match) return;
 			url = match[1];
-			isEmbed = true;
+			isEmbed = !/^http:\/\/blip\.tv/.test(data.location);
 		}
 		this.processXML(decodeURIComponent(url), isEmbed, callback);
 	} else {

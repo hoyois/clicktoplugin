@@ -3,23 +3,6 @@
 if(settings.version === undefined) {
 	openTab(safari.extension.baseURI + "settings.html");
 }
-if(settings.version < 25) {
-	settings.removeItem("enabledKillers");
-	settings.removeItem("usePlaylists");
-	settings.removeItem("language");
-	settings.maxInvisibleSize = 8;
-}
-if(settings.version < 27) {
-	settings.defaultResolution = settings.maxResolution;
-	settings.removeItem("maxResolution");
-	settings.allowInvisible = settings.loadInvisible;
-	settings.removeItem("loadInvisible");
-	settings.trackSelectorShortcut = settings.showTitleShortcut;
-	settings.removeItem("showTitleShortcut");	
-	settings.removeItem("showPoster");
-	settings.removeItem("showMediaTooltip");
-	settings.removeItem("defaultTab");
-}
 if(settings.version < 29) {
 	settings.openInQTPContext = settings.viewInQTPContext;
 	settings.removeItem("viewInQTPContext");
@@ -29,7 +12,24 @@ if(settings.version < 29) {
 	settings.killer = settings.additionalScripts;
 	settings.removeItem("additionalScripts");
 }
-settings.version = 34;
+if(settings.version < 35) {
+	var tmpArray = [];
+	for(var i = 0; i < settings.killers.length; i++) {
+		switch(settings.killers[i]) {
+		case "killers/IGN.js":
+		case "killers/MTVNetworks.js":
+		case "killers/BBC.js":
+		case "killers/Tumblr.js":
+		case "killers/Flash.js":
+			break;
+		default:
+			tmpArray.push(settings.killers[i]);
+		}
+	}
+	tmpArray.push("killers/IGN.js", "killers/MTVNetworks.js", "killers/BBC.js", "killers/Tumblr.js", "killers/Flash.js");
+	settings.killers = tmpArray;
+}
+settings.version = 35;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
