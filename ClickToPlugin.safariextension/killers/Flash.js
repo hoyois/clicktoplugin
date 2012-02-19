@@ -11,7 +11,7 @@ addKiller("Flash", {
 
 "process": function(data, callback) {
 	var flashvars = parseFlashVariables(data.params.flashvars);
-	if(/^rmtp/.test(flashvars.streamer)) return;
+	if(/^rtmp/.test(flashvars.streamer)) return;
 	
 	// Get media and poster URL
 	var sourceURL, posterURL;

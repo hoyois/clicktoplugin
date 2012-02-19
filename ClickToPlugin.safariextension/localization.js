@@ -5,6 +5,7 @@
 var PREFERENCES_STRINGS = {
 	"PREFERENCES_LAYOUT": {
 		"en-us": ["#general li > span:first-child{max-width:160px;}"],
+		"tr-tr": [],
 		"fr-fr": ["nav{padding-right:1px;}", "#media_player li > span:first-child{max-width:220px;}"],
 		"es-es": ["#media_player li > span.textarea_label > label{max-width:200px;}"],
 		"de-de": ["nav{padding-right:1px;}", "#general li > span:first-child{max-width:170px;}", "#media_player li > span.textarea_label > label{max-width:180px;}"],
@@ -14,6 +15,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"PREFERENCES_TITLE": {
 		"en-us": "ClickToPlugin Preferences",
+		"tr-tr": "ClickToPlugin Ayarları",
 		"fr-fr": "Préférences ClickToPlugin",
 		"es-es": "Preferencias de ClickToPlugin",
 		"de-de": "ClickToPlugin-Einstellungen",
@@ -25,6 +27,7 @@ var PREFERENCES_STRINGS = {
 	// Tabs
 	"GENERAL_TAB": {
 		"en-us": "General",
+		"tr-tr": "Genel",
 		"fr-fr": "Général",
 		"es-es": "General",
 		"de-de": "Allgemein",
@@ -34,6 +37,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"PLUGINS_TAB": {
 		"en-us": "Plug-ins",
+		"tr-tr": "Plug-inler",
 		"fr-fr": "Plugins",
 		"es-es": "Complementos",
 		"de-de": "Plug-Ins",
@@ -43,6 +47,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"CONTROL_LISTS_TAB": {
 		"en-us": "Control lists",
+		"tr-tr": "Kontrol listeleri",
 		"fr-fr": "Listes de contrôle",
 		"es-es": "Listas de control",
 		"de-de": "Filterregeln",
@@ -52,6 +57,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"MEDIA_TAB": {
 		"en-us": "Media player",
+		"tr-tr": "Ortam oynatıcısı",
 		"fr-fr": "Lecteur multimédia",
 		"es-es": "Reproductor multimedia",
 		"de-de": "Media-Player",
@@ -61,6 +67,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"CONTEXT_MENU_TAB": {
 		"en-us": "Shortcut menu",
+		"tr-tr": "Kısayol menüsü",
 		"fr-fr": "Menu contextuel",
 		"es-es": "Menú contextual",
 		"de-de": "Kontextmenü",
@@ -70,6 +77,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SHORTCUTS_TAB": {
 		"en-us": "Keyboard shortcuts",
+		"tr-tr": "Klavye kısayolları",
 		"fr-fr": "Raccourcis clavier",
 		"es-es": "Accesos por teclado",
 		"de-de": "Keyboard-Shortcuts",
@@ -81,6 +89,7 @@ var PREFERENCES_STRINGS = {
 	// General tab
 	"PLACEHOLDER_OPACITY": {
 		"en-us": "Placeholder opacity:",
+		"tr-tr": "Yer tutucu saydamlığı",
 		"fr-fr": "Transparence des boîtes de remplacement :",
 		"es-es": "Opacidad:",
 		"de-de": "Platzhalter-Transparenz",
@@ -90,6 +99,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SHOW_TOOLTIP": {
 		"en-us": "Show plug-in source as tooltip",
+		"tr-tr": "Plug-in kaynağını tiyo olarak göster",
 		"fr-fr": "Afficher la source du plugin en infobulle",
 		"es-es": "Mostrar la procedencia del complemento como mensaje de ayuda contextual",
 		"de-de": "Plug-In-Quelle im Tooltip anzeigen",
@@ -99,6 +109,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"ALLOW_INVISIBLE_PLUGINS": {
 		"en-us": "Allow invisible plug-ins",
+		"tr-tr": "Görünmez plug-inlere izin ver",
 		"fr-fr": "Autoriser les plugins invisibles",
 		"es-es": "Permitir los complementos invisibles",
 		"de-de": "Unsichtbare Plug-Ins erlauben",
@@ -108,6 +119,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"DEBUG_MODE": {
 		"en-us": "Block plug-ins manually",
+		"tr-tr": "Plug-inleri el ile engelle",
 		"fr-fr": "Bloquer les plugins manuellement",
 		"es-es": "Bloquear los complementos manualmente",
 		"de-de": "Plug-Ins manuell blockieren",
@@ -117,6 +129,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SIFR_POLICY": {
 		"en-us": "sIFR text policy:",
+		"tr-tr": "sIFR metin politikası",
 		"fr-fr": "Texte sIFR :",
 		"es-es": "Texto sIFR:",
 		"de-de": "sIFR-Richtlinie:",
@@ -126,6 +139,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SIFR_TEXT_ONLY": {
 		"en-us": "Show text only",
+		"tr-tr": "Sadece metin olarak göster",
 		"fr-fr": "N’afficher que le texte",
 		"es-es": "Únicamente mostrar el texto",
 		"de-de": "Nur Text anzeigen",
@@ -135,6 +149,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SIFR_NORMAL": {
 		"en-us": "Treat as regular Flash",
+		"tr-tr": "Olağan flash olarak muamele et",
 		"fr-fr": "Considérer comme Flash",
 		"es-es": "Tratar como un complemento Flash",
 		"de-de": "Als normales Flash behandeln",
@@ -144,6 +159,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SIFR_AUTOLOAD": {
 		"en-us": "Load automatically",
+		"tr-tr": "Otomatik yükle",
 		"fr-fr": "Autoriser",
 		"es-es": "Cargar automáticamente",
 		"de-de": "Automatisch laden",
@@ -153,6 +169,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"KILLER_SCRIPTS": {
 		"en-us": "Plug-in to HTML5 conversion scripts:",
+		"tr-tr": "Plug-ini HTML5’e çevirme komutları",
 		"fr-fr": "Scripts de conversion en HTML5 :",
 		"es-es": "Scripts para conversiones en HTML5:",
 		"de-de": "Scripte zum umwandeln von Plug-Ins zu HTML5:",
@@ -162,6 +179,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"DEFAULT_KILLERS_BUTTON": {
 		"en-us": "Use default",
+		"tr-tr": "Varsayılana dön",
 		"fr-fr": "Défaut",
 		"es-es": "Predeterminado",
 		"de-de": "Zurücksetzen",
@@ -171,6 +189,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"LOAD_PLUGIN_IF_NOT_KILLED": {
 		"en-us": "Load plug-in if HTML5 conversion fails",
+		"tr-tr": "Plug-ini, eğer HTML5 çevrimi başarısız olursa yükle",
 		"fr-fr": "Charger le plugin si la conversion en HTML5 échoue",
 		"es-es": "Cargar el complemento si la conversión a HTML5 falla",
 		"de-de": "Lade Plug-in wenn HTML5-Umwandlung fehlschlägt",
@@ -180,6 +199,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"USE_FALLBACK_MEDIA": {
 		"en-us": "Use HTML5 media fallbacks",
+		"tr-tr": "HTML5 medya yedeklerini kullan",
 		"fr-fr": "Utiliser les replis HTML5",
 		"es-es": "Utilizar “fallbacks” en HTML5",
 		"de-de": "HTML5-Media-Fallbacks benutzen",
@@ -189,6 +209,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"DOWNLOADING": {
 		"en-us": "Downloading:",
+		"tr-tr": "İndiriyor",
 		"fr-fr": "Téléchargements :",
 		"es-es": "Descargas:",
 		"de-de": "Download:",
@@ -198,6 +219,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"USE_DOWNLOAD_MANAGER": {
 		"en-us": "Use a download manager",
+		"tr-tr": "İndirme yöneticisi kullan",
 		"fr-fr": "Utiliser un gestionnaire de téléchargement",
 		"es-es": "Utilizar un gestor de descargas",
 		"de-de": "Downloadmanager benutzen",
@@ -207,6 +229,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"AIRPLAY_HOSTNAME": {
 		"en-us": "AirPlay device hostname:",
+		"tr-tr": "AirPlay aygıt ismi:",
 		"fr-fr": "Périphérique AirPlay :",
 		"es-es": "Nombre del dispositivo AirPlay:",
 		"de-de": "AirPlay-Geräte-Hostname:",
@@ -216,6 +239,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"AIRPLAY_PASSWORD": {
 		"en-us": "AirPlay password:",
+		"tr-tr": "AirPlay parolası:",
 		"fr-fr": "Mot de passe AirPlay :",
 		"es-es": "Contraseña para AirPlay:",
 		"de-de": "AirPlay-Passwort:",
@@ -227,6 +251,7 @@ var PREFERENCES_STRINGS = {
 	// Plug-ins tab
 	"ALLOW_THESE_PLUGINS": {
 		"en-us": "Load these plug-ins automatically:",
+		"tr-tr": "Bu plug-inlerı otomatik yükle:",
 		"fr-fr": "Autoriser ces plugins :",
 		"es-es": "Permitir estos complementos:",
 		"de-de": "Folgende Plug-Ins automatisch laden:",
@@ -236,6 +261,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"NO_PLUGINS_NOTICE": {
 		"en-us": "You currently have no enabled plug-ins!",
+		"tr-tr": "Şu anda aktif plug-ininiz yok!",
 		"fr-fr": "Aucun plugin actif!",
 		"es-es": "Actualmente no tienens ningún complemento habilitado!",
 		"de-de": "Sie haben aktuell keine Plug-Ins aktiviert!",
@@ -245,6 +271,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"PLUGIN_FILENAME": {
 		"en-us": function(file) {return "From file: " + file;},
+		"tr-tr": function(file) {return file + " dosyasından";},
 		"fr-fr": function(file) {return "Fichier : " + file;},
 		"es-es": function(file) {return "Desde el archivo: " + file;},
 		"de-de": function(file) {return "Von Datei: " + file;},
@@ -254,6 +281,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"PLUGIN_DESCRIPTION": {
 		"en-us": function(file) {return "Description: " + file;},
+		"tr-tr": function(file) {return "Tanım: " + file;},
 		"fr-fr": function(file) {return "Description : " + file;},
 		"es-es": function(file) {return "Descripción: " + file;},
 		"de-de": function(file) {return "Beschreibung: " + file;},
@@ -265,6 +293,7 @@ var PREFERENCES_STRINGS = {
 	// Control lists tab
 	"ALLOW_LOCATIONS": {
 		"en-us": "Allow plug-ins on these sites:",
+		"tr-tr": "Bu sayfalardaki plug-inlere izin ver:",
 		"fr-fr": "Autoriser les plugins sur ces sites :",
 		"es-es": "Permitir los complementos en estos sitios:",
 		"de-de": "Plug-Ins auf folgenden Seiten erlauben:",
@@ -274,6 +303,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"ALLOW_SOURCES": {
 		"en-us": "Allow plug-ins from these sources:",
+		"tr-tr": "Bu kaynaklardaki plug-inlere izin ver:",
 		"fr-fr": "Autoriser les plugins provenant de :",
 		"es-es": "Permitir los complementos en los archivos:",
 		"de-de": "Plug-Ins von folgenden Quellen erlauben:",
@@ -283,6 +313,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"BLOCK_LOCATIONS": {
 		"en-us": "Block plug-ins on these sites:",
+		"tr-tr": "Bu sayfalardaki plug-inleri engelle:",
 		"fr-fr": "Bloquer les plugins sur ces sites :",
 		"es-es": "Bloquear los complementos en estos sitios:",
 		"de-de": "Plug-Ins auf folgenden Seiten blockieren:",
@@ -292,6 +323,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"BLOCK_SOURCES": {
 		"en-us": "Block plug-ins from these sources:",
+		"tr-tr": "Bu kaynaklardaki plug-inleri engelle:",
 		"fr-fr": "Bloquer les plugins provenant de :",
 		"es-es": "Bloquear los complementos en los archivos:",
 		"de-de": "Plug-Ins von folgenden Quellen blockieren:",
@@ -301,6 +333,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"INVERT_WHITELISTS": {
 		"en-us": "Invert lists",
+		"tr-tr": "Listeleri çevir",
 		"fr-fr": "Inverser",
 		"es-es": "Invertir las listas",
 		"de-de": "Listen invertieren",
@@ -310,6 +343,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"HIDE_LOCATIONS": {
 		"en-us": "Hide plug-ins on these sites:",
+		"tr-tr": "Bu sayfalardaki plug-inleri gizle:",
 		"fr-fr": "Masquer les plugins sur ces sites :",
 		"es-es": "Ocultar los complementos en estos sitios:",
 		"de-de": "Plug-Ins auf folgenden Seiten verstecken:",
@@ -319,6 +353,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"HIDE_SOURCES": {
 		"en-us": "Hide plug-ins from these sources:",
+		"tr-tr": "Bu kaynaklardaki plug-inleri gizle:",
 		"fr-fr": "Masquer les plugins provenant de :",
 		"es-es": "Ocultar los complementos en los archivos:",
 		"de-de": "Plug-Ins von folgenden Quellen verstecken:",
@@ -328,6 +363,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SHOW_LOCATIONS": {
 		"en-us": "Show plug-ins on these sites:",
+		"tr-tr": "Bu sayfalardaki plug-inleri göster",
 		"fr-fr": "Afficher les plugins sur ces sites :",
 		"es-es": "Mostrar los complementos en estos sitios:",
 		"de-de": "Plug-Ins auf folgenden Seiten anzeigen:",
@@ -337,6 +373,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SHOW_SOURCES": {
 		"en-us": "Show plug-ins from these sources:",
+		"tr-tr": "Bu kaynaklardaki plug-inleri göster",
 		"fr-fr": "Afficher les plugins provenant de :",
 		"es-es": "Mostrar los complementos en los archivos:",
 		"de-de": "Plug-Ins von folgenden Quellen anzeigen:",
@@ -346,6 +383,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"INVERT_BLACKLISTS": {
 		"en-us": "Invert lists",
+		"tr-tr": "Listeleri çevir",
 		"fr-fr": "Inverser",
 		"es-es": "Invertir las listas",
 		"de-de": "Listen invertieren",
@@ -357,6 +395,7 @@ var PREFERENCES_STRINGS = {
 	// Media player tab
 	"DEFAULT_PLAYER": {
 		"en-us": "Default media player:",
+		"tr-tr": "Varsayılan ortam oynatıcı:",
 		"fr-fr": "Lecteur par défaut :",
 		"es-es": "Reproductor multimedia por defecto:",
 		"de-de": "Standard Media-Player:",
@@ -367,6 +406,7 @@ var PREFERENCES_STRINGS = {
 	// "HTML5_PLAYER": {} // "HTML5"
 	"PLUGIN_PLAYER": {
 		"en-us": "Plug-in",
+		"tr-tr": "Plug-in",
 		"fr-fr": "Plugin",
 		"es-es": "Complemento",
 		"de-de": "Plug-In",
@@ -376,6 +416,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"QUICKTIME_PLAYER": {
 		"en-us": "QuickTime Player",
+		"tr-tr": "QuickTime Player",
 		"fr-fr": "QuickTime Player",
 		"es-es": "QuickTime Player",
 		"de-de": "QuickTime-Player",
@@ -386,6 +427,7 @@ var PREFERENCES_STRINGS = {
 	// "AIRPLAY_PLAYER": {} // "AirPlay"
 	"AUTOLOAD_MEDIA_PLAYER": {
 		"en-us": "Load media player automatically",
+		"tr-tr": "Ortam oynatıcısını otomatik yükle",
 		"fr-fr": "Charger le lecteur automatiquement",
 		"es-es": "Cargar el reproductor automáticamente",
 		"de-de": "Media-Player automatisch laden",
@@ -395,6 +437,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"AUTOPLAY_LOCATIONS": {
 		"en-us": "Autoplay on these sites:",
+		"tr-tr": "Bu sayfalarda otomatik oynat:",
 		"fr-fr": "Lancer la lecture automatiquement sur ces sites :",
 		"es-es": "Reproducir automáticamente en estos sitios:",
 		"de-de": "Automatische Wiedergabe auf folgenden Seiten:",
@@ -404,6 +447,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"INITIAL_BEHAVIOR": {
 		"en-us": "Initial behavior:",
+		"tr-tr": "İlk davranış:",
 		"en-gb": "Initial behaviour:",
 		"fr-fr": "Action initiale :",
 		"es-es": "Acción inicial:",
@@ -414,6 +458,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"INITIAL_NO_BUFFER": {
 		"en-us": "Do not preload",
+		"tr-tr": "Ön yükleme yapma",
 		"fr-fr": "Aucune",
 		"es-es": "No precargar",
 		"de-de": "Nicht puffern",
@@ -423,6 +468,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"INITIAL_BUFFER": {
 		"en-us": "Preload",
+		"tr-tr": "Önyükleme",
 		"fr-fr": "Préchargement",
 		"es-es": "Emprezar la precarga",
 		"de-de": "Puffern",
@@ -432,6 +478,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"INITIAL_AUTOPLAY": {
 		"en-us": "Autoplay",
+		"tr-tr": "Otomatik oynat",
 		"fr-fr": "Lecture automatique",
 		"es-es": "Reproducir automáticamente",
 		"de-de": "Automatisch wiedergeben",
@@ -441,6 +488,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"INSTANT_AUTOPLAY": {
 		"en-us": "Instant autoplay",
+		"tr-tr": "Anında oynat",
 		"fr-fr": "Lecture instantanée",
 		"es-es": "Reproducción sin esperas",
 		"de-de": "Sofortige Wiedergabe",
@@ -450,6 +498,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"DEFAULT_RESOLUTION": {
 		"en-us": "Default resolution:",
+		"tr-tr": "Varsayılan çözünürlük:",
 		"fr-fr": "Résolution par défaut :",
 		"es-es": "Resolución por defecto:",
 		"de-de": "Standardauflösung:",
@@ -459,6 +508,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"NONNATIVE_FORMATS_POLICY": {
 		"en-us": "Nonnative formats policy:",
+		"tr-tr": "Yerel olmayan biçimler için kurallar:",
 		"fr-fr": "Formats non natifs :",
 		"es-es": "Formatos no nativos:",
 		"de-de": "Regel für proprietäre Formate:",
@@ -468,6 +518,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"NONNATIVE_IGNORE": {
 		"en-us": "Never use as default",
+		"tr-tr": "Asla varsayılan olarak kullanma",
 		"fr-fr": "Ne jamais utiliser comme défaut",
 		"es-es": "Nunca usar por defecto",
 		"de-de": "Niemals als Standard verwenden",
@@ -477,6 +528,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"NONNATIVE_LAST_RESORT": {
 		"en-us": "Use only as a last resort",
+		"tr-tr": "Son çare olarak kullan",
 		"fr-fr": "N’utiliser qu’en dernier recours",
 		"es-es": "Usar como última opción",
 		"de-de": "Nur als letzten Versuch verwenden",
@@ -486,6 +538,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"NONNATIVE_USE_FREELY": {
 		"en-us": "Use freely",
+		"tr-tr": "Serbestçe kullan",
 		"fr-fr": "Utiliser sans restrictions",
 		"es-es": "Usar libremente",
 		"de-de": "Frei verwenden",
@@ -495,6 +548,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SOURCE_SELECTOR": {
 		"en-us": "Source selector:",
+		"tr-tr": "Kaynak seçimi:",
 		"fr-fr": "Sélecteur de médias :",
 		"es-es": "Selector de fuentes:",
 		"de-de": "Quellenauswahl:",
@@ -504,6 +558,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SHOW_MEDIA_SOURCES": {
 		"en-us": "Include media sources",
+		"tr-tr": "Ortam kaynaklarını göster",
 		"fr-fr": "Inclure les formats disponibles",
 		"es-es": "Incluir fuentes multimedia",
 		"de-de": "Medienquellen anzeigen",
@@ -513,6 +568,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SHOW_PLUGIN_SOURCE": {
 		"en-us": "Include plug-in",
+		"tr-tr": "Plug-ini göster",
 		"fr-fr": "Inclure le plugin",
 		"es-es": "Incluir el complemento",
 		"de-de": "Plug-In anzeigen",
@@ -522,6 +578,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SHOW_QTP_SOURCE": {
 		"en-us": "Include QuickTime Player",
+		"tr-tr": "QuickTime Player’ı göster",
 		"fr-fr": "Inclure QuickTime Player",
 		"es-es": "Incluir QuickTime Player",
 		"de-de": "QuickTime-Player anzeigen",
@@ -531,6 +588,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SHOW_AIRPLAY_SOURCE": {
 		"en-us": "Include AirPlay",
+		"tr-tr": "AirPlay’i göster",
 		"fr-fr": "Inclure AirPlay",
 		"es-es": "Incluir AirPlay",
 		"de-de": "AirPlay anzeigen",
@@ -540,6 +598,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SHOW_SITE_SOURCE": {
 		"en-us": "Include the video’s web page",
+		"tr-tr": "Videonun sayfasını göster",
 		"fr-fr": "Inclure la page web de la vidéo",
 		"es-es": "Incluir la página web del video",
 		"de-de": "Video-Seite anzeigen",
@@ -549,6 +608,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SHOW_POSTER": {
 		"en-us": "Show preview image",
+		"tr-tr": "Önizleme resmini göster",
 		"fr-fr": "Afficher un aperçu de la vidéo",
 		"es-es": "Mostrar la imagen de previsualización",
 		"de-de": "Vorschau anzeigen",
@@ -558,6 +618,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"HIDE_REWIND_BUTTON": {
 		"en-us": "Hide “Rewind” button",
+		"tr-tr": "“Sarma” tuşunu gizle",
 		"fr-fr": "Supprimer le bouton « Rembobiner »",
 		"es-es": "Ocultar el botón Rebobinar",
 		"de-de": "„Zurückspul“-Knopf ausblenden",
@@ -567,6 +628,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SOUND_VOLUME": {
 		"en-us": "Sound volume:",
+		"tr-tr": "Ses seviyesi: ",
 		"fr-fr": "Volume sonore :",
 		"es-es": "Volumen del sonido:",
 		"de-de": "Lautstärke:",
@@ -578,6 +640,7 @@ var PREFERENCES_STRINGS = {
 	// Shortcut menu tab
 	"SHOW_IN_CONTEXT_MENU": {
 		"en-us": "Show these commands in the shortcut menu:",
+		"tr-tr": "Bu komutları kısayol menüsünde göster:",
 		"fr-fr": "Afficher ces options dans le menu contextuel :",
 		"es-es": "Mostrar estas opciones en el menú contextual:",
 		"de-de": "Folgende Befehle im Kontextmenü anzeigen:",
@@ -587,6 +650,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SETTINGS_CONTEXT": {
 		"en-us": "ClickToPlugin Preferences",
+		"tr-tr": "ClickToPlugin ayarları",
 		"fr-fr": "Préférences ClickToPlugin",
 		"es-es": "Preferencias de ClickToPlugin",
 		"de-de": "ClickToPlugin-Einstellungen",
@@ -596,6 +660,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"DISABLE_ENABLE_CONTEXT": {
 		"en-us": "Disable/Enable ClickToPlugin",
+		"tr-tr": "ClickToPlugin’i aç/kapa",
 		"fr-fr": "Désactiver/Activer ClickToPlugin",
 		"es-es": "Desactivar/Activar ClickToPlugin",
 		"de-de": "ClickToPlugin deaktivieren/aktivieren",
@@ -605,6 +670,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"ALWAYS_ALLOW_CONTEXT": {
 		"en-us": "Always Allow",
+		"tr-tr": "Herzaman izin ver",
 		"fr-fr": "Toujours autoriser",
 		"es-es": "Permitir siempre",
 		"de-de": "Immer erlauben",
@@ -614,6 +680,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"ALWAYS_HIDE_CONTEXT": {
 		"en-us": "Always Hide",
+		"tr-tr": "Herzaman gizle",
 		"fr-fr": "Toujours masquer",
 		"es-es": "Ocultar siempre",
 		"de-de": "Immer verstecken",
@@ -623,6 +690,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"LOAD_ALL_CONTEXT": {
 		"en-us": "Load All Plug-ins",
+		"tr-tr": "Bütün plug-inleri yükle",
 		"fr-fr": "Débloquer tous les plugins",
 		"es-es": "Cargar todos los complementos",
 		"de-de": "Alle Plug-Ins laden",
@@ -632,6 +700,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"LOAD_INVISIBLE_CONTEXT": {
 		"en-us": "Load Invisible Plug-ins",
+		"tr-tr": "Bütün görünmez plug-inleri göster",
 		"fr-fr": "Débloquer les plugins invisibles",
 		"es-es": "Cargar los complementos invisibles",
 		"de-de": "Unsichtbare Plug-Ins laden",
@@ -641,6 +710,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"HIDE_ALL_CONTEXT": { // UNUSED
 		"en-us": "Hide All Plug-ins",
+		"tr-tr": "Bütün plug-inleri gizle",
 		"fr-fr": "Masquer tous les plugins",
 		"es-es": "Ocultar todos los complementos",
 		"de-de": "Alle Plug-Ins verstecken",
@@ -650,6 +720,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"DOWNLOAD_CONTEXT": {
 		"en-us": "Download Video",
+		"tr-tr": "Videoyu indir",
 		"fr-fr": "Télécharger la vidéo",
 		"es-es": "Descargar el vídeo",
 		"de-de": "Video herunterladen",
@@ -659,6 +730,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"VIEW_ON_SITE_CONTEXT": {
 		"en-us": "View on Site",
+		"tr-tr": "Sayfada göster",
 		"fr-fr": "Voir la vidéo sur le site",
 		"es-es": "Ver en la página web",
 		"de-de": "Auf Seite wiedergeben",
@@ -668,6 +740,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"OPEN_IN_QTP_CONTEXT": {
 		"en-us": "Open in QuickTime Player",
+		"tr-tr": "QuickTime Player’da aç",
 		"fr-fr": "Ouvrir dans QuickTime Player",
 		"es-es": "Abrir en QuickTime Player",
 		"de-de": "Im QuickTime-Player öffnen",
@@ -677,6 +750,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SEND_VIA_AIRPLAY_CONTEXT": {
 		"en-us": "Send via AirPlay",
+		"tr-tr": "AirPlay ile gönder",
 		"fr-fr": "Envoyer par AirPlay",
 		"es-es": "Enviar vía AirPlay",
 		"de-de": "An AirPlay-Gerät senden",
@@ -688,6 +762,7 @@ var PREFERENCES_STRINGS = {
 	// Keyboard shortcuts tab
 	"CLEAR_BUTTON": {
 		"en-us": "Clear",
+		"tr-tr": "Temizle",
 		"fr-fr": "Effacer",
 		"es-es": "Limpiar",
 		"de-de": "Leeren",
@@ -697,6 +772,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"SETTINGS_SHORTCUT": {
 		"en-us": "Open preferences:",
+		"tr-tr": "Ayarları aç:",
 		"fr-fr": "Ouvrir les préférences :",
 		"es-es": "Mostrar las preferencias:",
 		"de-de": "Einstellungen öffnen",
@@ -706,6 +782,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"WHITELIST_SHORTCUT": {
 		"en-us": "Allow plug-ins on domain:",
+		"tr-tr": "Bu alandaki plug-inlere izin ver:",
 		"fr-fr": "Autoriser les plugins sur ce domaine :",
 		"es-es": "Permitir los complementos en el dominio:",
 		"de-de": "Plug-Ins auf dieser Domäne erlauben:",
@@ -715,6 +792,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"LOAD_ALL_SHORTCUT": {
 		"en-us": "Load all plug-ins in frontmost tab:",
+		"tr-tr": "Bütün plug-inleri en öndeki sekmede yükle:",
 		"fr-fr": "Débloquer tous les plugins :",
 		"es-es": "Cargar todos los complementos en la pestaña actual:",
 		"de-de": "Alle Plug-Ins im vordersten Tab laden:",
@@ -724,6 +802,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"HIDE_ALL_SHORTCUT": {
 		"en-us": "Hide all plug-ins in frontmost tab:",
+		"tr-tr": "Bütün plug-inleri en öndeki sekmede gizle:",
 		"fr-fr": "Masquer tous les plugins :",
 		"es-es": "Ocultar todos los complementos en la pestaña actual:",
 		"de-de": "Alle Plug-Ins im vordersten Tab verstecken:",
@@ -733,6 +812,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"HIDE_PLUGIN_SHORTCUT": {
 		"en-us": "Hide targeted plug-in:",
+		"tr-tr": "Seçilmiş plug-ini gizle:",
 		"fr-fr": "Masquer le plugin ciblé :",
 		"es-es": "Ocultar el complemento seleccionado:",
 		"de-de": "Plug-In verstecken:",
@@ -742,6 +822,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"PLAY_PAUSE_SHORTCUT": {
 		"en-us": "Play/pause:",
+		"tr-tr": "Oynat/durdur",
 		"fr-fr": "Lecture/pause :",
 		"es-es": "Reproducir/Pausar:",
 		"de-de": "Wiedergabe/Pause:",
@@ -751,6 +832,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"TOGGLE_FULLSCREEN_SHORTCUT": {
 		"en-us": "Enter fullscreen:",
+		"tr-tr": "Tamekran yap:",
 		"fr-fr": "Mode plein écran :",
 		"es-es": "Ver en pantalla completa:",
 		"de-de": "Vollbild:",
@@ -760,6 +842,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"VOLUME_UP_SHORTCUT": {
 		"en-us": "Volume up:",
+		"tr-tr": "Sesi aç",
 		"fr-fr": "Augmenter le volume :",
 		"es-es": "Subir el volumen:",
 		"de-de": "Lautstärke erhöhen:",
@@ -769,6 +852,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"VOLUME_DOWN_SHORTCUT": {
 		"en-us": "Volume down:",
+		"tr-tr": "Sesi kıs:",
 		"fr-fr": "Diminuer le volume :",
 		"es-es": "Bajar el volumen:",
 		"de-de": "Lautstärke senken:",
@@ -778,6 +862,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"TOGGLE_LOOPING_SHORTCUT": {
 		"en-us": "Toggle repeat:",
+		"tr-tr": "Tekrarı değiştir:",
 		"fr-fr": "Activer/désactiver la répétition :",
 		"es-es": "Activar/Desactivar la repetición:",
 		"de-de": "Wiederholen umschalten:",
@@ -787,6 +872,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"PREV_TRACK_SHORTCUT": {
 		"en-us": "Previous track:",
+		"tr-tr": "Önceki iz:",
 		"fr-fr": "Piste précédente :",
 		"es-es": "Pista anterior:",
 		"de-de": "Vorheriger Spur:",
@@ -796,6 +882,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"NEXT_TRACK_SHORTCUT": {
 		"en-us": "Next track:",
+		"tr-tr": "Sonraki iz:",
 		"fr-fr": "Piste suivante :",
 		"es-es": "Pista siguiente:",
 		"de-de": "Nächster Spur:",
@@ -805,6 +892,7 @@ var PREFERENCES_STRINGS = {
 	},
 	"TRACK_SELECTOR_SHORTCUT": {
 		"en-us": "Show/hide track selector:",
+		"tr-tr": "İz seçimini göster/gizle:",
 		"fr-fr": "Afficher/masquer le selecteur de pistes :",
 		"es-es": "Mostrar/Ocultar el selector de pistas:",
 		"de-de": "Spurauswahl ein-/ausblenden:",
@@ -818,6 +906,7 @@ var GLOBAL_STRINGS = {
 	// Context menu items
 	"PREFERENCES": {
 		"en-us": "ClickToPlugin Preferences…",
+		"tr-tr": "ClickToPlugin Ayarları...",
 		"fr-fr": "Préférences ClickToPlugin…",
 		"es-es": "Preferencias de ClickToPlugin…",
 		"de-de": "ClickToPlugin-Einstellungen …",
@@ -827,6 +916,7 @@ var GLOBAL_STRINGS = {
 	},
 	"SWITCH_ON": {
 		"en-us": "Enable ClickToPlugin",
+		"tr-tr": "ClickToPlugin’i aç",
 		"fr-fr": "Activer ClickToPlugin",
 		"es-es": "Activar ClickToPlugin",
 		"de-de": "ClickToPlugin aktivieren",
@@ -836,6 +926,7 @@ var GLOBAL_STRINGS = {
 	},
 	"SWITCH_OFF": {
 		"en-us": "Disable ClickToPlugin",
+		"tr-tr": "ClickToPlugin’i kapat",
 		"fr-fr": "Désactiver ClickToPlugin",
 		"es-es": "Desactivar ClickToPlugin",
 		"de-de": "ClickToPlugin deaktivieren",
@@ -845,6 +936,7 @@ var GLOBAL_STRINGS = {
 	},
 	"LOAD_ALL_PLUGINS": {
 		"en-us": "Load All Plug-ins",
+		"tr-tr": "Bütün plug-inleri yükle",
 		"fr-fr": "Débloquer tous les plugins",
 		"es-es": "Cargar todos los complementos",
 		"de-de": "Alle Plug-Ins laden",
@@ -854,6 +946,7 @@ var GLOBAL_STRINGS = {
 	},
 	"LOAD_INVISIBLE_PLUGINS": {
 		"en-us": "Load Invisible Plug-ins",
+		"tr-tr": "Bütün gizli plug-inleri yükle",
 		"fr-fr": "Débloquer les plugins invisibles",
 		"es-es": "Cargar los complementos invisibles",
 		"de-de": "Unsichtbare Plug-Ins laden",
@@ -863,6 +956,7 @@ var GLOBAL_STRINGS = {
 	},
 	"HIDE_ALL_PLUGINS": { // UNUSED
 		"en-us": "Hide All Plug-ins",
+		"tr-tr": "Bütün plug-inleri gizle",
 		"fr-fr": "Masquer tous les plugins",
 		"es-es": "Ocultar todos los complementos",
 		"de-de": "Alle Plug-Ins verstecken",
@@ -872,6 +966,7 @@ var GLOBAL_STRINGS = {
 	},
 	"ALWAYS_ALLOW_ON_DOMAIN": {
 		"en-us": "Allow Plug-ins on Domain",
+		"tr-tr": "Bu alandaki plug-inlere izin ver",
 		"fr-fr": "Autoriser les plugins sur ce domaine",
 		"es-es": "Permitir los complementos en del dominio",
 		"de-de": "Plug-Ins auf dieser Domäne erlauben",
@@ -881,6 +976,7 @@ var GLOBAL_STRINGS = {
 	},
 	"ALWAYS_BLOCK_ON_DOMAIN": {
 		"en-us": "Block Plug-ins on Domain",
+		"tr-tr": "Bu alandaki plug-inleri engelle",
 		"fr-fr": "Bloquer les plugins sur ce domaine",
 		"es-es": "Bloquear los complementos en del dominio",
 		"de-de": "Plug-Ins auf dieser Domäne blockieren",
@@ -890,6 +986,7 @@ var GLOBAL_STRINGS = {
 	},
 	"ALWAYS_ALLOW_SOURCE": {
 		"en-us": "Always Allow",
+		"tr-tr": "Hep izin ver",
 		"fr-fr": "Toujours autoriser",
 		"es-es": "Permitir siempre",
 		"de-de": "Immer erlauben",
@@ -899,6 +996,7 @@ var GLOBAL_STRINGS = {
 	},
 	"ALWAYS_HIDE_ON_DOMAIN": {
 		"en-us": "Hide Plug-ins on Domain",
+		"tr-tr": "Bu alandaki plug-inleri gizle",
 		"fr-fr": "Masquer les plugins sur ce domaine",
 		"es-es": "Ocultar los complementos en del dominio",
 		"de-de": "Plug-Ins auf dieser Domäne verstecken",
@@ -908,6 +1006,7 @@ var GLOBAL_STRINGS = {
 	},
 	"ALWAYS_SHOW_ON_DOMAIN": {
 		"en-us": "Show Plug-ins on Domain",
+		"tr-tr": "Bu alandaki plug-inleri göster",
 		"fr-fr": "Afficher les plugins sur ce domaine",
 		"es-es": "Mostrar los complementos en del dominio",
 		"de-de": "Plug-Ins auf dieser Domäne anzeigen",
@@ -917,6 +1016,7 @@ var GLOBAL_STRINGS = {
 	},
 	"ALWAYS_HIDE_SOURCE": {
 		"en-us": "Always Hide",
+		"tr-tr": "Hep gizle",
 		"fr-fr": "Toujours masquer",
 		"es-es": "Ocultar siempre",
 		"de-de": "Immer verstecken",
@@ -926,6 +1026,7 @@ var GLOBAL_STRINGS = {
 	},
 	"DOWNLOAD_VIDEO": {
 		"en-us": "Download Video",
+		"tr-tr": "Videoyu indir",
 		"fr-fr": "Télécharger la vidéo",
 		"es-es": "Descargar el vídeo",
 		"de-de": "Video herunterladen",
@@ -935,6 +1036,7 @@ var GLOBAL_STRINGS = {
 	},
 	"DOWNLOAD_AUDIO": {
 		"en-us": "Download Audio",
+		"tr-tr": "Sesi indir",
 		"fr-fr": "Télécharger l’audio",
 		"es-es": "Descargar el audio",
 		"de-de": "Audio herunterladen",
@@ -944,6 +1046,7 @@ var GLOBAL_STRINGS = {
 	},
 	"OPEN_IN_QUICKTIME_PLAYER": {
 		"en-us": "Open in QuickTime Player",
+		"tr-tr": "QuickTime Player’da aç",
 		"fr-fr": "Ouvrir dans QuickTime Player",
 		"es-es": "Abrir en QuickTime Player",
 		"de-de": "Im QuickTime-Player öffnen",
@@ -953,6 +1056,7 @@ var GLOBAL_STRINGS = {
 	},
 	"SEND_VIA_AIRPLAY": {
 		"en-us": "Send via AirPlay",
+		"tr-tr": "AirPlay ile gönder",
 		"fr-fr": "Envoyer par AirPlay",
 		"es-es": "Enviar vía AirPlay",
 		"de-de": "An AirPlay-Gerät senden",
@@ -962,6 +1066,7 @@ var GLOBAL_STRINGS = {
 	},
 	"GET_PLUGIN_INFO": {
 		"en-us": "Get Plug-in Info",
+		"tr-tr": "Plug-in bilgilerini al",
 		"fr-fr": "Lire les informations",
 		"es-es": "Mostrar la información del complemento",
 		"de-de": "Plug-In-Informationen",
@@ -971,6 +1076,7 @@ var GLOBAL_STRINGS = {
 	},
 	"LOAD_PLUGIN": {
 		"en-us": function(plugin) {return plugin ? "Load " + plugin : "Load Plug-in";},
+		"tr-tr": function(plugin) {return plugin ? plugin + "’ı yükle" : "Plug-ini yükle";},
 		"fr-fr": function(plugin) {return plugin ? "Charger " + plugin : "Charger le plugin";},
 		"es-es": function(plugin) {return plugin ? "Cargar " + plugin : "Cargar el complemento";},
 		"de-de": function(plugin) {return plugin ? plugin + " laden" : "Plug-In laden";},
@@ -980,6 +1086,7 @@ var GLOBAL_STRINGS = {
 	},
 	"HIDE_PLUGIN": {
 		"en-us": function(plugin) {return plugin ? "Hide " + plugin : "Hide Plug-in";},
+		"tr-tr": function(plugin) {return plugin ? plugin + "’ı gizle" : "Plug-ini gizle";},
 		"fr-fr": function(plugin) {return plugin ? "Masquer " + plugin : "Masquer le plugin";},
 		"es-es": function(plugin) {return plugin ? "Ocultar " + plugin : "Ocultar el complemento";},
 		"de-de": function(plugin) {return plugin ? plugin + " verstecken" : "Plug-In verstecken";},
@@ -989,6 +1096,7 @@ var GLOBAL_STRINGS = {
 	},
 	"RESTORE_PLUGIN": {
 		"en-us": function(plugin) {return plugin ? "Restore " + plugin : "Restore Plug-in";},
+		"tr-tr": function(plugin) {return plugin ? plugin + "’ı onar" : "Plug-ini onar";},
 		"fr-fr": function(plugin) {return plugin ? "Restaurer " + plugin : "";},
 		"es-es": function(plugin) {return plugin ? "Restablecer " + plugin : "";},
 		"de-de": function(plugin) {return plugin ? plugin + " wiederherstellen" : "Plug-In wiederherstellen";},
@@ -998,6 +1106,7 @@ var GLOBAL_STRINGS = {
 	},
 	"VIEW_ON_SITE": {
 		"en-us": function(site) {return "View on " + site;},
+		"tr-tr": function(site) {return site + "’da göster";},
 		"fr-fr": function(site) {return "Voir la vidéo sur " + site;},
 		"es-es": function(site) {return "Ver en " + site;},
 		"de-de": function(site) {return "Auf " + site + " wiedergeben";},
@@ -1009,6 +1118,7 @@ var GLOBAL_STRINGS = {
 	// Dialogs
 	"QT_CONFIRM_LAUNCH_DIALOG": {
 		"en-us": function(url) {return "A QuickTime object would like to play\n\n" + url + "\n\nin QuickTime Player. Do you want to allow it?";},
+		"tr-tr": function(url) {return "Bir QuickTime nesnesi\n\n" + url + "\n\n’ı QuickTime Player’da açmak ıstiyor. Onaylamak istiyor musunuz?";},
 		"fr-fr": function(url) {return "Un objet QuickTime voudrait lancer le lecture de\n\n" + url + "\n\ndans QuickTime Player. Voulez-vous l’autoriser?";},
 		"es-es": function(url) {return "Un objeto QuickTime quiere reproducirse\n\n" + url + "\n\nen QuickTime Player. Quieres permitirlo?";},
 		"de-de": function(url) {return "Ein QuickTime-Objekt möchte\n\n" + url + "\n\nim QuickTime-Player öffnen. Möchten Sie es erlauben?";},
@@ -1021,6 +1131,7 @@ var GLOBAL_STRINGS = {
 var INJECTED_STRINGS = {
 	"LOADING": {
 		"en-us": "Loading...",
+		"tr-tr": "Yükleniyor...",
 		"fr-fr": "Chargement…",
 		"es-es": "Cargando...",
 		"de-de": "Laden …",
@@ -1030,6 +1141,7 @@ var INJECTED_STRINGS = {
 	},
 	"QT_PLAYER": {
 		"en-us": "QT Player",
+		"tr-tr": "QT Player",
 		"fr-fr": "QT Player",
 		"es-es": "QT Player",
 		"de-de": "QT-Player",
