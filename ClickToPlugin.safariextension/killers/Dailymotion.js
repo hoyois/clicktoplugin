@@ -8,10 +8,14 @@ addKiller("Dailymotion", {
 	if(/^http:\/\/www\.dailymotion\.com\/hub\//.test(data.location)) {
 		var match = /#videoId=(.*)/.exec(data.location);
 		if(match) this.processVideoID(match[1], callback);
-	} else if(data.params.flashvars) {
-		var sequence = parseFlashVariables(data.params.flashvars).sequence;
-		if(sequence) this.processSequence(decodeURIComponent(sequence), callback);
 	} else {
+		if(data.params.flashvars) {
+			var sequence = parseFlashVariables(data.params.flashvars).sequence;
+			if(sequence) {
+				this.processSequence(decodeURIComponent(sequence), callback);
+				return;
+			}
+		}
 		var match = /\/swf\/([^&]+)/.exec(data.src);
 		if(match) this.processVideoID(match[1], callback);
 	}
