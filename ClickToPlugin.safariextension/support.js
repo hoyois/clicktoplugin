@@ -54,7 +54,7 @@ function matchList(list, string) {
 		s = list[i];
 		if(s.charAt(0) === "@") { // if s starts with '@', interpret as regexp
 			try {
-				s = new RegExp(s.substr(1));
+				s = new RegExp(s.substring(1));
 			} catch(e) { // invalid regexp: ignore
 				continue;
 			}
