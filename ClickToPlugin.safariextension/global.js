@@ -31,7 +31,7 @@ if(settings.version < 35) {
 	tmpArray.push("killers/IGN.js", "killers/MTVNetworks.js", "killers/BBC.js", "killers/Tumblr.js", "killers/Flash.js", "killers/Silverlight.js", "killers/Generic.js");
 	settings.killers = tmpArray;
 }
-settings.version = 35;
+settings.version = 36;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
