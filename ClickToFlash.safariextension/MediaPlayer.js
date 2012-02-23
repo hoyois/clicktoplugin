@@ -544,6 +544,7 @@ MediaPlayer.prototype.initTrackSelector = function() {
 	if(this.playlistLength === 1) {
 		selector.disabled = true;
 		var option = document.createElement("option");
+		option.value = 0;
 		if(this.playlist[0].title) option.textContent = this.playlist[0].title;
 		selector.appendChild(option);
 		return;

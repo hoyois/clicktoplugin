@@ -71,7 +71,7 @@ function handleKeyPressEvent(event) {
 	if(event.keyCode === 32) {
 		event.preventDefault();
 		var position = event.target.selectionStart;
-		event.target.value = event.target.value.substr(0, position) + "\n" + event.target.value.substr(position);
+		event.target.value = event.target.value.substring(0, position) + "\n" + event.target.value.substring(position);
 		event.target.selectionEnd = position + 1;
 		var e = document.createEvent("HTMLEvents");
 		e.initEvent("input", true, true);
@@ -197,7 +197,7 @@ function registerShortcut(shortcut, input) {
 // Shortcut display
 function parseKeyID(keyID) {
 	if(/^U\+/.test(keyID)) {
-		var code = parseInt(keyID.substr(2), 16);
+		var code = parseInt(keyID.substring(2), 16);
 		switch(code) {
 		case 8: return "\u232b";
 		case 9: return "\u21e5";
@@ -208,7 +208,7 @@ function parseKeyID(keyID) {
 		}
 	}
 	if(keyID.charAt(0) === "F") {
-		return "[F" + keyID.substr(1) + "]";
+		return "[F" + keyID.substring(1) + "]";
 	}
 	switch(keyID) {
 	case "Enter": return "\u2305";
