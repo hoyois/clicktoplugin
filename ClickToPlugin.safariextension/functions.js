@@ -58,8 +58,6 @@ function openInQuickTimePlayer(url) {
 	embed.allowedToLoad = true;
 	embed.className = "CTPpluginLauncher";
 	embed.setAttribute("type", "video/quicktime");
-	embed.setAttribute("width", "0");
-	embed.setAttribute("height", "0");
 	// need an external URL for source, since QT plugin doesn't accept safari-extension:// protocol
 	// Apple has a small 1px image for this same purpose
 	embed.setAttribute("src", "http://images.apple.com/apple-events/includes/qtbutton.mov");
