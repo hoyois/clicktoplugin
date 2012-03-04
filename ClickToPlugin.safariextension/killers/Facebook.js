@@ -43,8 +43,10 @@ addKiller("Facebook", {
 			videoData.playlist[0].siteInfo = {"name": "Facebook", "url": url};
 			callback(videoData);
 		};
-		var regex = new RegExp("addVariable\\(\"([a-z_]*)\", \"([^\"]*)\"\\);", "g");
-		_this.processFlashVars(parseWithRegExp(xhr.responseText, regex, unescapeUnicode), callbackForEmbed);
+		var s = xhr.responseText.substring(xhr.responseText.indexOf(".forEach"))
+		s = s.substring(s.indexOf("swf.addVariable"));
+		var regex = new RegExp("\\[\"([a-z_]*)\",\"([^\"]*)\"][,\\]]", "g");
+		_this.processFlashVars(parseWithRegExp(s, regex, unescapeUnicode), callbackForEmbed);
 	};
 	xhr.send(null);
 }
