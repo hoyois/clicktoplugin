@@ -29,7 +29,7 @@ if(settings.version < 35) {
 	tmpArray.push("killers/IGN.js", "killers/MTVNetworks.js", "killers/BBC.js", "killers/Tumblr.js", "killers/Flash.js");
 	settings.killers = tmpArray;
 }
-settings.version = 36;
+settings.version = 37;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
