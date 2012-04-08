@@ -36,14 +36,19 @@ if(settings.version < 38) {
 	for(var i = 0; i < settings.killers.length; i++) {
 		switch(settings.killers[i]) {
 		case "killers/IGN.js":
+		case "killers/Tumblr.js":
+		case "killers/Flash.js":
+		case "killers/Silverlight.js":
+		case "killers/Generic.js":
 			break;
 		default:
 			tmpArray.push(settings.killers[i]);
 		}
 	}
+	tmpArray.push("killers/CollegeHumor.js", "killers/Tumblr.js", "killers/Flash.js", "killers/Silverlight.js", "killers/Generic.js");
 	settings.killers = tmpArray;
 }
-settings.version = 38; // LATEST RELEASE: 37
+settings.version = 38;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
