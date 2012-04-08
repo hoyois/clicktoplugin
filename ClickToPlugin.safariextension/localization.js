@@ -4,14 +4,14 @@
 
 var PREFERENCES_STRINGS = {
 	"PREFERENCES_LAYOUT": {
-		"en-us": ["#general li > span:first-child{max-width:160px;}"],
+		"en-us": ["nav{padding-right:1px;}", "#general li > span:first-child{max-width:160px;}"],
 		"tr-tr": [],
-		"fr-fr": ["nav{padding-right:1px;}", "#media_player li > span:first-child{max-width:220px;}"],
-		"es-es": ["#media_player li > span.textarea_label > label{max-width:200px;}"],
-		"de-de": ["nav{padding-right:1px;}", "#general li > span:first-child{max-width:170px;}", "#media_player li > span.textarea_label > label{max-width:180px;}"],
-		"ja-jp": ["#general li > span:first-child{max-width:250px;}"],
-		"zh-tw": [],
-		"zh-cn": ["nav{padding-right:1px;}"]
+		"fr-fr": ["#media_player li > span:first-child{max-width:220px;}"],
+		"es-es": ["nav{padding-right:1px;}", "#media_player li > span.textarea_label > label{max-width:200px;}"],
+		"de-de": ["#general li > span:first-child{max-width:170px;}", "#media_player li > span.textarea_label > label{max-width:180px;}"],
+		"ja-jp": ["nav{padding-right:1px;}", "#general li > span:first-child{max-width:250px;}"],
+		"zh-tw": ["nav{padding-right:1px;}"],
+		"zh-cn": []
 	},
 	"PREFERENCES_TITLE": {
 		"en-us": "ClickToPlugin Preferences",

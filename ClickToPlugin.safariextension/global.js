@@ -31,7 +31,19 @@ if(settings.version < 35) {
 	tmpArray.push("killers/IGN.js", "killers/MTVNetworks.js", "killers/BBC.js", "killers/Tumblr.js", "killers/Flash.js", "killers/Silverlight.js", "killers/Generic.js");
 	settings.killers = tmpArray;
 }
-settings.version = 37;
+if(settings.version < 38) {
+	var tmpArray = [];
+	for(var i = 0; i < settings.killers.length; i++) {
+		switch(settings.killers[i]) {
+		case "killers/IGN.js":
+			break;
+		default:
+			tmpArray.push(settings.killers[i]);
+		}
+	}
+	settings.killers = tmpArray;
+}
+settings.version = 38; // LATEST RELEASE: 37
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);

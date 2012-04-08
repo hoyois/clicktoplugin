@@ -14,11 +14,11 @@ addKiller("Vimeo", {
 	if(!videoID) return;
 	
 	var xhr = new XMLHttpRequest();
-	xhr.open('GET', "http://www.vimeo.com/moogaloop/load/clip:" + videoID + "/local/", true);
+	xhr.open('GET', "http://vimeo.com/moogaloop/load/clip:" + videoID + "/local/", true);
 	xhr.onload = function() {
 		var xml = xhr.responseXML;
 		
-		var url = "http://www.vimeo.com/moogaloop/play/clip:" + videoID + "/" + xml.getElementsByTagName("request_signature")[0].textContent + "/" + xml.getElementsByTagName("request_signature_expires")[0].textContent + "/?q=";
+		var url = "http://vimeo.com/moogaloop/play/clip:" + videoID + "/" + xml.getElementsByTagName("request_signature")[0].textContent + "/" + xml.getElementsByTagName("request_signature_expires")[0].textContent + "/?q=";
 		
 		var handleMIMEType = function(MIMEType) {
 			var isNative = MIMEType === "video/mp4";

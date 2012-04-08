@@ -53,7 +53,7 @@ addKiller("YouTube", {
 				if(yt.www.watch.player.oldSeekTo) yt.www.watch.player.seekTo = yt.www.watch.player.oldSeekTo;\
 			} catch(e) {}";
 		
-		if(flashvars.list && feature !== "mfu_in_order" && /^PL|^SP|^UL|^AV/.test(flashvars.list)) this.processPlaylistID(flashvars.list, flashvars, callback);
+		if(flashvars.list && feature !== "mfu_in_order" && /^PL|^SP|^UL/.test(flashvars.list)) this.processPlaylistID(flashvars.list, flashvars, callback);
 		else if(flashvars.t && flashvars.url_encoded_fmt_stream_map) this.processFlashVars(flashvars, callback);
 		else if(flashvars.video_id) this.processVideoID(flashvars.video_id, callback);
 	} else { // Embedded YT video
@@ -146,9 +146,6 @@ addKiller("YouTube", {
 		case "SP":
 			loadAPIList("https://gdata.youtube.com/feeds/api/playlists/" + playlistID.substring(2), 1, false);
 			break;
-		case "AV":
-			loadArtistList("https://www.youtube.com/artist?a=" + playlistID.substring(2));
-			break;
 		case "UL":
 			if(flashvars.creator) loadAPIList("https://gdata.youtube.com/feeds/api/users/" + flashvars.creator + "/uploads", 1, true);
 			else if(flashvars.ptchn) loadAPIList("https://gdata.youtube.com/feeds/api/users/" + flashvars.ptchn + "/uploads", 1, true);
@@ -174,21 +171,6 @@ addKiller("YouTube", {
 			}
 			if(xhr.responseXML.querySelector("link[rel='next']") === null) processList();
 			else loadAPIList(playlistURL, startIndex + 50, reverse);
-		};
-		xhr.send(null);
-	};
-	
-	var loadArtistList = function(url) {
-		var xhr = new XMLHttpRequest();
-		xhr.open('GET', url, true);
-		xhr.onload = function() {
-			var html = document.implementation.createHTMLDocument("");
-			html.documentElement.innerHTML = xhr.responseText;
-			var entries = html.getElementById("artist-videos").getElementsByClassName("album-row");
-			for(var i = 0; i < entries.length; i++) {
-				videoIDList.unshift(entries[i].id.substring(12));
-			}
-			processList();
 		};
 		xhr.send(null);
 	};
