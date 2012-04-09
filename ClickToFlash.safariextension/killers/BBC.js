@@ -27,6 +27,10 @@ addKiller("BBC", {
 	var flashvars = parseFlashVariables(data.params.flashvars);
 	var playlistURL = decodeURIComponent(flashvars.playlist);
 	
+	if(playlistURL === "undefined") { // BBC bug
+		playlistURL = data.location.replace(/^http:\/\/www/, "http://playlists").replace(/[#?].*$/, "") + "A/playlist.sxml";
+	}
+	
 	var xhr = new XMLHttpRequest();
 	xhr.open('GET', playlistURL, true);
 	xhr.onload = function (event) {
@@ -65,7 +69,6 @@ addKiller("BBC", {
 				var sources;
 
 				sources = [];
-
 				data.media.forEach( function( media, i ) {
 					if( !(media.connection instanceof Array) && typeof(media['connection']) != undefined )
 						return;
