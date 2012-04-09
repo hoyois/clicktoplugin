@@ -69,12 +69,7 @@ addKiller("ThemisMedia", {
                     }
                     return "\\u" + charCode;
                 } else if (entity in _this.entities) {
-                    var decoded = _this.entities[entity];
-                    if (decoded === '"') {
-                        return '\\"';
-                    } else {
-                        return decoded;
-                    }
+                    return _this.entities[entity];
                 } else {
                     return match;
                 }
