@@ -3,16 +3,7 @@
 if(settings.version === undefined) {
 	openTab(safari.extension.baseURI + "settings.html");
 }
-if(settings.version < 29) {
-	settings.openInQTPContext = settings.viewInQTPContext;
-	settings.removeItem("viewInQTPContext");
-	settings.showMediaSources = settings.showSourceSelector;
-	settings.showPluginSource = settings.showSourceSelector;
-	settings.removeItem("showSourceSelector");
-	settings.killer = settings.additionalScripts;
-	settings.removeItem("additionalScripts");
-}
-if(settings.version < 35) {
+if(settings.version < 38) {
 	var tmpArray = [];
 	for(var i = 0; i < settings.killers.length; i++) {
 		switch(settings.killers[i]) {
@@ -28,24 +19,7 @@ if(settings.version < 35) {
 			tmpArray.push(settings.killers[i]);
 		}
 	}
-	tmpArray.push("killers/IGN.js", "killers/MTVNetworks.js", "killers/BBC.js", "killers/Tumblr.js", "killers/Flash.js", "killers/Silverlight.js", "killers/Generic.js");
-	settings.killers = tmpArray;
-}
-if(settings.version < 38) {
-	var tmpArray = [];
-	for(var i = 0; i < settings.killers.length; i++) {
-		switch(settings.killers[i]) {
-		case "killers/IGN.js":
-		case "killers/Tumblr.js":
-		case "killers/Flash.js":
-		case "killers/Silverlight.js":
-		case "killers/Generic.js":
-			break;
-		default:
-			tmpArray.push(settings.killers[i]);
-		}
-	}
-	tmpArray.push("killers/CollegeHumor.js", "killers/Tumblr.js", "killers/Flash.js", "killers/Silverlight.js", "killers/Generic.js");
+	tmpArray.push( "killers/MTVNetworks.js", "killers/BBC.js", "killers/CollegeHumor.js", "killers/Tumblr.js", "killers/Flash.js", "killers/Silverlight.js", "killers/Generic.js");
 	settings.killers = tmpArray;
 }
 settings.version = 38;
