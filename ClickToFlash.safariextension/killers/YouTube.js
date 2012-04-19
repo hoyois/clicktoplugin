@@ -53,7 +53,7 @@ addKiller("YouTube", {
 				if(yt.www.watch.player.oldSeekTo) yt.www.watch.player.seekTo = yt.www.watch.player.oldSeekTo;\
 			} catch(e) {}";
 		
-		if(flashvars.list && feature !== "mfu_in_order" && /^PL|^SP|^UL/.test(flashvars.list)) this.processPlaylistID(flashvars.list, flashvars, callback);
+		if(flashvars.list && feature !== "channel" && /^PL|^SP|^UL/.test(flashvars.list)) this.processPlaylistID(flashvars.list, flashvars, callback);
 		else if(flashvars.t && flashvars.url_encoded_fmt_stream_map) this.processFlashVars(flashvars, callback);
 		else if(flashvars.video_id) this.processVideoID(flashvars.video_id, callback);
 	} else { // Embedded YT video
@@ -163,6 +163,10 @@ addKiller("YouTube", {
 		var xhr = new XMLHttpRequest();
 		xhr.open('GET', playlistURL + "?start-index=" + startIndex + "&max-results=50", true);
 		xhr.onload = function() {
+			if(xhr.status !== 200) {
+				_this.processFlashVars(flashvars, callback);
+				return;
+			}
 			var entries = xhr.responseXML.getElementsByTagName("entry");
 			for(var i = 0; i < entries.length; i++) {
 				try{ // being lazy
