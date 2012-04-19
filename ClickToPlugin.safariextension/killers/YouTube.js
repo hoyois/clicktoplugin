@@ -152,7 +152,7 @@ addKiller("YouTube", {
 			else {
 				var xhr = new XMLHttpRequest();
 				xhr.open("GET", "https://www.youtube.com/get_video_info?&video_id=" + playlistID.substring(2) + "&eurl=http%3A%2F%2Fwww%2Eyoutube%2Ecom%2F", true);
-				xhr.onload = function() {loadAPIList("https://gdata.youtube.com/feeds/api/users/" + encodeURIComponent(parseFlashVariables(xhr.responseText).author) + "/uploads", 1, true);};
+				xhr.onload = function() {loadAPIList("https://gdata.youtube.com/feeds/api/users/" + parseFlashVariables(xhr.responseText).author + "/uploads", 1, true);};
 				xhr.send(null);
 			}
 			break;
