@@ -36,7 +36,7 @@ know.
 Daily Show Clips
 - http://media.mtvnservices.com/pmt/e1/players/mgid:cms:video:thedailyshow.com:/context11/config.xml
 Daily Show Episodes
-- http://media.mtvnservices.com/pmt/e1/players/mgid:cms:episode:thedailyshow.com:/context7/config.xml
+- http://media.mtvnservices.com/pmt/e1/players/mgid:cms:episode:thedailyshow.com:/context5/config.xml
 Colbert Report Episodes
 - http://media.mtvnservices.com/pmt/e1/players/mgid:cms:episode:colbertnation.com:/context7/config.xml
 Colbert Report Clips
@@ -50,7 +50,7 @@ addKiller("MTVNetworks", {
 
 "contexts": {
 	"cms:video:thedailyshow.com:": "context11",
-	"cms:episode:thedailyshow.com:": "context7",
+	"cms:episode:thedailyshow.com:": "context5",
 	"cms:episode:colbertnation.com:": "context7",
 	"cms:video:colbertnation.com:": "context8",
 	"moses:video:gametrailers.com:": "context1",
