@@ -42,61 +42,26 @@ function openTab(url) {
 	tab.url = url;
 }
 
-
 function airplay(url) {
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", "http://" + settings.airplayHostname + ":7000/play", true, "AirPlay", secureSettings.getItem("airplayPassword"));
-	xhr.addEventListener('load', function() {
-		setupAirplayStatusTimer();
-	})
+	xhr.onload = function() {
+		// Set timer to prevent playback from aborting
+		var timer = setInterval(function() {
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", "http://" + settings.airplayHostname + ":7000/playback-info", true, "AirPlay", secureSettings.getItem("airplayPassword"));
+			xhr.onload = function() {
+				if(xhr.responseXML.getElementsByTagName("key").length === 0) { // playback terminated
+					clearInterval(timer);
+				}
+			};
+			xhr.onerror = function() {
+				clearInterval(timer);
+			};
+			xhr.send();
+		}, 1000);
+	};
 	xhr.send("Content-Location:" + url + "\nStart-Position:0\n");
-}
-
-var airplayTimer;
-
-function parseAirplayPlist(xml) {
-	var result = {}
-	var elements = xml.getElementsByTagName('key');
-	Array.prototype.slice.call(elements).forEach(function(element) {
-		var nextElement = element.nextElementSibling;
-		switch(nextElement.tagName) {
-			case 'real':
-				result[element.textContent] = parseFloat(nextElement.textContent);
-				break;
-			case 'true':
-				result[element.textContent] = true;
-				break;
-			case 'false':
-				result[element.textContent] = false;
-				break;
-		}
-	});
-	return result;
-}
-
-function fetchAirplayStatus() {
-	var xhr = new XMLHttpRequest();
-	xhr.open("GET", "http://" + settings.airplayHostname + ":7000/playback-info", true, "AirPlay", secureSettings.getItem("airplayPassword"));
-	xhr.addEventListener('load', function(event) {
-		var status = parseAirplayPlist(event.target.responseXML);
-		// Stop timer if status has no properties (playback finished or aborted on appletv)
-		if(Object.getOwnPropertyNames(status).length == 0) {
-			clearTimeout(fetchAirplayStatus);
-			return false;
-		}
-		// Do something with the play state
-		// console.dir(status);
-	});
-	xhr.addEventListener('error', function() {
-		clearTimeout(fetchAirplayStatus);
-	});
-	xhr.send();
-}
-
-function setupAirplayStatusTimer() {
-	// Install timer for playback state. when we dont call it at least every
-	// ~20 seconds the playback will abort!
-	airplayTimer = setInterval(fetchAirplayStatus, 1000);
 }
 
 function matchList(list, string) {
