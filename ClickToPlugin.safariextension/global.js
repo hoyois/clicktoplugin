@@ -229,7 +229,7 @@ function handleContextMenu(event) {
 	var u = event.userInfo;
 	var c = event.contextMenu;
 	if(u === null) {
-		if(safari.extension.disabled) {
+		if(disabled) {
 			if(settings.disableEnableContext) c.appendContextMenuItem("switchOn", SWITCH_ON);
 		} else {
 			if(settings.settingsContext && !event.target.url) c.appendContextMenuItem("settings", PREFERENCES);
@@ -291,9 +291,11 @@ function doCommand(event) {
 	}
 }
 
+var disabled = false;
+
 function switchOff() {
 	safari.extension.removeContentScripts();
-	safari.extension.disabled = true;
+	disabled = true;
 	reloadTab(safari.application.activeBrowserWindow.activeTab);
 }
 
@@ -304,7 +306,7 @@ function switchOn() {
 	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "main.js");
 	safari.extension.addContentScript(localizationScript, [], [], false);
 	updateGlobalShortcuts();
-	safari.extension.disabled = false;
+	disabled = false;
 	reloadTab(safari.application.activeBrowserWindow.activeTab);
 }
 
