@@ -264,66 +264,73 @@ MediaPlayer.prototype.addListeners = function() {
 
 MediaPlayer.prototype.registerShortcuts = function() {
 	var _this = this;
-	if(settings.playPauseShortcut) {
-		this.addEventListener(settings.playPauseShortcut.type, function(event) {
-			if(testShortcut(event, settings.playPauseShortcut)) {
-				if(_this.mediaElement.paused || _this.mediaElement.ended) _this.mediaElement.play();
-				else _this.mediaElement.pause();
-			}
-		});
-	}
-	if(settings.enterFullscreenShortcut) {
-		this.addEventListener(settings.enterFullscreenShortcut.type, function(event) {
-			if(testShortcut(event, settings.enterFullscreenShortcut)) {
-				if(_this.mediaElement.webkitDisplayingFullscreen) _this.mediaElement.webkitExitFullscreen();
-				else _this.mediaElement.webkitEnterFullscreen();
-			}
-		});
-	}
-	if(settings.volumeUpShortcut) {
-		this.addEventListener(settings.volumeUpShortcut.type, function(event) {
-			if(testShortcut(event, settings.volumeUpShortcut)) {
-				var newVolume = _this.mediaElement.volume + .1;
-				if(newVolume > 1) _this.mediaElement.volume = 1;
-				else _this.mediaElement.volume = newVolume;
-			}
-		});
-	}
-	if(settings.volumeDownShortcut) {
-		this.addEventListener(settings.volumeDownShortcut.type, function(event) {
-			if(testShortcut(event, settings.volumeDownShortcut)) {
-				var newVolume = _this.mediaElement.volume - .1;
-				if(newVolume < 0) _this.mediaElement.volume = 0;
-				else _this.mediaElement.volume = newVolume;
-			}
-		});
-	}
-	if(this.playlistLength > 1) {
-		if(settings.prevTrackShortcut) {
-			this.addEventListener(settings.prevTrackShortcut.type, function(event) {
-				if(testShortcut(event, settings.prevTrackShortcut)) _this.prevTrack();
+	["key", "gesture"].forEach(function(x) {
+		if(settings.playPauseShortcut[x]) {
+			this.addEventListener(settings.playPauseShortcut[x].type, function(event) {
+				if(testShortcut(event, settings.playPauseShortcut[x])) {
+					if(_this.mediaElement.paused || _this.mediaElement.ended) _this.mediaElement.play();
+					else _this.mediaElement.pause();
+				}
 			});
 		}
-		if(settings.nextTrackShortcut) {
-			this.addEventListener(settings.nextTrackShortcut.type, function(event) {
-				if(testShortcut(event, settings.nextTrackShortcut)) _this.nextTrack();
+		if(settings.enterFullscreenShortcut[x]) {
+			this.addEventListener(settings.enterFullscreenShortcut[x].type, function(event) {
+				if(testShortcut(event, settings.enterFullscreenShortcut[x])) {
+					if(_this.mediaElement.webkitDisplayingFullscreen) {
+						_this.mediaElement.webkitExitFullscreen(); // should use document in Safari 6
+					}
+					else {
+						if(_this.mediaElement.webkitRequestFullscreen) _this.mediaElement.webkitRequestFullscreen();
+						else _this.mediaElement.webkitEnterFullscreen(); // Safari 5 compatibility
+					}
+				}
 			});
 		}
-	}
-	if(settings.toggleLoopingShortcut) {
-		this.addEventListener(settings.toggleLoopingShortcut.type, function(event) {
-			if(testShortcut(event, settings.toggleLoopingShortcut)) _this.toggleLooping();
-		});
-	}
-	if(settings.trackSelectorShortcut && (this.playlist[0].title || this.playlistLength > 1)) {
-		this.addEventListener(settings.trackSelectorShortcut.type, function(event) {
-			if(_this.mediaElement.readyState === 0) return;
-			event.allowDefault = false;
-			if(testShortcut(event, settings.trackSelectorShortcut)) {
-				_this.trackSelector.toggle();
+		if(settings.volumeUpShortcut[x]) {
+			this.addEventListener(settings.volumeUpShortcut[x].type, function(event) {
+				if(testShortcut(event, settings.volumeUpShortcut[x])) {
+					var newVolume = _this.mediaElement.volume + .1;
+					if(newVolume > 1) _this.mediaElement.volume = 1;
+					else _this.mediaElement.volume = newVolume;
+				}
+			});
+		}
+		if(settings.volumeDownShortcut[x]) {
+			this.addEventListener(settings.volumeDownShortcut[x].type, function(event) {
+				if(testShortcut(event, settings.volumeDownShortcut[x])) {
+					var newVolume = _this.mediaElement.volume - .1;
+					if(newVolume < 0) _this.mediaElement.volume = 0;
+					else _this.mediaElement.volume = newVolume;
+				}
+			});
+		}
+		if(this.playlistLength > 1) {
+			if(settings.prevTrackShortcut[x]) {
+				this.addEventListener(settings.prevTrackShortcut[x].type, function(event) {
+					if(testShortcut(event, settings.prevTrackShortcut[x])) _this.prevTrack();
+				});
 			}
-		});
-	}
+			if(settings.nextTrackShortcut[x]) {
+				this.addEventListener(settings.nextTrackShortcut[x].type, function(event) {
+					if(testShortcut(event, settings.nextTrackShortcut[x])) _this.nextTrack();
+				});
+			}
+		}
+		if(settings.toggleLoopingShortcut[x]) {
+			this.addEventListener(settings.toggleLoopingShortcut[x].type, function(event) {
+				if(testShortcut(event, settings.toggleLoopingShortcut[x])) _this.toggleLooping();
+			});
+		}
+		if(settings.trackSelectorShortcut[x] && (this.playlist[0].title || this.playlistLength > 1)) {
+			this.addEventListener(settings.trackSelectorShortcut[x].type, function(event) {
+				if(_this.mediaElement.readyState === 0) return;
+				event.allowDefault = false;
+				if(testShortcut(event, settings.trackSelectorShortcut[x])) {
+					_this.trackSelector.toggle();
+				}
+			});
+		}
+	}, this);
 };
 
 MediaPlayer.prototype.addEventListener = function(type, handler) {
@@ -374,13 +381,15 @@ MediaPlayer.prototype.initShadowDOM = function() {
 	
 	if(this.playlistLength > 1) {
 		// Re-order controls
-		this.shadowDOM.rewindButton.style.WebkitBoxOrdinalGroup = "1";
-		this.shadowDOM.seekBackButton.style.WebkitBoxOrdinalGroup = "2";
-		this.shadowDOM.playButton.style.WebkitBoxOrdinalGroup = "3";
-		this.shadowDOM.seekForwardButton.style.WebkitBoxOrdinalGroup = "4";
-		this.shadowDOM.timelineContainer.style.WebkitBoxOrdinalGroup = "6";
-		this.shadowDOM.muteButton.style.WebkitBoxOrdinalGroup = "7";
-		this.shadowDOM.fullscreenButton.style.WebkitBoxOrdinalGroup = "9";
+		this.shadowDOM.controlsPanel.style.WebkitBoxDirection = "reverse";
+		this.shadowDOM.timelineContainer.style.WebkitBoxDirection = "normal";
+		this.shadowDOM.rewindButton.style.WebkitBoxOrdinalGroup = "9";
+		this.shadowDOM.seekBackButton.style.WebkitBoxOrdinalGroup = "8";
+		this.shadowDOM.playButton.style.WebkitBoxOrdinalGroup = "7";
+		this.shadowDOM.seekForwardButton.style.WebkitBoxOrdinalGroup = "6";
+		this.shadowDOM.timelineContainer.style.WebkitBoxOrdinalGroup = "4";
+		// this.shadowDOM.muteButton.style.WebkitBoxOrdinalGroup = "3"; // cf. #88615
+		this.shadowDOM.fullscreenButton.style.WebkitBoxOrdinalGroup = "1";
 		
 		// Show back/forward buttons
 		this.shadowDOM.seekBackButton.style.display = "-webkit-box";
@@ -571,7 +580,7 @@ MediaPlayer.prototype.initTrackSelector = function() {
 		player.loadTrack(parseInt(event.target.value));
 		player.container.focus();
 	}, false);
-	if(settings.trackSelectorShortcut && settings.trackSelectorShortcut.type === "keydown") { // override keydown shortcuts
+	if(settings.trackSelectorShortcut.key && settings.trackSelectorShortcut.key.type === "keydown") { // override keydown shortcuts
 		selector.addEventListener("keydown", function(event) {
 			if((event.keyIdentifier === "U+0020" || event.keyIdentifier === "Up" || event.keyIdentifier === "Down") && !event.shiftKey && !event.metaKey && !event.altKey && !event.ctrlKey) event.allowDefault = true;
 		}, false);

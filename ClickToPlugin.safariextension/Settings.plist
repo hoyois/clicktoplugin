@@ -54,7 +54,6 @@
 		<key>DefaultValue</key>
 		<array>
 			<string>killers/YouTube.js</string>
-			<string>killers/Vimeo.js</string>
 			<string>killers/Dailymotion.js</string>
 			<string>killers/Facebook.js</string>
 			<string>killers/Break.js</string>
@@ -239,55 +238,70 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>altKey</key>
-			<true/>
-			<key>ctrlKey</key>
-			<false/>
-			<key>keyIdentifier</key>
-			<string>U+002C</string>
-			<key>metaKey</key>
-			<false/>
-			<key>shiftKey</key>
-			<false/>
-			<key>type</key>
-			<string>keydown</string>
+			<key>key</key>
+			<dict>
+				<key>altKey</key>
+				<true/>
+				<key>ctrlKey</key>
+				<false/>
+				<key>keyIdentifier</key>
+				<string>U+002C</string>
+				<key>metaKey</key>
+				<false/>
+				<key>shiftKey</key>
+				<false/>
+				<key>type</key>
+				<string>keydown</string>
+			</dict>
 		</dict>
 		<key>Key</key>
 		<string>settingsShortcut</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<false/>
+		<dict>
+			<key>key</key>
+			<false/>
+		</dict>
 		<key>Key</key>
 		<string>addToWhitelistShortcut</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<false/>
+		<dict>
+			<key>key</key>
+			<false/>
+		</dict>
 		<key>Key</key>
 		<string>loadAllShortcut</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<false/>
+		<dict>
+			<key>key</key>
+			<false/>
+		</dict>
 		<key>Key</key>
 		<string>hideAllShortcut</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>altKey</key>
-			<true/>
-			<key>button</key>
-			<real>0.0</real>
-			<key>ctrlKey</key>
-			<false/>
-			<key>metaKey</key>
-			<false/>
-			<key>shiftKey</key>
-			<false/>
-			<key>type</key>
-			<string>click</string>
+			<key>gesture</key>
+			<dict>
+				<key>altKey</key>
+				<true/>
+				<key>button</key>
+				<real>0.0</real>
+				<key>ctrlKey</key>
+				<false/>
+				<key>metaKey</key>
+				<false/>
+				<key>shiftKey</key>
+				<false/>
+				<key>type</key>
+				<string>click</string>
+			</dict>
 		</dict>
 		<key>Key</key>
 		<string>hidePluginShortcut</string>
@@ -295,18 +309,23 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>altKey</key>
+			<key>key</key>
+			<dict>
+				<key>altKey</key>
+				<false/>
+				<key>ctrlKey</key>
+				<false/>
+				<key>keyIdentifier</key>
+				<string>U+0020</string>
+				<key>metaKey</key>
+				<false/>
+				<key>shiftKey</key>
+				<false/>
+				<key>type</key>
+				<string>keydown</string>
+			</dict>
+			<key>gesture</key>
 			<false/>
-			<key>ctrlKey</key>
-			<false/>
-			<key>keyIdentifier</key>
-			<string>U+0020</string>
-			<key>metaKey</key>
-			<false/>
-			<key>shiftKey</key>
-			<false/>
-			<key>type</key>
-			<string>keydown</string>
 		</dict>
 		<key>Key</key>
 		<string>playPauseShortcut</string>
@@ -314,18 +333,23 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>altKey</key>
+			<key>key</key>
+			<dict>
+				<key>altKey</key>
+				<false/>
+				<key>ctrlKey</key>
+				<false/>
+				<key>keyIdentifier</key>
+				<string>U+0046</string>
+				<key>metaKey</key>
+				<false/>
+				<key>shiftKey</key>
+				<false/>
+				<key>type</key>
+				<string>keydown</string>
+			</dict>
+			<key>gesture</key>
 			<false/>
-			<key>ctrlKey</key>
-			<false/>
-			<key>keyIdentifier</key>
-			<string>U+0046</string>
-			<key>metaKey</key>
-			<false/>
-			<key>shiftKey</key>
-			<false/>
-			<key>type</key>
-			<string>keydown</string>
 		</dict>
 		<key>Key</key>
 		<string>enterFullscreenShortcut</string>
@@ -333,18 +357,23 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>altKey</key>
+			<key>key</key>
+			<dict>
+				<key>altKey</key>
+				<false/>
+				<key>ctrlKey</key>
+				<false/>
+				<key>keyIdentifier</key>
+				<string>Up</string>
+				<key>metaKey</key>
+				<false/>
+				<key>shiftKey</key>
+				<false/>
+				<key>type</key>
+				<string>keydown</string>
+			</dict>
+			<key>gesture</key>
 			<false/>
-			<key>ctrlKey</key>
-			<false/>
-			<key>keyIdentifier</key>
-			<string>Up</string>
-			<key>metaKey</key>
-			<false/>
-			<key>shiftKey</key>
-			<false/>
-			<key>type</key>
-			<string>keydown</string>
 		</dict>
 		<key>Key</key>
 		<string>volumeUpShortcut</string>
@@ -352,18 +381,23 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>altKey</key>
+			<key>key</key>
+			<dict>
+				<key>altKey</key>
+				<false/>
+				<key>ctrlKey</key>
+				<false/>
+				<key>keyIdentifier</key>
+				<string>Down</string>
+				<key>metaKey</key>
+				<false/>
+				<key>shiftKey</key>
+				<false/>
+				<key>type</key>
+				<string>keydown</string>
+			</dict>
+			<key>gesture</key>
 			<false/>
-			<key>ctrlKey</key>
-			<false/>
-			<key>keyIdentifier</key>
-			<string>Down</string>
-			<key>metaKey</key>
-			<false/>
-			<key>shiftKey</key>
-			<false/>
-			<key>type</key>
-			<string>keydown</string>
 		</dict>
 		<key>Key</key>
 		<string>volumeDownShortcut</string>
@@ -371,18 +405,23 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>altKey</key>
+			<key>key</key>
+			<dict>
+				<key>altKey</key>
+				<false/>
+				<key>ctrlKey</key>
+				<false/>
+				<key>keyIdentifier</key>
+				<string>Left</string>
+				<key>metaKey</key>
+				<false/>
+				<key>shiftKey</key>
+				<false/>
+				<key>type</key>
+				<string>keydown</string>
+			</dict>
+			<key>gesture</key>
 			<false/>
-			<key>ctrlKey</key>
-			<false/>
-			<key>keyIdentifier</key>
-			<string>Left</string>
-			<key>metaKey</key>
-			<false/>
-			<key>shiftKey</key>
-			<false/>
-			<key>type</key>
-			<string>keydown</string>
 		</dict>
 		<key>Key</key>
 		<string>prevTrackShortcut</string>
@@ -390,18 +429,23 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>altKey</key>
+			<key>key</key>
+			<dict>
+				<key>altKey</key>
+				<false/>
+				<key>ctrlKey</key>
+				<false/>
+				<key>keyIdentifier</key>
+				<string>Right</string>
+				<key>metaKey</key>
+				<false/>
+				<key>shiftKey</key>
+				<false/>
+				<key>type</key>
+				<string>keydown</string>
+			</dict>
+			<key>gesture</key>
 			<false/>
-			<key>ctrlKey</key>
-			<false/>
-			<key>keyIdentifier</key>
-			<string>Right</string>
-			<key>metaKey</key>
-			<false/>
-			<key>shiftKey</key>
-			<false/>
-			<key>type</key>
-			<string>keydown</string>
 		</dict>
 		<key>Key</key>
 		<string>nextTrackShortcut</string>
@@ -409,18 +453,23 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>altKey</key>
+			<key>key</key>
 			<false/>
-			<key>button</key>
-			<real>0.0</real>
-			<key>ctrlKey</key>
-			<false/>
-			<key>metaKey</key>
-			<false/>
-			<key>shiftKey</key>
-			<false/>
-			<key>type</key>
-			<string>dblclick</string>
+			<key>gesture</key>
+			<dict>
+				<key>altKey</key>
+				<false/>
+				<key>button</key>
+				<real>0.0</real>
+				<key>ctrlKey</key>
+				<false/>
+				<key>metaKey</key>
+				<false/>
+				<key>shiftKey</key>
+				<false/>
+				<key>type</key>
+				<string>dblclick</string>
+			</dict>
 		</dict>
 		<key>Key</key>
 		<string>toggleLoopingShortcut</string>
@@ -428,18 +477,23 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>altKey</key>
+			<key>key</key>
+			<dict>
+				<key>altKey</key>
+				<false/>
+				<key>ctrlKey</key>
+				<false/>
+				<key>keyIdentifier</key>
+				<string>Enter</string>
+				<key>metaKey</key>
+				<false/>
+				<key>shiftKey</key>
+				<false/>
+				<key>type</key>
+				<string>keydown</string>
+			</dict>
+			<key>gesture</key>
 			<false/>
-			<key>ctrlKey</key>
-			<false/>
-			<key>keyIdentifier</key>
-			<string>Enter</string>
-			<key>metaKey</key>
-			<false/>
-			<key>shiftKey</key>
-			<false/>
-			<key>type</key>
-			<string>keydown</string>
 		</dict>
 		<key>Key</key>
 		<string>trackSelectorShortcut</string>

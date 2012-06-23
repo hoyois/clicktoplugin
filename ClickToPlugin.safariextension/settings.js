@@ -89,7 +89,7 @@ main.addEventListener("input", function(event) {
 var updatedKillers = false;
 
 // Killer reset
-var defaultKillers = "killers/YouTube.js\nkillers/Vimeo.js\nkillers/Dailymotion.js\nkillers/Facebook.js\nkillers/Break.js\nkillers/Blip.js\nkillers/Metacafe.js\nkillers/TED.js\nkillers/MTVNetworks.js\nkillers/BBC.js\nkillers/CollegeHumor.js\nkillers/Tumblr.js\nkillers/Flash.js\nkillers/Silverlight.js\nkillers/Generic.js";
+var defaultKillers = "killers/YouTube.js\nkillers/Dailymotion.js\nkillers/Facebook.js\nkillers/Break.js\nkillers/Blip.js\nkillers/Metacafe.js\nkillers/TED.js\nkillers/MTVNetworks.js\nkillers/BBC.js\nkillers/CollegeHumor.js\nkillers/Tumblr.js\nkillers/Flash.js\nkillers/Silverlight.js\nkillers/Generic.js";
 document.getElementById("reset_killers").addEventListener("click", function() {
 	var textarea = document.getElementById("killers");
 	textarea.value = defaultKillers;
@@ -151,9 +151,10 @@ main.addEventListener("change", function(event) {
 }, false);
 
 // Shortcuts input
+var shortcuts = {};
 var shortcutsMenu = document.getElementById("keyboard_shortcuts")
 shortcutsMenu.addEventListener("keydown", function(event) {
-	if(event.target.classList.contains("keyboard")) handleKeyboardEvent(event);
+	if(event.target.classList.contains("shortcut")) handleKeyboardEvent(event);
 }, false);
 shortcutsMenu.addEventListener("click", function(event) {
 	if(event.target.classList.contains("shortcut_clear")) clearShortcut(event);
@@ -166,33 +167,33 @@ shortcutsMenu.addEventListener("mousewheel", function(event) {
 	if(event.target.classList.contains("mouse")) handleWheelEvent(event);
 }, false);
 function clearShortcut(event) {
-	var textField = event.target.previousSibling.previousSibling;
-	textField.value = "";
-	changeSetting(textField.id, false);
-	if(textField.id === "settingsShortcut") {
-		document.getElementById("settingsContext").disabled = true;
-		document.getElementById("settingsContext").checked = true;
-		changeSetting("settingsContext", true);
-	}
+	var input = event.target.previousSibling.previousSibling;
+	var id = input.id;
+	input.value = "";
+	shortcuts[id] = {"key": false, "gesture": false}
+	changeSetting(id, shortcuts[id]);
 }
 function handleKeyboardEvent(event) {
 	event.preventDefault();
 	event.stopPropagation();
 	if(event.keyIdentifier === "Shift" || event.keyIdentifier === "Control" || event.keyIdentifier === "Alt" || event.keyIdentifier === "Meta") return;
-	registerShortcut({"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "keyIdentifier": event.keyIdentifier}, event.target);
+	shortcuts[event.target.id].key = {"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "keyIdentifier": event.keyIdentifier};
+	registerShortcut(event.target);
 }
 function handleClickEvent(event) {
 	event.preventDefault();
-	registerShortcut({"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "button": event.button}, event.target.previousSibling);
+	shortcuts[event.target.previousSibling.id].gesture = {"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "button": event.button};
+	registerShortcut(event.target.previousSibling);
 }
 function handleWheelEvent(event) {
 	event.preventDefault();
-	registerShortcut({"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "direction": simplifyWheelDelta(event.wheelDeltaX, event.wheelDeltaY)}, event.target.previousSibling);
+	shortcuts[event.target.previousSibling.id].gesture = {"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "direction": simplifyWheelDelta(event.wheelDeltaX, event.wheelDeltaY)};
+	registerShortcut(event.target.previousSibling);
 }
-function registerShortcut(shortcut, input) {
-	input.value = showShortcut(shortcut);
-	changeSetting(input.id, shortcut);
-	if(input.id === "settingsShortcut") document.getElementById("settingsContext").disabled = false;
+function registerShortcut(input) {
+	var id = input.id;
+	input.value = showShortcut(shortcuts[id]);
+	changeSetting(id, shortcuts[id]);
 }
 
 // Shortcut display
@@ -231,13 +232,22 @@ function simplifyWheelDelta(x, y) {
 	if(-x > y) return "right";
 	return "up";
 }
-function showShortcut(shortcut) {
+function stringify(shortcut) {
 	if(!shortcut) return "";
 	var prefix = (shortcut.shiftKey ? "\u21e7" : "") + (shortcut.ctrlKey ? "\u2303" : "") + (shortcut.altKey ? "\u2325" : "") + (shortcut.metaKey ? "\u2318" : "");
 	if(shortcut.type === "keydown") return prefix + parseKeyID(shortcut.keyIdentifier);
 	if(shortcut.type === "click") return prefix + "[click" + shortcut.button + "]";
 	if(shortcut.type === "dblclick") return prefix + "[dblclick" + shortcut.button + "]";
-	if(shortcut.type === "mousewheel") return prefix + "[wheel" + shortcut.direction + "]";
+	if(shortcut.type === "mousewheel") return prefix + "[wheel" + shortcut.direction + "]"; // USE ARROW HERE??
+}
+function showShortcut(shortcut) {
+	var text = "";
+	if(shortcut.key) {
+		text += stringify(shortcut.key);
+		if(shortcut.gesture) text += ", ";
+	}
+	if(shortcut.gesture) text += stringify(shortcut.gesture);
+	return text;
 }
 
 // Localization
@@ -380,7 +390,8 @@ function loadSettings(event) {
 			}
 			break;
 		case "INPUT":
-			if(input.classList.contains("keyboard")) {
+			if(input.classList.contains("shortcut")) {
+				shortcuts[id] = settings[id];
 				input.value = showShortcut(settings[id]);
 				break;
 			}
@@ -403,12 +414,11 @@ function loadSettings(event) {
 	// Dependencies
 	if(settings.defaultPlayer !== "html5") document.getElementById("mediaAutoload").disabled = true;
 	else if(settings.mediaAutoload) document.getElementById("showPoster").disabled = true;
-	if(!settings.settingsShortcut) document.getElementById("settingsContext").disabled = true;
 	
 	// Intercept Cmd+W & pref-pane shortcut to close the pref pane
 	if(window !== top) {
 		document.addEventListener("keydown", function(event) {
-			if((event.keyIdentifier === "U+0057" && event.metaKey === true && event.altKey === false && event.ctrlKey === false && event.shiftKey === false) || (settings.settingsShortcut && event.keyIdentifier === settings.settingsShortcut.keyIdentifier && event.metaKey === settings.settingsShortcut.metaKey && event.altKey === settings.settingsShortcut.altKey && event.ctrlKey === settings.settingsShortcut.ctrlKey && event.shiftKey === settings.settingsShortcut.shiftKey)) {
+			if((event.keyIdentifier === "U+0057" && event.metaKey === true && event.altKey === false && event.ctrlKey === false && event.shiftKey === false) || (settings.settingsShortcut.key && event.keyIdentifier === settings.settingsShortcut.key.keyIdentifier && event.metaKey === settings.settingsShortcut.key.metaKey && event.altKey === settings.settingsShortcut.key.altKey && event.ctrlKey === settings.settingsShortcut.key.ctrlKey && event.shiftKey === settings.settingsShortcut.key.shiftKey)) {
 				event.preventDefault();
 				safari.self.tab.dispatchMessage("hideSettings", "");
 			}

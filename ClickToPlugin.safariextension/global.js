@@ -22,6 +22,9 @@ if(settings.version < 38) {
 	tmpArray.push( "killers/MTVNetworks.js", "killers/BBC.js", "killers/CollegeHumor.js", "killers/Tumblr.js", "killers/Flash.js", "killers/Silverlight.js", "killers/Generic.js");
 	settings.killers = tmpArray;
 }
+if(settings.version < 40) {
+	// Remove Vimeo.js
+}
 settings.version = 39;
 
 // LOCALIZATION
@@ -56,8 +59,8 @@ var shortcutScript;
 function updateGlobalShortcuts() {
 	safari.extension.removeContentScript(shortcutScript);
 	var script = "";
-	if(settings.settingsShortcut) script += "document.addEventListener(\"" + settings.settingsShortcut.type + "\",function(e){if(testShortcut(e," + JSON.stringify(settings.settingsShortcut) + "))safari.self.tab.dispatchMessage(\"showSettings\", \"\");},false);";
-	if(settings.addToWhitelistShortcut) script += "document.addEventListener(\"" + settings.addToWhitelistShortcut.type + "\",function(e){if(testShortcut(e," + JSON.stringify(settings.addToWhitelistShortcut) + "))safari.self.tab.dispatchMessage(\"whitelist\",location.href);},false);";
+	if(settings.settingsShortcut.key) script += "document.addEventListener(\"" + settings.settingsShortcut.key.type + "\",function(e){if(testShortcut(e," + JSON.stringify(settings.settingsShortcut.key) + "))safari.self.tab.dispatchMessage(\"showSettings\", \"\");},false);";
+	if(settings.addToWhitelistShortcut.key) script += "document.addEventListener(\"" + settings.addToWhitelistShortcut.key.type + "\",function(e){if(testShortcut(e," + JSON.stringify(settings.addToWhitelistShortcut.key) + "))safari.self.tab.dispatchMessage(\"whitelist\",location.href);},false);";
 	if(script) shortcutScript =  safari.extension.addContentScript(script, [], [safari.extension.baseURI + "*"], false);
 }
 updateGlobalShortcuts();
