@@ -6,6 +6,7 @@ var tabs = nav.children;
 var sections = document.getElementsByTagName("section");
 var menus = document.getElementsByTagName("menu");
 
+var shortcutInputs = document.getElementsByClassName("shortcut");
 var clearShortcutButtons = document.getElementsByClassName("shortcut_clear");
 var pluginInputs = document.getElementsByClassName("plugin");
 
@@ -151,8 +152,10 @@ main.addEventListener("change", function(event) {
 }, false);
 
 // Shortcuts input
-var shortcuts = {};
-var shortcutsMenu = document.getElementById("keyboard_shortcuts")
+var keys = {};
+var gestures = {};
+var shortcutsMenu = document.getElementById("keyboard_shortcuts");
+
 shortcutsMenu.addEventListener("keydown", function(event) {
 	if(event.target.classList.contains("shortcut")) handleKeyboardEvent(event);
 }, false);
@@ -166,34 +169,39 @@ shortcutsMenu.addEventListener("dblclick", function(event) {
 shortcutsMenu.addEventListener("mousewheel", function(event) {
 	if(event.target.classList.contains("mouse")) handleWheelEvent(event);
 }, false);
-function clearShortcut(event) {
-	var input = event.target.previousSibling.previousSibling;
-	var id = input.id;
-	input.value = "";
-	shortcuts[id] = {"key": false, "gesture": false}
-	changeSetting(id, shortcuts[id]);
-}
+
 function handleKeyboardEvent(event) {
 	event.preventDefault();
 	event.stopPropagation();
 	if(event.keyIdentifier === "Shift" || event.keyIdentifier === "Control" || event.keyIdentifier === "Alt" || event.keyIdentifier === "Meta") return;
-	shortcuts[event.target.id].key = {"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "keyIdentifier": event.keyIdentifier};
-	registerShortcut(event.target);
+	keys[event.target.id] = {"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "keyIdentifier": event.keyIdentifier};
+	displayShortcut(event.target.id);
+	changeSetting("keys", keys);
 }
 function handleClickEvent(event) {
 	event.preventDefault();
-	shortcuts[event.target.previousSibling.id].gesture = {"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "button": event.button};
-	registerShortcut(event.target.previousSibling);
+	gestures[event.target.previousSibling.id] = {"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "button": event.button};
+	displayShortcut(event.target.previousSibling.id);
+	changeSetting("gestures", gestures);
 }
 function handleWheelEvent(event) {
 	event.preventDefault();
-	shortcuts[event.target.previousSibling.id].gesture = {"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "direction": simplifyWheelDelta(event.wheelDeltaX, event.wheelDeltaY)};
-	registerShortcut(event.target.previousSibling);
+	gestures[event.target.previousSibling.id] = {"type": event.type, "shiftKey": event.shiftKey, "ctrlKey": event.ctrlKey, "altKey": event.altKey, "metaKey": event.metaKey, "direction": simplifyWheelDelta(event.wheelDeltaX, event.wheelDeltaY)};
+	displayShortcut(event.target.previousSibling.id);
+	changeSetting("gestures", gestures);
 }
-function registerShortcut(input) {
+function clearShortcut(event) {
+	var input = event.target.previousSibling.previousSibling;
 	var id = input.id;
-	input.value = showShortcut(shortcuts[id]);
-	changeSetting(id, shortcuts[id]);
+	input.value = "";
+	if(keys[id]) {
+		keys[id] = false;
+		changeSetting("keys", keys);
+	}
+	if(gestures[id]) {
+		gestures[id] = false;
+		changeSetting("gestures", keys);
+	}
 }
 
 // Shortcut display
@@ -232,22 +240,22 @@ function simplifyWheelDelta(x, y) {
 	if(-x > y) return "right";
 	return "up";
 }
-function stringify(shortcut) {
+function shortcutAsString(shortcut) {
 	if(!shortcut) return "";
 	var prefix = (shortcut.shiftKey ? "\u21e7" : "") + (shortcut.ctrlKey ? "\u2303" : "") + (shortcut.altKey ? "\u2325" : "") + (shortcut.metaKey ? "\u2318" : "");
 	if(shortcut.type === "keydown") return prefix + parseKeyID(shortcut.keyIdentifier);
 	if(shortcut.type === "click") return prefix + "[click" + shortcut.button + "]";
 	if(shortcut.type === "dblclick") return prefix + "[dblclick" + shortcut.button + "]";
-	if(shortcut.type === "mousewheel") return prefix + "[wheel" + shortcut.direction + "]"; // USE ARROW HERE??
+	if(shortcut.type === "mousewheel") return prefix + "[wheel" + shortcut.direction + "]";
 }
-function showShortcut(shortcut) {
-	var text = "";
-	if(shortcut.key) {
-		text += stringify(shortcut.key);
-		if(shortcut.gesture) text += ", ";
+function displayShortcut(id) {
+	var s = "";
+	if(keys[id]) {
+		s += shortcutAsString(keys[id]);
+		if(gestures[id]) s += ", ";
 	}
-	if(shortcut.gesture) text += stringify(shortcut.gesture);
-	return text;
+	if(gestures[id]) s += shortcutAsString(gestures[id]);
+	document.getElementById(id).value = s;
 }
 
 // Localization
@@ -371,6 +379,13 @@ function loadSettings(event) {
 	currentTab = settings.currentTab;
 	delete settings.currentTab;
 	
+	// Shortcuts
+	keys = settings.keys;
+	delete settings.keys;
+	gestures = settings.gestures;
+	delete settings.gestures;
+	for(var i = 0; i < shortcutInputs.length; i++) displayShortcut(shortcutInputs[i].id);
+	
 	// Other settings
 	for(var id in settings) {
 		var input = document.getElementById(id);
@@ -390,11 +405,6 @@ function loadSettings(event) {
 			}
 			break;
 		case "INPUT":
-			if(input.classList.contains("shortcut")) {
-				shortcuts[id] = settings[id];
-				input.value = showShortcut(settings[id]);
-				break;
-			}
 			switch(input.type) {
 			case "range":
 				input.value = settings[id]*100;
@@ -418,7 +428,7 @@ function loadSettings(event) {
 	// Intercept Cmd+W & pref-pane shortcut to close the pref pane
 	if(window !== top) {
 		document.addEventListener("keydown", function(event) {
-			if((event.keyIdentifier === "U+0057" && event.metaKey === true && event.altKey === false && event.ctrlKey === false && event.shiftKey === false) || (settings.settingsShortcut.key && event.keyIdentifier === settings.settingsShortcut.key.keyIdentifier && event.metaKey === settings.settingsShortcut.key.metaKey && event.altKey === settings.settingsShortcut.key.altKey && event.ctrlKey === settings.settingsShortcut.key.ctrlKey && event.shiftKey === settings.settingsShortcut.key.shiftKey)) {
+			if((event.keyIdentifier === "U+0057" && event.metaKey === true && event.altKey === false && event.ctrlKey === false && event.shiftKey === false) || (keys.prefPane && event.keyIdentifier === keys.prefPane.keyIdentifier && event.metaKey === keys.prefPane.metaKey && event.altKey === keys.prefPane.altKey && event.ctrlKey === keys.prefPane.ctrlKey && event.shiftKey === keys.prefPane.shiftKey)) {
 				event.preventDefault();
 				safari.self.tab.dispatchMessage("hideSettings", "");
 			}

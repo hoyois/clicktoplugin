@@ -264,40 +264,40 @@ MediaPlayer.prototype.addListeners = function() {
 
 MediaPlayer.prototype.registerShortcuts = function() {
 	var _this = this;
-	["key", "gesture"].forEach(function(x) {
-		if(settings.playPauseShortcut[x]) {
-			this.addEventListener(settings.playPauseShortcut[x].type, function(event) {
-				if(testShortcut(event, settings.playPauseShortcut[x])) {
+	["keys", "gestures"].forEach(function(x) {
+		if(settings[x].playPause) {
+			this.addEventListener(settings[x].playPause.type, function(event) {
+				if(testShortcut(event, settings[x].playPause)) {
 					if(_this.mediaElement.paused || _this.mediaElement.ended) _this.mediaElement.play();
 					else _this.mediaElement.pause();
 				}
 			});
 		}
-		if(settings.enterFullscreenShortcut[x]) {
-			this.addEventListener(settings.enterFullscreenShortcut[x].type, function(event) {
-				if(testShortcut(event, settings.enterFullscreenShortcut[x])) {
+		if(settings[x].enterFullscreen) {
+			this.addEventListener(settings[x].enterFullscreen.type, function(event) {
+				if(testShortcut(event, settings[x].enterFullscreen)) {
 					if(_this.mediaElement.webkitDisplayingFullscreen) {
-						_this.mediaElement.webkitExitFullscreen(); // should use document in Safari 6
-					}
-					else {
+						if(_this.mediaElement.webkitRequestFullscreen) document.webkitExitFullscreen();
+						else _this.mediaElement.webkitExitFullscreen(); // Safari 5 compatibility
+					} else {
 						if(_this.mediaElement.webkitRequestFullscreen) _this.mediaElement.webkitRequestFullscreen();
-						else _this.mediaElement.webkitEnterFullscreen(); // Safari 5 compatibility
+						else _this.mediaElement.webkitEnterFullscreen();
 					}
 				}
 			});
 		}
-		if(settings.volumeUpShortcut[x]) {
-			this.addEventListener(settings.volumeUpShortcut[x].type, function(event) {
-				if(testShortcut(event, settings.volumeUpShortcut[x])) {
+		if(settings[x].volumeUp) {
+			this.addEventListener(settings[x].volumeUp.type, function(event) {
+				if(testShortcut(event, settings[x].volumeUp)) {
 					var newVolume = _this.mediaElement.volume + .1;
 					if(newVolume > 1) _this.mediaElement.volume = 1;
 					else _this.mediaElement.volume = newVolume;
 				}
 			});
 		}
-		if(settings.volumeDownShortcut[x]) {
-			this.addEventListener(settings.volumeDownShortcut[x].type, function(event) {
-				if(testShortcut(event, settings.volumeDownShortcut[x])) {
+		if(settings[x].volumeDown) {
+			this.addEventListener(settings[x].volumeDown.type, function(event) {
+				if(testShortcut(event, settings[x].volumeDown)) {
 					var newVolume = _this.mediaElement.volume - .1;
 					if(newVolume < 0) _this.mediaElement.volume = 0;
 					else _this.mediaElement.volume = newVolume;
@@ -305,27 +305,27 @@ MediaPlayer.prototype.registerShortcuts = function() {
 			});
 		}
 		if(this.playlistLength > 1) {
-			if(settings.prevTrackShortcut[x]) {
-				this.addEventListener(settings.prevTrackShortcut[x].type, function(event) {
-					if(testShortcut(event, settings.prevTrackShortcut[x])) _this.prevTrack();
+			if(settings[x].prevTrack) {
+				this.addEventListener(settings[x].prevTrack.type, function(event) {
+					if(testShortcut(event, settings[x].prevTrack)) _this.prevTrack();
 				});
 			}
-			if(settings.nextTrackShortcut[x]) {
-				this.addEventListener(settings.nextTrackShortcut[x].type, function(event) {
-					if(testShortcut(event, settings.nextTrackShortcut[x])) _this.nextTrack();
+			if(settings[x].nextTrack) {
+				this.addEventListener(settings[x].nextTrack.type, function(event) {
+					if(testShortcut(event, settings[x].nextTrack)) _this.nextTrack();
 				});
 			}
 		}
-		if(settings.toggleLoopingShortcut[x]) {
-			this.addEventListener(settings.toggleLoopingShortcut[x].type, function(event) {
-				if(testShortcut(event, settings.toggleLoopingShortcut[x])) _this.toggleLooping();
+		if(settings[x].toggleLooping) {
+			this.addEventListener(settings[x].toggleLooping.type, function(event) {
+				if(testShortcut(event, settings[x].toggleLooping)) _this.toggleLooping();
 			});
 		}
-		if(settings.trackSelectorShortcut[x] && (this.playlist[0].title || this.playlistLength > 1)) {
-			this.addEventListener(settings.trackSelectorShortcut[x].type, function(event) {
+		if(settings[x].trackSelector && (this.playlist[0].title || this.playlistLength > 1)) {
+			this.addEventListener(settings[x].trackSelector.type, function(event) {
 				if(_this.mediaElement.readyState === 0) return;
 				event.allowDefault = false;
-				if(testShortcut(event, settings.trackSelectorShortcut[x])) {
+				if(testShortcut(event, settings[x].trackSelector)) {
 					_this.trackSelector.toggle();
 				}
 			});
@@ -580,7 +580,7 @@ MediaPlayer.prototype.initTrackSelector = function() {
 		player.loadTrack(parseInt(event.target.value));
 		player.container.focus();
 	}, false);
-	if(settings.trackSelectorShortcut.key && settings.trackSelectorShortcut.key.type === "keydown") { // override keydown shortcuts
+	if(settings.keys.trackSelector && settings.keys.trackSelector.type === "keydown") { // override keydown shortcuts
 		selector.addEventListener("keydown", function(event) {
 			if((event.keyIdentifier === "U+0020" || event.keyIdentifier === "Up" || event.keyIdentifier === "Down") && !event.shiftKey && !event.metaKey && !event.altKey && !event.ctrlKey) event.allowDefault = true;
 		}, false);

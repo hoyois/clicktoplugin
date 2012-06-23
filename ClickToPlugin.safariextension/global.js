@@ -22,10 +22,26 @@ if(settings.version < 38) {
 	tmpArray.push( "killers/MTVNetworks.js", "killers/BBC.js", "killers/CollegeHumor.js", "killers/Tumblr.js", "killers/Flash.js", "killers/Silverlight.js", "killers/Generic.js");
 	settings.killers = tmpArray;
 }
-if(settings.version < 40) {
-	// Remove Vimeo.js
+if(settings.version < 41) {
+	var tmpArray = [];
+	for(var i = 0; i < settings.killers.length; i++) {
+		if(settings.killers[i] !== "killers/Vimeo.js") tmpArray.push(settings.killers[i]);
+	}
+	settings.killers = tmpArray;
+	
+	var shortcutList = ["addToWhitelist", "showAll", "hideAll", "hidePlugin", "playPause", "enterFullscreen", "volumeUp", "volumeDown", "prevTrack", "nextTrack", "trackSelector", "toggleLooping"];
+	for(var i = 0; i < shortcutList.length; i++) {
+		var tmpId = shortcutList[i] + "Shortcut";
+		if(settings[tmpId]) {
+			if(settings[tmpId].type === "keydown") settings.keys[shortcutList[i]] = settings[tmpId];
+			else settings.gestures[shortcutList[i]] = settings[tmpId];
+		}
+		settings.removeItem(tmpId);
+	}
+	if(settings.settingsShortcut) settings.keys.prefPane = settings.settingsShortcut;
+	settings.removeItem("settingsShortcut");
 }
-settings.version = 39;
+settings.version = 41;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
@@ -33,9 +49,9 @@ var localizationScript = localizeAsScript(INJECTED_STRINGS, settings.language);
 safari.extension.addContentScript(localizationScript, [], [], false);
 
 // SETTINGS
-var ALL_SETTINGS = ["language", "currentTab", "killers", "loadIfNotKilled", "useFallbackMedia", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "mediaAutoload", "mediaWhitelist", "initialBehavior", "instantAutoplay", "defaultResolution", "defaultPlayer", "showMediaSources", "showPluginSource", "showQTPSource", "showAirPlaySource", "showSiteSource", "showPoster", "hideRewindButton", "codecsPolicy", "volume", "useDownloadManager", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "openInQTPContext", "airplayContext", "settingsShortcut", "addToWhitelistShortcut", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "trackSelectorShortcut", "allowInvisible", "sIFRPolicy", "opacity", "debug", "showTooltip", "airplayHostname", "airplayPassword"];
+var ALL_SETTINGS = ["language", "currentTab", "killers", "loadIfNotKilled", "useFallbackMedia", "allowedPlugins", "locationsWhitelist", "sourcesWhitelist", "locationsBlacklist", "sourcesBlacklist", "invertWhitelists", "invertBlacklists", "mediaAutoload", "mediaWhitelist", "initialBehavior", "instantAutoplay", "defaultResolution", "defaultPlayer", "showMediaSources", "showPluginSource", "showQTPSource", "showAirPlaySource", "showSiteSource", "showPoster", "hideRewindButton", "codecsPolicy", "volume", "useDownloadManager", "settingsContext", "disableEnableContext", "addToWhitelistContext", "addToBlacklistContext", "loadAllContext", "loadInvisibleContext", "downloadContext", "viewOnSiteContext", "openInQTPContext", "airplayContext", "keys", "gestures", "allowInvisible", "sIFRPolicy", "opacity", "debug", "showTooltip", "airplayHostname", "airplayPassword"];
 var SECURE_SETTINGS = ["airplayPassword"];
-var INJECTED_SETTINGS = ["useFallbackMedia", "initialBehavior", "instantAutoplay", "defaultPlayer", "showMediaSources", "showPluginSource", "showQTPSource", "showAirPlaySource", "showSiteSource", "showPoster", "hideRewindButton", "volume", "useDownloadManager", "loadAllShortcut", "hideAllShortcut", "hidePluginShortcut", "volumeUpShortcut", "volumeDownShortcut", "playPauseShortcut", "enterFullscreenShortcut", "prevTrackShortcut", "nextTrackShortcut", "toggleLoopingShortcut", "trackSelectorShortcut", "sIFRPolicy", "opacity", "debug", "showTooltip"];
+var INJECTED_SETTINGS = ["useFallbackMedia", "initialBehavior", "instantAutoplay", "defaultPlayer", "showMediaSources", "showPluginSource", "showQTPSource", "showAirPlaySource", "showSiteSource", "showPoster", "hideRewindButton", "volume", "useDownloadManager", "keys", "gestures", "sIFRPolicy", "opacity", "debug", "showTooltip"];
 
 /* Hidden settings:
 language (default: undefined)
@@ -59,8 +75,8 @@ var shortcutScript;
 function updateGlobalShortcuts() {
 	safari.extension.removeContentScript(shortcutScript);
 	var script = "";
-	if(settings.settingsShortcut.key) script += "document.addEventListener(\"" + settings.settingsShortcut.key.type + "\",function(e){if(testShortcut(e," + JSON.stringify(settings.settingsShortcut.key) + "))safari.self.tab.dispatchMessage(\"showSettings\", \"\");},false);";
-	if(settings.addToWhitelistShortcut.key) script += "document.addEventListener(\"" + settings.addToWhitelistShortcut.key.type + "\",function(e){if(testShortcut(e," + JSON.stringify(settings.addToWhitelistShortcut.key) + "))safari.self.tab.dispatchMessage(\"whitelist\",location.href);},false);";
+	if(settings.keys.prefPane) script += "document.addEventListener(\"" + settings.keys.prefPane.type + "\",function(e){if(testShortcut(e," + JSON.stringify(settings.keys.prefPane) + "))safari.self.tab.dispatchMessage(\"showSettings\", \"\");},false);";
+	if(settings.keys.addToWhitelist) script += "document.addEventListener(\"" + settings.keys.addToWhitelist.type + "\",function(e){if(testShortcut(e," + JSON.stringify(settings.keys.addToWhitelist) + "))safari.self.tab.dispatchMessage(\"whitelist\",location.href);},false);";
 	if(script) shortcutScript =  safari.extension.addContentScript(script, [], [safari.extension.baseURI + "*"], false);
 }
 updateGlobalShortcuts();
@@ -68,8 +84,7 @@ updateGlobalShortcuts();
 function changeSetting(key, value) {
 	(isSecureSetting(key) ? secureSettings : settings)[key] = value;
 	switch(key) {
-	case "settingsShortcut":
-	case "addToWhitelistShortcut":
+	case "keys":
 		updateGlobalShortcuts();
 		break;
 	case "killers": // reload killers
@@ -352,12 +367,6 @@ function kill(data, tab) {
 	
 	var callback = function(mediaData) {
 		if(!tab.page) return; // user has closed tab
-		/* TODO?: implement this
-		if(mediaData === null) { // killer failed
-			if(++k < killerIDs.length) killers[killerIDs[k]].process(data, callback);
-			else if(settings.loadIfNotKilled) tab.page.dispatchMessage("load", {"documentID": data.documentID, "elementID": data.elementID});
-			return;
-		}*/
 		if(mediaData.playlist.length === 0) return;
 		
 		for(var i = 0; i < mediaData.playlist.length; i++) {

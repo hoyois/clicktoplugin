@@ -238,7 +238,7 @@
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>key</key>
+			<key>prefPane</key>
 			<dict>
 				<key>altKey</key>
 				<true/>
@@ -253,63 +253,13 @@
 				<key>type</key>
 				<string>keydown</string>
 			</dict>
-		</dict>
-		<key>Key</key>
-		<string>settingsShortcut</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<dict>
-			<key>key</key>
+			<key>addToWhitelist</key>
 			<false/>
-		</dict>
-		<key>Key</key>
-		<string>addToWhitelistShortcut</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<dict>
-			<key>key</key>
+			<key>loadAll</key>
 			<false/>
-		</dict>
-		<key>Key</key>
-		<string>loadAllShortcut</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<dict>
-			<key>key</key>
+			<key>hideAll</key>
 			<false/>
-		</dict>
-		<key>Key</key>
-		<string>hideAllShortcut</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<dict>
-			<key>gesture</key>
-			<dict>
-				<key>altKey</key>
-				<true/>
-				<key>button</key>
-				<real>0.0</real>
-				<key>ctrlKey</key>
-				<false/>
-				<key>metaKey</key>
-				<false/>
-				<key>shiftKey</key>
-				<false/>
-				<key>type</key>
-				<string>click</string>
-			</dict>
-		</dict>
-		<key>Key</key>
-		<string>hidePluginShortcut</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<dict>
-			<key>key</key>
+			<key>playPause</key>
 			<dict>
 				<key>altKey</key>
 				<false/>
@@ -324,16 +274,7 @@
 				<key>type</key>
 				<string>keydown</string>
 			</dict>
-			<key>gesture</key>
-			<false/>
-		</dict>
-		<key>Key</key>
-		<string>playPauseShortcut</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<dict>
-			<key>key</key>
+			<key>enterFullscreen</key>
 			<dict>
 				<key>altKey</key>
 				<false/>
@@ -348,16 +289,7 @@
 				<key>type</key>
 				<string>keydown</string>
 			</dict>
-			<key>gesture</key>
-			<false/>
-		</dict>
-		<key>Key</key>
-		<string>enterFullscreenShortcut</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<dict>
-			<key>key</key>
+			<key>volumeUp</key>
 			<dict>
 				<key>altKey</key>
 				<false/>
@@ -372,16 +304,7 @@
 				<key>type</key>
 				<string>keydown</string>
 			</dict>
-			<key>gesture</key>
-			<false/>
-		</dict>
-		<key>Key</key>
-		<string>volumeUpShortcut</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<dict>
-			<key>key</key>
+			<key>volumeDown</key>
 			<dict>
 				<key>altKey</key>
 				<false/>
@@ -396,16 +319,7 @@
 				<key>type</key>
 				<string>keydown</string>
 			</dict>
-			<key>gesture</key>
-			<false/>
-		</dict>
-		<key>Key</key>
-		<string>volumeDownShortcut</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<dict>
-			<key>key</key>
+			<key>prevTrack</key>
 			<dict>
 				<key>altKey</key>
 				<false/>
@@ -420,16 +334,7 @@
 				<key>type</key>
 				<string>keydown</string>
 			</dict>
-			<key>gesture</key>
-			<false/>
-		</dict>
-		<key>Key</key>
-		<string>prevTrackShortcut</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<dict>
-			<key>key</key>
+			<key>nextTrack</key>
 			<dict>
 				<key>altKey</key>
 				<false/>
@@ -444,18 +349,60 @@
 				<key>type</key>
 				<string>keydown</string>
 			</dict>
-			<key>gesture</key>
+			<key>trackSelector</key>
+			<dict>
+				<key>altKey</key>
+				<false/>
+				<key>ctrlKey</key>
+				<false/>
+				<key>keyIdentifier</key>
+				<string>Enter</string>
+				<key>metaKey</key>
+				<false/>
+				<key>shiftKey</key>
+				<false/>
+				<key>type</key>
+				<string>keydown</string>
+			</dict>
+			<key>toggleLooping</key>
 			<false/>
 		</dict>
 		<key>Key</key>
-		<string>nextTrackShortcut</string>
+		<string>keys</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
 		<dict>
-			<key>key</key>
+			<key>hidePlugin</key>
+			<dict>
+				<key>altKey</key>
+				<true/>
+				<key>button</key>
+				<real>0.0</real>
+				<key>ctrlKey</key>
+				<false/>
+				<key>metaKey</key>
+				<false/>
+				<key>shiftKey</key>
+				<false/>
+				<key>type</key>
+				<string>click</string>
+			</dict>
+			<key>playPause</key>
 			<false/>
-			<key>gesture</key>
+			<key>enterFullscreen</key>
+			<false/>
+			<key>volumeUp</key>
+			<false/>
+			<key>volumeDown</key>
+			<false/>
+			<key>prevTrack</key>
+			<false/>
+			<key>nextTrack</key>
+			<false/>
+			<key>trackSelector</key>
+			<false/>
+			<key>toggleLooping</key>
 			<dict>
 				<key>altKey</key>
 				<false/>
@@ -472,31 +419,7 @@
 			</dict>
 		</dict>
 		<key>Key</key>
-		<string>toggleLoopingShortcut</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<dict>
-			<key>key</key>
-			<dict>
-				<key>altKey</key>
-				<false/>
-				<key>ctrlKey</key>
-				<false/>
-				<key>keyIdentifier</key>
-				<string>Enter</string>
-				<key>metaKey</key>
-				<false/>
-				<key>shiftKey</key>
-				<false/>
-				<key>type</key>
-				<string>keydown</string>
-			</dict>
-			<key>gesture</key>
-			<false/>
-		</dict>
-		<key>Key</key>
-		<string>trackSelectorShortcut</string>
+		<string>gestures</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>

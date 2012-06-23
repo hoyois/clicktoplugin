@@ -425,22 +425,22 @@ function showInfo(elementID) {
 }
 
 function registerGlobalShortcuts() {
-	if(settings.loadAllShortcut.key) {
-		document.addEventListener(settings.loadAllShortcut.key.type, function(event) {
-			if(testShortcut(event, settings.loadAllShortcut.key)) safari.self.tab.dispatchMessage("loadAll", "");
+	if(settings.keys.loadAll) {
+		document.addEventListener(settings.keys.loadAll.type, function(event) {
+			if(testShortcut(event, settings.keys.loadAll)) safari.self.tab.dispatchMessage("loadAll", "");
 		}, false);
 	}
-	if(settings.hideAllShortcut.key) {
-		document.addEventListener(settings.hideAllShortcut.key.type, function(event) {
-			if(testShortcut(event, settings.hideAllShortcut.key)) safari.self.tab.dispatchMessage("hideAll", "");
+	if(settings.keys.hideAll) {
+		document.addEventListener(settings.keys.hideAll.type, function(event) {
+			if(testShortcut(event, settings.keys.hideAll)) safari.self.tab.dispatchMessage("hideAll", "");
 		}, false);
 	}
 }
 
 function registerLocalShortcuts(elementID) {
-	if(settings.hidePluginShortcut.gesture) {
-		_[elementID].placeholder.addEventListener(settings.hidePluginShortcut.gesture.type, function(event) {
-			if(testShortcut(event, settings.hidePluginShortcut.gesture)) {
+	if(settings.gestures.hidePlugin) {
+		_[elementID].placeholder.addEventListener(settings.gestures.hidePlugin.type, function(event) {
+			if(testShortcut(event, settings.gestures.hidePlugin)) {
 				hidePlugin(elementID);
 				event.stopImmediatePropagation();
 			}
