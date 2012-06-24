@@ -200,7 +200,7 @@ function clearShortcut(event) {
 	}
 	if(gestures[id]) {
 		gestures[id] = false;
-		changeSetting("gestures", keys);
+		changeSetting("gestures", gestures);
 	}
 }
 

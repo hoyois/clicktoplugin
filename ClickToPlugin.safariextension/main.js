@@ -1,5 +1,5 @@
 "use strict";
-if(window.safari === undefined) throw "SafariContentNamespace does not exist";
+if(window.safari === undefined) throw "Warning: SafariContentNamespace does not exist";
 
 var _ = []; // main array
 

@@ -30,16 +30,20 @@ if(settings.version < 41) {
 	settings.killers = tmpArray;
 	
 	var shortcutList = ["addToWhitelist", "showAll", "hideAll", "hidePlugin", "playPause", "enterFullscreen", "volumeUp", "volumeDown", "prevTrack", "nextTrack", "trackSelector", "toggleLooping"];
+	var tmpKeys = settings.keys;
+	var tmpGestures = settings.gestures;
 	for(var i = 0; i < shortcutList.length; i++) {
 		var tmpId = shortcutList[i] + "Shortcut";
 		if(settings[tmpId]) {
-			if(settings[tmpId].type === "keydown") settings.keys[shortcutList[i]] = settings[tmpId];
-			else settings.gestures[shortcutList[i]] = settings[tmpId];
+			if(settings[tmpId].type === "keydown") tmpKeys[shortcutList[i]] = settings[tmpId];
+			else tmpGestures[shortcutList[i]] = settings[tmpId];
 		}
 		settings.removeItem(tmpId);
 	}
-	if(settings.settingsShortcut) settings.keys.prefPane = settings.settingsShortcut;
+	if(settings.settingsShortcut) tmpKeys.prefPane = settings.settingsShortcut;
 	settings.removeItem("settingsShortcut");
+	settings.keys = tmpKeys;
+	settings.gestures = tmpGestures;
 }
 settings.version = 41;
 

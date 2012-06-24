@@ -276,13 +276,8 @@ MediaPlayer.prototype.registerShortcuts = function() {
 		if(settings[x].enterFullscreen) {
 			this.addEventListener(settings[x].enterFullscreen.type, function(event) {
 				if(testShortcut(event, settings[x].enterFullscreen)) {
-					if(_this.mediaElement.webkitDisplayingFullscreen) {
-						if(_this.mediaElement.webkitRequestFullscreen) document.webkitExitFullscreen();
-						else _this.mediaElement.webkitExitFullscreen(); // Safari 5 compatibility
-					} else {
-						if(_this.mediaElement.webkitRequestFullscreen) _this.mediaElement.webkitRequestFullscreen();
-						else _this.mediaElement.webkitEnterFullscreen();
-					}
+					if(_this.mediaElement.webkitDisplayingFullscreen) _this.mediaElement.webkitExitFullscreen();
+					else _this.mediaElement.webkitEnterFullscreen();
 				}
 			});
 		}
@@ -377,10 +372,11 @@ MediaPlayer.prototype.initShadowDOM = function() {
 		this.shadowDOM[e] = sheet.cssRules[0];
 	}
 	
+	this.shadowDOM.controlsPanel.style.position = "absolute"; // for height < 25 in Safari 6 (cf. mediaControls.css)
 	if(settings.hideRewindButton) this.shadowDOM.rewindButton.style.display = "none";
 	
 	if(this.playlistLength > 1) {
-		// Re-order controls
+		// Re-order controls (cf. #88615)
 		this.shadowDOM.controlsPanel.style.WebkitBoxDirection = "reverse";
 		this.shadowDOM.timelineContainer.style.WebkitBoxDirection = "normal";
 		this.shadowDOM.rewindButton.style.WebkitBoxOrdinalGroup = "9";
@@ -388,7 +384,6 @@ MediaPlayer.prototype.initShadowDOM = function() {
 		this.shadowDOM.playButton.style.WebkitBoxOrdinalGroup = "7";
 		this.shadowDOM.seekForwardButton.style.WebkitBoxOrdinalGroup = "6";
 		this.shadowDOM.timelineContainer.style.WebkitBoxOrdinalGroup = "4";
-		// this.shadowDOM.muteButton.style.WebkitBoxOrdinalGroup = "3"; // cf. #88615
 		this.shadowDOM.fullscreenButton.style.WebkitBoxOrdinalGroup = "1";
 		
 		// Show back/forward buttons
