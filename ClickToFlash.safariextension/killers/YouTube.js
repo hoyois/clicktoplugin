@@ -68,7 +68,7 @@ addKiller("YouTube", {
 "processFlashVars": function(flashvars, callback) {
 	if(!flashvars.url_encoded_fmt_stream_map || flashvars.ps === "live") return;
 	var formatList = decodeURIComponent(flashvars.url_encoded_fmt_stream_map).split(",");
-		
+	
 	var sources = [];
 	
 	/* fmt values:
@@ -122,7 +122,7 @@ addKiller("YouTube", {
 	xhr.open("GET", "https://www.youtube.com/get_video_info?&video_id=" + videoID + "&eurl=http%3A%2F%2Fwww%2Eyoutube%2Ecom%2F", true);
 	xhr.onload = function() {
 		var flashvars = parseFlashVariables(xhr.responseText);
-		if(flashvars.status === "ok") {
+		if(flashvars.status === "ok" && flashvars.ps !== "live") {
 			flashvars.title = decodeURIComponent(flashvars.title.replace(/\+/g, " "));
 			var callbackForEmbed = function(videoData) {
 				videoData.playlist[0].siteInfo = {"name": "YouTube", "url": "http://www.youtube.com/watch?v=" + videoID};

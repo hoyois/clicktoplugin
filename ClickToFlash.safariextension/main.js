@@ -1,4 +1,6 @@
 "use strict";
+if(window.safari === undefined) throw "Warning: SafariContentNamespace does not exist";
+
 var _ = []; // main array
 
 var settings;
@@ -423,22 +425,22 @@ function showInfo(elementID) {
 }
 
 function registerGlobalShortcuts() {
-	if(settings.loadAllShortcut) {
-		document.addEventListener(settings.loadAllShortcut.type, function(event) {
-			if(testShortcut(event, settings.loadAllShortcut)) safari.self.tab.dispatchMessage("loadAll", "");
+	if(settings.keys.loadAll) {
+		document.addEventListener(settings.keys.loadAll.type, function(event) {
+			if(testShortcut(event, settings.keys.loadAll)) safari.self.tab.dispatchMessage("loadAll", "");
 		}, false);
 	}
-	if(settings.hideAllShortcut) {
-		document.addEventListener(settings.hideAllShortcut.type, function(event) {
-			if(testShortcut(event, settings.hideAllShortcut)) safari.self.tab.dispatchMessage("hideAll", "");
+	if(settings.keys.hideAll) {
+		document.addEventListener(settings.keys.hideAll.type, function(event) {
+			if(testShortcut(event, settings.keys.hideAll)) safari.self.tab.dispatchMessage("hideAll", "");
 		}, false);
 	}
 }
 
 function registerLocalShortcuts(elementID) {
-	if(settings.hidePluginShortcut) {
-		_[elementID].placeholder.addEventListener(settings.hidePluginShortcut.type, function(event) {
-			if(testShortcut(event, settings.hidePluginShortcut)) {
+	if(settings.gestures.hidePlugin) {
+		_[elementID].placeholder.addEventListener(settings.gestures.hidePlugin.type, function(event) {
+			if(testShortcut(event, settings.gestures.hidePlugin)) {
 				hidePlugin(elementID);
 				event.stopImmediatePropagation();
 			}
