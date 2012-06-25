@@ -20,14 +20,14 @@ addKiller("TED", {
 	
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", url, true);
-	xhr.onload = function() {
+	xhr.addEventListener("load", function() {
 		var page = new DOMParser().parseFromString(xhr.responseText, "text/xml");
 		var talkID = page.getElementById("flash_message").getElementsByTagName("a")[1].href;
 		talkID = /[^-.]*/.exec(talkID.substring(talkID.lastIndexOf("/") + 1))[0];
 		
 		var xhr2 = new XMLHttpRequest();
 		xhr2.open("GET", "http://www.ted.com/download/links/slug/" + talkID + "/type/talks/ext/mp4", true);
-		xhr2.onload = function() {
+		xhr2.addEventListener("load", function() {
 			var xml = new DOMParser().parseFromString(("<root>" + xhr2.responseText + "</root>").replace(/&[^;]*;/g, ""), "text/xml");
 			
 			var sources = [];
@@ -50,9 +50,9 @@ addKiller("TED", {
 					"siteInfo": siteInfo
 				}]
 			});
-		};
+		}, false);
 		xhr2.send(null);
-	};
+	}, false);
 	xhr.send(null);
 }
 

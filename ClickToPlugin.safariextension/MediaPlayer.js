@@ -379,6 +379,7 @@ MediaPlayer.prototype.initShadowDOM = function() {
 		// Re-order controls (cf. #88615)
 		this.shadowDOM.controlsPanel.style.WebkitBoxDirection = "reverse";
 		this.shadowDOM.timelineContainer.style.WebkitBoxDirection = "normal";
+		this.shadowDOM.volumeSliderContainer.style.WebkitBoxDirection = "normal";
 		this.shadowDOM.rewindButton.style.WebkitBoxOrdinalGroup = "9";
 		this.shadowDOM.seekBackButton.style.WebkitBoxOrdinalGroup = "8";
 		this.shadowDOM.playButton.style.WebkitBoxOrdinalGroup = "7";

@@ -38,7 +38,7 @@ addKiller("Facebook", {
 	var xhr = new XMLHttpRequest();
 	var url = "https://www.facebook.com/video/video.php?v=" + videoID;
 	xhr.open("GET", url, true);
-	xhr.onload = function() {
+	xhr.addEventListener("load", function() {
 		var callbackForEmbed = function(videoData) {
 			videoData.playlist[0].siteInfo = {"name": "Facebook", "url": url};
 			callback(videoData);
@@ -47,7 +47,7 @@ addKiller("Facebook", {
 		s = s.substring(s.indexOf("swf.addVariable"));
 		var regex = new RegExp("\\[\"([a-z_]*)\",\"([^\"]*)\"][,\\]]", "g");
 		_this.processFlashVars(parseWithRegExp(s, regex, unescapeUnicode), callbackForEmbed);
-	};
+	}, false);
 	xhr.send(null);
 }
 

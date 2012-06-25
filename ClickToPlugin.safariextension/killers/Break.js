@@ -27,7 +27,7 @@ addKiller("Break", {
 	
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", url, true);
-	xhr.onload = function() {
+	xhr.addEventListener("load", function() {
 		var sources = [];
 		if(!videoHash) {
 			match = /sGlobalToken=['"]([^'"]*)['"]/.exec(xhr.responseText);
@@ -67,7 +67,7 @@ addKiller("Break", {
 			"sources": sources,
 			"siteInfo": siteInfo
 		}]});
-	};
+	}, false);
 	xhr.send(null);
 }
 

@@ -49,7 +49,7 @@ addKiller("Dailymotion", {
 	var _this = this;
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", "http://www.dailymotion.com/video/" + videoID, true);
-	xhr.onload = function() {
+	xhr.addEventListener("load", function() {
 		var match = /addVariable\(\"sequence\",\s*\"([^"]*)\"/.exec(xhr.responseText);
 		if(match) {
 			var callbackForEmbed = function(videoData) {
@@ -58,7 +58,7 @@ addKiller("Dailymotion", {
 			}
 			_this.processSequence(decodeURIComponent(match[1]), callbackForEmbed);
 		}
-	};
+	}, false);
 	xhr.send(null);
 }
 

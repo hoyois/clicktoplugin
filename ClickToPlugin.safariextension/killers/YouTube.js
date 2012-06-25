@@ -120,7 +120,7 @@ addKiller("YouTube", {
 	var _this = this;
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", "https://www.youtube.com/get_video_info?&video_id=" + videoID + "&eurl=http%3A%2F%2Fwww%2Eyoutube%2Ecom%2F", true);
-	xhr.onload = function() {
+	xhr.addEventListener("load", function() {
 		var flashvars = parseFlashVariables(xhr.responseText);
 		if(flashvars.status === "ok" && flashvars.ps !== "live") {
 			flashvars.title = decodeURIComponent(flashvars.title.replace(/\+/g, " "));
@@ -132,7 +132,7 @@ addKiller("YouTube", {
 		} else { // happens if YT just removed content and didn't update its playlists yet
 			callback({"playlist": [null]});
 		}
-	};
+	}, false);
 	xhr.send(null);
 },
 
@@ -152,7 +152,7 @@ addKiller("YouTube", {
 			else {
 				var xhr = new XMLHttpRequest();
 				xhr.open("GET", "https://www.youtube.com/get_video_info?&video_id=" + playlistID.substring(2) + "&eurl=http%3A%2F%2Fwww%2Eyoutube%2Ecom%2F", true);
-				xhr.onload = function() {loadAPIList("https://gdata.youtube.com/feeds/api/users/" + parseFlashVariables(xhr.responseText).author + "/uploads", 1, true);};
+				xhr.addEventListener("load", function() {loadAPIList("https://gdata.youtube.com/feeds/api/users/" + parseFlashVariables(xhr.responseText).author + "/uploads", 1, true);}, false);
 				xhr.send(null);
 			}
 			break;
@@ -162,7 +162,7 @@ addKiller("YouTube", {
 	var loadAPIList = function(playlistURL, startIndex, reverse) {
 		var xhr = new XMLHttpRequest();
 		xhr.open('GET', playlistURL + "?start-index=" + startIndex + "&max-results=50", true);
-		xhr.onload = function() {
+		xhr.addEventListener("load", function() {
 			if(xhr.status !== 200) {
 				_this.processFlashVars(flashvars, callback);
 				return;
@@ -175,7 +175,7 @@ addKiller("YouTube", {
 			}
 			if(xhr.responseXML.querySelector("link[rel='next']") === null) processList();
 			else loadAPIList(playlistURL, startIndex + 50, reverse);
-		};
+		}, false);
 		xhr.send(null);
 	};
 	
