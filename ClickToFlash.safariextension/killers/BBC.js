@@ -33,7 +33,7 @@ addKiller("BBC", {
 	
 	var xhr = new XMLHttpRequest();
 	xhr.open('GET', playlistURL, true);
-	xhr.onload = function (event) {
+	xhr.addEventListener("load", function (event) {
 		var doc = event.target.responseXML;
 		var mediatorElements = doc.getElementsByTagName('mediator');
 	
@@ -60,7 +60,7 @@ addKiller("BBC", {
 		
 		var xhr = new XMLHttpRequest();
 		xhr.open('GET', url, true);
-		xhr.onload = function(event) {
+		xhr.addEventListener("load", function(event) {
 
 			var processJSON = function(data) {
 				if( data.result != 'ok' )
@@ -90,10 +90,10 @@ addKiller("BBC", {
 				 }]});
 			};
 			eval(event.target.response);
-		};
-		xhr.send();
-	}
-	xhr.send();
+		}, false);
+		xhr.send(null);
+	}, false);
+	xhr.send(null);
 	
 	
 

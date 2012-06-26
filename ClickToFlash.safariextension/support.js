@@ -47,22 +47,20 @@ function airplay(url) {
 	var port = ":7000";
 	if(/:\d+$/.test(settings.airplayHostname)) port = "";
 	xhr.open("POST", "http://" + settings.airplayHostname + port + "/play", true, "AirPlay", secureSettings.getItem("airplayPassword"));
-	xhr.onload = function() {
+	xhr.addEventListener("load", function() {
 		// Set timer to prevent playback from aborting
 		var timer = setInterval(function() {
 			var xhr = new XMLHttpRequest();
 			xhr.open("GET", "http://" + settings.airplayHostname + port + "/playback-info", true, "AirPlay", secureSettings.getItem("airplayPassword"));
-			xhr.onload = function() {
+			xhr.addEventListener("load", function() {
 				if(xhr.responseXML.getElementsByTagName("key").length === 0) { // playback terminated
 					clearInterval(timer);
 				}
-			};
-			xhr.onerror = function() {
-				clearInterval(timer);
-			};
+			}, false);
+			xhr.addEventListener("error", function() {clearInterval(timer);}, false);
 			xhr.send();
 		}, 1000);
-	};
+	}, false);
 	xhr.send("Content-Location:" + url + "\nStart-Position:0\n");
 }
 
@@ -187,7 +185,7 @@ function chooseDefaultSource(sources) {
 function parseXSPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlaylistData) {
 	var xhr = new XMLHttpRequest();
 	xhr.open('GET', playlistURL, true);
-	xhr.onload = function() {
+	xhr.addEventListener("load", function() {
 		var x = xhr.responseXML.getElementsByTagName("track");
 		var playlist = [];
 		var audioOnly = true;
@@ -215,6 +213,10 @@ function parseXSPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlayli
 			if(i === 0 && !posterURL) posterURL = altPosterURL;
 			list = x[I].getElementsByTagName("title");
 			if(list.length > 0) title = list[0].textContent;
+			else {
+				list = x[I].getElementsByTagName("annotation");
+				if(list.length > 0) title = list[0].textContent;
+			}
 			
 			playlist.push({
 				"sources": [info],
@@ -223,6 +225,6 @@ function parseXSPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlayli
 			});
 		}
 		handlePlaylistData({"playlist": playlist, "startTrack": startTrack, "audioOnly": audioOnly});
-	};
+	}, false);
 	xhr.send(null);
 }

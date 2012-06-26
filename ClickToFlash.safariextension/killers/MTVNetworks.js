@@ -115,7 +115,7 @@ addKiller("MTVNetworks", {
 
 	var xhr = new XMLHttpRequest();
 	xhr.open('GET', configURL , true);
-	xhr.onload = function() {
+	xhr.addEventListener("load", function() {
 		var doc = new DOMParser().parseFromString(this.responseText.replace(/^\s+/,''), "text/xml");
 		var feedElement = doc.getElementsByTagName('feed')[0];
 		var feedURL = feedElement.textContent;
@@ -133,8 +133,8 @@ addKiller("MTVNetworks", {
 			renditionsURLs = _this.getRenditionsURLsFromFeed( feedURL, data, callbackData, _this.processRenditions, callback);
 		else
 			_this.processRenditions( renditionsURLs, data, callbackData, callback );
-	};
-	xhr.send();
+	}, false);
+	xhr.send(null);
 
 	return;
 },
@@ -180,14 +180,14 @@ addKiller("MTVNetworks", {
 	var _this = this;
 	var xhr2 = new XMLHttpRequest();
 	xhr2.open('GET',feedURL, true);
-	xhr2.onload = function() {
+	xhr2.addEventListener("load", function() {
 		var doc = new DOMParser().parseFromString(this.responseText.replace(/^\s+/,''), "text/xml");
 		var renditionsURLs = _this.getRenditionsURLsFromDoc( doc, data, callbackData, callback);
 
 		if( processCallback )
 			return processCallback(renditionsURLs, data, callbackData, callback);
-	};
-	xhr2.send();
+	}, false);
+	xhr2.send(null);
 	return;
 },
 "processRenditions": function(renditionsURLs, data, callbackData, callback) {
@@ -204,7 +204,7 @@ addKiller("MTVNetworks", {
 
 			var xhr3 = new XMLHttpRequest();
 			xhr3.open('GET', renditionsURLs[j], true);
-			xhr3.onload = function() {
+			xhr3.addEventListener("load", function() {
 
 				var doc = new DOMParser().parseFromString(this.responseText.replace(/^\s+/,''), "text/xml");
 				var sources = [];
@@ -250,8 +250,8 @@ addKiller("MTVNetworks", {
 					callback( callbackData );
 				}
 
-			};
-			xhr3.send();
+			}, false);
+			xhr3.send(null);
 		})(j);
 	}
 	return;

@@ -14,7 +14,7 @@ addKiller("CollegeHumor", {
 	
 	var xhr = new XMLHttpRequest();
 	xhr.open('GET', "http://www.collegehumor.com/moogaloop/video/" + videoID, true);
-	xhr.onload = function() {
+	xhr.addEventListener("load", function() {
 		var video = xhr.responseXML.querySelector("video");
 		
 		// YouTube redirection
@@ -36,7 +36,7 @@ addKiller("CollegeHumor", {
 				"isNative": true
 			}]
 		}]});
-	};
+	}, false);
 	xhr.send(null);
 }
 
