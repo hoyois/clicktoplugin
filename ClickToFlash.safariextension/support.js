@@ -58,10 +58,10 @@ function airplay(url) {
 				}
 			}, false);
 			xhr.addEventListener("error", function() {clearInterval(timer);}, false);
-			xhr.send();
+			xhr.send(null);
 		}, 1000);
 	}, false);
-	xhr.send("Content-Location:" + url + "\nStart-Position:0\n");
+	xhr.send("Content-Location: " + url + "\nStart-Position: 0\n");
 }
 
 function matchList(list, string) {
