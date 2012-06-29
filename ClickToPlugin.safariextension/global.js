@@ -45,7 +45,7 @@ if(settings.version < 41) {
 	settings.keys = tmpKeys;
 	settings.gestures = tmpGestures;
 }
-settings.version = 42;
+settings.version = 43;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
