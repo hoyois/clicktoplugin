@@ -42,7 +42,7 @@ addKiller("Metacafe", {
 	var _this = this;
 	var xhr = new XMLHttpRequest();
 	var url = "http://www.metacafe.com/watch/" + videoID;
-	xhr.open('GET', url, true);
+	xhr.open("GET", url, true);
 	xhr.addEventListener("load", function() {
 		var match = /name=\"flashvars\"\svalue=\"([^"]*)\"/.exec(xhr.responseText);
 		if(match) {

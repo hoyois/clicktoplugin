@@ -1,261 +1,114 @@
-/*
-Copyright 2011 Paul Grave
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
-/*
-
-# Should work with the following URLs:
-
-- http://www.colbertnation.com/full-episodes/thu-december-15-2011-daniel-craig
-- http://www.thedailyshow.com/full-episodes/thu-december-15-2011-matt-damon
-- http://gametrailers.com/video/preview-binary-domain/725281
-- http://www.thedailyshow.com/collection/404874/the-republican-field/120707
-- http://www.colbertnation.com/the-colbert-report-collections/403545/bye-bye-bye-plan/
-- http://www.mtv.com/videos/movie-trailers/722144/men-in-black-3.jhtml
-- http://www.southparkstudios.co.uk/clips/sp_vid_254168/
-- http://www.comedycentral.com/shows/30-rock/index.jhtml
-- http://www.southparkstudios.com/
-
-# Config URLs for the various MTV network sites
-
-The context number is important.  If someone know's how to derive it, then please let me
-know.
-
-Daily Show Clips
-- http://media.mtvnservices.com/pmt/e1/players/mgid:cms:video:thedailyshow.com:/context11/config.xml
-Daily Show Episodes
-- http://media.mtvnservices.com/pmt/e1/players/mgid:cms:episode:thedailyshow.com:/context5/config.xml
-Colbert Report Episodes
-- http://media.mtvnservices.com/pmt/e1/players/mgid:cms:episode:colbertnation.com:/context7/config.xml
-Colbert Report Clips
-- http://media.mtvnservices.com/pmt/e1/players/mgid:cms:video:colbertnation.com:/context8/config.xml
-Gametrailers
-- http://media.mtvnservices.com/pmt/e1/players/mgid:moses:video:gametrailers.com:/context1/config.xml
-*/
-
-
 addKiller("MTVNetworks", {
 
 "contexts": {
-	"cms:video:thedailyshow.com:": "context11",
-	"cms:episode:thedailyshow.com:": "context5",
-	"cms:episode:colbertnation.com:": "context7",
-	"cms:video:colbertnation.com:": "context8",
-	"moses:video:gametrailers.com:": "context1",
-	"cms:item:southparkstudios.com:": "context1",
-	"cms:content:southparkstudios.com:": "context2",
-	"cms:video:comedycentral.com:": "context6",
-	"cms:video:tosh.comedycentral.com:": "context2",
-	"hcx:content:comedycentral.co.uk:": "context3"
+	"cms:video:thedailyshow.com:": "11",
+	"cms:episode:thedailyshow.com:": "1", // with tdslocal.mud => shadow.comedycentral.com
+	"cms:video:colbertnation.com:": "8",
+	"cms:episode:colbertnation.com:": "7", // not iPad-compatible
+	// "arc:video:gametrailers.com:": "1", // works without context
+	// "cms:item:southparkstudios.com:": "1", // works without context
+	"cms:content:southparkstudios.com:": "3",
+	"cms:video:comedycentral.com:": "6", // no example found
+	"arc:playlist:comedycentral.com:": "4",
+	// "arc:video:comedycentral.com:": "1", // works without context
+	// "cms:video:tosh.comedycentral.com:": "1", // works without context
+	// "cms:promo:tosh.comedycentral.com:": "1", // works without context
+	"hcx:content:comedycentral.co.uk:": "3", // no example found
+	// "cms:video:jokes.com:": "1", // works without context
+	// "uma:video:mtv.com:": "1" // works without context
+	// "uma:videolist:mtv.com:" // only works without context
 },
+
 "canKill": function(data) {
-	return data.src && data.src.indexOf("media.mtvnservices.com") !== -1;
+	return data.src.indexOf("media.mtvnservices.com") !== -1;
 },
+
 "process": function(data, callback) {
-//	console.log(data);
-
-	var flashvars = parseFlashVariables(data.params.flashvars);
-	var matches = /mgid:(.*?\.\w+:)[-\w]+/.exec(data.src);
-	var mgid = matches[0];
-
-	// The context number in the URL below is important.  I can't figure out how to derive
-	// it or even better derive the entire URL.
-	// The swf on the page redirects to a URL the contains the all important config url.
-	// As far as I can see there's know way to grab the redirected location.
-	//
-	// E.g., this URL (which is the data.src): http://media.mtvnservices.com/mgid:cms:video:colbertnation.com:404447
-	// redirects to this:
-	// http://media.mtvnservices.com/player/prime/mediaplayerprime.1.11.3.swf?uri=mgid:cms:video:colbertnation.com:404447&type=normal&ref=None&geo=GB&group=entertainment&&CONFIG_URL=http%3a%2f%2fmedia.mtvnservices.com%2fpmt%2fe1%2fplayers%2fmgid%3acms%3avideo%3acolbertnation.com%3a%2fcontext3%2fconfig.xml%3furi%3dmgid%3acms%3avideo%3acolbertnation.com%3a404447%26type%3dnormal%26ref%3dNone%26geo%3dGB%26group%3dentertainment%2
-	//
-	// You can see in the URL immediately above that the CONFIG_URL is there, but how do
-	// I grab it?
-	// The configURL isn't in the data var either.  I can't access the current page from
-	// the killer unless I make an XHR to grab it, but even if I do that I can't grab
-	// the redirected URL.
-	// XHR'ing the data.src erases any evidence of Location headers.  I thought I could
-	// perhaps inject an iframe into the globalpage, with its src = data.src, but Safari
-	// doesn't even attempt to load the content.
-
-	// So en lieu of being able to accurately derive the configURL, I do the best I can
-	// with the info available in the data var and the knowledge that I've acquired
-	// when visiting each of the supported sites.
-
-	// I've discovered that the context number given in the CONFIG_URL varies depending on
-	// your geo location, you'll either be provided with a context number
-	// that works or one that doesn't.  E.g., colbert episodes provides me with a context
-	// of 7 in the US but 5 in the UK. context5 doesn't work.
-	// So it's perhaps better that we don't derive it but instead hardcode it.
-
-	// Try to get a context, if we can't lets set it to context1, it might work.  Better
-	// than nothing.
-	var context = this.contexts[matches[1]];
-	if( typeof(context) == "undefined" )
-		context = "context1";
-
-	var configURL = 'http://media.mtvnservices.com/pmt/e1/players/mgid:'+ matches[1] +'/' + context + '/config.xml';
-	if( mgid.indexOf('mtv.com') >= 0 )
-		configURL = 'http://www.mtv.com/player/embed/AS3/configuration.jhtml?uri=' + mgid + '&type=network&ref=www.mtv.com';
-
-//	console.log(configURL);
-
-	var callbackData = {"playlist": []};
+	var mgid = /mgid:([^.]*[.\w]+:)[-\w]+/.exec(data.src);
+	if(!mgid) return;
+	var context = "";
+	if(this.contexts[mgid[1]]) context = "/context" + this.contexts[mgid[1]];
+	
 	var _this = this;
-
 	var xhr = new XMLHttpRequest();
-	xhr.open('GET', configURL , true);
+	xhr.open("GET", "http://media.mtvnservices.com/pmt/e1/players/mgid:" + mgid[1] + context + "/config.xml", true);
 	xhr.addEventListener("load", function() {
-		var doc = new DOMParser().parseFromString(this.responseText.replace(/^\s+/,''), "text/xml");
-		var feedElement = doc.getElementsByTagName('feed')[0];
-		var feedURL = feedElement.textContent;
-		feedURL = feedURL.replace('{uri}',mgid);
-		var fluxAccountDomain = doc.getElementsByTagName('fluxAccountDomain')[0].textContent;
-		siteName = fluxAccountDomain.replace('community.','');
-		data.siteName = siteName;
-
-		// MTV has the info this doc, so there's no need to make an additional XHR
-		var renditionsURLs = _this.getRenditionsURLsFromDoc( doc, data, callbackData, callback);
-
-		// No renditionsURLs ? Then we're probably not on mtv so we'll need to make the
-		// additional call that gets us the resource that contains the renditions.
-		if( renditionsURLs.length == 0 )
-			renditionsURLs = _this.getRenditionsURLsFromFeed( feedURL, data, callbackData, _this.processRenditions, callback);
-		else
-			_this.processRenditions( renditionsURLs, data, callbackData, callback );
+		var xml = xhr.responseXML;
+		var feedURL = xml.getElementsByTagName("feed")[0].textContent.replace(/\n/g, "").replace("{uri}", mgid[0]);
+		if(mgid[1] === "cms:episode:thedailyshow.com:") {
+			feedURL = feedURL.replace("tdslocal.mud", "shadow.comedycentral.com");
+		}
+		if(feedURL) _this.processFeedURL(feedURL, mgid[1], callback);
 	}, false);
 	xhr.send(null);
-
-	return;
 },
-"getRenditionsURLsFromDoc": function( doc, data, callbackData, callback) {
 
-	var items = doc.getElementsByTagName('item');
-	var item, renditionsURLs, poster, title;
-
-	renditionsURLs = [];
-
-	for( var i = 0; i < items.length ; i++ ) {
-		item = items[i];
-
-		var itemContentTag = item.getElementsByTagNameNS('http://search.yahoo.com/mrss/','content');
-
-		if( !itemContentTag.length )
-			continue;
-
-		var renditionURL = itemContentTag[0].getAttribute('url');
-
-		// all renditionURLs happen to have have mediagen in their paths.  This check
-		// is to avoid adding URLs that don't return renditions.
-		if(  /mediagen/i.test(renditionURL) ) {
-
-			renditionsURLs.push( renditionURL );
-			playlistItem = {};
-
-			if( item.getElementsByTagNameNS('http://search.yahoo.com/mrss/','thumbnail').length > 0 )
-				playlistItem.poster = (item.getElementsByTagNameNS('http://search.yahoo.com/mrss/','thumbnail')[0]).getAttribute('url');
-
-			if( item.getElementsByTagName('title').length > 0 )
-				playlistItem.title = (item.getElementsByTagName('title')[0]).textContent;
-
-			playlistItem.sources = [];
-			callbackData.playlist.push(playlistItem);
+"processFeedURL": function(feedURL, mgid, callback) {
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", feedURL, true);
+	xhr.addEventListener("load", function() {
+		var xml = new DOMParser().parseFromString(xhr.responseText.replace(/^\s+/,""), "text/xml");
+		var items = xml.getElementsByTagName("item");
+		
+		var list = [];
+		var playlist = [];
+		
+		var content, poster, title, obj;
+		for(var i = 0; i < items.length; i++) {
+			content = items[i].getElementsByTagNameNS("http://search.yahoo.com/mrss/", "content")[0];
+			if(!content) continue;
+			obj = {"content": content.getAttribute("url")};
+			
+			poster = items[i].getElementsByTagNameNS("http://search.yahoo.com/mrss/", "thumbnail")[0];
+			if(poster) obj.poster = poster.getAttribute("url");
+			
+			title = items[i].getElementsByTagName("title")[0];
+			if(title) obj.title = title.textContent;
+			
+			list.push(obj);
 		}
-
-	}
-
-	return renditionsURLs;
-},
-"getRenditionsURLsFromFeed": function( feedURL, data, callbackData, processCallback, callback) {
-	var _this = this;
-	var xhr2 = new XMLHttpRequest();
-	xhr2.open('GET',feedURL, true);
-	xhr2.addEventListener("load", function() {
-		var doc = new DOMParser().parseFromString(this.responseText.replace(/^\s+/,''), "text/xml");
-		var renditionsURLs = _this.getRenditionsURLsFromDoc( doc, data, callbackData, callback);
-
-		if( processCallback )
-			return processCallback(renditionsURLs, data, callbackData, callback);
-	}, false);
-	xhr2.send(null);
-	return;
-},
-"processRenditions": function(renditionsURLs, data, callbackData, callback) {
-
-	// we use the todo var to track the number of jobs (i.e., XHR calls) that
-	// we need to make in order to get the sources for all the playlists
-	var todo = renditionsURLs.length;
-	for( var j = 0; j < renditionsURLs.length ; j++ ) {
-
-		// we can never be sure of the value of j if we don't use an anonymous wrapper
-		// function.  We're making sure that the onload callback is able to reference the
-		// value of j at the time the xhr was made.
-		( function(j) {
-
-			var xhr3 = new XMLHttpRequest();
-			xhr3.open('GET', renditionsURLs[j], true);
-			xhr3.addEventListener("load", function() {
-
-				var doc = new DOMParser().parseFromString(this.responseText.replace(/^\s+/,''), "text/xml");
+		
+		var length = list.length - 1;
+		
+		var next = function() {
+			if(list.length === 0) callback({"playlist": playlist});
+			else addToPlaylist(list.shift());
+		};
+		
+		var addToPlaylist = function(obj) {
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", obj.content, true);
+			delete obj.content;
+			xhr.addEventListener("load", function() {
+				var renditions = xhr.responseXML.getElementsByTagName("rendition");
+				
 				var sources = [];
-				var renditions = doc.getElementsByTagName('rendition');
-
-				for( var i = renditions.length - 1; i >= 0; i-- ) {
-
-					var src = renditions[i].getElementsByTagName('src')[0];
-					var source = {};
-					source.height = renditions[i].getAttribute('height');
-					source.format = renditions[i].getAttribute('bitrate') + "k MP4";
-					source.isNative = renditions[i].getAttribute('type').indexOf('mp4') !== -1;
-					source.url = src.textContent;
-
-					// Very hacky but this makes colbertnation + dailyshow sources work
-					// that otherwise wouldn't
-					source.url = source.url.replace(/rtmpe:\/\/\w+.fplive.net\/\w+/,'http://mtvnmobile2.rd.llnwd.net/44620/mtvnorigin');
-
-					// we don't want to add rmpt or rtmpe sources to our sources array.
-					// we're not able to play those.
-					if( !/^rtmpe?:\/\//.test( source.url ) )
-						sources.push(source);
-				};
-
-				// we only add sources to the playlist if we have any.
-				if( sources.length )
-					callbackData.playlist[j].sources = sources;
-
-				// we're done iterating through the sources, so we that one job done
-				// therefore we decrement the job list var
-				todo--;
-
-				// all our xhr requests have finished, lets finish up by calling the callback
-				if( todo <= 0 ) {
-
-					// just incase there are some playlists with no valid sources
-					// lets remove them.
-					callbackData.playlist = callbackData.playlist.filter( function(element, index, array) {
-						return (element.sources && element.sources.length > 0);
-					});
-
-					// that's it, we've generated the callbackData now call the callback
-					callback( callbackData );
+				for(var i = renditions.length -1 ; i >= 0; i--) {					
+					var source = typeInfo(renditions[i].getAttribute("type"));
+					if(source === null) continue;
+					source.format = renditions[i].getAttribute("bitrate") + "k " + source.format;
+					source.height = parseInt(renditions[i].getAttribute("height"));
+					source.url = renditions[i].getElementsByTagName("src")[0].textContent;	
+					source.url = "http://mtvnmobile.vo.llnwd.net/kip0/_pxn=0+_pxK=18639/44620/mtvnorigin" + source.url.substring(source.url.indexOf("/gsp."));
+					sources.push(source);
 				}
-
+				
+				if(sources.length === 0) {
+					if(list.length === length) return;
+				} else {
+					obj.sources = sources;
+					playlist.push(obj);
+				}
+				
+				next();
 			}, false);
-			xhr3.send(null);
-		})(j);
-	}
-	return;
+			xhr.send(null);
+		};
+		
+		next();
+		
+	}, false);
+	xhr.send(null);
 }
-
 
 });

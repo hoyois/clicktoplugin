@@ -13,7 +13,7 @@ addKiller("CollegeHumor", {
 	}
 	
 	var xhr = new XMLHttpRequest();
-	xhr.open('GET', "http://www.collegehumor.com/moogaloop/video/" + videoID, true);
+	xhr.open("GET", "http://www.collegehumor.com/moogaloop/video/" + videoID, true);
 	xhr.addEventListener("load", function() {
 		var video = xhr.responseXML.querySelector("video");
 		

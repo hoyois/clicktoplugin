@@ -1,29 +1,10 @@
-/*
-Copyright 2011 Paul Grave
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 addKiller("BBC", {
 
 "canKill": function(data) {
-	return data.params && data.params.id && data.location.indexOf("bbc.co.uk") !== -1;
+	return /^http:\/\/emp\.bbci\.co\.uk\/.*emp\.swf/.test(data.src);
 },
+
 "process": function(data, callback) {
-	
-	if(!/emp.swf/.test(data.src))
-		return;
-	
 	var flashvars = parseFlashVariables(data.params.flashvars);
 	var playlistURL = decodeURIComponent(flashvars.playlist);
 	
@@ -32,71 +13,53 @@ addKiller("BBC", {
 	}
 	
 	var xhr = new XMLHttpRequest();
-	xhr.open('GET', playlistURL, true);
-	xhr.addEventListener("load", function (event) {
-		var doc = event.target.responseXML;
-		var mediatorElements = doc.getElementsByTagName('mediator');
-	
-		if( !mediatorElements.length ) 
-			return;
+	xhr.open("GET", playlistURL, true);
+	xhr.addEventListener("load", function(event) {
+		var xml = event.target.responseXML;
+		var mediator = xml.getElementsByTagName("mediator")[0];
+		if(!mediator) return;
 		
-		var titleElements = doc.getElementsByTagName('title');
-		var title, poster;
+		var track = {};
+		var title = xml.getElementsByTagName("title")[0];
+		if(title) track.title = title.textContent;
 		
-		if ( titleElements.length ) {
-			title = titleElements[0].textContent;
-		};
-		
-		var linkElements = doc.getElementsByTagName('link');
-		
-		for( var i = 0; i < linkElements.length ; i++ ) {
-			if( linkElements[i].getAttribute('rel') == 'holding' ) {
-				poster = linkElements[i].getAttribute('href');
+		var links = xml.getElementsByTagName("link");
+		for(var i = 0; i < links.length; i++) {
+			if(links[i].getAttribute("rel") === "holding") {
+				track.poster = links[i].getAttribute("href");
 				break;
 			}
 		}
 		
-		var url = "http://open.live.bbc.co.uk/mediaselector/4/jsfunc/stream/" + mediatorElements[0].getAttribute('identifier') + "/processJSON/";
-		
 		var xhr = new XMLHttpRequest();
-		xhr.open('GET', url, true);
-		xhr.addEventListener("load", function(event) {
-
+		xhr.open("GET", "http://open.live.bbc.co.uk/mediaselector/4/jsfunc/stream/" + mediator.getAttribute("identifier") + "/processJSON/", true);
+		// Can also use /mtis instead of /jsfunc to get an XML response; JSON should be marginally faster
+		xhr.addEventListener("load", function() {
 			var processJSON = function(data) {
-				if( data.result != 'ok' )
-					return;
-
-				var sources;
-
-				sources = [];
-				data.media.forEach( function( media, i ) {
-					if( !(media.connection instanceof Array) && typeof(media['connection']) != undefined )
-						return;
-
+				if(data.result !== "ok") return;
+				
+				var sources = [];
+				data.media.forEach(function(media) {
 					var connection = media.connection[0];
-
-					if( typeof(connection['protocol']) != undefined && connection.protocol != 'http' )
-						return;
-
-					if( connection.href && media.bitrate && media.height )
-					   sources.push({"url": connection.href , "format":  media.bitrate + "k MP4", "height": media.height, "isNative": true});
+					if(!connection || connection.protocol !== "http" || !connection.href) return;
+					sources.push({
+						"url": connection.href,
+						"format":  media.bitrate + "k MP4",
+						"height": parseInt(media.height),
+						"isNative": true
+					});
 				});
-
-				if(sources.length > 0) callback({
-					"playlist": [{
-						"title": title,
-						"poster": poster,
-						"sources": sources
-				 }]});
+				if(sources.length === 0) return;
+				track.sources = sources;
+				callback({"playlist": [track]});
 			};
-			eval(event.target.response);
+			
+			eval(xhr.responseText);
+			
 		}, false);
 		xhr.send(null);
 	}, false);
 	xhr.send(null);
-	
-	
-
 }
 
 });
