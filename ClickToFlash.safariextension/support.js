@@ -184,7 +184,7 @@ function chooseDefaultSource(sources) {
 
 function parseXSPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlaylistData) {
 	var xhr = new XMLHttpRequest();
-	xhr.open('GET', playlistURL, true);
+	xhr.open("GET", playlistURL, true);
 	xhr.addEventListener("load", function() {
 		var x = xhr.responseXML.getElementsByTagName("track");
 		var playlist = [];

@@ -43,7 +43,13 @@ if(settings.version < 41) {
 	settings.keys = tmpKeys;
 	settings.gestures = tmpGestures;
 }
-settings.version = 43;
+if(settings.version < 44) {
+	var tmpArray = settings.killers;
+	tmpArray.unshift("killers/Vimeo.js");
+	settings.killers = tmpArray;
+}
+settings.version = 44;
+
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);

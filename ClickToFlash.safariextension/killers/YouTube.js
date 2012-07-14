@@ -161,7 +161,7 @@ addKiller("YouTube", {
 	
 	var loadAPIList = function(playlistURL, startIndex, reverse) {
 		var xhr = new XMLHttpRequest();
-		xhr.open('GET', playlistURL + "?start-index=" + startIndex + "&max-results=50", true);
+		xhr.open("GET", playlistURL + "?start-index=" + startIndex + "&max-results=50", true);
 		xhr.addEventListener("load", function() {
 			if(xhr.status !== 200) {
 				_this.processFlashVars(flashvars, callback);

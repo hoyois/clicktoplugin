@@ -48,6 +48,7 @@
 		<key>DefaultValue</key>
 		<array>
 			<string>killers/YouTube.js</string>
+			<string>killers/Vimeo.js</string>
 			<string>killers/Dailymotion.js</string>
 			<string>killers/Facebook.js</string>
 			<string>killers/Break.js</string>
