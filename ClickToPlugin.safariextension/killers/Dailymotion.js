@@ -9,15 +9,15 @@ addKiller("Dailymotion", {
 		var match = /#videoId=(.*)/.exec(data.location);
 		if(match) this.processVideoID(match[1], callback);
 	} else {
-		if(data.params.flashvars) {
-			var sequence = parseFlashVariables(data.params.flashvars).sequence;
-			if(sequence) {
-				this.processSequence(decodeURIComponent(sequence), callback);
-				return;
-			}
+		var sequence;
+		if(data.params.flashvars) sequence = parseFlashVariables(data.params.flashvars).sequence;
+		if(sequence) {
+			this.processSequence(decodeURIComponent(sequence), callback);
+			return;
+		} else {
+			var match = /\/swf\/([^&]+)/.exec(data.src);
+			if(match) this.processVideoID(match[1], callback);
 		}
-		var match = /\/swf\/([^&]+)/.exec(data.src);
-		if(match) this.processVideoID(match[1], callback);
 	}
 },
 
@@ -50,13 +50,14 @@ addKiller("Dailymotion", {
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", "http://www.dailymotion.com/video/" + videoID, true);
 	xhr.addEventListener("load", function() {
-		var match = /addVariable\(\"sequence\",\s*\"([^"]*)\"/.exec(xhr.responseText);
+		var match = /flashvars = ([^;]*);/.exec(xhr.responseText);
 		if(match) {
+			var flashvars = JSON.parse(match[1]);
 			var callbackForEmbed = function(videoData) {
 				videoData.playlist[0].siteInfo = {"name": "Dailymotion", "url": "http://www.dailymotion.com/video/" + videoID};
 				callback(videoData);
 			}
-			_this.processSequence(decodeURIComponent(match[1]), callbackForEmbed);
+			_this.processSequence(decodeURIComponent(flashvars.sequence), callbackForEmbed);
 		}
 	}, false);
 	xhr.send(null);
