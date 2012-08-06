@@ -3,23 +3,6 @@
 if(settings.version === undefined) {
 	openTab(safari.extension.baseURI + "settings.html");
 }
-if(settings.version < 38) {
-	var tmpArray = [];
-	for(var i = 0; i < settings.killers.length; i++) {
-		switch(settings.killers[i]) {
-		case "killers/IGN.js":
-		case "killers/MTVNetworks.js":
-		case "killers/BBC.js":
-		case "killers/Tumblr.js":
-		case "killers/Flash.js":
-			break;
-		default:
-			tmpArray.push(settings.killers[i]);
-		}
-	}
-	tmpArray.push( "killers/MTVNetworks.js", "killers/BBC.js", "killers/CollegeHumor.js", "killers/Tumblr.js", "killers/Flash.js");
-	settings.killers = tmpArray;
-}
 if(settings.version < 41) {
 	var tmpArray = [];
 	for(var i = 0; i < settings.killers.length; i++) {
@@ -48,8 +31,25 @@ if(settings.version < 44) {
 	tmpArray.unshift("killers/Vimeo.js");
 	settings.killers = tmpArray;
 }
-settings.version = 44;
-
+if(settings.version < 45) {
+	var tmpArray = [];
+	for(var i = 0; i < settings.killers.length; i++) {
+		switch(settings.killers[i]) {
+		case "killers/IGN.js":
+		case "killers/MTVNetworks.js":
+		case "killers/BBC.js":
+		case "killers/CollegeHumor.js":
+		case "killers/Tumblr.js":
+		case "killers/Flash.js":
+			break;
+		default:
+			tmpArray.push(settings.killers[i]);
+		}
+	}
+	tmpArray.push("killers/MTVNetworks.js", "killers/BBC.js", "killers/Brightcove.js", "killers/CollegeHumor.js", "killers/Tumblr.js", "killers/Flash.js");
+	settings.killers = tmpArray;
+}
+settings.version = 45;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);

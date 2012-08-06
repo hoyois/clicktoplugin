@@ -150,7 +150,7 @@ function extractExt(url) {
 	url = url.substring(url.lastIndexOf("/", i) + 1, i);
 	i = url.lastIndexOf(".");
 	if(i === -1) return "";
-	return url.substring(i + 1).toLowerCase();
+	return url.substring(i + 1).toLowerCase().trimRight();
 }
 
 function chooseDefaultSource(sources) {

@@ -57,6 +57,7 @@
 			<string>killers/TED.js</string>
 			<string>killers/MTVNetworks.js</string>
 			<string>killers/BBC.js</string>
+			<string>killers/Brightcove.js</string>
 			<string>killers/CollegeHumor.js</string>
 			<string>killers/Tumblr.js</string>
 			<string>killers/Flash.js</string>

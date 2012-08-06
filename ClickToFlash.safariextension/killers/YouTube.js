@@ -80,6 +80,7 @@ addKiller("YouTube", {
 	for(var i = 0; i < formatList.length; i++) {
 		var x = parseFlashVariables(formatList[i]);
 		var videoURL = decodeURIComponent(x.url) + "&title=" + encodeURIComponent(flashvars.title);
+		if(x.sig) videoURL += "&signature=" + x.sig;
 		if(x.itag === "38") {
 			sources.push({"url": videoURL, "format": "4K MP4", "height": 2304, "isNative": true});
 		} else if(x.itag === "37") {
