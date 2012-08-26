@@ -1,18 +1,23 @@
 addKiller("YouTube", {
 
-"formats": {
-	"5": canPlayFLV ? {"format": "240p FLV", "height": 240, "isNative": false} : undefined,/*
-	"6": {"format": "270p FLV", "height": 270, "isNative": false},*/
-	"18": {"format": "360p MP4", "height": 360, "isNative": true},
-	"22": {"format": "720p MP4", "height": 720, "isNative": true},/*
-	"34": canPlayFLV ? {"format": "360p FLV", "height": 360, "isNative": false} : undefined,*/
-	"35": canPlayFLV ? {"format": "480p FLV", "height": 480, "isNative": false} : undefined,
-	"37": {"format": "1080p MP4", "height": 1080, "isNative": true},
-	"38": {"format": "4K MP4", "height": 2304, "isNative": true}/*,
-	"43": canPlayWebM ? {"format": "360p WebM", "height": 360, "isNative": false} : undefined,
-	"44": canPlayWebM ? {"format": "480p WebM", "height": 480, "isNative": false} : undefined,
-	"45": canPlayWebM ? {"format": "720p WebM", "height": 720, "isNative": false} : undefined,
-	"46": canPlayWebM ? {"format": "1080p WebM", "height": 1080, "isNative": false} : undefined*/
+"getInfo": function(itag) {
+	if(itag === "38") return {"format": "4K MP4", "height": 2304, "isNative": true};
+	if(itag === "37") return {"format": "1080p MP4", "height": 1080, "isNative": true};
+	if(itag === "22") return {"format": "720p MP4", "height": 720, "isNative": true};
+	if(itag === "18") return {"format": "360p MP4", "height": 360, "isNative": true};
+	if(canPlayFLV) {
+		if(itag === "35") return {"format": "480p FLV", "height": 480, "isNative": false};
+		//if(itag === "34") return {"format": "360p FLV", "height": 360, "isNative": false};
+		//if(itag === "6") return {"format": "270p FLV", "height": 270, "isNative": false};
+		if(itag === "5") return {"format": "240p FLV", "height": 240, "isNative": false};
+	}
+	/*if(canPlayWebM) {
+		if(itag === "46") return {"format": "1080p WebM", "height": 1080, "isNative": false};
+		if(itag === "45") return {"format": "720p WebM", "height": 720, "isNative": false};
+		if(itag === "44") return {"format": "480p WebM", "height": 480, "isNative": false};
+		if(itag === "43") return {"format": "360p WebM", "height": 360, "isNative": false};
+	}*/
+	return false;
 },
 
 "canKill": function(data) {
@@ -91,10 +96,10 @@ addKiller("YouTube", {
 	var formatList = decodeURIComponent(flashvars.url_encoded_fmt_stream_map).split(",");
 	
 	var sources = [];
-	var x, source;
+	var x;
 	for(var i = 0; i < formatList.length; i++) {
 		x = parseFlashVariables(formatList[i]);
-		source = this.formats[x.itag];
+		var source = this.getInfo(x.itag);
 		if(source) {
 			source.url = decodeURIComponent(x.url) + "&title=" + encodeURIComponent(flashvars.title);
 			if(x.sig) source.url += "&signature=" + x.sig;
