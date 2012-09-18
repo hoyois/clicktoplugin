@@ -487,6 +487,7 @@ MediaPlayer.prototype.initTrackSelector = function() {
 	status.className = "CTPstatusDisplay";
 	var selector = document.createElement("select");
 	selector.className = "CTPtrackList";
+	
 	container.appendChild(status)
 	container.appendChild(selector);
 	
@@ -555,20 +556,25 @@ MediaPlayer.prototype.initTrackSelector = function() {
 		return;
 	}
 	
+	for(var i = 0; i < this.playlistLength; i++) {
+		var option = document.createElement("option");
+		option.disabled = true;
+		option.value = (i + this.playlistLength - this.startTrack) % this.playlistLength;
+		option.textContent = "[" + (i+1) + "/" + this.playlistLength + "]\u2002" + LOADING;
+		selector.appendChild(option);
+	}
+	
 	this.trackSelector.add = function(playlist) {
-		var firstTrack = selector.querySelector("[value='0']");
 		var start = player.playlist.length - playlist.length;
 		for(var i = 0; i < playlist.length; i++) {
-			if(playlist[i] === null) continue;
-			var option = document.createElement("option");
-			var track = i + start;
-			option.value = track;
-			var title = "[" + player.printTrack(track) + "/" + player.playlistLength + "]\u2002";
-			if(playlist[i].title) title += playlist[i].title;
+			var track = player.printTrack(i + start);
+			var option = selector.childNodes[track - 1];
+			var title = "[" + track + "/" + player.playlistLength + "]\u2002";
+			if(playlist[i] !== null) {
+				option.disabled = false;
+				if(playlist[i].title) title += playlist[i].title;
+			}
 			option.textContent = title;
-			if(firstTrack === null) firstTrack = option;
-			if(player.printTrack(track) <= player.startTrack) selector.insertBefore(option, firstTrack);
-			else selector.appendChild(option);
 		}
 	};
 	
