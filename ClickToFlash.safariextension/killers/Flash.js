@@ -54,6 +54,9 @@ addKiller("Flash", {
 		}
 	}
 	
+	// Site-specific hacks
+	if(/^http:\/\/www\.tvn24\.pl/.test(data.location)) sourceURL = sourceURL.replace(".flv", ".mp4");
+	
 	if(!sourceURL) return;
 	var ext = extractExt(sourceURL);
 	var isPlaylist = data.file === "playlistfile" || data.hash === "playlist_url" || ext === "xml" || ext === "xspf";

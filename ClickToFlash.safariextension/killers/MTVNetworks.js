@@ -7,7 +7,8 @@ addKiller("MTVNetworks", {
 	"cms:episode:colbertnation.com:": "7",
 	// "arc:video:gametrailers.com:": "1", // works without context
 	// "cms:item:southparkstudios.com:": "1", // works without context
-	"cms:content:southparkstudios.com:": "3",
+	"cms:content:southparkstudios.com:": "3", // outdated?
+	"arc:episode:southparkstudios.com:": "3",
 	"cms:video:comedycentral.com:": "6", // no example found
 	"arc:playlist:comedycentral.com:": "4",
 	// "arc:video:comedycentral.com:": "1", // works without context
