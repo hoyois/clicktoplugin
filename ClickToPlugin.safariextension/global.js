@@ -3,7 +3,14 @@
 if(settings.version === undefined) {
 	openTab(safari.extension.baseURI + "settings.html");
 }
-settings.version = 46;
+if(settings.version < 47) {
+	var tmpArray = [];
+		for(var i = 0; i < settings.killers.length; i++) {
+			if(settings.killers[i] !== "killers/CollegeHumor.js") tmpArray.push(settings.killers[i]);
+		}
+		settings.killers = tmpArray;
+}
+settings.version = 47;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
