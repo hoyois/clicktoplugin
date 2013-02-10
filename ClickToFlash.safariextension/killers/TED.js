@@ -21,8 +21,9 @@ addKiller("TED", {
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", url, true);
 	xhr.addEventListener("load", function() {
-		var page = new DOMParser().parseFromString(xhr.responseText, "text/xml");
-		var talkID = page.getElementById("flash_message").getElementsByTagName("a")[1].href;
+		var page = document.implementation.createHTMLDocument("");
+		page.documentElement.innerHTML = xhr.responseText;
+		var talkID = page.getElementById("no-flash-video-download").href;
 		talkID = /[^-.]*/.exec(talkID.substring(talkID.lastIndexOf("/") + 1))[0];
 		
 		var xhr2 = new XMLHttpRequest();
@@ -43,7 +44,6 @@ addKiller("TED", {
 			
 			callback({
 				"playlist": [{
-					//"poster": /&su=([^&]*)&/.exec(page.getElementById("embedCode").getAttribute("value"))[1],
 					"poster": page.querySelector("[rel=\"image_src\"]").href,
 					"title": page.getElementById("altHeadline").textContent,
 					"sources": sources,

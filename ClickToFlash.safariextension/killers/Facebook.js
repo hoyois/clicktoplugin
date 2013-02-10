@@ -18,7 +18,7 @@ addKiller("Facebook", {
 
 "processFlashVars": function(flashvars, callback) {
 	var sources = [];
-	var video = JSON.parse(decodeURIComponent(flashvars.video));
+	var video = JSON.parse(decodeURIComponent(flashvars.params));
 	if(video.hd_src) sources.push({"url": video.hd_src.replace(/\\\//g,"/"), "format": "HD MP4", "height": 720, "isNative": true});
 	if(video.sd_src) sources.push({"url": video.sd_src.replace(/\\\//g,"/"), "format": "SD MP4", "height": 240, "isNative": true});
 	else return;
