@@ -29,7 +29,7 @@ addKiller("YouTube", {
 "process": function(data, callback) {
 	
 	if(data.embed) { // old-style YT embed
-		var match = /\.com\/([vpe])\/([^&?]+)/.exec(data.src);
+		var match = /\.com\/([vpe])\/+([^&?]+)/.exec(data.src);
 		if(match) {
 			if(match[1] === "p") this.processPlaylistID("PL" + match[2], {}, callback);
 			else this.processVideoID(match[2], callback);
@@ -103,6 +103,18 @@ addKiller("YouTube", {
 		if(source) {
 			source.url = decodeURIComponent(x.url) + "&title=" + encodeURIComponent(flashvars.title);
 			if(x.sig) source.url += "&signature=" + x.sig;
+			else if(x.s) source.url += "&signature="
+				+ x.s.substring(6,7)
+				+ x.s.substring(1,3)
+				+ x.s.substring(62,63)
+				+ x.s.substring(7,43)
+				+ x.s.substring(0,1)
+				+ x.s.substring(56,57)
+				+ x.s.substring(45,56)
+				+ x.s.substring(43,44)
+				+ x.s.substring(57,62)
+				+ x.s.substring(3,4)
+				+ x.s.substring(63,84);
 			sources.push(source);
 		}
 	}

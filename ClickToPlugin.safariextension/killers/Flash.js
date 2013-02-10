@@ -11,6 +11,25 @@ addKiller("Flash", {
 
 "process": function(data, callback) {
 	var flashvars = parseFlashVariables(data.params.flashvars);
+	
+	if(flashvars.config) {
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", makeAbsoluteURL(decodeURIComponent(flashvars.config), data.baseURL), true);
+		var _this = this;
+		xhr.addEventListener("load", function() {
+			var config = xhr.responseXML.getElementsByTagName("config")[0];
+			var node;
+			for(var i = 0; i < config.childNodes.length; i++) {
+				node = config.childNodes[i];
+				flashvars[node.nodeName] = node.textContent;
+			}
+			_this.processFlashVars(data, flashvars, callback);
+		}, false);
+		xhr.send(null);
+	} else this.processFlashVars(data, flashvars, callback);
+},
+
+"processFlashVars": function(data, flashvars, callback) {
 	if(/^rtmp/.test(flashvars.streamer)) return;
 	
 	// Get media and poster URL

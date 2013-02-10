@@ -10,7 +10,7 @@ if(settings.version < 47) {
 		}
 		settings.killers = tmpArray;
 }
-settings.version = 47;
+settings.version = 48;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
@@ -43,10 +43,15 @@ function isSecureSetting(key) {
 var shortcutScript;
 function updateGlobalShortcuts() {
 	safari.extension.removeContentScript(shortcutScript);
-	var script = "";
-	if(settings.keys.prefPane) script += "document.addEventListener(\"" + settings.keys.prefPane.type + "\",function(e){if(testShortcut(e," + JSON.stringify(settings.keys.prefPane) + "))safari.self.tab.dispatchMessage(\"showSettings\", \"\");},false);";
-	if(settings.keys.addToWhitelist) script += "document.addEventListener(\"" + settings.keys.addToWhitelist.type + "\",function(e){if(testShortcut(e," + JSON.stringify(settings.keys.addToWhitelist) + "))safari.self.tab.dispatchMessage(\"whitelist\",location.href);},false);";
-	if(script) shortcutScript =  safari.extension.addContentScript(script, [], [safari.extension.baseURI + "*"], false);
+	if(settings.keys.prefPane || settings.keys.addToWhitelist || settings.keys.loadAll || settings.keys.hideAll) {
+		var script = "document.addEventListener(\"keydown\",function(e){";
+		if(settings.keys.prefPane) script += "if(testShortcut(e," + JSON.stringify(settings.keys.prefPane) + "))safari.self.tab.dispatchMessage(\"showSettings\", \"\");";
+		if(settings.keys.addToWhitelist) script += "if(testShortcut(e," + JSON.stringify(settings.keys.addToWhitelist) + "))safari.self.tab.dispatchMessage(\"whitelist\",location.href);";
+		if(settings.keys.loadAll) script += "if(testShortcut(e," + JSON.stringify(settings.keys.loadAll) + "))safari.self.tab.dispatchMessage(\"loadAll\", \"\");";
+		if(settings.keys.hideAll) script += "if(testShortcut(e," + JSON.stringify(settings.keys.hideAll) + "))safari.self.tab.dispatchMessage(\"hideAll\", \"\");";
+		script += "},false);"
+		shortcutScript = safari.extension.addContentScript(script, [], [safari.extension.baseURI + "*"], false);
+	}
 }
 updateGlobalShortcuts();
 

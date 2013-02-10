@@ -5,16 +5,15 @@ addKiller("Blip", {
 },
 
 "process": function(data, callback) {
-	if(/stratos.swf/.test(data.src)) {
-		var isEmbed = false;
-		var url = parseFlashVariables(data.params.flashvars).file;
-		if(!url) {
-			var match = /[?&#]file=([^&]*)/.exec(data.src);
-			if(!match) return;
-			url = match[1];
-			isEmbed = !/^http:\/\/blip\.tv/.test(data.location);
-		}
-		this.processXML(decodeURIComponent(url), isEmbed, callback);
+	if(/^https?:\/\/blip\.tv\/players\/xplayer/.test(data.location)) {
+		var videoID = parseFlashVariables(data.location.split(/\?/)[1]).id;
+		var url = "http://blip.tv/rss/flash/" + videoID;
+		this.processXML(url, false, callback);
+	} else if(/stratos\.swf/.test(data.src)) {
+		var match = /[?&#]file=([^&]*)/.exec(data.src);
+		if(!match) return;
+		url = match[1];
+		this.processXML(decodeURIComponent(url), !/^http:\/\/blip\.tv/.test(data.location), callback);
 	} else {
 		var match = /blip\.tv\/play\/([^%]*)/.exec(data.src);
 		if(match) this.processOldVideoID(match[1], callback);
@@ -28,7 +27,7 @@ addKiller("Blip", {
 		var xml = xhr.responseXML;
 		var media = xml.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "content");
 		var sources = [];
-		var url, info, height, width, audioOnly = true;
+		var url, info, height, audioOnly = true;
 		
 		for(var i = 0; i < media.length; i++) {
 			url = media[i].getAttribute("url");
@@ -36,9 +35,8 @@ addKiller("Blip", {
 			if(!info) continue;
 			if(!info.isAudio) audioOnly = false;
 			height = media[i].getAttribute("height");
-			width = media[i].getAttribute("width");
 			info.url = url;
-			info.format = media[i].getAttributeNS("http://blip.tv/dtd/blip/1.0", "role") + (info.isAudio ? "" : " (" + width + "x" + height + ")") + " " + info.format;
+			info.format = media[i].getAttributeNS("http://blip.tv/dtd/blip/1.0", "role") + " " + info.format;
 			info.height = parseInt(height);
 			sources.push(info);
 		}

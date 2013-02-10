@@ -582,7 +582,7 @@ MediaPlayer.prototype.initTrackSelector = function() {
 		player.loadTrack(parseInt(event.target.value));
 		player.container.focus();
 	}, false);
-	if(settings.keys.trackSelector && settings.keys.trackSelector.type === "keydown") { // override keydown shortcuts
+	if(settings.keys.trackSelector) { // override keydown shortcuts
 		selector.addEventListener("keydown", function(event) {
 			if((event.keyIdentifier === "U+0020" || event.keyIdentifier === "Up" || event.keyIdentifier === "Down") && !event.shiftKey && !event.metaKey && !event.altKey && !event.ctrlKey) event.allowDefault = true;
 		}, false);

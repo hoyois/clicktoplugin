@@ -33,7 +33,11 @@ addKiller("Brightcove", {
 		var processRendition = function(source) {
 			// videoCodec can be H264, SORENSON, or ON2
 			if(source.videoCodec !== "H264" || !source.defaultURL) return;
-			sources.unshift({"url": source.defaultURL, "format": Math.round(parseInt(source.encodingRate)/100000) + "00k MP4", "height": parseInt(source.frameHeight), "isAudio": source.audioOnly, "isNative": true});
+			var bitrate = Math.round(parseInt(source.encodingRate)/100000);
+			var format;
+			if(bitrate === 0) format = source.frameHeight + "p MP4";
+			else format = bitrate + "00k MP4";
+			sources.unshift({"url": source.defaultURL, "format": format, "height": parseInt(source.frameHeight), "isAudio": source.audioOnly, "isNative": true});
 		};
 		
 		media.renditions.forEach(processRendition);
