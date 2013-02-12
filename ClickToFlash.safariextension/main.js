@@ -1,8 +1,13 @@
 "use strict";
-if(window.safari === undefined) { // Safari bug
-	document.addEventListener("beforeload", function(event) {event.preventDefault();}, true);
-	throw new ReferenceError("Can't find variable: safari => blocking all resources in this frame");
+
+// In iframes with src="javascript:...", safari is undefined
+var w = window;
+while(w.safari === undefined) {
+	if(w === window.top) break; // Should never happen
+	w = w.parent;
 }
+var safari = w.safari;
+var href = w.location.href;
 
 var _ = []; // main array
 
@@ -19,38 +24,11 @@ document.addEventListener("beforeload", handleBeforeLoadEvent, true);
 document.addEventListener("contextmenu", function(event) {
 	safari.self.tab.setContextMenuEventUserInfo(event, {
 		"documentID": documentID,
-		"location": location.href,
+		"location": href,
 		"blocked": this.getElementsByClassName("CTPplaceholder").length,
 		"invisible": this.getElementsByClassName("CTPinvisible").length
 	});
 }, false);
-
-// Show/Hide preferences
-var showSettings;
-var hideSettings;
-if(window === top) {
-	showSettings = function() {
-		if(document.body.nodeName === "FRAMESET") {
-			// for HTML4 frameset documents, need to open settings in a new tab
-			safari.self.tab.dispatchMessage("openSettings", "");
-			return;
-		}
-		var iframe = document.createElement("iframe");
-		iframe.id = "CTPsettingsPane";
-		iframe.className = "CTPhidden";
-		iframe.src = safari.extension.baseURI + "settings.html";
-		var handleLoadEvent = function(event) {
-			event.target.removeEventListener("load", handleLoadEvent, false);
-			event.target.className = "";
-		};
-		iframe.addEventListener("load", handleLoadEvent, false);
-		document.body.appendChild(iframe);
-	}
-	hideSettings = function() {
-		document.body.removeChild(document.getElementById("CTPsettingsPane"));
-		focus();
-	}
-}
 
 function respondToMessage(event) {
 	// Ignore messages for other documents
@@ -103,26 +81,45 @@ function respondToMessage(event) {
 		hideSource(event.message);
 		break;
 	case "loadLocation":
-		if(location.href.indexOf(event.message) !== -1) loadAll();
+		if(href.indexOf(event.message) !== -1) loadAll();
 		break;
 	case "hideLocation":
-		if(location.href.indexOf(event.message) !== -1) hideAll();
+		if(href.indexOf(event.message) !== -1) hideAll();
 		break;
 	case "loadInvisible":
 		loadInvisible();
 		break;
 	case "showSettings":
-		if(window === top) showSettings();
+		if(window === top) {
+			if(document.body.nodeName === "FRAMESET") {
+				// for HTML4 frameset documents, need to open settings in a new tab
+				safari.self.tab.dispatchMessage("openSettings", "");
+				return;
+			}
+			var iframe = document.createElement("iframe");
+			iframe.id = "CTPsettingsPane";
+			iframe.className = "CTPhidden";
+			iframe.src = safari.extension.baseURI + "settings.html";
+			var handleLoadEvent = function(event) {
+				event.target.removeEventListener("load", handleLoadEvent, false);
+				event.target.className = "";
+			};
+			iframe.addEventListener("load", handleLoadEvent, false);
+			document.body.appendChild(iframe);
+		}
 		break;
 	case "hideSettings":
-		if(window === top) hideSettings();
+		if(window === top) {
+			document.body.removeChild(document.getElementById("CTPsettingsPane"));
+			focus();
+		}
 		break;
 	}
 }
 
 /* NOTE on duplicate beforeload events
 There are 3 different types (all bugs, see #44575)
-#1 within 1st handler: when accessing styles or ancestor <object> in handler
+#1 within 1st handler: when accessing styles of ancestor <object> in handler
 #2 after 1st handler: only observed with plugins disabled and !#1
 #3 after 1st handler if allowed: caused by misdeclared image types (should not happen in real life)
 */
@@ -152,7 +149,7 @@ function handleBeforeLoadEvent(event) {
 	if(event.url) anchor.href = event.url;
 	data.src = anchor.href;
 	data.type = event.target.type;
-	data.location = location.href;
+	data.location = href;
 	data.isObject = event.target instanceof HTMLObjectElement;
 	data.params = getParams(event.target); // parameters passed to the plugin
 	
@@ -207,7 +204,7 @@ function handleBeforeLoadEvent(event) {
 	if(settings.debug) {
 		var e = event.target, positionX = 0, positionY = 0;
 		do {positionX += e.offsetLeft; positionY += e.offsetTop;} while(e = e.offsetParent);
-		if(!confirm("Should ClickToFlash block this element?\n\nPlug-in: " + (response.plugin ? response.plugin : "") + "\nLocation: " + location.href + "\nSource: " + response.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + data.width + "×" + data.height)) return;
+		if(!confirm("Should ClickToFlash block this element?\n\nPlug-in: " + (response.plugin ? response.plugin : "") + "\nLocation: " + href + "\nSource: " + response.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + data.width + "×" + data.height)) return;
 	}
 	
 	// Block resource
@@ -423,7 +420,7 @@ function clickPlaceholder(elementID) {
 }
 
 function showInfo(elementID) {
-	alert("Plug-in: " + (_[elementID].plugin ? _[elementID].plugin : "∅") + " (" + _[elementID].width + "×" + _[elementID].height + ")\nLocation: " + location.href + "\nSource: " + _[elementID].src + "\n\nHTML:\n" + new XMLSerializer().serializeToString(_[elementID].element));
+	alert("Plug-in: " + (_[elementID].plugin ? _[elementID].plugin : "∅") + " (" + _[elementID].width + "×" + _[elementID].height + ")\nLocation: " + href + "\nSource: " + _[elementID].src + "\n\nHTML:\n" + new XMLSerializer().serializeToString(_[elementID].element));
 }
 
 function registerShortcuts(elementID) {
