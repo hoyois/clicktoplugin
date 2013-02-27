@@ -2,7 +2,7 @@ addKiller("Silverlight", {
 
 "canKill": function(data) {
 	if(data.type !== "application/x-silverlight-2") return false;
-	var match = /(?:^|,)(m|fileurl|mediaurl)=/.exec(data.params.initparams);
+	var match = /(?:^|,)\s*(m|fileurl|mediaurl|link)=/.exec(data.params.initparams);
 	if(match) {data.file = match[1]; return true;}
 	return false;
 },
