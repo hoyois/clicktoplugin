@@ -138,7 +138,7 @@ function parseWithRegExp(text, regex, processValue) { // regex needs 'g' flag
 	return obj;
 }
 function parseFlashVariables(s) {return parseWithRegExp(s, /([^&=]*)=([^&]*)/g);}
-function parseSLVariables(s) {return parseWithRegExp(s, /\s?([^,=]*)=([^,]*)/g);}
+function parseSLVariables(s) {return parseWithRegExp(s, /\s*([^,=]*)=([^,]*)/g);}
 
 function extractDomain(url) {
 	return /\/\/([^\/]+)\//.exec(url)[1];

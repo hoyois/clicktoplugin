@@ -1,30 +1,29 @@
 addKiller("Facebook", {
 
 "canKill": function(data) {
-	return /^https?:\/\/fbstatic-a\.akamaihd\.net\/rsrc\.php\/v[1-9]\/[a-zA-Z0-9]{2}\/r\/[a-zA-Z0-9_-]*\.swf/.test(data.src) || data.src.indexOf("www.facebook.com/v/") !== -1;
+	return data.src.indexOf("www.facebook.com/v/") !== -1 || /^https?:\/\/(?:fbstatic-a\.akamaihd\.net|static\.ak\.fbcdn\.net|s-static\.ak\.facebook\.com|b\.static\.ak\.fbcdn\.net)\/rsrc\.php\/v[1-9]\/[a-zA-Z0-9_-]{2}\/r\/[a-zA-Z0-9_-]*\.swf/.test(data.src);
 },
 
 "process": function(data, callback) {
-	if(data.params.flashvars) {
-		var flashvars = parseFlashVariables(data.params.flashvars);
-		if(flashvars.video_href && flashvars.video_id) this.processVideoID(flashvars.video_id, callback);
-		else this.processFlashVars(flashvars, callback);
-		return;
+	var flashvars = parseFlashVariables(data.params.flashvars);
+	if(flashvars.params) {
+		this.processParams(flashvars.params, callback);
+	} else { // Embedded video
+		var match = /facebook\.com\/v\/([^&?]+)/.exec(data.src);
+		if(!match) match = /\.swf.*[?&]v=([^&]*)/.exec(data.src);
+		if(match) this.processVideoID(match[1], callback);
 	}
-	// Embedded video
-	var match = /\.com\/v\/([^&?]+)/.exec(data.src);
-	if(match) this.processVideoID(match[1], callback);
 },
 
-"processFlashVars": function(flashvars, callback) {
+"processParams": function(params, callback) {
 	var sources = [];
-	var video = JSON.parse(decodeURIComponent(flashvars.params));
+	var video = JSON.parse(decodeURIComponent(params));
 	if(video.hd_src) sources.push({"url": video.hd_src.replace(/\\\//g,"/"), "format": "HD MP4", "height": 720, "isNative": true});
 	if(video.sd_src) sources.push({"url": video.sd_src.replace(/\\\//g,"/"), "format": "SD MP4", "height": 240, "isNative": true});
-	else return;
+	if(sources.length === 0) return;
 	
 	var posterURL;
-	if(flashvars.thumbnail_src) posterURL = decodeURIComponent(flashvars.thumbnail_src);
+	if(video.thumbnail_src) posterURL = video.thumbnail_src.replace(/\\\//g,"/");
 	
 	callback({"playlist": [{"poster": posterURL, "sources": sources}]});
 },
@@ -39,10 +38,8 @@ addKiller("Facebook", {
 			videoData.playlist[0].siteInfo = {"name": "Facebook", "url": url};
 			callback(videoData);
 		};
-		var s = xhr.responseText.substring(xhr.responseText.indexOf(".forEach"))
-		s = s.substring(s.indexOf("swf.addVariable"));
-		var regex = new RegExp("\\[\"([a-z_]*)\",\"([^\"]*)\"][,\\]]", "g");
-		_this.processFlashVars(parseWithRegExp(s, regex, unescapeUnicode), callbackForEmbed);
+		var match = /\[\"params\",\s*\"([^"]*)\"\]/.exec(xhr.responseText);
+		if(match) _this.processParams(match[1].replace(/\\u0025/g, "%"), callbackForEmbed);
 	}, false);
 	xhr.send(null);
 }
