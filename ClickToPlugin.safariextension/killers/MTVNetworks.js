@@ -2,7 +2,7 @@ addKiller("MTVNetworks", {
 
 "contexts": {
 	"cms:video:thedailyshow.com:": "11",
-	"cms:episode:thedailyshow.com:": "1", // with tdslocal.mud => shadow.comedycentral.com
+	"cms:episode:thedailyshow.com:": "5",
 	"cms:video:colbertnation.com:": "8",
 	"cms:episode:colbertnation.com:": "7",
 	// "arc:video:gametrailers.com:": "1", // works without context
@@ -36,9 +36,6 @@ addKiller("MTVNetworks", {
 	xhr.addEventListener("load", function() {
 		var xml = xhr.responseXML;
 		var feedURL = xml.getElementsByTagName("feed")[0].textContent.replace(/\n/g, "").replace("{uri}", mgid[0]);
-		if(mgid[1] === "cms:episode:thedailyshow.com:") {
-			feedURL = feedURL.replace("tdslocal.mud", "shadow.comedycentral.com");
-		}
 		if(feedURL) _this.processFeedURL(feedURL, mgid[1], callback);
 	}, false);
 	xhr.send(null);
