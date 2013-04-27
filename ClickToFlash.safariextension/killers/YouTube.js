@@ -47,12 +47,12 @@ addKiller("YouTube", {
 		callback(mediaData);
 	};
 	
-	if(playlistID) this.processPlaylist(playlistID, flashvars, mainCallback, callback);
+	if(playlistID) this.processPlaylist(playlistID, flashvars, !onsite, mainCallback, callback);
 	else if(onsite && /%26sig%3D/.test(flashvars.url_encoded_fmt_stream_map)) this.processFlashVars(flashvars, mainCallback);
-	else if(videoID) this.processVideoID(videoID, mainCallback);
+	else if(videoID) this.processVideoID(videoID, !onsite, mainCallback);
 },
 
-"processVideoID": function(videoID, callback) {
+"processVideoID": function(videoID, isEmbed, callback) {
 	var _this = this;
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", "https://www.youtube.com/get_video_info?&video_id=" + videoID + "&eurl=http%3A%2F%2Fwww%2Eyoutube%2Ecom%2F", true);
@@ -60,7 +60,7 @@ addKiller("YouTube", {
 		var flashvars = parseFlashVariables(xhr.responseText);
 		if(flashvars.status === "ok" && flashvars.ps !== "live") {
 			_this.processFlashVars(flashvars, function(mediaData) {
-				mediaData.playlist[0].siteInfo = {"name": "YouTube", "url": "http://www.youtube.com/watch?v=" + videoID};
+				if(isEmbed) mediaData.playlist[0].siteInfo = {"name": "YouTube", "url": "http://www.youtube.com/watch?v=" + videoID};
 				callback(mediaData);
 			});
 		} else { // happens e.g. if YT just removed content and didn't update its playlists yet
@@ -100,7 +100,7 @@ addKiller("YouTube", {
 	});
 },
 
-"processPlaylist": function(playlistID, flashvars, mainCallback, callback) {
+"processPlaylist": function(playlistID, flashvars, isEmbed, mainCallback, callback) {
 	var videoIDList = [];
 	var _this = this;
 	
@@ -161,8 +161,8 @@ addKiller("YouTube", {
 		};
 		
 		// load the first video at once
-		if(flashvars.url_encoded_fmt_stream_map) _this.processFlashVars(flashvars, callbackForPlaylist);
-		else _this.processVideoID(videoIDList[0], callbackForPlaylist);
+		if(/%26sig%3D/.test(flashvars.url_encoded_fmt_stream_map)) _this.processFlashVars(flashvars, callbackForPlaylist);
+		else _this.processVideoID(videoIDList[0], isEmbed, callbackForPlaylist);
 		videoIDList.shift();
 		unloadList();
 	};
@@ -179,9 +179,9 @@ addKiller("YouTube", {
 			if(i === imax) {
 				callback(mediaData);
 				unloadList();
-			} else _this.processVideoID(videoIDList.shift(), next);
+			} else _this.processVideoID(videoIDList.shift(), true, next);
 		};
-		_this.processVideoID(videoIDList.shift(), next);
+		_this.processVideoID(videoIDList.shift(), true, next);
 	};
 	
 	if(/^UL/.test(playlistID)) {
