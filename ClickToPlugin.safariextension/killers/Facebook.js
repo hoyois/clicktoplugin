@@ -17,7 +17,7 @@ addKiller("Facebook", {
 
 "processParams": function(params, callback) {
 	var sources = [];
-	var video = JSON.parse(decodeURIComponent(params));
+	var video = JSON.parse(decodeURIComponent(params)).video_data[0];
 	if(video.hd_src) sources.push({"url": video.hd_src.replace(/\\\//g,"/"), "format": "HD MP4", "height": 720, "isNative": true});
 	if(video.sd_src) sources.push({"url": video.sd_src.replace(/\\\//g,"/"), "format": "SD MP4", "height": 240, "isNative": true});
 	if(sources.length === 0) return;

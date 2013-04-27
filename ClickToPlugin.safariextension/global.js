@@ -10,7 +10,15 @@ if(settings.version < 47) {
 		}
 		settings.killers = tmpArray;
 }
-settings.version = 51;
+if(settings.version < 52) {
+	var tmpArray = [];
+		for(var i = 0; i < settings.killers.length; i++) {
+			if(settings.killers[i] === "killers/Tumblr.js") tmpArray.push("killers/IGN.js");
+			else tmpArray.push(settings.killers[i]);
+		}
+		settings.killers = tmpArray;
+}
+settings.version = 52;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
