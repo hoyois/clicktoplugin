@@ -1,7 +1,7 @@
 addKiller("Break", {
 
 "canKill": function(data) {
-	if(/\.break\.com\/(?:static|break)\//.test(data.src)) {data.onsite = true; return true;}
+	if(/s\.brkmd\.com\/content\/swf\/|media1\.break\.com\/break\/swf\//.test(data.src)) {data.onsite = true; return true;}
 	if(data.src.indexOf("embed.break.com/") !== -1) {data.onsite = false; return true;}
 	return false;
 },

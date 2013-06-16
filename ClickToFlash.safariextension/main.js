@@ -229,7 +229,6 @@ function handleBeforeLoadEvent(event) {
 	
 	// Copy CSS box & positioning properties that have an effect on page layout
 	// NOTE: 'display' is set to 'inline-block' which is always correct for "replaced elements"
-	// WATCH: properties that may be supported soon: CSS3 baseline properties
 	var style = getComputedStyle(event.target, null);
 	var properties = ["top", "right", "bottom", "left", "z-index", "clear", "float", "vertical-align", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-before-collapse", "-webkit-margin-after-collapse"];
 	// position: static -> relative (for source selector positioning)

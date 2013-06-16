@@ -47,16 +47,31 @@ nav {
 nav > ul {
 	-webkit-padding-start: 0;
 	list-style-type: none;
+	
+	/* Safari < 6.1 */
 	display: -webkit-box;
 	-webkit-box-orient: horizontal;
 	-webkit-box-pack: center;
 	-webkit-box-align: baseline;
+	
+	/* Safari >= 6.1 */
+	display: -webkit-flex;
+	-webkit-flex-direction: row;
+	-webkit-justify-content: center;
+	-webkit-align-items: baseline;
+	
 	margin: 0 auto;
 }
 
 nav > ul > li {
 	display: block;
+	
+	/* Safari < 6.1 */
 	-webkit-box-flex: 0;
+	
+	/* Safari >= 6.1 */
+	-webkit-flex: none;
+	
 	padding: 0;
 	margin: 0;
 	height: 20px;
@@ -223,4 +238,3 @@ input.shortcut_clear {
 	bottom: 1px;
 	margin-left: 10px;
 }
-

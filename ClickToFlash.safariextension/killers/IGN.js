@@ -24,12 +24,16 @@ addKiller("IGN", {
 	if(isEmbed) siteInfo = {"name": "IGN", "url": media.metadata.url.replace(/\\\//g, "/")};
 	
 	var videoURL = media.url.replace(/\\\//g, "/");
+	var source = urlInfo(videoURL);
+	if(!source) return;
+	source.url = videoURL;
+	source.height = 720;
 	var poster = media.poster[0].url.replace(/\\\//g, "/").replace(/\{size\}/, "large");
 	
 	callback({
 		"playlist": [{
 			"title": media.metadata.title,
-			"sources": [{"url": videoURL, "format": "MP4", "height": 720, "isNative": true}],
+			"sources": [source],
 			"poster": poster,
 			"siteInfo": siteInfo
 		}]

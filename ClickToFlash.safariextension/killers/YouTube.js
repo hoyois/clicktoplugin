@@ -48,7 +48,7 @@ addKiller("YouTube", {
 	};
 	
 	if(playlistID) this.processPlaylist(playlistID, flashvars, !onsite, mainCallback, callback);
-	else if(onsite && /%26sig%3D/.test(flashvars.url_encoded_fmt_stream_map)) this.processFlashVars(flashvars, mainCallback);
+	else if(onsite && /%2[6C]sig%3D/.test(flashvars.url_encoded_fmt_stream_map)) this.processFlashVars(flashvars, mainCallback);
 	else if(videoID) this.processVideoID(videoID, !onsite, mainCallback);
 },
 
