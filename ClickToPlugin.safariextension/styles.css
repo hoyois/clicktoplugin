@@ -6,7 +6,7 @@ CSS Reset (specificity 0,0,1,0)
 
 /*
 Not reset here:
--webkit-box-* (flex boxes)
+-webkit-flex-* (flex boxes)
 -webkit-transition-property
 background
 color
@@ -14,16 +14,9 @@ display
 font-family
 font-size
 height
-left
 opacity
 position
 width
-*/
-
-/*
-Should pseudo-elements be reset as well? e.g.
-.CTPplaceholder ::before {content: none !important;}
-etc.
 */
 
 .CTPplaceholder,
@@ -63,6 +56,7 @@ etc.
 	font-style: normal !important;
 	font-variant: normal !important;
 	font-weight: normal !important;
+	left: auto !important;
 	letter-spacing: normal !important;
 	line-height: normal !important;
 	margin: 0 !important;
@@ -97,16 +91,24 @@ Placeholder element
 	-webkit-transition-property: none !important;
 	width: auto !important;
 	height: auto !important;
-	left: auto !important;
 }
 
 .CTPplaceholder .CTPplaceholderContainer {
 	position: relative !important;
+	
+	/* Safari < 6.1 */
 	display: -webkit-box !important;
 	-webkit-box-align: center !important;
 	-webkit-box-direction: normal !important;
 	-webkit-box-orient: horizontal !important;
 	-webkit-box-pack: center !important;
+	
+	/* Safari >= 6.1 */
+	display: -webkit-flex !important;
+	-webkit-align-items: center !important;
+	-webkit-flex-direction: row !important;
+	-webkit-justify-content: center !important;
+	
 	-webkit-transition-property: none !important;
 	background-attachment: scroll !important;
 	background-clip: padding-box !important;
@@ -137,10 +139,15 @@ Placeholder element
 .CTPplaceholder .CTPlogoContainer {
 	position: relative !important;
 	display: block !important;
+	
+	/* Safari < 6.1 */
 	-webkit-box-flex: 0 !important;
+	
+	/* Safari >= 6.1 */
+	-webkit-flex: none !important;
+	
+	/* For Safari < 6.0(?): prevents the label from setting the baseline of the placeholder. */
 	float: left !important;
-	/* The only effect of float:left is to prevent the label from setting the baseline of the placeholder.
-	This should already be taken care of by overflow:hidden, but WebKit computes the baseline incorrectly. */
 }
 
 .CTPplaceholder .CTPlogo {
@@ -231,12 +238,21 @@ Media player
 
 .CTPmediaPlayer .CTPtrackSelector {
 	position: absolute !important;
+	
+	/* Safari < 6.1 */
 	display: -webkit-box !important;
-	-webkit-appearance: media-controls-background !important;
 	-webkit-box-align: center !important;
 	-webkit-box-direction: normal !important;
 	-webkit-box-orient: horizontal !important;
 	-webkit-box-pack: start !important;
+	
+	/* Safari >= 6.1 */
+	display: -webkit-flex !important;
+	-webkit-align-items: center !important;
+	-webkit-flex-direction: row !important;
+	-webkit-justify-content: flex-start !important;
+	
+	-webkit-appearance: media-controls-background !important;
 	-webkit-transition-property: none !important;
 	bottom: 0 !important;
 	box-sizing: border-box !important;
@@ -251,30 +267,50 @@ Media player
 .CTPmediaPlayer .CTPstatusDisplay,
 .CTPmediaPlayer .CTPtrackList {
 	position: static !important;
+	
+	/* Safari < 6.1 */
 	display: -webkit-box !important;
-	-webkit-box-align: start !important;
-	-webkit-box-orient: vertical !important;
-	-webkit-box-pack: center !important;
+	-webkit-box-align: center !important;
+	-webkit-box-direction: normal !important;
+	-webkit-box-orient: horizontal !important;
+	-webkit-box-pack: start !important;
+	
+	/* Safari >= 6.1 */
+	display: -webkit-flex !important;
+	-webkit-align-items: center !important;
+	-webkit-flex-direction: row !important;
+	-webkit-justify-content: flex-start !important;
+	
 	-webkit-transition-property: none !important;
 	color: white !important;
 	font: -webkit-small-control !important;
 	font-size: 10px !important;
 	height: inherit !important;
-	left: auto !important;
 	opacity: 1 !important;
 	text-shadow: black 0 1px 1px !important;
-	white-space: pre-wrap !important;
+	white-space: pre !important;
 	width: auto !important;
 }
 
 .CTPmediaPlayer .CTPstatusDisplay {
+	
+	/* Safari < 6.1 */
 	-webkit-box-flex: 0 !important;
+	
+	/* Safari >= 6.1 */
+	-webkit-flex: none !important;
+	
 	pointer-events: none !important;
 }
 
 .CTPmediaPlayer .CTPtrackList {
+	
+	/* Safari < 6.1 */
 	-webkit-box-flex: 1 !important;
-	-webkit-line-clamp: 1 !important;
+	
+	/* Safari >= 6.1 */
+	-webkit-flex: 1 !important;
+	
 	overflow: hidden !important;
 	text-overflow: ellipsis !important;
 }
@@ -284,7 +320,6 @@ Media player
 	background: none !important;
 	font: -webkit-small-control !important;
 	font-size: 10px !important;
-	left: auto !important;
 	height: auto !important;
 	width: auto !important;
 	text-shadow: black 0 1px 1px !important;

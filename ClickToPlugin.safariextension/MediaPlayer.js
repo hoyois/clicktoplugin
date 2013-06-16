@@ -376,7 +376,8 @@ MediaPlayer.prototype.initShadowDOM = function() {
 	if(settings.hideRewindButton) this.shadowDOM.rewindButton.style.display = "none";
 	
 	if(this.playlistLength > 1) {
-		// Re-order controls (cf. #88615)
+		// Reorder controls
+		// Safari < 6.1
 		this.shadowDOM.controlsPanel.style.WebkitBoxDirection = "reverse";
 		this.shadowDOM.timelineContainer.style.WebkitBoxDirection = "normal";
 		this.shadowDOM.volumeSliderContainer.style.WebkitBoxDirection = "normal";
@@ -386,13 +387,22 @@ MediaPlayer.prototype.initShadowDOM = function() {
 		this.shadowDOM.seekForwardButton.style.WebkitBoxOrdinalGroup = "6";
 		this.shadowDOM.timelineContainer.style.WebkitBoxOrdinalGroup = "4";
 		this.shadowDOM.fullscreenButton.style.WebkitBoxOrdinalGroup = "1";
+		// Safari >= 6.1
+		this.shadowDOM.rewindButton.style.WebkitOrder = "-5";
+		this.shadowDOM.seekBackButton.style.WebkitOrder = "-4";
+		this.shadowDOM.playButton.style.WebkitOrder = "-3";
+		this.shadowDOM.seekForwardButton.style.WebkitOrder = "-2";
+		this.shadowDOM.timelineContainer.style.WebkitOrder = "-1";
+		this.shadowDOM.fullscreenButton.style.WebkitOrder = "1";
 		
 		// Show back/forward buttons
-		this.shadowDOM.seekBackButton.style.display = "-webkit-box";
+		this.shadowDOM.seekBackButton.style.display = "-webkit-box"; // Safari < 6.1
+		this.shadowDOM.seekBackButton.style.display = "-webkit-flex"; // Safari >= 6.1
 		this.shadowDOM.seekBackButton.style.marginLeft = "6px";
 		this.shadowDOM.seekBackButton.style.width = "20px";
 		this.shadowDOM.seekBackButton.style.height = "12px";
-		this.shadowDOM.seekForwardButton.style.display = "-webkit-box";
+		this.shadowDOM.seekForwardButton.style.display = "-webkit-box"; // Safari < 6.1
+		this.shadowDOM.seekForwardButton.style.display = "-webkit-flex"; // Safari >= 6.1
 		this.shadowDOM.seekForwardButton.style.marginLeft = "6px";
 		this.shadowDOM.seekForwardButton.style.width = "20px";
 		this.shadowDOM.seekForwardButton.style.height = "12px";

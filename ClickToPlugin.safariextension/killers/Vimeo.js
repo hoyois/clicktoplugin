@@ -55,7 +55,7 @@ addKiller("Vimeo", {
 		}
 		
 		var siteInfo;
-		if(data.location.indexOf("vimeo.com/") === -1 || data.location === "http://vimeo.com/" || data.location.indexOf("player.vimeo.com/") !== -1) siteInfo = {"name": "Vimeo", "url": "http://vimeo.com/" + videoID};
+		if(data.location.indexOf("vimeo.com/") === -1 || /^https?:\/\/vimeo\.com\/$/.test(data.location) || data.location.indexOf("player.vimeo.com/") !== -1) siteInfo = {"name": "Vimeo", "url": "http://vimeo.com/" + videoID};
 		
 		callback({"playlist": [{
 			"siteInfo": siteInfo,
