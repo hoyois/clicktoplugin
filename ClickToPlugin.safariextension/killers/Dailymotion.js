@@ -20,11 +20,10 @@ addKiller("Dailymotion", {
 	var name = function(name) {return function(x) {return x.name === name;};};
 	var base = config.sequence.filter(name("root"))[0].layerList.filter(name("background"))[0];
 	var video = base.sequenceList.filter(name("main"))[0].layerList.filter(name("video"))[0].param;
-	var image = base.sequenceList.filter(name("main"))[0].layerList.filter(name("relatedBackground"))[0].param;
 	var params = base.sequenceList.filter(name("reporting"))[0].layerList.filter(name("reporting"))[0].param.extraParams;
 	
 	var title = unescape(params.videoTitle.replace(/\+/g, " ").replace(/\\u/g, "%u").replace(/\\["'\/\\]/g, function(s){return s.charAt(1);})); // sic
-	var poster = image.imageURL.replace(/\\\//g,"/");
+	var poster = params.videoPreviewURL.replace(/\\\//g,"/");
 	
 	var sources = [];
 	if(video.hd1080URL) sources.push({"url": video.hd1080URL.replace(/\\\//g,"/"), "format": "1080p MP4", "height": 1080, "isNative": true});
