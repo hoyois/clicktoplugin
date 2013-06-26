@@ -157,7 +157,7 @@ MediaPlayer.prototype.normalizeTrack = function(track) {
 
 MediaPlayer.prototype.loadFirstTrack = function() {
 	this.initShadowDOM();
-	if(this.initScript) injectScript("(function(){var mediaElement=document.getElementById(\"" + this.mediaElement.id + "\");" + this.initScript + "})();");
+	if(this.initScript) injectScript("(function(){" + this.initScript + "}).call(document.getElementById(\"" + this.mediaElement.id + "\"));");
 	if(this.startTime) {
 		var _this = this;
 		var setInitialTime = function(event) {
