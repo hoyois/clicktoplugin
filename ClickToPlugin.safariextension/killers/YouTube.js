@@ -136,7 +136,7 @@ addKiller("YouTube", {
 		var xhr2 = new XMLHttpRequest();
 		xhr2.open("GET", match[0].replace(/\\/g, ""), true);
 		xhr2.addEventListener("load", function() {
-			match = /function [A-Za-z]+\(a\)\{a=a\.split\(\"\"\);([^"]*)/.exec(xhr2.responseText);
+			match = /function [A-Za-z]+\(a\)\{a=a(?:\.split|\[[A-Za-z]+\])\(\"\"\);([^"]*)/.exec(xhr2.responseText);
 			if(!match) return;
 			_this.decoder[1] = [];
 			var a, regex = /\(([^\d\)]*)(\d*)\)|\[(\d+)\]/g;
