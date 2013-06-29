@@ -2,10 +2,7 @@
 
 // In iframes with src="javascript:...", safari is undefined
 var w = window;
-while(w.safari === undefined) {
-	if(w === window.top) break; // Should never happen
-	w = w.parent;
-}
+while(w.safari === undefined) w = w.parent;
 var safari = w.safari;
 var href = w.location.href;
 
@@ -204,7 +201,7 @@ function handleBeforeLoadEvent(event) {
 	if(settings.debug) {
 		var e = event.target, positionX = 0, positionY = 0;
 		do {positionX += e.offsetLeft; positionY += e.offsetTop;} while(e = e.offsetParent);
-		if(!confirm("Should ClickToPlugin block this element?\n\nPlug-in: " + (response.plugin ? response.plugin : "") + "\nLocation: " + href + "\nSource: " + response.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + data.width + "×" + data.height)) return;
+		if(!confirm("Should ClickToPlugin block this element?\n\nPlug-in: " + (response.plugin ? response.plugin : "None") + "\nLocation: " + href + "\nSource: " + response.src + "\nPosition: (" + positionX + "," + positionY + ")\nSize: " + data.width + "×" + data.height)) return;
 	}
 	
 	// Block resource
@@ -367,7 +364,7 @@ function initMedia(elementID, media) {
 		else if(settings.defaultPlayer === "airplay") label = "AirPlay";
 	}
 	if(label) displayBadge(elementID, label);
-	else displayBadge(elementID, (_[elementID].plugin ? _[elementID].plugin : "∅") + "*");
+	else displayBadge(elementID, (_[elementID].plugin ? _[elementID].plugin : MISSING_PLUGIN) + "*");
 }
 
 function loadMedia(elementID, focus) {
@@ -419,7 +416,7 @@ function clickPlaceholder(elementID) {
 }
 
 function showInfo(elementID) {
-	alert("Plug-in: " + (_[elementID].plugin ? _[elementID].plugin : "∅") + " (" + _[elementID].width + "×" + _[elementID].height + ")\nLocation: " + href + "\nSource: " + _[elementID].src + "\n\nHTML:\n" + new XMLSerializer().serializeToString(_[elementID].element));
+	alert("Plug-in: " + (_[elementID].plugin ? _[elementID].plugin : "None") + " (" + _[elementID].width + "×" + _[elementID].height + ")\nLocation: " + href + "\nSource: " + _[elementID].src + "\n\nHTML:\n" + new XMLSerializer().serializeToString(_[elementID].element));
 }
 
 function registerShortcuts(elementID) {

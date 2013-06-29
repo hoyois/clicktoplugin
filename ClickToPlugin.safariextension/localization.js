@@ -537,7 +537,7 @@ var PREFERENCES_STRINGS = {
 		"en-us": "Instant autoplay",
 		"tr-tr": "Anında oynat",
 		"it-it": "Riproduzione automatica immediata",
-		"fr-fr": "Lecture instantanée",
+		"fr-fr": "Lecture automatique immédiate",
 		"es-es": "Reproducción sin esperas",
 		"de-de": "Sofortige Wiedergabe",
 		"ja-jp": "直接に再生",
@@ -1239,6 +1239,17 @@ var GLOBAL_STRINGS = {
 };
 
 var INJECTED_STRINGS = {
+	"MISSING_PLUGIN": {
+		"en-us": "Missing Plug-in",
+		"tr-tr": "Eksik Yazılım Eki",
+		"it-it": "Plugin mancante",
+		"fr-fr": "Module manquant",
+		"es-es": "Módulo no encontrado",
+		"de-de": "Fehlendes Plug-In",
+		"ja-jp": "プラグインが見つかりません",
+		"zh-tw": "找不到外掛模組",
+		"zh-cn": "缺少插件"
+	},
 	"LOADING": {
 		"en-us": "Loading...",
 		"tr-tr": "Yükleniyor...",

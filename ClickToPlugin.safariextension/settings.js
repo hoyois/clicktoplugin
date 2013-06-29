@@ -306,6 +306,7 @@ function buildPluginMenu() {
 		return 0;
 	});
 	for(var i = 0; i < plugins.length; i++) {
+		if(!plugins[i].filename) continue; // internal WebKit plugin
 		var li = document.createElement("li");
 		var span = document.createElement("span");
 		span.className = "checkbox sub";

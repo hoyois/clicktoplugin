@@ -3,21 +3,6 @@
 if(settings.version === undefined) {
 	openTab(safari.extension.baseURI + "settings.html");
 }
-if(settings.version < 47) {
-	var tmpArray = [];
-		for(var i = 0; i < settings.killers.length; i++) {
-			if(settings.killers[i] !== "killers/CollegeHumor.js") tmpArray.push(settings.killers[i]);
-		}
-		settings.killers = tmpArray;
-}
-if(settings.version < 52) {
-	var tmpArray = [];
-		for(var i = 0; i < settings.killers.length; i++) {
-			if(settings.killers[i] === "killers/Tumblr.js") tmpArray.push("killers/IGN.js");
-			else tmpArray.push(settings.killers[i]);
-		}
-		settings.killers = tmpArray;
-}
 settings.version = 55;
 
 // LOCALIZATION
@@ -216,6 +201,7 @@ function resolveNativePlugin(data, tab) {
 }
 
 function isAllowed(plugin) {
+	if(!plugin.filename) return true; // internal WebKit plugin
 	for(var i = 0; i < settings.allowedPlugins.length; i++) {
 		// Accessing navigator.plugins[...] creates a new object so === is always false,
 		// but Safari uses the filename property as a unique ID for plugins
