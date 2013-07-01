@@ -307,15 +307,15 @@ var PREFERENCES_STRINGS = {
 		"zh-cn": function(file) {return "从文件: " + file;}
 	},
 	"PLUGIN_DESCRIPTION": {
-		"en-us": function(file) {return "Description: " + file;},
-		"tr-tr": function(file) {return "Tanım: " + file;},
-		"it-it": function(file) {return "Descrizione: " + file;},
-		"fr-fr": function(file) {return "Description : " + file;},
-		"es-es": function(file) {return "Descripción: " + file;},
-		"de-de": function(file) {return "Beschreibung: " + file;},
-		"ja-jp": function(file) {return "情報：" + file;},
-		"zh-tw": function(file) {return "詳細資料：" + file;},
-		"zh-cn": function(file) {return "细节: " + file;}
+		"en-us": function(text) {return "Description: " + text;},
+		"tr-tr": function(text) {return "Tanım: " + text;},
+		"it-it": function(text) {return "Descrizione: " + text;},
+		"fr-fr": function(text) {return "Description : " + text;},
+		"es-es": function(text) {return "Descripción: " + text;},
+		"de-de": function(text) {return "Beschreibung: " + text;},
+		"ja-jp": function(text) {return "情報：" + text;},
+		"zh-tw": function(text) {return "詳細資料：" + text;},
+		"zh-cn": function(text) {return "细节: " + text;}
 	},
 	
 	// Control lists tab
