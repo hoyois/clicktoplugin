@@ -3,7 +3,7 @@
 if(settings.version === undefined) {
 	openTab(safari.extension.baseURI + "settings.html");
 }
-settings.version = 55;
+settings.version = 56;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);

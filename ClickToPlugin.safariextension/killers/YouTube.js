@@ -36,9 +36,9 @@ addKiller("YouTube", {
 			
 			match = /[#&?]t=(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?/.exec(data.location);
 			if(match) {
-				var hours = parseInt(match[1], 10) || 0;
-				var minutes = parseInt(match[2], 10) || 0;
-				var seconds = parseInt(match[3], 10) || 0;
+				var hours = parseInt(match[1]) || 0;
+				var minutes = parseInt(match[2]) || 0;
+				var seconds = parseInt(match[3]) || 0;
 				startTime = 3600 * hours + 60 * minutes + seconds;
 			}
 		} else startTime = parseInt(flashvars.start);
@@ -69,14 +69,14 @@ addKiller("YouTube", {
 	
 	var fmtList = decodeURIComponent(flashvars.url_encoded_fmt_stream_map).split(",");
 	var sources = [];
-	var x;
+	var x, source;
 	for(var i = 0; i < fmtList.length; i++) {
 		x = parseFlashVariables(fmtList[i]);
-		var source = this.expandItag(x.itag);
+		source = this.expandItag(x.itag);
 		if(source) {
 			source.url = decodeURIComponent(x.url) + "&title=" + flashvars.title + encodeURIComponent(" [" + source.format.split(" ")[0] + "]");
 			if(x.sig) source.url += "&signature=" + x.sig;
-			else if(x.s) source.url += "&signature=" + this.decodeSignature(x.s, flashvars.key);
+			else if(x.s) source.url += "&signature=" + this.decodeSignature(x.s);
 			sources.push(source);
 		}
 	}
@@ -128,8 +128,7 @@ addKiller("YouTube", {
 "updateDecoder": function(flashvars, callback) {
 	var _this = this;
 	var xhr = new XMLHttpRequest();
-	var url = "https://www.youtube.com/watch?v=" + flashvars.video_id;
-	xhr.open("GET", url, true);
+	xhr.open("GET", "https://www.youtube.com/watch?v=" + flashvars.video_id, true);
 	xhr.addEventListener("load", function() {
 		var match = /https?:\\\/\\\/s\.ytimg\.com\\\/yts\\\/jsbin\\\/html5player-vfl.{6}\.js/.exec(xhr.responseText);
 		if(!match) return;
@@ -163,7 +162,7 @@ addKiller("YouTube", {
 		var flashvars = parseFlashVariables(xhr.responseText);
 		if(flashvars.status === "ok" && flashvars.ps !== "live") {
 			var callbackForEmbed = function(mediaData) {
-				mediaData.playlist[0].siteInfo = {"name": "YouTube", "url": "http://www.youtube.com/watch?v=" + videoID};
+				mediaData.playlist[0].siteInfo = {"name": "YouTube", "url": "https://www.youtube.com/watch?v=" + videoID};
 				callback(mediaData);
 			};
 			if(flashvars.use_cipher_signature !== "True") _this.processFlashVars(flashvars, callbackForEmbed);
@@ -216,7 +215,7 @@ addKiller("YouTube", {
 	
 	var loadPlaylist = function(page) {
 		var xhr = new XMLHttpRequest();
-		xhr.open("GET", "http://www.youtube.com/playlist?list=" + playlistID + "&page=" + page, true);
+		xhr.open("GET", "https://www.youtube.com/playlist?list=" + playlistID + "&page=" + page, true);
 		xhr.addEventListener("load", function() {
 			if(xhr.status === 200) {
 				var regex = /class=\"video-title-container\">\s*<a href=\"\/watch\?v=([^&]*)/g;
@@ -283,7 +282,7 @@ addKiller("YouTube", {
 			var xhr = new XMLHttpRequest();
 			xhr.open("GET", "https://www.youtube.com/watch?&v=" + playlistID.substring(2), true);
 			xhr.addEventListener("load", function() {
-				var match = /http:\/\/www\.youtube\.com\/user\/([^"]*)/.exec(xhr.responseText);
+				var match = /https?:\/\/www\.youtube\.com\/user\/([^"]*)/.exec(xhr.responseText);
 				if(match) loadAPIList("https://gdata.youtube.com/feeds/api/users/" + match[1] + "/uploads", 1, true);
 				else _this.processFlashVars(flashvars, mainCallback);
 			}, false);
@@ -294,7 +293,6 @@ addKiller("YouTube", {
 
 "initScript": "\
 	try{\
-		if(!this.parentNode) throw null;\
 		var _this = this;\
 		var seekTo = function(time) {\
 			var seek = function() {\
