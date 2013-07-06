@@ -3,22 +3,7 @@
 if(settings.version === undefined) {
 	openTab(safari.extension.baseURI + "settings.html");
 }
-if(settings.version < 47) {
-	var tmpArray = [];
-		for(var i = 0; i < settings.killers.length; i++) {
-			if(settings.killers[i] !== "killers/CollegeHumor.js") tmpArray.push(settings.killers[i]);
-		}
-		settings.killers = tmpArray;
-}
-if(settings.version < 52) {
-	var tmpArray = [];
-		for(var i = 0; i < settings.killers.length; i++) {
-			if(settings.killers[i] === "killers/Tumblr.js") tmpArray.push("killers/IGN.js");
-			else tmpArray.push(settings.killers[i]);
-		}
-		settings.killers = tmpArray;
-}
-settings.version = 55;
+settings.version = 56;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);

@@ -113,7 +113,7 @@ MediaPlayer.prototype.initPlaylistControls = function() {
 	this.mediaElement.addEventListener("click", function(event) {
 		if(event.target !== this) return; // click on trackSelector
 		var coord = _this.getCoordinates(event);
-		if(coord.y + 25 > _this.height) { // click in controls
+		if(coord.y + 25 > _this.height && event.target.controls) { // click in controls
 			if(coord.x >= x + 6 && coord.x <= x + 25) {
 				event.preventDefault();
 				_this.prevTrack();
@@ -332,7 +332,7 @@ MediaPlayer.prototype.addEventListener = function(type, handler) {
 	if(type === "click" || type === "dblclick") { // ignore clicks on controls
 		var _this = this;
 		this.container.addEventListener(type, function(event) {
-			if(event.target !== _this.mediaElement || event.offsetY + 25 > _this.height) return;
+			if(event.target !== _this.mediaElement || (_this.mediaElement.controls && event.offsetY + 25 > _this.height)) return;
 			handler(event);
 		}, false);
 	} else {
@@ -506,13 +506,13 @@ MediaPlayer.prototype.initTrackSelector = function() {
 	if(this.playlistLength > 1) leftOffset += 52;
 	
 	var showLoading = function() {
-		player.shadowDOM.controlsPanel.style.width = leftOffset + "px";
+		if(player.mediaElement.controls) player.shadowDOM.controlsPanel.style.width = leftOffset + "px";
 		player.shadowDOM.fullscreenButton.style.display = "none";
 		player.shadowDOM.volumeSliderContainer.style.display = "none";
 		player.shadowDOM.muteButton.style.display = "none";
 		player.shadowDOM.timelineContainer.style.display = "none";
-		container.style.setProperty("left", leftOffset + "px", "important");
-		container.style.setProperty("width", (player.width - leftOffset) + "px", "important");
+		if(player.mediaElement.controls) container.style.setProperty("left", leftOffset + "px", "important");
+		if(player.mediaElement.controls) container.style.setProperty("width", (player.width - leftOffset) + "px", "important");
 		container.classList.remove("CTPhidden");
 	};
 	
