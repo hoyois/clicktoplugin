@@ -72,6 +72,7 @@ addKiller("YouTube", {
 	var x, source;
 	for(var i = 0; i < fmtList.length; i++) {
 		x = parseFlashVariables(fmtList[i]);
+		if(!x.url) continue;
 		source = this.expandItag(x.itag);
 		if(source) {
 			source.url = decodeURIComponent(x.url) + "&title=" + flashvars.title + encodeURIComponent(" [" + source.format.split(" ")[0] + "]");
@@ -135,7 +136,7 @@ addKiller("YouTube", {
 		var xhr2 = new XMLHttpRequest();
 		xhr2.open("GET", match[0].replace(/\\/g, ""), true);
 		xhr2.addEventListener("load", function() {
-			match = /function [A-Za-z]+\(a\)\{a=a(?:\.split|\[[A-Za-z]+\])\(\"\"\);([^"]*)/.exec(xhr2.responseText);
+			match = /function [$_A-Za-z]+\(a\)\{a=a(?:\.split|\[[$_A-Za-z]+\])\(\"\"\);([^"]*)/.exec(xhr2.responseText);
 			if(!match) return;
 			_this.decoder[1] = [];
 			var a, regex = /\(([^\d\)]*)(\d*)\)|\[(\d+)\]/g;
