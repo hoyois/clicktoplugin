@@ -16,6 +16,11 @@ MediaPlayer.prototype.getURL = function(source) {
 	return this.playlist[this.currentTrack].sources[source].url;
 };
 
+MediaPlayer.prototype.getTitle = function() {
+	var title = this.playlist[this.currentTrack].title
+	return title ? title : "";
+};
+
 MediaPlayer.prototype.download = function(source) {
 	(settings.useDownloadManager ? sendToDownloadManager : downloadURL)(this.getURL(source));
 };
@@ -114,10 +119,10 @@ MediaPlayer.prototype.initPlaylistControls = function() {
 		if(event.target !== this) return; // click on trackSelector
 		var coord = _this.getCoordinates(event);
 		if(coord.y + 25 > _this.height && event.target.controls) { // click in controls
-			if(coord.x >= x + 6 && coord.x <= x + 25) {
+			if(coord.x >= x + 5 && coord.x <= x + 24) {
 				event.preventDefault();
 				_this.prevTrack();
-			} else if(coord.x >= x + 54 && coord.x <= x + 73) {
+			} else if(coord.x >= x + 53 && coord.x <= x + 72) {
 				event.preventDefault();
 				_this.nextTrack();
 			}
@@ -200,15 +205,23 @@ MediaPlayer.prototype.load = function(track, source, autoplay, updatePoster) {
 	// Pause first to prevent undesirable sound quirks
 	// Conditional needed, otherwise Webkit fails to reset autoplaying flag on initial load
 	if(!this.mediaElement.paused) this.mediaElement.pause();
+	
+	// Update internals
 	this.currentTrack = track;
 	this.currentSource = source;
+	
+	// Update control bar
+	this.shadowDOM.update();
+	this.trackSelector.update();
+	
+	// Finally, load the new source
 	this.mediaElement.src = this.playlist[track].sources[source].url;
 	if(updatePoster) this.updatePoster(); // must be done after setting src (#67900)
 	if(autoplay) {
 		this.mediaElement.preload = "auto";
 		this.mediaElement.autoplay = true;
+		this.mediaElement.load(); // makes the "Loading" text appear right away
 	}
-	this.trackSelector.update();
 	if(settings.instantAutoplay && this.mediaElement.autoplay) this.mediaElement.play();
 };
 
@@ -318,7 +331,6 @@ MediaPlayer.prototype.registerShortcuts = function() {
 		}
 		if(settings[x].trackSelector && (this.playlist[0].title || this.playlistLength > 1)) {
 			this.addEventListener(settings[x].trackSelector.type, function(event) {
-				if(_this.mediaElement.readyState === 0) return;
 				event.allowDefault = false;
 				if(testShortcut(event, settings[x].trackSelector)) {
 					_this.trackSelector.toggle();
@@ -361,52 +373,82 @@ ShadowDOM interface
 MediaPlayer.prototype.initShadowDOM = function() {
 	var sheet = this.container.appendChild(document.createElement("style")).sheet;
 	
-	// Status display is provided by trackSelector
-	sheet.insertRule("#" + this.mediaElement.id + "::-webkit-media-controls-status-display{display:none;}", 0);
+	// Hide status display in fullscreen
+	sheet.insertRule("#" + this.mediaElement.id + ":-webkit-full-screen::-webkit-media-controls-status-display{display:none;}", 0);
 	
-	var pseudoElements = {"controlsPanel": "-webkit-media-controls-panel", "playButton": "-webkit-media-controls-play-button", "muteButton": "-webkit-media-controls-mute-button", "volumeSliderContainer": "-webkit-media-controls-volume-slider-container", "rewindButton": "-webkit-media-controls-rewind-button", "fullscreenButton": "-webkit-media-controls-fullscreen-button", "timelineContainer": "-webkit-media-controls-timeline-container", "seekBackButton": "-webkit-media-controls-seek-back-button", "seekForwardButton": "-webkit-media-controls-seek-forward-button"};
+	var pseudoElements = {"controlsPanel": "-webkit-media-controls-panel", "statusDisplay": "-webkit-media-controls-status-display", "statusDisplayAfter": "-webkit-media-controls-status-display::after", "playButton": "-webkit-media-controls-play-button", "muteButton": "-webkit-media-controls-mute-button", "volumeSliderContainer": "-webkit-media-controls-volume-slider-container", "rewindButton": "-webkit-media-controls-rewind-button", "fullscreenButton": "-webkit-media-controls-fullscreen-button", "timelineContainer": "-webkit-media-controls-timeline-container", "seekBackButton": "-webkit-media-controls-seek-back-button", "seekForwardButton": "-webkit-media-controls-seek-forward-button"};
 	
-	this.shadowDOM = {};
+	var shadowDOM = {};
 	for(var e in pseudoElements) {
 		sheet.insertRule("#" + this.mediaElement.id + ":not(:-webkit-full-screen)::" + pseudoElements[e] + "{}", 0);
-		this.shadowDOM[e] = sheet.cssRules[0];
+		shadowDOM[e] = sheet.cssRules[0];
 	}
 	
-	this.shadowDOM.controlsPanel.style.position = "absolute"; // for height < 25 in Safari 6 (cf. mediaControls.css)
-	if(settings.hideRewindButton) this.shadowDOM.rewindButton.style.display = "none";
+	shadowDOM.controlsPanel.style.position = "absolute"; // for height < 25 in Safari 6 (cf. mediaControls.css)
+	if(settings.hideRewindButton) shadowDOM.rewindButton.style.display = "none";
+	
+	// Status display
+	shadowDOM.statusDisplay.style.textAlign = "left"; // set to "right" in UA stylesheet
+	shadowDOM.statusDisplay.style.whiteSpace = "pre";
+	shadowDOM.statusDisplay.style.textOverflow = "ellipsis";
+	shadowDOM.statusDisplayAfter.style.paddingLeft = "1ex";
+	
+	var _this = this;
+	shadowDOM.update = function() {
+		// Add title after status display
+		var text = "";
+		if(_this.playlistLength > 1) text += "[" + _this.printTrack(_this.currentTrack) + "/" + _this.playlistLength + "]\u2002";
+		text += _this.getTitle().replace(/'/g, "\\'");
+		this.statusDisplayAfter.style.content = "'" + text + "'";
+		
+		// Hide the timeline (WebKit fails to do so when loading a new source)
+		this.timelineContainer.style.display = "none";
+		// Show status display
+		this.statusDisplay.style.setProperty("display", "block", "important");
+	};
+	
+	this.mediaElement.addEventListener("loadedmetadata", function() {
+		// Remove !important from statusDisplay.style.display so WebKit can hide it if appropriate
+		shadowDOM.statusDisplay.style.removeProperty("display"); // see #45778
+		shadowDOM.statusDisplay.style.display = "block";
+		// Show the timeline
+		shadowDOM.timelineContainer.style.removeProperty("display");
+	}, false);
 	
 	if(this.playlistLength > 1) {
 		// Reorder controls
-		// Safari < 6.1
-		this.shadowDOM.controlsPanel.style.WebkitBoxDirection = "reverse";
-		this.shadowDOM.timelineContainer.style.WebkitBoxDirection = "normal";
-		this.shadowDOM.volumeSliderContainer.style.WebkitBoxDirection = "normal";
-		this.shadowDOM.rewindButton.style.WebkitBoxOrdinalGroup = "9";
-		this.shadowDOM.seekBackButton.style.WebkitBoxOrdinalGroup = "8";
-		this.shadowDOM.playButton.style.WebkitBoxOrdinalGroup = "7";
-		this.shadowDOM.seekForwardButton.style.WebkitBoxOrdinalGroup = "6";
-		this.shadowDOM.timelineContainer.style.WebkitBoxOrdinalGroup = "4";
-		this.shadowDOM.fullscreenButton.style.WebkitBoxOrdinalGroup = "1";
-		// Safari >= 6.1
-		this.shadowDOM.rewindButton.style.WebkitOrder = "-5";
-		this.shadowDOM.seekBackButton.style.WebkitOrder = "-4";
-		this.shadowDOM.playButton.style.WebkitOrder = "-3";
-		this.shadowDOM.seekForwardButton.style.WebkitOrder = "-2";
-		this.shadowDOM.timelineContainer.style.WebkitOrder = "-1";
-		this.shadowDOM.fullscreenButton.style.WebkitOrder = "1";
+		if("WebkitOrder" in document.documentElement.style) { // Safari >= 6.1
+			shadowDOM.rewindButton.style.WebkitOrder = "-6";
+			shadowDOM.seekBackButton.style.WebkitOrder = "-5";
+			shadowDOM.playButton.style.WebkitOrder = "-4";
+			shadowDOM.seekForwardButton.style.WebkitOrder = "-3";
+			shadowDOM.timelineContainer.style.WebkitOrder = "-1";
+			shadowDOM.fullscreenButton.style.WebkitOrder = "1";
+		} else { // Safari < 6.1
+			shadowDOM.controlsPanel.style.WebkitBoxDirection = "reverse";
+			shadowDOM.timelineContainer.style.WebkitBoxDirection = "normal";
+			shadowDOM.volumeSliderContainer.style.WebkitBoxDirection = "normal";
+			shadowDOM.rewindButton.style.WebkitBoxOrdinalGroup = "9";
+			shadowDOM.seekBackButton.style.WebkitBoxOrdinalGroup = "8";
+			shadowDOM.playButton.style.WebkitBoxOrdinalGroup = "7";
+			shadowDOM.seekForwardButton.style.WebkitBoxOrdinalGroup = "6";
+			shadowDOM.statusDisplay.style.WebkitBoxOrdinalGroup = "5";
+			shadowDOM.timelineContainer.style.WebkitBoxOrdinalGroup = "4";
+			shadowDOM.fullscreenButton.style.WebkitBoxOrdinalGroup = "1";
+		}
 		
 		// Show back/forward buttons
-		this.shadowDOM.seekBackButton.style.display = "-webkit-box"; // Safari < 6.1
-		this.shadowDOM.seekBackButton.style.display = "-webkit-flex"; // Safari >= 6.1
-		this.shadowDOM.seekBackButton.style.marginLeft = "6px";
-		this.shadowDOM.seekBackButton.style.width = "20px";
-		this.shadowDOM.seekBackButton.style.height = "12px";
-		this.shadowDOM.seekForwardButton.style.display = "-webkit-box"; // Safari < 6.1
-		this.shadowDOM.seekForwardButton.style.display = "-webkit-flex"; // Safari >= 6.1
-		this.shadowDOM.seekForwardButton.style.marginLeft = "6px";
-		this.shadowDOM.seekForwardButton.style.width = "20px";
-		this.shadowDOM.seekForwardButton.style.height = "12px";
+		shadowDOM.seekBackButton.style.display = "block";
+		shadowDOM.seekBackButton.style.marginLeft = "5px";
+		shadowDOM.seekBackButton.style.width = "20px";
+		shadowDOM.seekBackButton.style.height = "12px";
+		shadowDOM.seekForwardButton.style.display = "block";
+		shadowDOM.seekForwardButton.style.marginLeft = "5px";
+		shadowDOM.seekForwardButton.style.width = "20px";
+		shadowDOM.seekForwardButton.style.height = "12px";
 	}
+	
+	this.shadowDOM = shadowDOM;
 };
 
 /***********************
@@ -473,11 +515,11 @@ MediaPlayer.prototype.initSourceSelector = function() {
 			if(settings.showSiteSource && media.siteInfo) append(media.siteInfo.name, clickSite, media.siteInfo.url);
 			if(settings.showQTPSource && player.currentSource !== undefined) append(QT_PLAYER, clickQTP);
 			if(settings.showAirPlaySource && player.currentSource !== undefined) append("AirPlay", clickAirPlay);
-
+			
 			// Unhide if it doesn't overflow
 			if(list.childNodes.length > 0 && container.offsetWidth + 10 < player.width && container.offsetHeight + (player.mediaElement ? 35 : 10) < player.height) container.classList.remove("CTPhidden");
 		},
-
+		
 		"setSource": function(i) {
 			list.childNodes[player.currentSource].classList.remove("CTPcurrentSource");
 			list.childNodes[i].classList.add("CTPcurrentSource");
@@ -493,38 +535,10 @@ MediaPlayer.prototype.initTrackSelector = function() {
 	var player = this;
 	var container = document.createElement("div");
 	container.className = "CTPtrackSelector CTPhidden";
-	var status = document.createElement("div");
-	status.className = "CTPstatusDisplay";
 	var selector = document.createElement("select");
 	selector.className = "CTPtrackList";
 	
-	container.appendChild(status)
 	container.appendChild(selector);
-	
-	var leftOffset = 53;
-	if(settings.hideRewindButton) leftOffset -= 26;
-	if(this.playlistLength > 1) leftOffset += 52;
-	
-	var showLoading = function() {
-		if(player.mediaElement.controls) player.shadowDOM.controlsPanel.style.width = leftOffset + "px";
-		player.shadowDOM.fullscreenButton.style.display = "none";
-		player.shadowDOM.volumeSliderContainer.style.display = "none";
-		player.shadowDOM.muteButton.style.display = "none";
-		player.shadowDOM.timelineContainer.style.display = "none";
-		if(player.mediaElement.controls) container.style.setProperty("left", leftOffset + "px", "important");
-		if(player.mediaElement.controls) container.style.setProperty("width", (player.width - leftOffset) + "px", "important");
-		container.classList.remove("CTPhidden");
-	};
-	
-	var hideLoading = function() {
-		container.classList.add("CTPhidden");
-		player.shadowDOM.timelineContainer.style.removeProperty("display");
-		player.shadowDOM.muteButton.style.removeProperty("display");
-		player.shadowDOM.volumeSliderContainer.style.removeProperty("display");
-		player.shadowDOM.fullscreenButton.style.removeProperty("display");
-		player.shadowDOM.controlsPanel.style.removeProperty("width");
-		status.textContent = "";
-	};
 	
 	var show = function() {
 		player.shadowDOM.controlsPanel.style.display = "none";
@@ -545,16 +559,11 @@ MediaPlayer.prototype.initTrackSelector = function() {
 			if(container.classList.contains("CTPhidden")) show();
 			else hide();
 		},
-		
 		"update": function() {
-			if(player.shadowDOM.controlsPanel.style.display === "none") hide();
 			selector.value = player.currentTrack;
-			if(player.mediaElement.preload !== "none") status.textContent = LOADING + " "; // en-space
-			showLoading();
 		},
 	};
 	
-	this.mediaElement.addEventListener("loadedmetadata", hideLoading, false);
 	this.container.appendChild(container);
 	
 	if(this.playlistLength === 1) {
@@ -590,8 +599,10 @@ MediaPlayer.prototype.initTrackSelector = function() {
 	
 	selector.addEventListener("change", function(event) {
 		player.loadTrack(parseInt(event.target.value));
+		hide();
 		player.container.focus();
 	}, false);
+	
 	if(settings.keys.trackSelector) { // override keydown shortcuts
 		selector.addEventListener("keydown", function(event) {
 			if((event.keyIdentifier === "U+0020" || event.keyIdentifier === "Up" || event.keyIdentifier === "Down") && !event.shiftKey && !event.metaKey && !event.altKey && !event.ctrlKey) event.allowDefault = true;

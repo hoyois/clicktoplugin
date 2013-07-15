@@ -264,7 +264,6 @@ Media player
 	right: 0 !important;
 }
 
-.CTPmediaPlayer .CTPstatusDisplay,
 .CTPmediaPlayer .CTPtrackList {
 	position: static !important;
 	
@@ -272,12 +271,14 @@ Media player
 	display: -webkit-box !important;
 	-webkit-box-align: center !important;
 	-webkit-box-direction: normal !important;
+	-webkit-box-flex: 1 !important;
 	-webkit-box-orient: horizontal !important;
 	-webkit-box-pack: start !important;
 	
 	/* Safari >= 6.1 */
 	display: -webkit-flex !important;
 	-webkit-align-items: center !important;
+	-webkit-flex: 1 !important;
 	-webkit-flex-direction: row !important;
 	-webkit-justify-content: flex-start !important;
 	
@@ -287,32 +288,11 @@ Media player
 	font-size: 10px !important;
 	height: inherit !important;
 	opacity: 1 !important;
+	overflow: hidden !important;
+	text-overflow: ellipsis !important;
 	text-shadow: black 0 1px 1px !important;
 	white-space: pre !important;
 	width: auto !important;
-}
-
-.CTPmediaPlayer .CTPstatusDisplay {
-	
-	/* Safari < 6.1 */
-	-webkit-box-flex: 0 !important;
-	
-	/* Safari >= 6.1 */
-	-webkit-flex: none !important;
-	
-	pointer-events: none !important;
-}
-
-.CTPmediaPlayer .CTPtrackList {
-	
-	/* Safari < 6.1 */
-	-webkit-box-flex: 1 !important;
-	
-	/* Safari >= 6.1 */
-	-webkit-flex: 1 !important;
-	
-	overflow: hidden !important;
-	text-overflow: ellipsis !important;
 }
 
 .CTPsourceSelector * {
@@ -394,7 +374,6 @@ Media player
 	cursor: default !important;
 }
 
-/* Should use CSS3 ::marker here */
 .CTPsourceSelector .CTPsourceItem::before {
 	content: "" !important;
 }

@@ -2,7 +2,7 @@
 
 // In iframes with src="javascript:...", safari is undefined
 var w = window;
-while(w.safari === undefined) w = w.parent;
+while(w.safari === undefined && w !== window.top) w = w.parent;
 var safari = w.safari;
 var href = w.location.href;
 
@@ -191,7 +191,7 @@ function handleBeforeLoadEvent(event) {
 		return;
 	}
 	
-	// Initialize settings and global shortcuts
+	// Initialize settings
 	if(documentID === undefined) {
 		documentID = response.documentID;
 		settings = response.settings;
