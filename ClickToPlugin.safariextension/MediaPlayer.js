@@ -542,8 +542,6 @@ MediaPlayer.prototype.initTrackSelector = function() {
 	
 	var show = function() {
 		player.shadowDOM.controlsPanel.style.display = "none";
-		container.style.setProperty("left", "0px", "important");
-		container.style.setProperty("width", "inherit", "important");
 		container.classList.remove("CTPhidden");
 		selector.focus();
 	};
