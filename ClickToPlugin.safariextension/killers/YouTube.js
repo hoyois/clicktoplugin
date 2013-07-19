@@ -1,3 +1,13 @@
+// SITE-SPECIFIC HACK for ClickToPlugin
+// Prevents YouTube from removing the Flash player and disables SPF
+if(window.safari) {
+	var script = "\
+		var s = document.createElement('script');\
+		s.textContent = 'window.ytplayer=window.ytplayer||{};ytplayer.config=ytplayer.config||{};Object.defineProperty(ytplayer.config,\"min_version\",{\"value\":\"0.0.0\"});window.ytspf=window.ytspf||{};Object.defineProperty(ytspf,\"enabled\",{\"value\":false});';\
+		document.head.appendChild(s);";
+	safari.extension.addContentScript(script, ["http://www.youtube.com/*", "https://www.youtube.com/*"], [], true);
+}
+
 addKiller("YouTube", {
 
 "playlistFilter": /^UL|^PL|^SP|^AL/,
@@ -60,26 +70,30 @@ addKiller("YouTube", {
 },
 
 "processFlashVars": function(flashvars, callback) {
-	if(flashvars.ps === "live") return;
+	if(flashvars.ps === "live" && !flashvars.hlsvp) return;
 	
-	if(this.decoder[1] === null && !/%2[6C]sig%3D/.test(flashvars.url_encoded_fmt_stream_map)) {
+	if(this.decoder[1] === null && /%2[6C]s%3D/.test(flashvars.url_encoded_fmt_stream_map)) {
 		this.updateDecoder(flashvars, callback);
 		return;
 	}
 	
-	var fmtList = decodeURIComponent(flashvars.url_encoded_fmt_stream_map).split(",");
 	var sources = [];
-	var x, source;
-	for(var i = 0; i < fmtList.length; i++) {
-		x = parseFlashVariables(fmtList[i]);
-		if(!x.url) continue;
-		source = this.expandItag(x.itag);
-		if(source) {
-			source.url = decodeURIComponent(x.url) + "&title=" + flashvars.title + encodeURIComponent(" [" + source.format.split(" ")[0] + "]");
-			if(x.sig) source.url += "&signature=" + x.sig;
-			else if(x.s) source.url += "&signature=" + this.decodeSignature(x.s);
-			sources.push(source);
+	if(flashvars.url_encoded_fmt_stream_map) {
+		var fmtList = decodeURIComponent(flashvars.url_encoded_fmt_stream_map).split(",");
+		var x, source;
+		for(var i = 0; i < fmtList.length; i++) {
+			x = parseFlashVariables(fmtList[i]);
+			if(!x.url) continue;
+			source = this.expandItag(x.itag);
+			if(source) {
+				source.url = decodeURIComponent(x.url) + "&title=" + flashvars.title + encodeURIComponent(" [" + source.format.split(" ")[0] + "]");
+				if(x.sig) source.url += "&signature=" + x.sig;
+				else if(x.s) source.url += "&signature=" + this.decodeSignature(x.s);
+				sources.push(source);
+			}
 		}
+	} else if(flashvars.hlsvp) {
+		sources.push({"url": decodeURIComponent(flashvars.hlsvp), "format": "M3U8", "isNative": true});
 	}
 	
 	var posterURL, title;
@@ -111,17 +125,16 @@ addKiller("YouTube", {
 
 "decodeSignature": function(s) {
 	s = s.split("");
-	var swap = function(i) {
+	var swap = function(n) {
 	    var t = s[0];
-	    s[0] = s[i%s.length];
-	    s[i] = t;
+	    s[0] = s[n%s.length];
+	    s[n] = t;
 	};
 	for(var i = 0; i < this.decoder[1].length; i++) {
-		switch(this.decoder[1][i][0]) {
-		case 0: s = s.reverse(); break;
-		case 1: s = s.slice(this.decoder[1][i][1]); break;
-		case 2: swap(this.decoder[1][i][1]); break;
-		}
+		var n = this.decoder[1][i];
+		if(n === 0) s = s.reverse();
+		else if(n < 0) s = s.slice(-n);
+		else swap(n);
 	}
 	return s.join("");
 },
@@ -144,9 +157,9 @@ addKiller("YouTube", {
 				var n = a[3] || a[2];
 				if(n === "0") continue;
 				if(a[1] === "") {
-					if(n === "") _this.decoder[1].push([0]);
-					else _this.decoder[1].push([1, parseInt(n)]);
-				} else _this.decoder[1].push([2, parseInt(n)]);
+					if(n === "") _this.decoder[1].push(0);
+					else _this.decoder[1].push(-parseInt(n));
+				} else _this.decoder[1].push(parseInt(n));
 			}
 			_this.processFlashVars(flashvars, callback);
 		}, false);
@@ -161,7 +174,7 @@ addKiller("YouTube", {
 	xhr.open("GET", "https://www.youtube.com/get_video_info?&video_id=" + videoID + "&eurl=http%3A%2F%2Fwww%2Eyoutube%2Ecom%2F", true);
 	xhr.addEventListener("load", function() {
 		var flashvars = parseFlashVariables(xhr.responseText);
-		if(flashvars.status === "ok" && flashvars.ps !== "live") {
+		if(flashvars.status === "ok") {
 			var callbackForEmbed = function(mediaData) {
 				mediaData.playlist[0].siteInfo = {"name": "YouTube", "url": "https://www.youtube.com/watch?v=" + videoID};
 				callback(mediaData);
@@ -253,7 +266,7 @@ addKiller("YouTube", {
 		};
 		
 		// load the first video at once
-		if(flashvars.url_encoded_fmt_stream_map) _this.processFlashVars(flashvars, callbackForPlaylist);
+		if(flashvars.url_encoded_fmt_stream_map || flashvars.hlsvp) _this.processFlashVars(flashvars, callbackForPlaylist);
 		else _this.processVideoID(videoIDList[0], callbackForPlaylist);
 		videoIDList.shift();
 		unloadList();
