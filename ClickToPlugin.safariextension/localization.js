@@ -13,7 +13,7 @@ var PREFERENCES_STRINGS = {
 		"ja-jp": ["nav{padding-right:1px;}", "#general li > span:first-child{max-width:250px;}"],
 		"zh-tw": ["nav{padding-right:1px;}"],
 		"zh-cn": [],
-		"pl-pl": []
+		"pl-pl": ["#control_lists li:nth-child(-n+2) span.textarea_label > label {min-width:230px;}"]
 	},
 	"PREFERENCES_TITLE": {
 		"en-us": "ClickToPlugin Preferences",
@@ -233,7 +233,7 @@ var PREFERENCES_STRINGS = {
 		"ja-jp": "HTML5の置き換えに問題が発生する場合はプラグインに戻す",
 		"zh-tw": "當外掛模組不能被轉換成 HTML5 時重新載入外掛模組",
 		"zh-cn": "当HTML5替代失败时重新加载插件",
-		"pl-pl": "Użyj wtyczki, gdy konwersja na HTML5 się nie powiedzie"
+		"pl-pl": "Użyj wtyczki, gdy konwersja się nie powiedzie"
 	},
 	"USE_FALLBACK_MEDIA": {
 		"en-us": "Use HTML5 media fallbacks",
@@ -343,7 +343,7 @@ var PREFERENCES_STRINGS = {
 		"ja-jp": function(text) {return "情報：" + text;},
 		"zh-tw": function(text) {return "詳細資料：" + text;},
 		"zh-cn": function(text) {return "细节: " + text;},
-		"pl-pl": function(file) {return "Opis: " + file;}
+		"pl-pl": function(text) {return "Opis: " + text;}
 	},
 	
 	// Control lists tab
@@ -590,7 +590,7 @@ var PREFERENCES_STRINGS = {
 		"ja-jp": "直接に再生",
 		"zh-tw": "即時播放",
 		"zh-cn": "立即播放",
-		"pl-pl": "Natychmiastowe autoodtwarzanie"
+		"pl-pl": "Natychmiastowe auto odtwarzanie"
 	},
 	"DEFAULT_RESOLUTION": {
 		"en-us": "Default resolution:",
@@ -796,7 +796,7 @@ var PREFERENCES_STRINGS = {
 		"ja-jp": "ClickToPlugin を有効／無効にする",
 		"zh-tw": "啟用或停用 ClickToPlugin",
 		"zh-cn": "启用/停用 ClickToPlugin",
-		"pl-pl": "Aktywuj/deaktywuj ClickToPlugin"
+		"pl-pl": "Aktywuj/dezaktywuj ClickToPlugin"
 	},
 	"ALWAYS_ALLOW_CONTEXT": {
 		"en-us": "Always Allow",
@@ -1062,7 +1062,7 @@ var PREFERENCES_STRINGS = {
 		"ja-jp": "次のトラック：",
 		"zh-tw": "下一個音軌：",
 		"zh-cn": "下一个曲目:",
-		"pl-pl": "Następna ścieżka"
+		"pl-pl": "Następna ścieżka:"
 	},
 	"TRACK_SELECTOR_SHORTCUT": {
 		"en-us": "Show/hide track selector:",
@@ -1114,7 +1114,7 @@ var GLOBAL_STRINGS = {
 		"ja-jp": "ClickToPlugin を無効",
 		"zh-tw": "停用 ClickToPlugin",
 		"zh-cn": "停用 ClickToPlugin",
-		"pl-pl": "Deaktywuj ClickToPlugin"
+		"pl-pl": "Dezaktywuj ClickToPlugin"
 	},
 	"LOAD_ALL_PLUGINS": {
 		"en-us": "Load All Plug-ins",
@@ -1186,7 +1186,7 @@ var GLOBAL_STRINGS = {
 		"ja-jp": "あらゆる許可",
 		"zh-tw": "永遠允許",
 		"zh-cn": "以后都准许",
-		"pl-pl": "Zawsze zezewalaj"
+		"pl-pl": "Zawsze zezwalaj"
 	},
 	"ALWAYS_HIDE_ON_DOMAIN": {
 		"en-us": "Hide Plug-ins on Domain",
