@@ -12,7 +12,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": ["#general li > span:first-child{max-width:170px;}", "#media_player li > span.textarea_label > label{max-width:180px;}"],
 		"ja-jp": ["nav{padding-right:1px;}", "#general li > span:first-child{max-width:250px;}"],
 		"zh-tw": ["nav{padding-right:1px;}"],
-		"zh-cn": []
+		"zh-cn": [],
+		"pl-pl": []
 	},
 	"PREFERENCES_TITLE": {
 		"en-us": "ClickToPlugin Preferences",
@@ -23,7 +24,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "ClickToPlugin-Einstellungen",
 		"ja-jp": "ClickToPlugin 設定",
 		"zh-tw": "ClickToPlugin 偏好設定",
-		"zh-cn": "ClickToPlugin 設定"
+		"zh-cn": "ClickToPlugin 設定",
+		"pl-pl": "Ustawienia ClickToPlugin"
 	},
 	
 	// Tabs
@@ -36,7 +38,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Allgemein",
 		"ja-jp": "一般",
 		"zh-tw": "一般",
-		"zh-cn": "通用"
+		"zh-cn": "通用",
+		"pl-pl": "Ogólne"
 	},
 	"PLUGINS_TAB": {
 		"en-us": "Plug-ins",
@@ -47,7 +50,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Plug-Ins",
 		"ja-jp": "プラグイン",
 		"zh-tw": "外掛模組",
-		"zh-cn": "插件"
+		"zh-cn": "插件",
+		"pl-pl": "Wtyczki"
 	},
 	"CONTROL_LISTS_TAB": {
 		"en-us": "Control lists",
@@ -58,7 +62,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Filterregeln",
 		"ja-jp": "制御リスト",
 		"zh-tw": "控制表",
-		"zh-cn": "控制表"
+		"zh-cn": "控制表",
+		"pl-pl": "Listy wyjątków"
 	},
 	"MEDIA_TAB": {
 		"en-us": "Media player",
@@ -69,7 +74,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Media-Player",
 		"ja-jp": "プレーヤー",
 		"zh-tw": "影片播放器",
-		"zh-cn": "视频播放器"
+		"zh-cn": "视频播放器",
+		"pl-pl": "Odtwarzacz mediów"
 	},
 	"CONTEXT_MENU_TAB": {
 		"en-us": "Shortcut menu",
@@ -80,7 +86,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Kontextmenü",
 		"ja-jp": "コンテキストメニュー",
 		"zh-tw": "快顯功能表",
-		"zh-cn": "快显菜单"
+		"zh-cn": "快显菜单",
+		"pl-pl": "Menu kontekstowe"
 	},
 	"SHORTCUTS_TAB": {
 		"en-us": "Keyboard shortcuts",
@@ -91,7 +98,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Keyboard-Shortcuts",
 		"ja-jp": "ショートカット",
 		"zh-tw": "鍵盤快速鍵",
-		"zh-cn": "快捷键"
+		"zh-cn": "快捷键",
+		"pl-pl": "Skróty klawiszowe"
 	},
 	
 	// General tab
@@ -104,7 +112,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Platzhalter-Transparenz",
 		"ja-jp": "プレイスホールダーの不透明度",
 		"zh-tw": "佔位符不透明度",
-		"zh-cn": "占位符不透明度"
+		"zh-cn": "占位符不透明度",
+		"pl-pl": "Nieprzezroczystość zastępczego obrazka:"
 	},
 	"SHOW_TOOLTIP": {
 		"en-us": "Show plug-in source as tooltip",
@@ -115,7 +124,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Plug-In-Quelle im Tooltip anzeigen",
 		"ja-jp": "ツールチップとしてプラグインのソースを表示する",
 		"zh-tw": "以快顯視窗顯示外掛模組來源",
-		"zh-cn": "在工具提示控件显示插件来源"
+		"zh-cn": "在工具提示控件显示插件来源",
+		"pl-pl": "Pokaż adres źródłowy w etykietce"
 	},
 	"ALLOW_INVISIBLE_PLUGINS": {
 		"en-us": "Allow invisible plug-ins",
