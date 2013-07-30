@@ -306,7 +306,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Folgende Plug-Ins automatisch laden:",
 		"ja-jp": "これらのプラグインを有効にする：",
 		"zh-tw": "允許載入這些外掛模組：",
-		"zh-cn": "加载这些插件:"
+		"zh-cn": "加载这些插件:",
+		"pl-pl": "Ładuj te wtyczki automatycznie:"
 	},
 	"NO_PLUGINS_NOTICE": {
 		"en-us": "You currently have no enabled plug-ins!",
@@ -317,7 +318,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Sie haben aktuell keine Plug-Ins aktiviert!",
 		"ja-jp": "有効されているプラグインは見つかりませんでした。",
 		"zh-tw": "現在沒有被啟用的外掛模組。",
-		"zh-cn": "没有已激活的插件。"
+		"zh-cn": "没有已激活的插件。",
+		"pl-pl": "Nie masz włączonych wtyczek."
 	},
 	"PLUGIN_FILENAME": {
 		"en-us": function(file) {return "From file: " + file;},
@@ -328,7 +330,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": function(file) {return "Von Datei: " + file;},
 		"ja-jp": function(file) {return "ファイルから：" + file;},
 		"zh-tw": function(file) {return "從檔案：" + file;},
-		"zh-cn": function(file) {return "从文件: " + file;}
+		"zh-cn": function(file) {return "从文件: " + file;},
+		"pl-pl": function(file) {return "Plik wtyczki: " + file;}
 	},
 	"PLUGIN_DESCRIPTION": {
 		"en-us": function(text) {return "Description: " + text;},
@@ -339,7 +342,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": function(text) {return "Beschreibung: " + text;},
 		"ja-jp": function(text) {return "情報：" + text;},
 		"zh-tw": function(text) {return "詳細資料：" + text;},
-		"zh-cn": function(text) {return "细节: " + text;}
+		"zh-cn": function(text) {return "细节: " + text;},
+		"pl-pl": function(file) {return "Opis: " + file;}
 	},
 	
 	// Control lists tab
@@ -352,7 +356,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Plug-Ins auf folgenden Seiten erlauben:",
 		"ja-jp": "これらのサイトならプラグインの読み込みを許可：",
 		"zh-tw": "永遠載入包含這些網址的外掛模組：",
-		"zh-cn": "永远加载这些地址的插件:"
+		"zh-cn": "永远加载这些地址的插件:",
+		"pl-pl": "Zezwól na wtyczki na tych stronach:"
 	},
 	"ALLOW_SOURCES": {
 		"en-us": "Allow plug-ins from these sources:",
@@ -363,7 +368,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Plug-Ins von folgenden Quellen erlauben:",
 		"ja-jp": "これらのソースならプラグインの読み込みを許可：",
 		"zh-tw": "永遠載入包含這些來源的外掛模組：",
-		"zh-cn": "永远加载这些来源的插件:"
+		"zh-cn": "永远加载这些来源的插件:",
+		"pl-pl": "Zezwól na wtyczki z tych źródeł:"
 	},
 	"BLOCK_LOCATIONS": {
 		"en-us": "Block plug-ins on these sites:",
@@ -374,7 +380,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Plug-Ins auf folgenden Seiten blockieren:",
 		"ja-jp": "これらのサイトならプラグイン読み込むことを抑止：",
 		"zh-tw": "阻擋包含這些網址的外掛模組：",
-		"zh-cn": "永远屏蔽这些地址的插件:"
+		"zh-cn": "永远屏蔽这些地址的插件:",
+		"pl-pl": "Blokuj wtyczki na tych stronach:"
 	},
 	"BLOCK_SOURCES": {
 		"en-us": "Block plug-ins from these sources:",
@@ -385,7 +392,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Plug-Ins von folgenden Quellen blockieren:",
 		"ja-jp": "これらのソースならプラグイン読み込むことを抑止：",
 		"zh-tw": "阻擋這些來源的外掛模組：",
-		"zh-cn": "永远屏蔽这些来源的插件:"
+		"zh-cn": "永远屏蔽这些来源的插件:",
+		"pl-pl": "Blokuj wtyczki z tych źródeł:"
 	},
 	"INVERT_WHITELISTS": {
 		"en-us": "Invert lists",
@@ -396,7 +404,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Listen invertieren",
 		"ja-jp": "逆にする",
 		"zh-tw": "逆向操作",
-		"zh-cn": "反转清单"
+		"zh-cn": "反转清单",
+		"pl-pl": "Odwróć listy"
 	},
 	"HIDE_LOCATIONS": {
 		"en-us": "Hide plug-ins on these sites:",
@@ -407,7 +416,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Plug-Ins auf folgenden Seiten verstecken:",
 		"ja-jp": "これらのサイトならプラグインを隠す：",
 		"zh-tw": "隱藏包含這些網址的外掛模組：",
-		"zh-cn": "隐藏这些地址的插件:"
+		"zh-cn": "隐藏这些地址的插件:",
+		"pl-pl": "Ukryj wtyczki na tych stronach:"
 	},
 	"HIDE_SOURCES": {
 		"en-us": "Hide plug-ins from these sources:",
@@ -418,7 +428,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Plug-Ins von folgenden Quellen verstecken:",
 		"ja-jp": "これらのソースならプラグインを隠す：",
 		"zh-tw": "隱藏這些來源的外掛模組：",
-		"zh-cn": "隐藏这些来源的插件:"
+		"zh-cn": "隐藏这些来源的插件:",
+		"pl-pl": "Ukryj wtyczki z tych źródeł:"
 	},
 	"SHOW_LOCATIONS": {
 		"en-us": "Show plug-ins on these sites:",
@@ -429,7 +440,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Plug-Ins auf folgenden Seiten anzeigen:",
 		"ja-jp": "これらのサイトならプラグインを表示する：",
 		"zh-tw": "顯示包含這些網址的外掛模組：",
-		"zh-cn": "显示这些地址的插件:"
+		"zh-cn": "显示这些地址的插件:",
+		"pl-pl": "Pokaż wtyczki na tych stronach:"
 	},
 	"SHOW_SOURCES": {
 		"en-us": "Show plug-ins from these sources:",
@@ -440,7 +452,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Plug-Ins von folgenden Quellen anzeigen:",
 		"ja-jp": "これらのソースならプラグインを表示する：",
 		"zh-tw": "顯示這些來源的外掛模組：",
-		"zh-cn": "永远显示这些来源的插件:"
+		"zh-cn": "永远显示这些来源的插件:",
+		"pl-pl": "Pokaż wtyczki z tych źródeł:"
 	},
 	"INVERT_BLACKLISTS": {
 		"en-us": "Invert lists",
@@ -451,7 +464,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Listen invertieren",
 		"ja-jp": "逆にする",
 		"zh-tw": "逆向操作",
-		"zh-cn": "反转清单"
+		"zh-cn": "反转清单",
+		"pl-pl": "Odwróć listy"
 	},
 	
 	// Media player tab
