@@ -136,7 +136,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Unsichtbare Plug-Ins erlauben",
 		"ja-jp": "不可視プラグインを有効にする",
 		"zh-tw": "載入不可見的外掛模組",
-		"zh-cn": "加载不可見的插件"
+		"zh-cn": "加载不可見的插件",
+		"pl-pl": "Zezwól na niewidoczne wtyczki"
 	},
 	"DEBUG_MODE": {
 		"en-us": "Block plug-ins manually",
@@ -147,7 +148,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Plug-Ins manuell blockieren",
 		"ja-jp": "手動的にプラグインを抑止する",
 		"zh-tw": "手動阻擋外掛模組",
-		"zh-cn": "手动屏蔽插件"
+		"zh-cn": "手动屏蔽插件",
+		"pl-pl": "Blokuj wtyczki ręcznie"
 	},
 	"SIFR_POLICY": {
 		"en-us": "sIFR text policy:",
@@ -158,7 +160,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "sIFR-Richtlinie:",
 		"ja-jp": "sIFR テキスト設定：",
 		"zh-tw": "sIFR 文字設定：",
-		"zh-cn": "sIFR 文字:"
+		"zh-cn": "sIFR 文字:",
+		"pl-pl": "Tekst sIFR:"
 	},
 	"SIFR_TEXT_ONLY": {
 		"en-us": "Show text only",
@@ -169,7 +172,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Nur Text anzeigen",
 		"ja-jp": "テキストのみを表示",
 		"zh-tw": "只顯示文字",
-		"zh-cn": "只显示文本"
+		"zh-cn": "只显示文本",
+		"pl-pl": "Tylko pokaż tekst"
 	},
 	"SIFR_NORMAL": {
 		"en-us": "Treat as regular Flash",
@@ -180,7 +184,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Als normales Flash behandeln",
 		"ja-jp": "Flash として扱う",
 		"zh-tw": "當作一般 Flash",
-		"zh-cn": "当作一般 Flash"
+		"zh-cn": "当作一般 Flash",
+		"pl-pl": "Traktuj jak wtyczkę Flash"
 	},
 	"SIFR_AUTOLOAD": {
 		"en-us": "Load automatically",
@@ -191,7 +196,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Automatisch laden",
 		"ja-jp": "自動的に読み込む",
 		"zh-tw": "自動載入",
-		"zh-cn": "自动加载"
+		"zh-cn": "自动加载",
+		"pl-pl": "Ładuj automatycznie"
 	},
 	"KILLER_SCRIPTS": {
 		"en-us": "Plug-in to HTML5 conversion scripts:",
@@ -202,7 +208,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Scripte zum umwandeln von Plug-Ins zu HTML5:",
 		"ja-jp": "これらのスクリプトを使用してHTML5の置き換えを実行する：",
 		"zh-tw": "使用這些腳本進行HTML5取代：",
-		"zh-cn": "使用这些脚本进行HTML5替代:"
+		"zh-cn": "使用这些脚本进行HTML5替代:",
+		"pl-pl": "Skrypty konwersji wtyczek na HTML5:"
 	},
 	"DEFAULT_KILLERS_BUTTON": {
 		"en-us": "Use default",
@@ -213,7 +220,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Zurücksetzen",
 		"ja-jp": "デフォルトに戻す",
 		"zh-tw": "使用預設值",
-		"zh-cn": "还原默认值"
+		"zh-cn": "还原默认值",
+		"pl-pl": "Przywróć domyślne"
 	},
 	"LOAD_PLUGIN_IF_NOT_KILLED": {
 		"en-us": "Load plug-in if HTML5 conversion fails",
@@ -224,7 +232,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Lade Plug-in wenn HTML5-Umwandlung fehlschlägt",
 		"ja-jp": "HTML5の置き換えに問題が発生する場合はプラグインに戻す",
 		"zh-tw": "當外掛模組不能被轉換成 HTML5 時重新載入外掛模組",
-		"zh-cn": "当HTML5替代失败时重新加载插件"
+		"zh-cn": "当HTML5替代失败时重新加载插件",
+		"pl-pl": "Użyj wtyczki, gdy konwersja na HTML5 się nie powiedzie"
 	},
 	"USE_FALLBACK_MEDIA": {
 		"en-us": "Use HTML5 media fallbacks",
@@ -235,7 +244,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "HTML5-Media-Fallbacks benutzen",
 		"ja-jp": "HTML5 のフォールバックセクションを有効にする",
 		"zh-tw": "使用 HTML5 的後備（Fallback）機制",
-		"zh-cn": "使用 HTML5 的应变（Fallback）计划"
+		"zh-cn": "使用 HTML5 的应变（Fallback）计划",
+		"pl-pl": "Zastępcze pliki dla mediów HTML5"
 	},
 	"DOWNLOADING": {
 		"en-us": "Downloading:",
@@ -246,7 +256,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Download:",
 		"ja-jp": "ダウンロード：",
 		"zh-tw": "下載：",
-		"zh-cn": "下载:"
+		"zh-cn": "下载:",
+		"pl-pl": "Pobieranie"
 	},
 	"USE_DOWNLOAD_MANAGER": {
 		"en-us": "Use a download manager",
@@ -257,7 +268,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Downloadmanager benutzen",
 		"ja-jp": "ダウンロードマネージャーを使う",
 		"zh-tw": "啟用下載管理程式",
-		"zh-cn": "启用下载管理工具"
+		"zh-cn": "启用下载管理工具",
+		"pl-pl": "Użyj menedżera pobierania"
 	},
 	"AIRPLAY_HOSTNAME": {
 		"en-us": "AirPlay device hostname:",
@@ -268,7 +280,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "AirPlay-Geräte-Hostname:",
 		"ja-jp": "AirPlay ホスト名：",
 		"zh-tw": "AirPlay 主機名稱：",
-		"zh-cn": "AirPlay 主机名称:"
+		"zh-cn": "AirPlay 主机名称:",
+		"pl-pl": "Host urządzenia AirPlay:"
 	},
 	"AIRPLAY_PASSWORD": {
 		"en-us": "AirPlay password:",
@@ -279,7 +292,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "AirPlay-Passwort:",
 		"ja-jp": "AirPlay パスワード：",
 		"zh-tw": "AirPlay 密碼：",
-		"zh-cn": "AirPlay 密码:"
+		"zh-cn": "AirPlay 密码:",
+		"pl-pl": "Hasło AirPlay:"
 	},
 	
 	// Plug-ins tab
