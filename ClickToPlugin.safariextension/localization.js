@@ -257,7 +257,7 @@ var PREFERENCES_STRINGS = {
 		"ja-jp": "ダウンロード：",
 		"zh-tw": "下載：",
 		"zh-cn": "下载:",
-		"pl-pl": "Pobieranie"
+		"pl-pl": "Pobieranie:"
 	},
 	"USE_DOWNLOAD_MANAGER": {
 		"en-us": "Use a download manager",
@@ -478,7 +478,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Standard Media-Player:",
 		"ja-jp": "デフォルトプレーヤー：",
 		"zh-tw": "預設播放器：",
-		"zh-cn": "默认播放器:"
+		"zh-cn": "默认播放器:",
+		"pl-pl": "Domyślny odtwarzacz mediów:"
 	},
 	// "HTML5_PLAYER": {} // "HTML5"
 	"PLUGIN_PLAYER": {
@@ -490,7 +491,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Plug-In",
 		"ja-jp": "プラグイン",
 		"zh-tw": "外掛模組",
-		"zh-cn": "插件"
+		"zh-cn": "插件",
+		"pl-pl": "Wtyczka"
 	},
 	"QUICKTIME_PLAYER": {
 		"en-us": "QuickTime Player",
@@ -501,7 +503,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "QuickTime-Player",
 		"ja-jp": "QuickTime プレーヤー",
 		"zh-tw": "QuickTime Player",
-		"zh-cn": "QuickTime Player"
+		"zh-cn": "QuickTime Player",
+		"pl-pl": "QuickTime Player"
 	},
 	// "AIRPLAY_PLAYER": {} // "AirPlay"
 	"AUTOLOAD_MEDIA_PLAYER": {
@@ -513,7 +516,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Media-Player automatisch laden",
 		"ja-jp": "プレーヤーを自動的に読み込む",
 		"zh-tw": "自動載入播放器",
-		"zh-cn": "自动加载播放器"
+		"zh-cn": "自动加载播放器",
+		"pl-pl": "Ładuj odtwarzacz automatycznie"
 	},
 	"AUTOPLAY_LOCATIONS": {
 		"en-us": "Autoplay on these sites:",
@@ -524,7 +528,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Automatische Wiedergabe auf folgenden Seiten:",
 		"ja-jp": "これらのサイトならプレーヤーを自動的に起動する：",
 		"zh-tw": "在這些網址自動播放：",
-		"zh-cn": "在这些地址启用自动播放:"
+		"zh-cn": "在这些地址启用自动播放:",
+		"pl-pl": "Odtwarzaj automatycznie na tych stronach:"
 	},
 	"INITIAL_BEHAVIOR": {
 		"en-us": "Initial behavior:",
@@ -536,7 +541,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Standardverhalten:",
 		"ja-jp": "初期挙動：",
 		"zh-tw": "初始動作：",
-		"zh-cn": "初始動作:"
+		"zh-cn": "初始動作:",
+		"pl-pl": "Początkowe działanie:"
 	},
 	"INITIAL_NO_BUFFER": {
 		"en-us": "Do not preload",
@@ -547,7 +553,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Nicht puffern",
 		"ja-jp": "何もしません",
 		"zh-tw": "不緩衝",
-		"zh-cn": "不缓冲"
+		"zh-cn": "不缓冲",
+		"pl-pl": "Nie ładuj"
 	},
 	"INITIAL_BUFFER": {
 		"en-us": "Preload",
@@ -558,7 +565,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Puffern",
 		"ja-jp": "バッファリングを始めます",
 		"zh-tw": "只開始緩衝",
-		"zh-cn": "开始缓冲"
+		"zh-cn": "开始缓冲",
+		"pl-pl": "Ładuj"
 	},
 	"INITIAL_AUTOPLAY": {
 		"en-us": "Autoplay",
@@ -569,7 +577,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Automatisch wiedergeben",
 		"ja-jp": "バッファリングを始めると共に再生します",
 		"zh-tw": "開始緩衝並且自動播放",
-		"zh-cn": "开始缓冲并且自动播放"
+		"zh-cn": "开始缓冲并且自动播放",
+		"pl-pl": "Odtwarzaj automatycznie"
 	},
 	"INSTANT_AUTOPLAY": {
 		"en-us": "Instant autoplay",
@@ -580,7 +589,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Sofortige Wiedergabe",
 		"ja-jp": "直接に再生",
 		"zh-tw": "即時播放",
-		"zh-cn": "立即播放"
+		"zh-cn": "立即播放",
+		"pl-pl": "Natychmiastowe autoodtwarzanie"
 	},
 	"DEFAULT_RESOLUTION": {
 		"en-us": "Default resolution:",
@@ -591,7 +601,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Standardauflösung:",
 		"ja-jp": "デフォルト解像度：",
 		"zh-tw": "預設解像度：",
-		"zh-cn": "默认解像度:"
+		"zh-cn": "默认解像度:",
+		"pl-pl": "Domyślna jakość:"
 	},
 	"NONNATIVE_FORMATS_POLICY": {
 		"en-us": "Nonnative formats policy:",
@@ -602,7 +613,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Regel für proprietäre Formate:",
 		"ja-jp": "非ネイティブなコーデック：",
 		"zh-tw": "非原生解碼器：",
-		"zh-cn": "非原生解码器:"
+		"zh-cn": "非原生解码器:",
+		"pl-pl": "Nienatywne formaty:"
 	},
 	"NONNATIVE_IGNORE": {
 		"en-us": "Never use as default",
@@ -613,7 +625,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Niemals als Standard verwenden",
 		"ja-jp": "使用せず",
 		"zh-tw": "不使用",
-		"zh-cn": "不使用"
+		"zh-cn": "不使用",
+		"pl-pl": "Nigdy nie używaj"
 	},
 	"NONNATIVE_LAST_RESORT": {
 		"en-us": "Use only as a last resort",
@@ -624,7 +637,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Nur als letzten Versuch verwenden",
 		"ja-jp": "候補にする",
 		"zh-tw": "作為最後選擇",
-		"zh-cn": "作为最后选择"
+		"zh-cn": "作为最后选择",
+		"pl-pl": "Używaj w ostateczności"
 	},
 	"NONNATIVE_USE_FREELY": {
 		"en-us": "Use freely",
@@ -635,7 +649,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Frei verwenden",
 		"ja-jp": "自由に使う",
 		"zh-tw": "任意使用",
-		"zh-cn": "自由使用"
+		"zh-cn": "自由使用",
+		"pl-pl": "Używaj swobodnie"
 	},
 	"SOURCE_SELECTOR": {
 		"en-us": "Source selector:",
@@ -646,7 +661,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Quellenauswahl:",
 		"ja-jp": "ソースセレクタ：",
 		"zh-tw": "來源選取器：",
-		"zh-cn": "来源选择器:"
+		"zh-cn": "来源选择器:",
+		"pl-pl": "Wybór źródła:"
 	},
 	"SHOW_MEDIA_SOURCES": {
 		"en-us": "Include media sources",
@@ -657,7 +673,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Medienquellen anzeigen",
 		"ja-jp": "メディアのソースを含む",
 		"zh-tw": "包括媒體來源",
-		"zh-cn": "包含媒体的来源"
+		"zh-cn": "包含媒体的来源",
+		"pl-pl": "Dołącz źródła mediów"
 	},
 	"SHOW_PLUGIN_SOURCE": {
 		"en-us": "Include plug-in",
@@ -668,7 +685,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Plug-In anzeigen",
 		"ja-jp": "プラグインを含む",
 		"zh-tw": "包括外掛模組",
-		"zh-cn": "包含插件"
+		"zh-cn": "包含插件",
+		"pl-pl": "Dołącz wtyczkę"
 	},
 	"SHOW_QTP_SOURCE": {
 		"en-us": "Include QuickTime Player",
@@ -679,7 +697,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "QuickTime-Player anzeigen",
 		"ja-jp": "QuickTime プレーヤーを含む",
 		"zh-tw": "包括 QuickTime Player",
-		"zh-cn": "包含 QuickTime Player"
+		"zh-cn": "包含 QuickTime Player",
+		"pl-pl": "Dołącz QuickTime Player"
 	},
 	"SHOW_AIRPLAY_SOURCE": {
 		"en-us": "Include AirPlay",
@@ -690,7 +709,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "AirPlay anzeigen",
 		"ja-jp": "AirPlay を含む",
 		"zh-tw": "包括 AirPlay",
-		"zh-cn": "包含 AirPlay"
+		"zh-cn": "包含 AirPlay",
+		"pl-pl": "Dołącz AirPlay"
 	},
 	"SHOW_SITE_SOURCE": {
 		"en-us": "Include the video’s web page",
@@ -701,7 +721,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Video-Seite anzeigen",
 		"ja-jp": "ビデオの参照元URLを含む",
 		"zh-tw": "包括影片的來源頁",
-		"zh-cn": "包含视频原先的页面"
+		"zh-cn": "包含视频原先的页面",
+		"pl-pl": "Dołącz stronę z wideo"
 	},
 	"SHOW_POSTER": {
 		"en-us": "Show preview image",
@@ -712,7 +733,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Vorschau anzeigen",
 		"ja-jp": "プレビューを有効にする",
 		"zh-tw": "啟用預覽",
-		"zh-cn": "显示缩图"
+		"zh-cn": "显示缩图",
+		"pl-pl": "Pokaż obrazek podglądu"
 	},
 	"HIDE_REWIND_BUTTON": {
 		"en-us": "Hide “Rewind” button",
@@ -723,7 +745,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "„Zurückspul“-Knopf ausblenden",
 		"ja-jp": "「巻き戻し」ボタンを隠す",
 		"zh-tw": "隱藏「迴轉」按鈕",
-		"zh-cn": "隐藏「倒带」按钮"
+		"zh-cn": "隐藏「倒带」按钮",
+		"pl-pl": "Ukryj przycisk „Przewiń wstecz”"
 	},
 	"SOUND_VOLUME": {
 		"en-us": "Sound volume:",
@@ -734,7 +757,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Lautstärke:",
 		"ja-jp": "音量：",
 		"zh-tw": "音量：",
-		"zh-cn": "音量:"
+		"zh-cn": "音量:",
+		"pl-pl": "Głośność dźwięku:"
 	},
 	
 	// Shortcut menu tab
