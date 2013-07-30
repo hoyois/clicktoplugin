@@ -197,7 +197,7 @@ var PREFERENCES_STRINGS = {
 		"ja-jp": "自動的に読み込む",
 		"zh-tw": "自動載入",
 		"zh-cn": "自动加载",
-		"pl-pl": "Ładuj automatycznie"
+		"pl-pl": "Wczytaj automatycznie"
 	},
 	"KILLER_SCRIPTS": {
 		"en-us": "Plug-in to HTML5 conversion scripts:",
@@ -307,7 +307,7 @@ var PREFERENCES_STRINGS = {
 		"ja-jp": "これらのプラグインを有効にする：",
 		"zh-tw": "允許載入這些外掛模組：",
 		"zh-cn": "加载这些插件:",
-		"pl-pl": "Ładuj te wtyczki automatycznie:"
+		"pl-pl": "Wczytaj te wtyczki automatycznie:"
 	},
 	"NO_PLUGINS_NOTICE": {
 		"en-us": "You currently have no enabled plug-ins!",
@@ -517,7 +517,7 @@ var PREFERENCES_STRINGS = {
 		"ja-jp": "プレーヤーを自動的に読み込む",
 		"zh-tw": "自動載入播放器",
 		"zh-cn": "自动加载播放器",
-		"pl-pl": "Ładuj odtwarzacz automatycznie"
+		"pl-pl": "Wczytaj odtwarzacz automatycznie"
 	},
 	"AUTOPLAY_LOCATIONS": {
 		"en-us": "Autoplay on these sites:",
@@ -554,7 +554,7 @@ var PREFERENCES_STRINGS = {
 		"ja-jp": "何もしません",
 		"zh-tw": "不緩衝",
 		"zh-cn": "不缓冲",
-		"pl-pl": "Nie ładuj"
+		"pl-pl": "Nie wczytuj"
 	},
 	"INITIAL_BUFFER": {
 		"en-us": "Preload",
@@ -566,7 +566,7 @@ var PREFERENCES_STRINGS = {
 		"ja-jp": "バッファリングを始めます",
 		"zh-tw": "只開始緩衝",
 		"zh-cn": "开始缓冲",
-		"pl-pl": "Ładuj"
+		"pl-pl": "Wczytuj"
 	},
 	"INITIAL_AUTOPLAY": {
 		"en-us": "Autoplay",
@@ -771,7 +771,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Folgende Befehle im Kontextmenü anzeigen:",
 		"ja-jp": "これらのコマンドをコンテキストメニューで表示：",
 		"zh-tw": "在快顯功能表顯示這些指令：",
-		"zh-cn": "在快显菜单显示这些命令:"
+		"zh-cn": "在快显菜单显示这些命令:",
+		"pl-pl": "Pokaż te komendy w menu kontekstowym:"
 	},
 	"SETTINGS_CONTEXT": {
 		"en-us": "ClickToPlugin Preferences",
@@ -782,7 +783,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "ClickToPlugin-Einstellungen",
 		"ja-jp": "ClickToPlugin 設定",
 		"zh-tw": "ClickToPlugin 偏好設定",
-		"zh-cn": "ClickToPlugin 設定"
+		"zh-cn": "ClickToPlugin 設定",
+		"pl-pl": "Ustawienia ClickToPlugin"
 	},
 	"DISABLE_ENABLE_CONTEXT": {
 		"en-us": "Disable/Enable ClickToPlugin",
@@ -793,7 +795,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "ClickToPlugin deaktivieren/aktivieren",
 		"ja-jp": "ClickToPlugin を有効／無効にする",
 		"zh-tw": "啟用或停用 ClickToPlugin",
-		"zh-cn": "启用/停用 ClickToPlugin"
+		"zh-cn": "启用/停用 ClickToPlugin",
+		"pl-pl": "Aktywuj/deaktywuj ClickToPlugin"
 	},
 	"ALWAYS_ALLOW_CONTEXT": {
 		"en-us": "Always Allow",
@@ -804,7 +807,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Immer erlauben",
 		"ja-jp": "あらゆる許可",
 		"zh-tw": "永遠允許",
-		"zh-cn": "以后都准许"
+		"zh-cn": "以后都准许",
+		"pl-pl": "Zawsze zezwalaj"
 	},
 	"ALWAYS_HIDE_CONTEXT": {
 		"en-us": "Always Hide",
@@ -815,7 +819,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Immer verstecken",
 		"ja-jp": "あらゆる隠す",
 		"zh-tw": "永遠隱藏",
-		"zh-cn": "以后都隐藏"
+		"zh-cn": "以后都隐藏",
+		"pl-pl": "Zawsze ukrywaj"
 	},
 	"LOAD_ALL_CONTEXT": {
 		"en-us": "Load All Plug-ins",
@@ -826,7 +831,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Alle Plug-Ins laden",
 		"ja-jp": "プラグインをすべて読み込む",
 		"zh-tw": "載入所有外掛模組",
-		"zh-cn": "加载所有插件"
+		"zh-cn": "加载所有插件",
+		"pl-pl": "Wczytaj wszystkie wtyczki"
 	},
 	"LOAD_INVISIBLE_CONTEXT": {
 		"en-us": "Load Invisible Plug-ins",
@@ -837,7 +843,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Unsichtbare Plug-Ins laden",
 		"ja-jp": "不可視プラグインを読み込む",
 		"zh-tw": "載入所有不可見的外掛模組",
-		"zh-cn": "加载所有不可見的插件"
+		"zh-cn": "加载所有不可見的插件",
+		"pl-pl": "Wczytaj niewidoczne wtyczki"
 	},
 	"HIDE_ALL_CONTEXT": { // UNUSED
 		"en-us": "Hide All Plug-ins",
@@ -848,7 +855,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Alle Plug-Ins verstecken",
 		"ja-jp": "プラグインをすべて隠す",
 		"zh-tw": "隱藏所有外掛模組",
-		"zh-cn": "隐藏所有插件"
+		"zh-cn": "隐藏所有插件",
+		"pl-pl": "Ukryj wszystkie wtyczki"
 	},
 	"DOWNLOAD_CONTEXT": {
 		"en-us": "Download Video",
@@ -859,7 +867,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Video herunterladen",
 		"ja-jp": "ビデオを保存",
 		"zh-tw": "下載影片",
-		"zh-cn": "下载视频"
+		"zh-cn": "下载视频",
+		"pl-pl": "Pobierz wideo"
 	},
 	"VIEW_ON_SITE_CONTEXT": {
 		"en-us": "View on Site",
@@ -870,7 +879,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Auf Seite wiedergeben",
 		"ja-jp": "サイトで開く",
 		"zh-tw": "於網站上檢視",
-		"zh-cn": "在网站上查看"
+		"zh-cn": "在网站上查看",
+		"pl-pl": "Wyświetl na stronie"
 	},
 	"OPEN_IN_QTP_CONTEXT": {
 		"en-us": "Open in QuickTime Player",
@@ -881,7 +891,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Im QuickTime-Player öffnen",
 		"ja-jp": "QuickTime プレーヤーで開く",
 		"zh-tw": "於 QuickTime Player 檢視",
-		"zh-cn": "在 QuickTime Player 查看"
+		"zh-cn": "在 QuickTime Player 查看",
+		"pl-pl": "Odtwórz w QuickTime Player"
 	},
 	"SEND_VIA_AIRPLAY_CONTEXT": {
 		"en-us": "Send via AirPlay",
@@ -892,7 +903,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "An AirPlay-Gerät senden",
 		"ja-jp": "AirPlay を経由で出力",
 		"zh-tw": "經由 AirPlay 輸出",
-		"zh-cn": "通过 AirPlay 输出"
+		"zh-cn": "通过 AirPlay 输出",
+		"pl-pl": "Prześlij przez AirPlay"
 	},
 	
 	// Keyboard shortcuts tab
@@ -905,7 +917,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Leeren",
 		"ja-jp": "クリア",
 		"zh-tw": "清除",
-		"zh-cn": "清除"
+		"zh-cn": "清除",
+		"pl-pl": "Wyczyść"
 	},
 	"SETTINGS_SHORTCUT": {
 		"en-us": "Open preferences:",
@@ -916,7 +929,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Einstellungen öffnen",
 		"ja-jp": "設定を開く：",
 		"zh-tw": "開啟偏好設定面板：",
-		"zh-cn": "开启设定面板:"
+		"zh-cn": "开启设定面板:",
+		"pl-pl": "Otwórz ustawienia:"
 	},
 	"WHITELIST_SHORTCUT": {
 		"en-us": "Allow plug-ins on domain:",
@@ -927,7 +941,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Plug-Ins auf dieser Domäne erlauben:",
 		"ja-jp": "このドメインならプラグイン自動的に読み込む：",
 		"zh-tw": "載入包含這個域名的外掛模組：",
-		"zh-cn": "加载包含这个域名的插件:"
+		"zh-cn": "加载包含这个域名的插件:",
+		"pl-pl": "Zezwól na wtyczki w domenie:"
 	},
 	"LOAD_ALL_SHORTCUT": {
 		"en-us": "Load all plug-ins in frontmost tab:",
@@ -938,7 +953,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Alle Plug-Ins im vordersten Tab laden:",
 		"ja-jp": "一番手前のタブでのプラグインをすべて読み込む：",
 		"zh-tw": "載入所有最前方標籤頁中的外掛模組：",
-		"zh-cn": "加载最前方标签中的所有插件:"
+		"zh-cn": "加载最前方标签中的所有插件:",
+		"pl-pl": "Wczytaj wszystkie wtyczki na karcie:"
 	},
 	"HIDE_ALL_SHORTCUT": {
 		"en-us": "Hide all plug-ins in frontmost tab:",
@@ -949,7 +965,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Alle Plug-Ins im vordersten Tab verstecken:",
 		"ja-jp": "一番手前のタブでのプラグインをすべて隠す：",
 		"zh-tw": "隱藏所有最前方標籤頁中的外掛模組：",
-		"zh-cn": "隐藏最前方标签中的所有插件:"
+		"zh-cn": "隐藏最前方标签中的所有插件:",
+		"pl-pl": "Ukryj wszystkie wtyczki na karcie:"
 	},
 	"HIDE_PLUGIN_SHORTCUT": {
 		"en-us": "Hide targeted plug-in:",
@@ -960,7 +977,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Plug-In verstecken:",
 		"ja-jp": "指定されたプラグインを隠す：",
 		"zh-tw": "隱藏指定外掛模組：",
-		"zh-cn": "隐藏指定的插件:"
+		"zh-cn": "隐藏指定的插件:",
+		"pl-pl": "Ukryj wskazaną wtyczkę:"
 	},
 	"PLAY_PAUSE_SHORTCUT": {
 		"en-us": "Play/pause:",
@@ -971,7 +989,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Wiedergabe/Pause:",
 		"ja-jp": "再生／一時停止：",
 		"zh-tw": "播放/暫停：",
-		"zh-cn": "播放/暂停:"
+		"zh-cn": "播放/暂停:",
+		"pl-pl": "Odtwórz/wstrzymaj:"
 	},
 	"TOGGLE_FULLSCREEN_SHORTCUT": {
 		"en-us": "Enter fullscreen:",
@@ -982,7 +1001,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Vollbild:",
 		"ja-jp": "フルスクリーンにする：",
 		"zh-tw": "全螢幕：",
-		"zh-cn": "全屏幕:"
+		"zh-cn": "全屏幕:",
+		"pl-pl": "Tryb pełnoekranowy:"
 	},
 	"VOLUME_UP_SHORTCUT": {
 		"en-us": "Volume up:",
@@ -993,7 +1013,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Lautstärke erhöhen:",
 		"ja-jp": "音量を上げる：",
 		"zh-tw": "調高音量：",
-		"zh-cn": "上升音量:"
+		"zh-cn": "上升音量:",
+		"pl-pl": "Zwiększ głośność:"
 	},
 	"VOLUME_DOWN_SHORTCUT": {
 		"en-us": "Volume down:",
@@ -1004,7 +1025,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Lautstärke senken:",
 		"ja-jp": "音量を下げる：",
 		"zh-tw": "調低音量：",
-		"zh-cn": "下降音量:"
+		"zh-cn": "下降音量:",
+		"pl-pl": "Zmniejsz głośność:"
 	},
 	"TOGGLE_LOOPING_SHORTCUT": {
 		"en-us": "Toggle repeat:",
@@ -1015,7 +1037,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Wiederholen umschalten:",
 		"ja-jp": "繰り返す：",
 		"zh-tw": "重播：",
-		"zh-cn": "重播:"
+		"zh-cn": "重播:",
+		"pl-pl": "Przełącz powtarzanie:"
 	},
 	"PREV_TRACK_SHORTCUT": {
 		"en-us": "Previous track:",
@@ -1026,7 +1049,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Vorheriger Spur:",
 		"ja-jp": "前のトラック：",
 		"zh-tw": "上一個音軌：",
-		"zh-cn": "上一个曲目:"
+		"zh-cn": "上一个曲目:",
+		"pl-pl": "Poprzednia ścieżka:"
 	},
 	"NEXT_TRACK_SHORTCUT": {
 		"en-us": "Next track:",
@@ -1037,7 +1061,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Nächster Spur:",
 		"ja-jp": "次のトラック：",
 		"zh-tw": "下一個音軌：",
-		"zh-cn": "下一个曲目:"
+		"zh-cn": "下一个曲目:",
+		"pl-pl": "Następna ścieżka"
 	},
 	"TRACK_SELECTOR_SHORTCUT": {
 		"en-us": "Show/hide track selector:",
@@ -1048,7 +1073,8 @@ var PREFERENCES_STRINGS = {
 		"de-de": "Spurauswahl ein-/ausblenden:",
 		"ja-jp": "トラックセレクタの表示／非表示：",
 		"zh-tw": "顯示/隱藏曲目選擇器：",
-		"zh-cn": "显示/隐藏曲目选择器:"
+		"zh-cn": "显示/隐藏曲目选择器:",
+		"pl-pl": "Pokaż/ukryj wybór ścieżek:"
 	}
 };
 
@@ -1063,7 +1089,8 @@ var GLOBAL_STRINGS = {
 		"de-de": "ClickToPlugin-Einstellungen …",
 		"ja-jp": "ClickToPlugin 設定...",
 		"zh-tw": "ClickToPlugin 偏好設定⋯",
-		"zh-cn": "ClickToPlugin 設定…"
+		"zh-cn": "ClickToPlugin 設定…",
+		"pl-pl": "Ustawienia ClickToPlugin"
 	},
 	"SWITCH_ON": {
 		"en-us": "Enable ClickToPlugin",
@@ -1074,7 +1101,8 @@ var GLOBAL_STRINGS = {
 		"de-de": "ClickToPlugin aktivieren",
 		"ja-jp": "ClickToPlugin を有効",
 		"zh-tw": "啟用 ClickToPlugin",
-		"zh-cn": "启用 ClickToPlugin"
+		"zh-cn": "启用 ClickToPlugin",
+		"pl-pl": "Aktywuj ClickToPlugin"
 	},
 	"SWITCH_OFF": {
 		"en-us": "Disable ClickToPlugin",
@@ -1085,7 +1113,8 @@ var GLOBAL_STRINGS = {
 		"de-de": "ClickToPlugin deaktivieren",
 		"ja-jp": "ClickToPlugin を無効",
 		"zh-tw": "停用 ClickToPlugin",
-		"zh-cn": "停用 ClickToPlugin"
+		"zh-cn": "停用 ClickToPlugin",
+		"pl-pl": "Deaktywuj ClickToPlugin"
 	},
 	"LOAD_ALL_PLUGINS": {
 		"en-us": "Load All Plug-ins",
@@ -1096,7 +1125,8 @@ var GLOBAL_STRINGS = {
 		"de-de": "Alle Plug-Ins laden",
 		"ja-jp": "プラグインを全部読み込む",
 		"zh-tw": "載入所有外掛模組",
-		"zh-cn": "加载所有插件"
+		"zh-cn": "加载所有插件",
+		"pl-pl": "Wczytaj wszystkie wtyczki"
 	},
 	"LOAD_INVISIBLE_PLUGINS": {
 		"en-us": "Load Invisible Plug-ins",
@@ -1107,7 +1137,8 @@ var GLOBAL_STRINGS = {
 		"de-de": "Unsichtbare Plug-Ins laden",
 		"ja-jp": "不可視のプラグインを全部読み込む",
 		"zh-tw": "載入所有不可見的外掛模組",
-		"zh-cn": "加载所有不可見的插件"
+		"zh-cn": "加载所有不可見的插件",
+		"pl-pl": "Wczytaj niewidoczne wtyczki"
 	},
 	"HIDE_ALL_PLUGINS": { // UNUSED
 		"en-us": "Hide All Plug-ins",
@@ -1118,7 +1149,8 @@ var GLOBAL_STRINGS = {
 		"de-de": "Alle Plug-Ins verstecken",
 		"ja-jp": "プラグインを全部隠す",
 		"zh-tw": "隱藏所有外掛模組",
-		"zh-cn": "隐藏所有插件"
+		"zh-cn": "隐藏所有插件",
+		"pl-pl": "Ukryj wszystkie wtyczki"
 	},
 	"ALWAYS_ALLOW_ON_DOMAIN": {
 		"en-us": "Allow Plug-ins on Domain",
@@ -1129,7 +1161,8 @@ var GLOBAL_STRINGS = {
 		"de-de": "Plug-Ins auf dieser Domäne erlauben",
 		"ja-jp": "このドメインならプラグイン読み込むを有効",
 		"zh-tw": "載入包含這個域名的外掛模組",
-		"zh-cn": "加载包含这个域名的插件"
+		"zh-cn": "加载包含这个域名的插件",
+		"pl-pl": "Zezwól na wtyczki w domenie"
 	},
 	"ALWAYS_BLOCK_ON_DOMAIN": {
 		"en-us": "Block Plug-ins on Domain",
@@ -1140,7 +1173,8 @@ var GLOBAL_STRINGS = {
 		"de-de": "Plug-Ins auf dieser Domäne blockieren",
 		"ja-jp": "このドメインならプラグイン読み込むを抑止",
 		"zh-tw": "阻擋包含這個域名的外掛模組",
-		"zh-cn": "屏蔽这个域名的插件"
+		"zh-cn": "屏蔽这个域名的插件",
+		"pl-pl": "Zablokuj wtyczki w domenie"
 	},
 	"ALWAYS_ALLOW_SOURCE": {
 		"en-us": "Always Allow",
@@ -1151,7 +1185,8 @@ var GLOBAL_STRINGS = {
 		"de-de": "Immer erlauben",
 		"ja-jp": "あらゆる許可",
 		"zh-tw": "永遠允許",
-		"zh-cn": "以后都准许"
+		"zh-cn": "以后都准许",
+		"pl-pl": "Zawsze zezewalaj"
 	},
 	"ALWAYS_HIDE_ON_DOMAIN": {
 		"en-us": "Hide Plug-ins on Domain",
@@ -1162,7 +1197,8 @@ var GLOBAL_STRINGS = {
 		"de-de": "Plug-Ins auf dieser Domäne verstecken",
 		"ja-jp": "このドメインならプラグインを隠す",
 		"zh-tw": "隱藏包含這個域名的外掛模組",
-		"zh-cn": "隐藏包含这个域名的插件"
+		"zh-cn": "隐藏包含这个域名的插件",
+		"pl-pl": "Ukryj wtyczki w domenie"
 	},
 	"ALWAYS_SHOW_ON_DOMAIN": {
 		"en-us": "Show Plug-ins on Domain",
@@ -1173,7 +1209,8 @@ var GLOBAL_STRINGS = {
 		"de-de": "Plug-Ins auf dieser Domäne anzeigen",
 		"ja-jp": "このドメインならプラグインを表示",
 		"zh-tw": "顯示包含這個域名的外掛模組",
-		"zh-cn": "显示包含这个域名的插件"
+		"zh-cn": "显示包含这个域名的插件",
+		"pl-pl": "Pokaż wtyczki w domenie"
 	},
 	"ALWAYS_HIDE_SOURCE": {
 		"en-us": "Always Hide",
@@ -1184,7 +1221,8 @@ var GLOBAL_STRINGS = {
 		"de-de": "Immer verstecken",
 		"ja-jp": "あらゆる隠す",
 		"zh-tw": "永遠隱藏",
-		"zh-cn": "以后都隐藏"
+		"zh-cn": "以后都隐藏",
+		"pl-pl": "Zawsze ukrywaj"
 	},
 	"DOWNLOAD_VIDEO": {
 		"en-us": "Download Video",
@@ -1195,7 +1233,8 @@ var GLOBAL_STRINGS = {
 		"de-de": "Video herunterladen",
 		"ja-jp": "ビデオを保存",
 		"zh-tw": "下載影片",
-		"zh-cn": "下载视频"
+		"zh-cn": "下载视频",
+		"pl-pl": "Pobierz wideo"
 	},
 	"DOWNLOAD_AUDIO": {
 		"en-us": "Download Audio",
@@ -1206,7 +1245,8 @@ var GLOBAL_STRINGS = {
 		"de-de": "Audio herunterladen",
 		"ja-jp": "オーディオを保存",
 		"zh-tw": "下載音頻",
-		"zh-cn": "下载音频"
+		"zh-cn": "下载音频",
+		"pl-pl": "Pobierz audio"
 	},
 	"OPEN_IN_QUICKTIME_PLAYER": {
 		"en-us": "Open in QuickTime Player",
@@ -1217,7 +1257,8 @@ var GLOBAL_STRINGS = {
 		"de-de": "Im QuickTime-Player öffnen",
 		"ja-jp": "QuickTime プレーヤーで開く",
 		"zh-tw": "於 QuickTime Player 檢視",
-		"zh-cn": "在 QuickTime Player 查看"
+		"zh-cn": "在 QuickTime Player 查看",
+		"pl-pl": "Odtwórz w QuickTime Player"
 	},
 	"SEND_VIA_AIRPLAY": {
 		"en-us": "Send via AirPlay",
@@ -1228,7 +1269,8 @@ var GLOBAL_STRINGS = {
 		"de-de": "An AirPlay-Gerät senden",
 		"ja-jp": "AirPlay を経由で出力",
 		"zh-tw": "經由 AirPlay 輸出",
-		"zh-cn": "通过 AirPlay 输出"
+		"zh-cn": "通过 AirPlay 输出",
+		"pl-pl": "Prześlij przez AirPlay"
 	},
 	"GET_PLUGIN_INFO": {
 		"en-us": "Get Plug-in Info",
@@ -1239,7 +1281,8 @@ var GLOBAL_STRINGS = {
 		"de-de": "Plug-In-Informationen",
 		"ja-jp": "情報を見る",
 		"zh-tw": "簡介",
-		"zh-cn": "简介"
+		"zh-cn": "简介",
+		"pl-pl": "Informacje o wtyczce"
 	},
 	"LOAD_PLUGIN": {
 		"en-us": function(plugin) {return plugin ? "Load " + plugin : "Load Plug-in";},
@@ -1250,7 +1293,8 @@ var GLOBAL_STRINGS = {
 		"de-de": function(plugin) {return plugin ? plugin + " laden" : "Plug-In laden";},
 		"ja-jp": function(plugin) {return plugin ? plugin + " を読み込む" : "プラグインを読み込む";},
 		"zh-tw": function(plugin) {return plugin ? "載入 " + plugin : "載入外掛模組";},
-		"zh-cn": function(plugin) {return plugin ? "加载 " + plugin : "加载插件";}
+		"zh-cn": function(plugin) {return plugin ? "加载 " + plugin : "加载插件";},
+		"pl-pl": function(plugin) {return plugin ? "Wczytaj " + plugin : "Wczytaj wtyczkę";}
 	},
 	"HIDE_PLUGIN": {
 		"en-us": function(plugin) {return plugin ? "Hide " + plugin : "Hide Plug-in";},
@@ -1261,7 +1305,9 @@ var GLOBAL_STRINGS = {
 		"de-de": function(plugin) {return plugin ? plugin + " verstecken" : "Plug-In verstecken";},
 		"ja-jp": function(plugin) {return plugin ? plugin + " を隠す" : "プラグインを隠す";},
 		"zh-tw": function(plugin) {return plugin ? "隱藏 " + plugin : "隱藏外掛模組";},
-		"zh-cn": function(plugin) {return plugin ? "隐藏 " + plugin : "隐藏插件";}
+		"zh-cn": function(plugin) {return plugin ? "隐藏 " + plugin : "隐藏插件";},
+		"pl-pl": function(plugin) {return plugin ? "Ukryj " + plugin : "Ukryj wtyczkę";}
+		
 	},
 	"RESTORE_PLUGIN": {
 		"en-us": function(plugin) {return plugin ? "Restore " + plugin : "Restore Plug-in";},
@@ -1272,7 +1318,8 @@ var GLOBAL_STRINGS = {
 		"de-de": function(plugin) {return plugin ? plugin + " wiederherstellen" : "Plug-In wiederherstellen";},
 		"ja-jp": function(plugin) {return plugin ? plugin + " に戻す" : "プラグインに戻す";},
 		"zh-tw": function(plugin) {return plugin ? "復原 " + plugin : "復原外掛模組";},
-		"zh-cn": function(plugin) {return plugin ? "还原 " + plugin : "还原插件";}
+		"zh-cn": function(plugin) {return plugin ? "还原 " + plugin : "还原插件";},
+		"pl-pl": function(plugin) {return plugin ? "Przywróć " + plugin : "Przywróć wtyczkę";}
 	},
 	"VIEW_ON_SITE": {
 		"en-us": function(site) {return "View on " + site;},
@@ -1283,7 +1330,8 @@ var GLOBAL_STRINGS = {
 		"de-de": function(site) {return "Auf " + site + " wiedergeben";},
 		"ja-jp": function(site) {return site + " で開く";},
 		"zh-tw": function(site) {return "於 " + site + " 檢視";},
-		"zh-cn": function(site) {return "在 " + site + " 查看";}
+		"zh-cn": function(site) {return "在 " + site + " 查看";},
+		"pl-pl": function(site) {return "Wyświetl na stronie " + site;}
 	},
 	
 	// Dialogs
@@ -1296,7 +1344,8 @@ var GLOBAL_STRINGS = {
 		"de-de": function(url) {return "Ein QuickTime-Objekt möchte\n\n" + url + "\n\nim QuickTime-Player öffnen. Möchten Sie es erlauben?";},
 		"ja-jp": function(url) {return "ある QuickTime コンテンツは\n\n" + url + "\n\nを QuickTime Player に再生しようとしていますが、これを許可しますか？";},
 		"zh-tw": function(url) {return "QuickTime 控制項正試圖於 QuickTime Player 播放\n\n" + url + "\n\n是否允許此項操作？";},
-		"zh-cn": function(url) {return "QuickTime 控制项正尝试在 QuickTime Player 播放\n\n" + url + "\n\n是否允许此项操作？";}
+		"zh-cn": function(url) {return "QuickTime 控制项正尝试在 QuickTime Player 播放\n\n" + url + "\n\n是否允许此项操作？";},
+		"pl-pl": function(url) {return "Obiekt QuickTime chce odtworzyć\n\n" + url + "\n\nw QuickTime Player. Czy chcesz na to zezwolić?";}
 	}
 };
 
@@ -1310,7 +1359,8 @@ var INJECTED_STRINGS = {
 		"de-de": "Fehlendes Plug-In",
 		"ja-jp": "プラグインが見つかりません",
 		"zh-tw": "找不到外掛模組",
-		"zh-cn": "缺少插件"
+		"zh-cn": "缺少插件",
+		"pl-pl": "Brakująca wtyczka"
 	},
 	"LOADING": {
 		"en-us": "Loading...",
@@ -1321,7 +1371,8 @@ var INJECTED_STRINGS = {
 		"de-de": "Laden …",
 		"ja-jp": "読み込み中...",
 		"zh-tw": "載入中⋯",
-		"zh-cn": "正在载入…"
+		"zh-cn": "正在载入…",
+		"pl-pl": "Wczytywanie…"
 	},
 	"QT_PLAYER": {
 		"en-us": "QT Player",
@@ -1332,7 +1383,8 @@ var INJECTED_STRINGS = {
 		"de-de": "QT-Player",
 		"ja-jp": "QT プレーヤー",
 		"zh-tw": "QT Player",
-		"zh-cn": "QT Player"
+		"zh-cn": "QT Player",
+		"pl-pl": "QT Player"
 	}
 };
 
