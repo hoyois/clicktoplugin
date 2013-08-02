@@ -11,9 +11,11 @@ addKiller("MTVNetworks", {
 	"arc:episode:southparkstudios.com:": "3",
 	"cms:video:comedycentral.com:": "6", // no example found
 	"arc:playlist:comedycentral.com:": "3",
+	// "arc:episode:comedycentral.com:": "2", // works without context
 	// "arc:video:comedycentral.com:": "1", // works without context
 	// "cms:video:tosh.comedycentral.com:": "1", // has no working context
 	// "cms:promo:tosh.comedycentral.com:": "1", // works without context
+	// "arc:episode:tosh:comedycentral.com:": "1", // has no working context
 	"hcx:content:comedycentral.co.uk:": "3"//, // no example found
 	// "cms:video:jokes.com:": "1", // works without context
 	// "uma:video:mtv.com:": "1" // works without context

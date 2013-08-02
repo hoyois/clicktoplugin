@@ -46,7 +46,7 @@ function sendToDownloadManager(url) {
 	embed.setAttribute("height", "0");
 	embed.setAttribute("src", url);
 	document.body.appendChild(embed);
-	setTimeout(function() {document.body.removeChild(embed);}, 5000);
+	setTimeout(function() {document.body.removeChild(embed);}, 10000);
 }
 
 function openInQuickTimePlayer(url) {
@@ -65,7 +65,7 @@ function openInQuickTimePlayer(url) {
 	embed.setAttribute("target", "quicktimeplayer");
 	embed.setAttribute("autohref", "autohref");
 	document.body.appendChild(embed);
-	setTimeout(function() {document.body.removeChild(embed);}, 5000);
+	setTimeout(function() {document.body.removeChild(embed);}, 10000);
 }
 
 // Shortcuts

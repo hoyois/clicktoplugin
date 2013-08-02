@@ -13,7 +13,7 @@ var PREFERENCES_STRINGS = {
 		"ja-jp": ["nav{padding-right:1px;}", "#general li > span:first-child{max-width:250px;}"],
 		"zh-tw": ["nav{padding-right:1px;}"],
 		"zh-cn": [],
-		"pl-pl": ["#control_lists li:nth-child(-n+2) span.textarea_label > label {min-width:230px;}"]
+		"pl-pl": ["nav{padding-right:1px;}", "#control_lists li > span.textarea_label > label{min-width:230px;}"]
 	},
 	"PREFERENCES_TITLE": {
 		"en-us": "ClickToPlugin Preferences",
@@ -1372,7 +1372,7 @@ var INJECTED_STRINGS = {
 		"ja-jp": "読み込み中...",
 		"zh-tw": "載入中⋯",
 		"zh-cn": "正在载入…",
-		"pl-pl": "Wczytywanie…"
+		"pl-pl": "Wczytuję…"
 	},
 	"QT_PLAYER": {
 		"en-us": "QT Player",

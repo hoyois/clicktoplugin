@@ -1,10 +1,13 @@
 "use strict";
 
 // In iframes with src="javascript:...", safari is undefined
-var w = window;
-while(w.safari === undefined && w !== window.top) w = w.parent;
-var safari = w.safari;
-var href = w.location.href;
+var href = window.location.href;
+if(window.safari === undefined) {
+	var w = window.parent;
+	while(w.safari === undefined && w !== window.top) w = w.parent;
+	window.safari = w.safari;
+	href = w.location.href;
+}
 
 var _ = []; // main array
 
@@ -171,8 +174,6 @@ function handleBeforeLoadEvent(event) {
 	// Address of element
 	data.documentID = documentID;
 	data.elementID = _.length++;
-	
-	data.pluginsDisabled = navigator.plugins.length === 0; // because plugins are always enabled in the global page
 	
 	var response = safari.self.tab.canLoad(event, data);
 	

@@ -17,7 +17,6 @@ function getTypeFromDataURI(url) {
 }
 
 function getPluginForType(data) {
-	if(data.pluginsDisabled) return null;
 	if(data.isObject) {
 		if(nativeTypes.indexOf(data.type) !== -1) return nativePlugin;
 	} else {
@@ -32,7 +31,6 @@ function getPluginForType(data) {
 }
 
 function getPluginForExt(data) {
-	if(data.pluginsDisabled) return null;
 	var ext = extractExt(data.src);
 	if(data.isObject) {
 		if(nativeExts.indexOf(ext) !== -1) return nativePlugin;
