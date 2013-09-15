@@ -14,11 +14,13 @@ addKiller("Break", {
 	var videoURL = decodeURIComponent(flashvars.videoPath).replace(/\.flv$|\.mp4$/, "");
 	var videoHash = ".mp4?" + flashvars.icon;
 	
+	var poster = flashvars.sThumbLoc || flashvars.thumbnailURL;
+	
 	var sources = [];
 	var call = function() {
 		callback({"playlist": [{
 			"title": unescape(flashvars.sVidTitle),
-			"poster": decodeURIComponent(flashvars.sThumbLoc),
+			"poster": decodeURIComponent(poster),
 			"sources": sources
 		}]});
 	};

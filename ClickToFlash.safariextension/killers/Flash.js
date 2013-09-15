@@ -57,10 +57,12 @@ addKiller("Flash", {
 		}
 	}
 	
+	if(/^[a-z]+:\/\//.test(sourceURL) && !/^http/.test(sourceURL)) return;
+	
 	// YouTube redirection
 	// (sometimes with flashvars.provider === "youtube")
 	if(/^http:\/\/(?:www.)?youtube.com/.test(sourceURL)) {
-		match = /[?&\/]v[=\/]([^?&\/]*)/.exec(sourceURL);
+		var match = /[?&\/]v[=\/]([^?&\/]*)/.exec(sourceURL);
 		if(match) {
 			if(!hasKiller("YouTube")) return;
 			var YTcallback = callback;
