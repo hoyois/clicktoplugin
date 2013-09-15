@@ -20,7 +20,7 @@ addKiller("YouTube", {
 
 "process": function(data, callback) {
 	var videoID, playlistID, startTime;
-	var onsite = /^https?:\/\/www\.youtube\.com\/watch/.test(data.location);
+	var onsite = /^https?:\/\/www\.youtube\.com\/watch\?/.test(data.location);
 	var flashvars = {};
 	
 	if(data.embed) { // old-style YT embed
@@ -84,7 +84,7 @@ addKiller("YouTube", {
 			if(!x.url) continue;
 			source = this.expandItag(x.itag);
 			if(source) {
-				source.url = decodeURIComponent(x.url) + "&title=" + flashvars.title + encodeURIComponent(" [" + source.format.split(" ")[0] + "]");
+				source.url = decodeURIComponent(x.url).replace(/^https/, "http") + "&title=" + flashvars.title + encodeURIComponent(" [" + source.format.split(" ")[0] + "]");
 				if(x.sig) source.url += "&signature=" + x.sig;
 				else if(x.s) source.url += "&signature=" + this.decodeSignature(x.s);
 				sources.push(source);

@@ -1339,7 +1339,7 @@ var GLOBAL_STRINGS = {
 		"en-us": function(url) {return "A QuickTime object would like to play\n\n" + url + "\n\nin QuickTime Player. Do you want to allow it?";},
 		"tr-tr": function(url) {return "Bir QuickTime nesnesi\n\n" + url + "\n\n’ı QuickTime Player’da açmak ıstiyor. Onaylamak istiyor musunuz?";},
 		"it-it": function(url) {return "Un oggetto QuickTime desidera riprodurre\n\n" + url + "\n\nin QuickTime Player. Vuoi consentirlo?";},
-		"fr-fr": function(url) {return "Un objet QuickTime voudrait lancer le lecture de\n\n" + url + "\n\ndans QuickTime Player. Voulez-vous l’autoriser?";},
+		"fr-fr": function(url) {return "Un objet QuickTime voudrait lancer le lecture de\n\n" + url + "\n\ndans QuickTime Player. Voulez-vous l’autoriser ?";},
 		"es-es": function(url) {return "Un objeto QuickTime quiere reproducirse\n\n" + url + "\n\nen QuickTime Player. Quieres permitirlo?";},
 		"de-de": function(url) {return "Ein QuickTime-Objekt möchte\n\n" + url + "\n\nim QuickTime-Player öffnen. Möchten Sie es erlauben?";},
 		"ja-jp": function(url) {return "ある QuickTime コンテンツは\n\n" + url + "\n\nを QuickTime Player に再生しようとしていますが、これを許可しますか？";},
