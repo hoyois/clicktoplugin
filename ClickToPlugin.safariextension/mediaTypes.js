@@ -6,14 +6,13 @@ function typeInfo(type) {
 	return null;
 }
 
-function urlInfo(url) {
-	url = extractExt(url);
-	if(url === "") return null;
+function extInfo(ext) {
+	if(ext === "") return null;
 	for(var type in nativeMediaTypes) {
-		if(nativeMediaTypes[type].exts.indexOf(url) !== -1) return {"isNative": true, "isAudio": /^audio/.test(type), "format": nativeMediaTypes[type].format};
+		if(nativeMediaTypes[type].exts.indexOf(ext) !== -1) return {"isNative": true, "isAudio": /^audio/.test(type), "format": nativeMediaTypes[type].format};
 	}
 	for(var type in addedMediaTypes) {
-		if(addedMediaTypes[type].exts.indexOf(url) !== -1) return {"isNative": false, "isAudio": /^audio/.test(type), "format": addedMediaTypes[type].format};
+		if(addedMediaTypes[type].exts.indexOf(ext) !== -1) return {"isNative": false, "isAudio": /^audio/.test(type), "format": addedMediaTypes[type].format};
 	}
 	return null;
 }
@@ -84,13 +83,16 @@ if(canPlayFLV) addMediaTypes({
 	"video/avi": {"exts": ["gvi", "vp6"], "format": "AVI"},
 	"video/divx": {"exts": ["divx"], "format": "DivX"},
 	"video/msvideo": {"exts": [], "format": "AVI"},
-	"video/webm": {"exts": ["webm"], "format": "WebM"},
 	"video/x-flv": {"exts": ["flv"], "format": "FLV"},
 	"video/x-nuv": {"exts": ["nuv"], "format": "NUV"},
 	"video/x-matroska": {"exts": ["mkv"], "format": "MKV"},
-	"audio/webm": {"exts": [], "format": "WebM"},
 	"audio/x-matroska": {"exts": ["mka"], "format": "MKA"},
 	"audio/x-tta": {"exts": ["tta"], "format": "TTA"}
+});
+// WebM
+if(canPlayWebM) addMediaTypes({
+	"video/webm": {"exts": ["webm"], "format": "WebM"},
+	"audio/webm": {"exts": [], "format": "WebM"}
 });
 // Xiph
 if(canPlayOgg) addMediaTypes({

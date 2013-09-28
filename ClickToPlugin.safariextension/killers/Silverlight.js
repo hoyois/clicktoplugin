@@ -10,7 +10,7 @@ addKiller("Silverlight", {
 "process": function(data, callback) {
 	var SLvars = parseSLVariables(data.params.initparams);
 	var mediaURL = decodeURIComponent(SLvars[data.file]);
-	var info = urlInfo(mediaURL);
+	var info = extInfo(getExt(mediaURL));
 	
 	var audioOnly = false;
 	var sources = [];

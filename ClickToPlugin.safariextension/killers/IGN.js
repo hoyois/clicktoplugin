@@ -24,7 +24,7 @@ addKiller("IGN", {
 	if(isEmbed) siteInfo = {"name": "IGN", "url": media.metadata.url.replace(/\\\//g, "/")};
 	
 	var videoURL = media.url.replace(/\\\//g, "/");
-	var source = urlInfo(videoURL);
+	var source = extInfo(getExt(videoURL));
 	if(!source) return;
 	source.url = videoURL;
 	source.height = 720;

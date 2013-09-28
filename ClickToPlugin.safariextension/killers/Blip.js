@@ -31,7 +31,7 @@ addKiller("Blip", {
 		
 		for(var i = 0; i < media.length; i++) {
 			url = media[i].getAttribute("url");
-			info = urlInfo(url);
+			info = extInfo(getExt(url));
 			if(!info) continue;
 			if(!info.isAudio) audioOnly = false;
 			height = media[i].getAttribute("height");
