@@ -2,7 +2,7 @@ addKiller("Flash", {
 
 "canKill": function(data) {
 	if(data.type !== "application/x-shockwave-flash") return false;
-	var match = /(?:^|&)(file|load|playlistfile|src|source|video|mp3|mp3url|soundFile|soundUrl|url|mediaUrl|file_url|sampleURL|wmvUrl|flvUrl)=/.exec(data.params.flashvars);
+	var match = /(?:^|&)(real_file|file|filename|load|playlistfile|src|source|video|mp3|mp3url|soundFile|soundUrl|url|mediaUrl|file_url|sampleURL|wmvUrl|flvUrl)=/.exec(data.params.flashvars);
 	if(match) {data.file = match[1]; return true;}
 	match = /[?&](file|mp3|playlist_url)=/.exec(data.src);
 	if(match) {data.hash = match[1]; return true;}
@@ -40,6 +40,9 @@ addKiller("Flash", {
 		case "file_url":
 			if(flashvars.poster_url) posterURL = decodeURIComponent(flashvars.poster_url);
 			break;
+		case "filename":
+			if(flashvars.icon) posterURL = decodeURIComponent(flashvars.icon);
+			break;
 		case "wmvUrl":
 		case "flvUrl":
 			if(flashvars.sScreenshotUrl) posterURL = decodeURIComponent(flashvars.sScreenshotUrl);
@@ -76,10 +79,10 @@ addKiller("Flash", {
 	}
 	
 	// Site-specific hacks
-	if(/^http:\/\/www\.tvn24\.pl/.test(data.location)) sourceURL = sourceURL.replace(".flv", ".mp4");
+	if(/^https?:\/\/www\.tvn24\.pl/.test(data.location)) sourceURL = sourceURL.replace(".flv", ".mp4");
 	
 	if(!sourceURL) return;
-	var ext = extractExt(sourceURL);
+	var ext = getExt(sourceURL);
 	var isPlaylist = data.file === "playlistfile" || data.hash === "playlist_url" || ext === "xml" || ext === "xspf";
 	
 	var baseURL = data.src; // used to resolve video URLs
@@ -90,15 +93,25 @@ addKiller("Flash", {
 		return;
 	}
 	
-	if(flashvars.real_file) sourceURL = decodeURIComponent(flashvars.real_file);
+	sourceURL = makeAbsoluteURL(sourceURL, baseURL);
 	
 	var sources = [];
 	var audioOnly = true;
-	var info;
+	var call = function(info) {
+		if(info) {
+			info.url = sourceURL;
+			sources.push(info);
+			if(!info.isAudio) audioOnly = false;
+		}
+		if(sources.length !== 0 || posterURL !== undefined) callback({
+			"playlist": [{"poster": posterURL, "sources": sources}],
+			"audioOnly": audioOnly
+		});
+	};
 	
 	if(flashvars["hd.file"]) {
 		var hdURL = decodeURIComponent(flashvars["hd.file"]);
-		info = urlInfo(hdURL);
+		var info = extInfo(getExt(hdURL));
 		if(info) {
 			info.url = makeAbsoluteURL(hdURL, baseURL);
 			info.format = "HD " + info.format;
@@ -108,17 +121,11 @@ addKiller("Flash", {
 		}
 	}
 	
-	info = urlInfo(sourceURL);
-	if(info) {
-		info.url = makeAbsoluteURL(sourceURL, baseURL);
-		sources.push(info);
-		if(!info.isAudio) audioOnly = false;
-	}
-	
-	if(sources.length !== 0 || posterURL !== undefined) callback({
-		"playlist": [{"poster": posterURL, "sources": sources}],
-		"audioOnly": audioOnly
-	});
+	if(ext === "php" || !ext) {
+		getMIMEType(sourceURL, function(type) {
+			call(typeInfo(type));
+		});
+	} else call(extInfo(ext));
 }
 
 });

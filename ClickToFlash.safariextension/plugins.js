@@ -31,7 +31,7 @@ function getPluginForType(data) {
 }
 
 function getPluginForExt(data) {
-	var ext = extractExt(data.src);
+	var ext = getExt(data.src);
 	if(data.isObject) {
 		if(nativeExts.indexOf(ext) !== -1) return nativePlugin;
 	} else {

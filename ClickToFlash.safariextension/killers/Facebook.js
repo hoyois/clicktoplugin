@@ -1,7 +1,7 @@
 addKiller("Facebook", {
 
 "canKill": function(data) {
-	return data.src.indexOf("www.facebook.com/v/") !== -1 || /^https?:\/\/(?:fbstatic-a\.akamaihd\.net|static\.ak\.fbcdn\.net|s-static\.ak\.facebook\.com|b\.static\.ak\.fbcdn\.net)\/rsrc\.php\/v[1-9]\/[a-zA-Z0-9_-]{2}\/r\/[a-zA-Z0-9_-]*\.swf/.test(data.src);
+	return data.src.indexOf("www.facebook.com/v/") !== -1 || /^https?:\/\/(?:fbstatic-a\.akamaihd\.net|static\.[a-z]*\.fbcdn\.net|s-static\.[a-z]*\.facebook\.com|b\.static\.[a-z]*\.fbcdn\.net)\/rsrc\.php\/v[1-9]\/[a-zA-Z0-9_-]{2}\/r\/[a-zA-Z0-9_-]*\.swf/.test(data.src);
 },
 
 "process": function(data, callback) {

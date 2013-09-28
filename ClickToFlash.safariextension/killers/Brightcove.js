@@ -35,7 +35,7 @@ addKiller("Brightcove", {
 			if(source.videoCodec !== "H264" || !source.defaultURL) return;
 			var bitrate = Math.round(parseInt(source.encodingRate)/100000);
 			var format = bitrate === 0 ? source.frameHeight + "p " : bitrate + "00k ";
-			var ext = extractExt(source.defaultURL);
+			var ext = getExt(source.defaultURL);
 			format += ext ? ext.toUpperCase() : "MP4";
 			sources.unshift({"url": source.defaultURL, "format": format, "height": parseInt(source.frameHeight), "isAudio": source.audioOnly, "isNative": true});
 		};
@@ -44,7 +44,7 @@ addKiller("Brightcove", {
 		if(sources.length === 0) {
 			media.IOSRenditions.forEach(processRendition);
 			if(sources.length === 0) {
-				var source = urlInfo(media.FLVFullLengthURL);
+				var source = extInfo(getExt(media.FLVFullLengthURL));
 				if(source && !media.FLVFullLengthStreamed) {
 					source.url = media.FLVFullLengthURL;
 					sources.push(source);

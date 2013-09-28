@@ -3,7 +3,7 @@
 if(settings.version === undefined) {
 	openTab(safari.extension.baseURI + "settings.html");
 }
-settings.version = 61;
+settings.version = 62;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
@@ -83,7 +83,7 @@ function respondToMessage(event) {
 		event.target.page.dispatchMessage(event.name, "");
 		break;
 	case "whitelist":
-		handleWhitelisting("locationsWhitelist", extractDomain(event.message));
+		handleWhitelisting("locationsWhitelist", getDomain(event.message));
 		break;
 	case "openTab":
 		openTab(event.message);
@@ -249,7 +249,7 @@ function doCommand(event) {
 	switch(event.command) {
 	case "locationsWhitelist":
 	case "locationsBlacklist":
-		handleWhitelisting(event.command, extractDomain(event.userInfo.location));
+		handleWhitelisting(event.command, getDomain(event.userInfo.location));
 		break;
 	case "sourcesWhitelist":
 	case "sourcesBlacklist":

@@ -141,11 +141,11 @@ function parseWithRegExp(text, regex, processValue) { // regex needs 'g' flag
 function parseFlashVariables(s) {return parseWithRegExp(s, /([^&=]*)=([^&]*)/g);}
 function parseSLVariables(s) {return parseWithRegExp(s, /\s*([^,=]*)=([^,]*)/g);}
 
-function extractDomain(url) {
+function getDomain(url) {
 	return /\/\/([^\/]+)\//.exec(url)[1];
 }
 
-function extractExt(url) {
+function getExt(url) {
 	var i = url.search(/[?#]/);
 	if(i === -1) i = undefined;
 	url = url.substring(url.lastIndexOf("/", i) + 1, i);
@@ -201,7 +201,7 @@ function parseXSPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlayli
 			if(list.length > 0) mediaURL = makeAbsoluteURL(list[0].textContent, baseURL);
 			else if(i === 0) return;
 			else continue;
-			info = urlInfo(mediaURL);
+			info = extInfo(getExt(mediaURL));
 			if(!info) {
 				if(i === 0) return;
 				if(i >= x.length - track) --startTrack;
