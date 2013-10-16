@@ -31,10 +31,14 @@ MediaPlayer.prototype.openInQTP = function(source) {
 };
 
 MediaPlayer.prototype.airplay = function(source) {
-	if(this.mediaElement) this.mediaElement.pause();
+	var position = 0;
+	if(this.mediaElement) {
+		this.mediaElement.pause();
+		position = this.mediaElement.currentTime / this.mediaElement.duration;
+	}
 	var anchor = document.createElement("a");
 	anchor.href = this.getURL(source);
-	safari.self.tab.dispatchMessage("airplay", anchor.href);
+	safari.self.tab.dispatchMessage("airplay", {"url": anchor.href, "position": position});
 };
 
 MediaPlayer.prototype.viewOnSite = function() {
@@ -542,8 +546,6 @@ MediaPlayer.prototype.initTrackSelector = function() {
 	
 	var show = function() {
 		player.shadowDOM.controlsPanel.style.display = "none";
-		container.style.setProperty("left", "0px", "important");
-		container.style.setProperty("width", "inherit", "important");
 		container.classList.remove("CTPhidden");
 		selector.focus();
 	};

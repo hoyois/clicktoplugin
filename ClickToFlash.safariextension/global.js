@@ -3,7 +3,7 @@
 if(settings.version === undefined) {
 	openTab(safari.extension.baseURI + "settings.html");
 }
-settings.version = 62;
+settings.version = 63;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
@@ -89,7 +89,7 @@ function respondToMessage(event) {
 		openTab(event.message);
 		break;
 	case "airplay":
-		airplay(event.message);
+		airplay(event.message.url, event.message.position);
 		break;
 	case "openSettings":
 		openTab(safari.extension.baseURI + "settings.html");
@@ -275,6 +275,7 @@ var disabled = false;
 
 function switchOff() {
 	safari.extension.removeContentScripts();
+	killers = {};
 	disabled = true;
 	reloadTab(safari.application.activeBrowserWindow.activeTab);
 }
@@ -286,6 +287,7 @@ function switchOn() {
 	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "main.js");
 	safari.extension.addContentScript(localizationScript, [], [], false);
 	updateGlobalShortcuts();
+	loadScripts.apply(this, settings.killers);
 	disabled = false;
 	reloadTab(safari.application.activeBrowserWindow.activeTab);
 }

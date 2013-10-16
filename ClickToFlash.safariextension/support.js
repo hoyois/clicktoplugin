@@ -42,7 +42,7 @@ function openTab(url) {
 	tab.url = url;
 }
 
-function airplay(url) {
+function airplay(url, position) {
 	var xhr = new XMLHttpRequest();
 	var port = ":7000";
 	if(/:\d+$/.test(settings.airplayHostname)) port = "";
@@ -62,7 +62,7 @@ function airplay(url) {
 		}, 1000);
 	}, false);
 	xhr.setRequestHeader("Content-Type", "text/parameters");
-	xhr.send("Content-Location: " + url + "\nStart-Position: 0\n");
+	xhr.send("Content-Location: " + url + "\nStart-Position: " + position + "\n");
 }
 
 function matchList(list, string) {

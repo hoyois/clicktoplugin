@@ -261,7 +261,7 @@ Media player
 	overflow: hidden !important;
 	padding: 0 7px !important;
 	pointer-events: visible !important;
-	right: 0 !important;
+	width: inherit !important;
 }
 
 .CTPmediaPlayer .CTPtrackList {
