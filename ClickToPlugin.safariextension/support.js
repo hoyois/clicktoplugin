@@ -42,7 +42,9 @@ function openTab(url) {
 	tab.url = url;
 }
 
-function airplay(url) {
+function airplay(airplayMessage) {
+	var url = airplayMessage[0];
+	var position = airplayMessage[1];
 	var xhr = new XMLHttpRequest();
 	var port = ":7000";
 	if(/:\d+$/.test(settings.airplayHostname)) port = "";
@@ -62,7 +64,7 @@ function airplay(url) {
 		}, 1000);
 	}, false);
 	xhr.setRequestHeader("Content-Type", "text/parameters");
-	xhr.send("Content-Location: " + url + "\nStart-Position: 0\n");
+	xhr.send("Content-Location: " + url + "\nStart-Position: " + position + "\n");
 }
 
 function matchList(list, string) {
