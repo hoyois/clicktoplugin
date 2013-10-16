@@ -31,16 +31,14 @@ MediaPlayer.prototype.openInQTP = function(source) {
 };
 
 MediaPlayer.prototype.airplay = function(source) {
-	if(this.mediaElement) this.mediaElement.pause();
-	var anchor = document.createElement("a");
-	anchor.href = this.getURL(source);	
-	var position = 0.0;
-	if(this.mediaElement)
-	{
+	var position = 0;
+	if(this.mediaElement) {
+		this.mediaElement.pause();
 		position = this.mediaElement.currentTime / this.mediaElement.duration;
 	}
-	var airplayMessage = [anchor.href, position];
-	safari.self.tab.dispatchMessage("airplay", airplayMessage);
+	var anchor = document.createElement("a");
+	anchor.href = this.getURL(source);
+	safari.self.tab.dispatchMessage("airplay", {"url": anchor.href, "position": position});
 };
 
 MediaPlayer.prototype.viewOnSite = function() {

@@ -3,7 +3,7 @@
 if(settings.version === undefined) {
 	openTab(safari.extension.baseURI + "settings.html");
 }
-settings.version = 62;
+settings.version = 63;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
@@ -83,13 +83,13 @@ function respondToMessage(event) {
 		event.target.page.dispatchMessage(event.name, "");
 		break;
 	case "whitelist":
-		handleWhitelisting("locationsWhitelist", extractDomain(event.message));
+		handleWhitelisting("locationsWhitelist", getDomain(event.message));
 		break;
 	case "openTab":
 		openTab(event.message);
 		break;
 	case "airplay":
-		airplay(event.message);
+		airplay(event.message.url, event.message.position);
 		break;
 	case "openSettings":
 		openTab(safari.extension.baseURI + "settings.html");
@@ -255,7 +255,7 @@ function doCommand(event) {
 	switch(event.command) {
 	case "locationsWhitelist":
 	case "locationsBlacklist":
-		handleWhitelisting(event.command, extractDomain(event.userInfo.location));
+		handleWhitelisting(event.command, getDomain(event.userInfo.location));
 		break;
 	case "sourcesWhitelist":
 	case "sourcesBlacklist":
@@ -281,6 +281,7 @@ var disabled = false;
 
 function switchOff() {
 	safari.extension.removeContentScripts();
+	killers = {};
 	disabled = true;
 	reloadTab(safari.application.activeBrowserWindow.activeTab);
 }
@@ -292,6 +293,7 @@ function switchOn() {
 	safari.extension.addContentScriptFromURL(safari.extension.baseURI + "main.js");
 	safari.extension.addContentScript(localizationScript, [], [], false);
 	updateGlobalShortcuts();
+	loadScripts.apply(this, settings.killers);
 	disabled = false;
 	reloadTab(safari.application.activeBrowserWindow.activeTab);
 }

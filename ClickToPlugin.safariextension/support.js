@@ -42,9 +42,7 @@ function openTab(url) {
 	tab.url = url;
 }
 
-function airplay(airplayMessage) {
-	var url = airplayMessage[0];
-	var position = airplayMessage[1];
+function airplay(url, position) {
 	var xhr = new XMLHttpRequest();
 	var port = ":7000";
 	if(/:\d+$/.test(settings.airplayHostname)) port = "";
@@ -143,7 +141,7 @@ function parseWithRegExp(text, regex, processValue) { // regex needs 'g' flag
 function parseFlashVariables(s) {return parseWithRegExp(s, /([^&=]*)=([^&]*)/g);}
 function parseSLVariables(s) {return parseWithRegExp(s, /\s*([^,=]*)=([^,]*)/g);}
 
-function extractDomain(url) {
+function getDomain(url) {
 	return /\/\/([^\/]+)\//.exec(url)[1];
 }
 
