@@ -39,7 +39,7 @@ addKiller("YouTube", {
 		if(this.playlistFilter.test(flashvars.list)) playlistID = flashvars.list;
 		if(onsite) {
 			
-			var match = /as3-vfl(.{6})\.swf/.exec(data.src);
+			var match = /-vfl(.{6})\/watch_as3\.swf/.exec(data.src);
 			if(match && match[1] !== this.decoder[0]) this.decoder = [match[1], null];
 			
 			match = /[#&?]t=(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?/.exec(data.location);
@@ -186,7 +186,7 @@ addKiller("YouTube", {
 					if(match) {
 						flashvars.url_encoded_fmt_stream_map = encodeURIComponent(unescapeUnicode(match[1]));
 						
-						match = /watch_as3-vfl(.{6})\.swf/.exec(xhr2.responseText);
+						match = /\/player-vfl(.{6})\/watch_as3\.swf/.exec(xhr2.responseText);
 						if(match && match[1] !== _this.decoder[0]) _this.decoder = [match[1], null];
 						
 						_this.processFlashVars(flashvars, callbackForEmbed);
