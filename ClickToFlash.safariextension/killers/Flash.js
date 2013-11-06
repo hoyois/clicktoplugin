@@ -2,7 +2,7 @@ addKiller("Flash", {
 
 "canKill": function(data) {
 	if(data.type !== "application/x-shockwave-flash") return false;
-	var match = /(?:^|&)(real_file|file|filename|load|playlistfile|src|source|video|mp3|mp3url|soundFile|soundUrl|url|mediaUrl|file_url|sampleURL|wmvUrl|flvUrl)=/.exec(data.params.flashvars);
+	var match = /(?:^|&)(real_file|file|filename|load|playlistfile|src|source|video|mp3|mp3url|soundFile|soundUrl|url|content|mediaUrl|file_url|sampleURL|wmvUrl|flvUrl)=/.exec(data.params.flashvars);
 	if(match) {data.file = match[1]; return true;}
 	match = /[?&](file|mp3|playlist_url)=/.exec(data.src);
 	if(match) {data.hash = match[1]; return true;}
@@ -36,21 +36,7 @@ addKiller("Flash", {
 	var sourceURL, posterURL;
 	if(data.file) {
 		sourceURL = decodeURIComponent(flashvars[data.file].replace(/\+/g, " "));
-		switch(data.file) {
-		case "file_url":
-			if(flashvars.poster_url) posterURL = decodeURIComponent(flashvars.poster_url);
-			break;
-		case "filename":
-			if(flashvars.icon) posterURL = decodeURIComponent(flashvars.icon);
-			break;
-		case "wmvUrl":
-		case "flvUrl":
-			if(flashvars.sScreenshotUrl) posterURL = decodeURIComponent(flashvars.sScreenshotUrl);
-			break;
-		default:
-			if(flashvars.image) posterURL = decodeURIComponent(flashvars.image);
-			else if(flashvars.preloadImage) posterURL = decodeURIComponent(flashvars.preloadImage);
-		}
+		posterURL = decodeURIComponent(flashvars.image || flashvars.preloadImage || flashvars.poster_url || flashvars.icon || flashvars.thumb || flashvars.sScreenshotUrl || "");
 	} else {
 		sourceURL = new RegExp("[?&]" + data.hash + "=([^&]*)").exec(data.src);
 		if(sourceURL) {
