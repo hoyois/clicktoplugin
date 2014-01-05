@@ -57,7 +57,7 @@ addKiller("YouTube", {
 		callback(mediaData);
 	};
 	
-	if(playlistID) this.processPlaylist(playlistID, videoID, mainCallback, callback);
+	if(playlistID) this.processPlaylist(playlistID, videoID, !onsite, mainCallback, callback);
 	else if(videoID) {
 		if(onsite && /%2[6C]sig%3D/.test(flashvars.url_encoded_fmt_stream_map)) this.processFlashVars(flashvars, mainCallback);
 		else this.processVideoID(videoID, !onsite, mainCallback);
@@ -132,38 +132,7 @@ addKiller("YouTube", {
 			sources.push(source);
 		}
 		
-		// Get 480p, 1080p, and 1440p
-		if((canPlayFLV ? /itag%3D135/ : /itag%3D137/).test(flashvars.adaptive_fmts)) {
-			var query = "?";
-			var dashmpd = decodeURIComponent(flashvars.dashmpd);
-			dashmpd = dashmpd.substring(dashmpd.indexOf("/dash/") + 6).split("/");
-			for(var i = 0; i < dashmpd.length; i++) {
-				if(dashmpd[i] === "s") query += "signature=" + this.decodeSignature(dashmpd[++i]) + "&";
-				else query += dashmpd[i] + "=" + dashmpd[++i] + "&";
-			}
-			
-			var url480 = path + query + "ratebypass=yes&itag=35&title=" + flashvars.title + "%20%5B480p%5D";
-			getMIMEType(url480, function(type) { // Check that the non-DASH videos exist
-				if(type !== "text/plain") {
-					if(canPlayFLV) sources.push({"url": url480, "format": "480p FLV", "height": 480, "isNative": false});
-					if(!canPlayFLV || /itag%3D137/.test(flashvars.adaptive_fmts)) {
-						sources.push({
-							"url": path + query + "ratebypass=yes&itag=37&title=" + flashvars.title + "%20%5B1080p%5D",
-							"format": "1080p MP4",
-							"height": 1080,
-							"isNative": true
-						});
-						if(/itag%3D138/.test(flashvars.adaptive_fmts)) sources.push({
-							"url": path + query + "ratebypass=yes&itag=38&title=" + flashvars.title + "%20%5B1440p%5D",
-							"format": "1440p MP4",
-							"height": 1440,
-							"isNative": true
-						});
-					}
-				}
-				call();
-			});
-		} else call();
+		call();
 	} else if(flashvars.hlsvp) {
 		sources.push({"url": decodeURIComponent(flashvars.hlsvp), "format": "M3U8", "isNative": true});
 		call();
@@ -182,7 +151,7 @@ addKiller("YouTube", {
 	return s.join("");
 },
 
-"processPlaylist": function(playlistID, videoID, mainCallback, callback) {
+"processPlaylist": function(playlistID, videoID, isEmbed, mainCallback, callback) {
 	var videoIDList = [];
 	var _this = this;
 	
@@ -243,7 +212,7 @@ addKiller("YouTube", {
 		};
 		
 		// load the first video at once
-		_this.processVideoID(videoIDList[0], !videoID, callbackForPlaylist);
+		_this.processVideoID(videoIDList[0], isEmbed, callbackForPlaylist);
 		videoIDList.shift();
 		unloadList();
 	};

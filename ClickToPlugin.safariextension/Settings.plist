@@ -133,9 +133,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<array>
-			<string>www.youtube.com/watch</string>
-		</array>
+		<array/>
 		<key>Key</key>
 		<string>mediaWhitelist</string>
 	</dict>

@@ -89,6 +89,15 @@ MediaPlayer.prototype.init = function(style) {
 	}
 	this.container.appendChild(this.mediaElement);
 	
+	if(this.playlistLength > 1 && this.initialBehavior !== "autoplay") {
+		var _this = this;
+		var setAutoplay = function(event) {
+			event.target.removeEventListener("play", setAutoplay, false);
+			_this.initialBehavior = "autoplay";
+		};
+		this.mediaElement.addEventListener("play", setAutoplay, false);
+	}
+	
 	// Set styles
 	this.container.style.setProperty("width", this.width + "px", "important");
 	this.container.style.setProperty("height", this.height + "px", "important");
@@ -175,13 +184,13 @@ MediaPlayer.prototype.loadFirstTrack = function() {
 		};
 		this.mediaElement.addEventListener("loadeddata", setInitialTime, false);
 	}
-	this.load(0, this.currentSource, false, true);
+	this.load(0, this.currentSource, true);
 	if(this.sourceSelector) this.sourceSelector.update();
 };
 
 MediaPlayer.prototype.loadTrack = function(track) {
 	var source = this.playlist[track].defaultSource;
-	this.load(track, source, true, true);
+	this.load(track, source, true);
 	if(this.sourceSelector) this.sourceSelector.update();
 };
 
@@ -195,12 +204,13 @@ MediaPlayer.prototype.switchSource = function(source) {
 	};
 	
 	if(this.sourceSelector) this.sourceSelector.setSource(source);
+	this.initialBehavior = "autoplay";
 	
-	this.load(this.currentTrack, source, true, !this.playlist[this.currentTrack].sources[this.currentSource].isAudio !== !this.playlist[this.currentTrack].sources[source].isAudio);
+	this.load(this.currentTrack, source, !this.playlist[this.currentTrack].sources[this.currentSource].isAudio !== !this.playlist[this.currentTrack].sources[source].isAudio);
 	this.mediaElement.addEventListener("loadeddata", setInitialTime, false);
 };
 
-MediaPlayer.prototype.load = function(track, source, autoplay, updatePoster) {
+MediaPlayer.prototype.load = function(track, source, updatePoster) {
 	if(updatePoster) {
 		// Remove poster early so that it doesn't show before the new poster is loaded
 		this.mediaElement.removeAttribute("poster");
@@ -221,11 +231,11 @@ MediaPlayer.prototype.load = function(track, source, autoplay, updatePoster) {
 	// Finally, load the new source
 	this.mediaElement.src = this.playlist[track].sources[source].url;
 	if(updatePoster) this.updatePoster(); // must be done after setting src (#67900)
-	if(autoplay) {
+	if(this.initialBehavior === "autoplay") {
 		this.mediaElement.preload = "auto";
 		this.mediaElement.autoplay = true;
-		this.mediaElement.load(); // makes the "Loading" text appear right away
 	}
+	if(this.mediaElement.preload === "auto") this.mediaElement.load(); // makes the "Loading" text appear right away
 	if(settings.instantAutoplay && this.mediaElement.autoplay) this.mediaElement.play();
 };
 
