@@ -9,7 +9,7 @@ if(settings.version === undefined) {
 	}
 	settings.killers = tmpArray;
 }
-settings.version = 65;
+settings.version = 66;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
@@ -346,7 +346,7 @@ function kill(data, tab) {
 		}
 		if(!mediaData.loadAfter) {
 			if(mediaData.playlist[0] === null) return;
-			mediaData.autoplay = matchList(settings.mediaWhitelist, data.location);
+			mediaData.autoplay = matchList(settings.mediaWhitelist, tab.url);
 			mediaData.autoload = mediaData.playlist[0].defaultSource !== undefined && settings.defaultPlayer === "html5" && (mediaData.autoplay || settings.mediaAutoload);
 		}
 		

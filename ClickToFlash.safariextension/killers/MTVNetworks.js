@@ -1,25 +1,22 @@
 addKiller("MTVNetworks", {
 
 "contexts": {
-	"cms:video:thedailyshow.com:": "11",
+	"cms:video:thedailyshow.com:": "",
 	"cms:episode:thedailyshow.com:": "5",
 	"cms:video:colbertnation.com:": "8",
 	"cms:episode:colbertnation.com:": "7",
-	// "arc:video:gametrailers.com:": "1", // works without context
-	// "cms:item:southparkstudios.com:": "1", // works without context
-	"cms:content:southparkstudios.com:": "3", // outdated?
+	"arc:video:gametrailers.com:": "",
+	"arc:video:southparkstudios.com:": "",
 	"arc:episode:southparkstudios.com:": "3",
-	"cms:video:comedycentral.com:": "6", // no example found
-	"arc:playlist:comedycentral.com:": "3",
-	// "arc:episode:comedycentral.com:": "2", // works without context
-	// "arc:video:comedycentral.com:": "1", // works without context
-	// "cms:video:tosh.comedycentral.com:": "1", // has no working context
-	// "cms:promo:tosh.comedycentral.com:": "1", // works without context
-	// "arc:episode:tosh:comedycentral.com:": "1", // has no working context
-	"hcx:content:comedycentral.co.uk:": "3"//, // no example found
-	// "cms:video:jokes.com:": "1", // works without context
-	// "uma:video:mtv.com:": "1" // works without context
-	// "uma:videolist:mtv.com:" // only works without context
+	"arc:video:comedycentral.com:": "",
+	"arc:playlist:comedycentral.com:": "6",
+	"arc:episode:comedycentral.com:": "",
+	"arc:promo:tosh.comedycentral.com:": "",
+	"arc:video:tosh.comedycentral.com:": "",
+	"arc:episode:tosh.comedycentral.com:": "1"//,
+	// "hcx:content:comedycentral.co.uk:": "", // no working context
+	// "uma:video:mtv.com:": "", // only rtmpe
+	// "uma:videolist:mtv.com:": "" // only rtmpe
 },
 
 "canKill": function(data) {
