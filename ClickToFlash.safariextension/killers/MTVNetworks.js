@@ -80,14 +80,18 @@ addKiller("MTVNetworks", {
 				var renditions = xhr.responseXML.getElementsByTagName("rendition");
 				
 				var sources = [];
-				var src;
+				var src, index;
 				for(var i = renditions.length -1 ; i >= 0; i--) {
 					var source = typeInfo(renditions[i].getAttribute("type"));
 					if(source === null) continue;
+					
+					src = renditions[i].getElementsByTagName("src")[0].textContent;
+					index = src.indexOf("/gsp.");
+					if(index === -1) continue;
+					source.url = "http://mtvnmobile.vo.llnwd.net/kip0/_pxn=0+_pxK=18639/44620/mtvnorigin" + src.substring(index);
+					
 					source.format = renditions[i].getAttribute("bitrate") + "k " + source.format;
 					source.height = parseInt(renditions[i].getAttribute("height"));
-					src = renditions[i].getElementsByTagName("src")[0].textContent;
-					source.url = "http://mtvnmobile.vo.llnwd.net/kip0/_pxn=0+_pxK=18639/44620/mtvnorigin" + src.substring(src.indexOf("/gsp."));
 					sources.push(source);
 				}
 				

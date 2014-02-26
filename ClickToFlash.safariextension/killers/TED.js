@@ -1,15 +1,18 @@
 addKiller("TED", {
 
 "canKill": function(data) {
-	return data.src.indexOf("http://video.ted.com/assets/player/swf") !== -1;
+	return /https?:\/\/video\.ted\.com\/assets\/player\/swf/.test(data.src);
 },
 
 "process": function(data, callback) {
 	var flashvars = parseFlashVariables(data.params.flashvars);
 	
 	var siteInfo;
-	if(/^http:\/\/www\.ted\.com\/talks/.test(data.location)) {
+	if(/^https?:\/\/www\.ted\.com\/talks/.test(data.location)) {
 		url = data.location;
+	} else if(/^https?:\/\/embed\.ted\.com\/talks/.test(data.location)) {
+		url = data.location.replace("//embed", "//www");
+		siteInfo = {"name": "TED", "url": url};
 	} else {
 		var match = /adKeys=talk=([^;]*);/.exec(data.params.flashvars);
 		if(match) {
