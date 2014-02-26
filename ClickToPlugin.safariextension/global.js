@@ -9,7 +9,7 @@ if(settings.version === undefined) {
 	}
 	settings.killers = tmpArray;
 }
-settings.version = 67;
+settings.version = 68;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
