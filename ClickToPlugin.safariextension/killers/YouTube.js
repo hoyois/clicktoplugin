@@ -86,25 +86,6 @@ addKiller("YouTube", {
 	if(flashvars.ps === "live" && !flashvars.hlsvp) return;
 	
 	var sources = [];
-	var call = function() {
-		var poster, title;
-		if(flashvars.iurlmaxres) poster = decodeURIComponent(flashvars.iurlmaxres);
-		else if(flashvars.iurlsd) poster = decodeURIComponent(flashvars.iurlsd);
-		else poster = "https://i.ytimg.com/vi/" + flashvars.video_id + "/hqdefault.jpg";
-		if(flashvars.title) title = decodeURIComponent(flashvars.title.replace(/\+/g, " "));
-		
-		sources.sort(function(s, t) {
-			return s.height < t.height ? 1 : -1;
-		});
-		
-		callback({
-			"playlist": [{
-				"title": title,
-				"poster": poster,
-				"sources": sources
-			}]
-		});
-	};
 	
 	// Get video URLs
 	if(flashvars.url_encoded_fmt_stream_map) {
@@ -126,17 +107,32 @@ addKiller("YouTube", {
 				source = {"format": "240p FLV", "height": 240, "isNative": false};
 			} else continue;
 			
-			source.url = decodeURIComponent(fmt.url).replace(/^https/, "http") + "&title=" + flashvars.title + "%20%5B" + source.height + "p%5D";
+			source.url = decodeURIComponent(fmt.url) + "&title=" + flashvars.title + "%20%5B" + source.height + "p%5D";
 			if(fmt.sig) source.url += "&signature=" + fmt.sig;
 			else if(fmt.s) source.url += "&signature=" + this.decodeSignature(fmt.s);
 			sources.push(source);
 		}
-		
-		call();
 	} else if(flashvars.hlsvp) {
 		sources.push({"url": decodeURIComponent(flashvars.hlsvp), "format": "M3U8", "isNative": true});
-		call();
 	}
+	
+	var poster, title;
+	if(flashvars.iurlmaxres) poster = decodeURIComponent(flashvars.iurlmaxres);
+	else if(flashvars.iurlsd) poster = decodeURIComponent(flashvars.iurlsd);
+	else poster = "https://i.ytimg.com/vi/" + flashvars.video_id + "/hqdefault.jpg";
+	if(flashvars.title) title = decodeURIComponent(flashvars.title.replace(/\+/g, " "));
+	
+	sources.sort(function(s, t) {
+		return s.height < t.height ? 1 : -1;
+	});
+	
+	callback({
+		"playlist": [{
+			"title": title,
+			"poster": poster,
+			"sources": sources
+		}]
+	});
 },
 
 "decodeSignature": function(s) {
@@ -178,7 +174,7 @@ addKiller("YouTube", {
 		xhr.open("GET", "https://www.youtube.com/playlist?list=" + playlistID + "&page=" + page, true);
 		xhr.addEventListener("load", function() {
 			if(xhr.status === 200) {
-				var regex = /class=\"video-title-container\">\s*<a href=\"\/watch\?v=([^&]*)/g;
+				var regex = /class=\"pl-video-content\"><a href=\"\s*\/watch\?v=([^&]*)/g;
 				var match;
 				while(match = regex.exec(xhr.responseText)) {
 					videoIDList.push(match[1]);

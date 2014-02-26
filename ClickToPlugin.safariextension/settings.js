@@ -118,6 +118,7 @@ main.addEventListener("change", function(event) {
 		} else {
 			document.getElementById("mediaAutoload").disabled = true;
 			document.getElementById("mediaAutoload").checked = false;
+			document.getElementById("showPoster").disabled = false;
 			changeSetting("mediaAutoload", false);
 		}
 		break;
