@@ -221,18 +221,11 @@ function handleBeforeLoadEvent(event) {
 	var placeholder = document.createElement("div");
 	if(settings.showTooltip) placeholder.title = response.src; // tooltip
 	placeholder.className = "CTPnoimage CTPplaceholder";
-	placeholder.style.setProperty("width", data.width + "px", "important");
-	placeholder.style.setProperty("height", data.height + "px", "important");
 	if(response.isInvisible) placeholder.classList.add("CTPinvisible");
 	
 	// Copy CSS box & positioning properties that have an effect on page layout
-	// NOTE: 'display' is set to 'inline-block' which is always correct for "replaced elements"
-	var style = getComputedStyle(event.target, null);
-	var properties = ["top", "right", "bottom", "left", "z-index", "clear", "float", "vertical-align", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-before-collapse", "-webkit-margin-after-collapse"];
-	// position: static -> relative (for source selector positioning)
-	if(style.getPropertyValue("position") === "static") placeholder.style.setProperty("position", "relative", "important");
-	else properties.push("position");
-	applyCSS(placeholder, style, properties);
+	event.target.classList.add("CTPnodisplay"); // to get the actual computed values (cf. CSSOM spec)
+	copyBoxCSS(event.target, placeholder, data.width, data.height);
 	
 	// Replace and stack
 	event.target.parentNode.replaceChild(placeholder, event.target);
@@ -252,14 +245,13 @@ function handleBeforeLoadEvent(event) {
 			stack.innerHTML = "<div><div></div></div>";
 			stack.firstChild.firstChild.appendChild(event.target);
 		}
+		event.target.classList.remove("CTPnodisplay");
 	}
 	
 	// Fill the main array
 	_[data.elementID] = {
 		"element": response.isNative ? event.target.cloneNode(true) : event.target,
 		"placeholder": placeholder,
-		"width": data.width,
-		"height": data.height,
 		"src": response.src,
 		"plugin": response.isNative ? "?" : response.plugin
 	};
@@ -267,13 +259,14 @@ function handleBeforeLoadEvent(event) {
 	// Event listeners (not in this scope to prevent unwanted closure)
 	registerShortcuts(data.elementID);
 	addListeners(data.elementID);
+	if("MutationObserver" in window) addObserver(data.elementID);
 	
 	// Fill the placeholder
 	placeholder.innerHTML = "<div class=\"CTPplaceholderContainer\"><div class=\"CTPlogoContainer CTPnodisplay\"><div class=\"CTPlogo\"></div><div class=\"CTPlogo CTPinset\"></div></div></div>";
 	placeholder.firstChild.style.setProperty("opacity", settings.opacity, "important");
 	
 	// Display the badge
-	if(_[data.elementID].plugin) displayBadge(data.elementID, _[data.elementID].plugin);
+	if(_[data.elementID].plugin) displayBadge(data.elementID, _[data.elementID].plugin, true);
 }
 
 function loadPlugin(elementID) {
@@ -327,7 +320,7 @@ function loadInvisible() {
 }
 
 function handleMediaData(elementID, mediaData) {
-	if(_[elementID].player === undefined) _[elementID].player = new MediaPlayer(_[elementID].width, _[elementID].height, {
+	if(_[elementID].player === undefined) _[elementID].player = new MediaPlayer({
 		"documentID": documentID,
 		"elementID": elementID,
 		"src": _[elementID].src,
@@ -370,6 +363,7 @@ function initMedia(elementID, media) {
 
 function loadMedia(elementID, focus) {
 	// Initialize player
+	_[elementID].placeholder.classList.add("CTPnodisplay");
 	_[elementID].player.init(getComputedStyle(_[elementID].placeholder, null));
 	
 	// Load player
@@ -380,7 +374,7 @@ function loadMedia(elementID, focus) {
 	_[elementID].placeholder = {};
 }
 
-function displayBadge(elementID, label) {
+function displayBadge(elementID, label, async) {
 	var logoContainer = _[elementID].placeholder.firstChild.firstChild;
 	
 	// Hide the badge
@@ -389,12 +383,24 @@ function displayBadge(elementID, label) {
 	// Set the new label
 	logoContainer.firstChild.textContent = label;
 	logoContainer.lastChild.textContent = label;
+	// Store dimensions of new label
+	var w1 = logoContainer.firstChild.offsetWidth;
+	var h1 = logoContainer.firstChild.offsetHeight;
+	var w2 = logoContainer.lastChild.offsetWidth;
+	var h2 = logoContainer.lastChild.offsetHeight;
 	
-	// Unhide
-	if(logoContainer.firstChild.offsetWidth <= _[elementID].width - 4 && logoContainer.firstChild.offsetHeight <= _[elementID].height - 4) logoContainer.className = "CTPlogoContainer";
-	else if(logoContainer.lastChild.offsetWidth <= _[elementID].width - 4 && logoContainer.lastChild.offsetHeight <= _[elementID].height - 4) logoContainer.className = "CTPlogoContainer CTPmini";
-	else logoContainer.className = "CTPlogoContainer CTPnodisplay";
-	logoContainer.lastChild.className = "CTPlogo CTPinset";
+	var unhide = function() {
+		var width = _[elementID].placeholder.offsetWidth;
+		var height = _[elementID].placeholder.offsetHeight;
+		if(w1 <= width - 4 && h1 <= height - 4) logoContainer.className = "CTPlogoContainer";
+		else if(w2 <= width - 4 && h2 <= height - 4) logoContainer.className = "CTPlogoContainer CTPmini";
+		else logoContainer.className = "CTPlogoContainer CTPnodisplay";
+		logoContainer.lastChild.className = "CTPlogo CTPinset";
+	};
+	
+	// Unhide label
+	if(async) setTimeout(unhide, 0);
+	else unhide();
 }
 
 function clickPlaceholder(elementID) {
@@ -417,7 +423,7 @@ function clickPlaceholder(elementID) {
 }
 
 function showInfo(elementID) {
-	alert("Plug-in: " + (_[elementID].plugin ? _[elementID].plugin : "None") + " (" + _[elementID].width + "×" + _[elementID].height + ")\nLocation: " + href + "\nSource: " + _[elementID].src + "\n\nHTML:\n" + new XMLSerializer().serializeToString(_[elementID].element));
+	alert("Plug-in: " + (_[elementID].plugin ? _[elementID].plugin : "None") + " (" + _[elementID].placeholder.offsetWidth + "×" + _[elementID].placeholder.offsetHeight + ")\nLocation: " + href + "\nSource: " + _[elementID].src + "\n\nHTML:\n" + new XMLSerializer().serializeToString(_[elementID].element));
 }
 
 function registerShortcuts(elementID) {
@@ -450,4 +456,14 @@ function addListeners(elementID) {
 		}
 		event.stopPropagation();
 	}, false);
+}
+
+function addObserver(elementID) {
+	_[elementID].observer = new MutationObserver(function(mutations) {
+		mutations.forEach(function(mutation) {
+			if(_[elementID].player && _[elementID].player.container) copyBoxCSS(mutation.target, _[elementID].player.container);
+			else copyBoxCSS(mutation.target, _[elementID].placeholder);
+		});
+	});
+	_[elementID].observer.observe(_[elementID].element, {"attributes": true, "attributeFilter": ["style"]});
 }
