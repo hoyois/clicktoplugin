@@ -1,10 +1,10 @@
 addKiller("MTVNetworks", {
 
 "contexts": {
-	"cms:video:thedailyshow.com:": "",
-	"cms:episode:thedailyshow.com:": "5",
-	"cms:video:colbertnation.com:": "8",
-	"cms:episode:colbertnation.com:": "7",
+	"arc:video:thedailyshow.com:": "3",
+	"arc:episode:thedailyshow.com:": "5",
+	"arc:video:colbertnation.com:": "3",
+	// "arc:episode:colbertnation.com:": "", // no feed
 	"arc:video:gametrailers.com:": "",
 	"arc:video:southparkstudios.com:": "",
 	"arc:episode:southparkstudios.com:": "3",
@@ -14,9 +14,14 @@ addKiller("MTVNetworks", {
 	"arc:promo:tosh.comedycentral.com:": "",
 	"arc:video:tosh.comedycentral.com:": "",
 	"arc:episode:tosh.comedycentral.com:": "1"//,
-	// "hcx:content:comedycentral.co.uk:": "", // no working context
+	// "hcx:content:comedycentral.co.uk:": "", // only rtmpe
 	// "uma:video:mtv.com:": "", // only rtmpe
 	// "uma:videolist:mtv.com:": "" // only rtmpe
+},
+
+"aliases": {
+	"arc:episode:colbertnation.com:": "arc:video:colbertnation.com:",
+	"arc:episode:southpark.de:": "arc:episode:southparkstudios.com:"
 },
 
 "canKill": function(data) {
@@ -26,6 +31,8 @@ addKiller("MTVNetworks", {
 "process": function(data, callback) {
 	var mgid = /mgid:([^.]*[.\w]+:)[-\w]+/.exec(data.src);
 	if(!mgid) return;
+	if(this.aliases[mgid[1]]) mgid[1] = this.aliases[mgid[1]];
+	
 	var context = "";
 	if(this.contexts[mgid[1]]) context = "/context" + this.contexts[mgid[1]];
 	

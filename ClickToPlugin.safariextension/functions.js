@@ -21,6 +21,21 @@ function applyCSS(element, style, properties) {
 	}
 }
 
+function copyBoxCSS(element, target, offsetWidth, offsetHeight) {
+	var style = getComputedStyle(element, null);
+	var properties = ["top", "right", "bottom", "left", "z-index", "clear", "float", "vertical-align", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-before-collapse", "-webkit-margin-after-collapse"];
+	// Position: static -> relative
+	if(style.getPropertyValue("position") === "static") target.style.setProperty("position", "relative", "important");
+	else properties.push("position");
+	// Dimensions: absolute -> offset
+	if(/%$|^auto$/.test(style.getPropertyValue("width"))) properties.push("width");
+	else if(offsetWidth !== undefined) target.style.setProperty("width", offsetWidth + "px", "important");
+	if(/%$|^auto$/.test(style.getPropertyValue("height"))) properties.push("height");
+	else if(offsetHeight !== undefined) target.style.setProperty("height", offsetHeight + "px", "important");
+	// Apply CSS
+	applyCSS(target, style, properties);
+}
+
 function injectScript(script) {
 	var element = document.createElement("script");
 	element.text = script;

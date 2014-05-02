@@ -10,7 +10,7 @@ if(window.safari) {
 
 addKiller("YouTube", {
 
-"playlistFilter": /^UL|^PL|^SP|^AL/,
+"playlistFilter": /^UL|^PL|^FL|^SP|^AL/,
 
 "canKill": function(data) {
 	if(/^https?:\/\/s\.ytimg\.com\//.test(data.src)) return true;
@@ -59,7 +59,7 @@ addKiller("YouTube", {
 	
 	if(playlistID) this.processPlaylist(playlistID, videoID, !onsite, mainCallback, callback);
 	else if(videoID) {
-		if(onsite && /%2[6C]sig%3D/.test(flashvars.url_encoded_fmt_stream_map)) this.processFlashVars(flashvars, mainCallback);
+		if(onsite && /[%5]2[6C]sig/.test(flashvars.url_encoded_fmt_stream_map)) this.processFlashVars(flashvars, mainCallback);
 		else this.processVideoID(videoID, !onsite, mainCallback);
 	}
 },
@@ -170,7 +170,7 @@ addKiller("YouTube", {
 		xhr.open("GET", "https://www.youtube.com/playlist?list=" + playlistID, true);
 		xhr.addEventListener("load", function() {
 			if(xhr.status === 200) {
-				var regex = /class=\"pl-video-content\"><a href=\"\s*\/watch\?v=([^&]*)/g;
+				var regex = /\bdata-video-id="([^"]*)"/g;
 				var match;
 				while(match = regex.exec(xhr.responseText)) {
 					videoIDList.push(match[1]);

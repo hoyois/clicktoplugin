@@ -1,60 +1,48 @@
 addKiller("TED", {
 
 "canKill": function(data) {
-	return /https?:\/\/video\.ted\.com\/assets\/player\/swf/.test(data.src);
+	return data.src.indexOf("ted.com/assets/player") !== -1;
 },
 
 "process": function(data, callback) {
 	var flashvars = parseFlashVariables(data.params.flashvars);
 	
 	var siteInfo;
-	if(/^https?:\/\/www\.ted\.com\/talks/.test(data.location)) {
-		url = data.location;
-	} else if(/^https?:\/\/embed\.ted\.com\/talks/.test(data.location)) {
-		url = data.location.replace("//embed", "//www");
+	var url = data.location;
+	if(/^https?:\/\/embed\.ted\.com\/talks/.test(url)) {
+		url = url.replace("embed", "www")
 		siteInfo = {"name": "TED", "url": url};
-	} else {
-		var match = /adKeys=talk=([^;]*);/.exec(data.params.flashvars);
-		if(match) {
-			url = "http://www.ted.com/talks/" + match[1] + ".html";
-			siteInfo = {"name": "TED", "url": url};
-		} else return;
 	}
+	
+	var playlist = JSON.parse(decodeURIComponent(flashvars.playlist).replace(/\\\//g, "/"));
+	var talkID = playlist.talks[0].resource[0].file;
+	talkID = talkID.substring(talkID.lastIndexOf("/"), talkID.lastIndexOf("-"));
+	
+	var urlBase = "http://download.ted.com/talks" + talkID;
+	var sources = [
+		{"url": urlBase + "-480p.mp4", "format": "480p MP4", "height": 480, "isNative": true},
+		{"url": urlBase + ".mp4", "format": "360p MP4", "height": 360, "isNative": true},
+		{"url": urlBase + "-light.mp4", "format": "270p MP4", "height": 270, "isNative": true}
+	];
 	
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", url, true);
 	xhr.addEventListener("load", function() {
 		var page = document.implementation.createHTMLDocument("");
 		page.documentElement.innerHTML = xhr.responseText;
-		var talkID = page.getElementById("no-flash-video-download").href;
-		talkID = /[^-.]*/.exec(talkID.substring(talkID.lastIndexOf("/") + 1))[0];
 		
-		var xhr2 = new XMLHttpRequest();
-		xhr2.open("GET", "http://www.ted.com/download/links/slug/" + talkID + "/type/talks/ext/mp4", true);
-		xhr2.addEventListener("load", function() {
-			var xml = new DOMParser().parseFromString(("<root>" + xhr2.responseText + "</root>").replace(/&[^;]*;/g, ""), "text/xml");
-			
-			var sources = [];
-			var audio = xml.getElementById("audio_downloads").getElementsByTagName("a");
-			var downloads = xml.getElementsByName("download_quality");
-			for(var i = downloads.length - 1; i >= 0; i--) {
-				var quality = downloads[i].dataset.name;
-				if(quality === "light") quality = "270p";
-				else if(quality === "regular") quality = "360p";
-				sources.push({"url": "http://download.ted.com/talks/" + talkID + downloads[i].getAttribute("value") + ".mp4", "format": quality + " MP4", "height": parseInt(quality), "isNative": true})
-			}
-			if(audio[0]) sources.push({"url": audio[0].getAttribute("href"), "format": "Audio MP3", "height": 0, "isNative": true, "isAudio": true});
-			
-			callback({
-				"playlist": [{
-					"poster": page.querySelector("[rel=\"image_src\"]").href,
-					"title": page.getElementById("altHeadline").textContent,
-					"sources": sources,
-					"siteInfo": siteInfo
-				}]
-			});
-		}, false);
-		xhr2.send(null);
+		var title = page.querySelector("[property=\"og:title\"]").getAttribute("content");
+		var posterURL = page.querySelector("[property=\"og:image\"]").getAttribute("content");
+		if(/\"audioDownload\":\"/.test(xhr.responseText)) sources.push({"url": urlBase + ".mp3", "format": "Audio MP3", "height": 0, "isNative": true, "isAudio": true});
+		
+		callback({
+			"playlist": [{
+				"poster": posterURL,
+				"title": title,
+				"sources": sources,
+				"siteInfo": siteInfo
+			}]
+		});
 	}, false);
 	xhr.send(null);
 }

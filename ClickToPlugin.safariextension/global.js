@@ -2,14 +2,22 @@
 // UPDATE
 if(settings.version === undefined) {
 	openTab(safari.extension.baseURI + "settings.html");
-} else if(settings.version < 64) {
+}
+if(settings.version < 64) {
 	var tmpArray = [];
 	for(var i = 0; i < settings.killers.length; i++) {
 		if(settings.killers[i] !== "killers/Vimeo.js") tmpArray.push(settings.killers[i]);
 	}
 	settings.killers = tmpArray;
 }
-settings.version = 68;
+if(settings.version < 69) {
+	var tmpArray = [];
+	for(var i = 0; i < settings.killers.length; i++) {
+		if(settings.killers[i] !== "killers/Break.js") tmpArray.push(settings.killers[i]);
+	}
+	settings.killers = tmpArray;
+}
+settings.version = 69;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
