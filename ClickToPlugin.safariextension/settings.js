@@ -288,18 +288,18 @@ function updateBlacklistLabels(invert) {
 }
 
 // List of plugins
-function buildPluginMenu() {
+function buildPluginMenu(plugins) {
 	var pluginMenu = document.getElementById("plug-ins");
 	pluginMenu.addEventListener("change", function() {
 		changeSetting("allowedPlugins", checkedPlugins());
 	}, false);
 	var span = pluginMenu.children[0].children[0];
-	if(navigator.plugins.length === 0) {
+	if(plugins.length === 0) {
 		span.textContent = NO_PLUGINS_NOTICE;
 		return;
 	}
 	span.textContent = ALLOW_THESE_PLUGINS;
-	var plugins = Array.prototype.slice.call(navigator.plugins, 0).sort(function(p, q) {
+	plugins.sort(function(p, q) {
 		p = p.name.toLowerCase();
 		q = q.name.toLowerCase();
 		if(p < q) return -1;
@@ -351,7 +351,8 @@ function adjustLayout() {
 // Load settings
 function loadSettings(event) {
 	if(event.name !== "CTPsettings") return;
-	var settings = event.message;
+	var settings = event.message.settings;
+	var plugins = event.message.plugins;
 	
 	// Localize
 	localize(PREFERENCES_STRINGS, settings.language);
@@ -361,8 +362,8 @@ function loadSettings(event) {
 	updateBlacklistLabels(settings.invertBlacklists);
 	
 	// Plugins
-	buildPluginMenu();
-	if(navigator.plugins.length > 0 && settings.allowedPlugins.length > 0) {
+	buildPluginMenu(plugins);
+	if(plugins.length > 0 && settings.allowedPlugins.length > 0) {
 		for(var i = 0; i < settings.allowedPlugins.length; i++) {
 			var input = document.getElementById("plugin/" + settings.allowedPlugins[i]);
 			if(input) input.checked = true;
