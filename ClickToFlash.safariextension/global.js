@@ -17,7 +17,7 @@ if(settings.version < 69) {
 	}
 	settings.killers = tmpArray;
 }
-settings.version = 69;
+settings.version = 70;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
@@ -112,7 +112,9 @@ function respondToMessage(event) {
 		changeSetting(event.message.setting, event.message.value);
 		break;
 	case "getSettings":
-		event.target.page.dispatchMessage("CTPsettings", getSettings(ALL_SETTINGS));
+		event.target.page.dispatchMessage("CTPsettings", {
+			"settings": getSettings(ALL_SETTINGS)
+		});
 		break;
 	}
 }

@@ -309,7 +309,7 @@ function adjustLayout() {
 // Load settings
 function loadSettings(event) {
 	if(event.name !== "CTPsettings") return;
-	var settings = event.message;
+	var settings = event.message.settings;
 	
 	// Localize
 	localize(PREFERENCES_STRINGS, settings.language);
