@@ -103,7 +103,7 @@ addKiller("YouTube", {
 				source = {"format": "240p FLV", "height": 240, "isNative": false};
 			} else continue;
 			
-			source.url = decodeURIComponent(fmt.url) + "&title=" + flashvars.title + "%20%5B" + source.height + "p%5D";
+			source.url = decodeURIComponent(fmt.url) + "&title=" + flashvars.title.replace(/%22/g, "	%27") + "%20%5B" + source.height + "p%5D";
 			if(fmt.sig) source.url += "&signature=" + fmt.sig;
 			else if(fmt.s) source.url += "&signature=" + this.decodeSignature(fmt.s);
 			sources.push(source);
