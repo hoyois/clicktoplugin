@@ -73,9 +73,9 @@ function openInQuickTimePlayer(url) {
 	embed.allowedToLoad = true;
 	embed.className = "CTPpluginLauncher";
 	embed.setAttribute("type", "video/quicktime");
-	// need an external URL for source, since QT plugin doesn't accept safari-extension:// protocol
-	// Apple has a small 1px image for this same purpose
-	embed.setAttribute("src", "http://images.apple.com/apple-events/includes/qtbutton.mov");
+	// Need an external URL for source, since QT plugin doesn't accept safari-extension:// protocol
+	// This is the same file used by Apple on trailers.apple.com
+	embed.setAttribute("src", "http://hoyois.github.io/qtbutton.mov");
 	embed.setAttribute("href", url);
 	embed.setAttribute("target", "quicktimeplayer");
 	embed.setAttribute("autohref", "autohref");
