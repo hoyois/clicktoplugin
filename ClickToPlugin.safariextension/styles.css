@@ -236,6 +236,10 @@ Media player
 	top: 0 !important;
 }
 
+.CTPmediaPlayer .CTPmediaElement::-webkit-media-controls-status-display.hidden {
+	display: none !important;
+}
+
 .CTPmediaPlayer .CTPtrackSelector {
 	position: absolute !important;
 	
