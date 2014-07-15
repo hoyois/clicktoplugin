@@ -122,7 +122,7 @@ MediaPlayer.prototype.destroy = function() {
 };
 
 MediaPlayer.prototype.initPlaylistControls = function() {
-	// Do nothing for Safari 7.1+
+	// Do nothing for Safari 7.1+ (prev/next buttons don't exist)
 	var v = /\bVersion\/(\d+)\.(\d+)/.exec(navigator.appVersion);
 	if(/\+/.test(navigator.appVersion) || parseInt(v[1]) > 7 || (parseInt(v[1]) === 7 && parseInt(v[2]) > 0)) return;
 	
