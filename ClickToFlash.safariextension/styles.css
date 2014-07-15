@@ -236,6 +236,10 @@ Media player
 	top: 0 !important;
 }
 
+.CTPmediaPlayer .CTPmediaElement::-webkit-media-controls-status-display.hidden {
+	display: none !important;
+}
+
 .CTPmediaPlayer .CTPtrackSelector {
 	position: absolute !important;
 	
@@ -254,6 +258,8 @@ Media player
 	
 	-webkit-appearance: media-controls-background !important;
 	-webkit-transition-property: none !important;
+	background-color: transparent !important;
+	background-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.921569) 0px, rgba(0, 0, 0, 0.921569) 1px, rgba(89, 89, 89, 0.921569) 1px, rgba(89, 89, 89, 0.921569) 2px, rgba(60, 60, 60, 0.921569) 2px, rgba(35, 35, 35, 0.921569) 12px, rgba(30, 30, 30, 0.921569) 12px, rgba(30, 30, 30, 0.921569) 13px, rgba(25, 25, 25, 0.921569) 13px, rgba(17, 17, 17, 0.921569) 100%) !important;
 	bottom: 0 !important;
 	box-sizing: border-box !important;
 	height: 25px !important;
