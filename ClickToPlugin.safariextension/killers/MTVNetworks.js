@@ -14,8 +14,7 @@ addKiller("MTVNetworks", {
 	"arc:episode:comedycentral.com:": "",
 	"arc:promo:tosh.comedycentral.com:": "",
 	"arc:video:tosh.comedycentral.com:": "",
-	"arc:episode:tosh.comedycentral.com:": "1"//,
-	// "hcx:content:comedycentral.co.uk:": "", // only rtmpe
+	"arc:episode:tosh.comedycentral.com:": "1"//
 	// "uma:video:mtv.com:": "", // only rtmpe
 	// "uma:videolist:mtv.com:": "" // only rtmpe
 },
@@ -43,34 +42,35 @@ addKiller("MTVNetworks", {
 	xhr.addEventListener("load", function() {
 		var xml = xhr.responseXML;
 		var feedURL = xml.getElementsByTagName("feed")[0].textContent.replace(/\n/g, "").replace("{uri}", mgid[0]);
-		if(feedURL) _this.processFeedURL(feedURL, mgid[1], callback);
+		if(feedURL) _this.processFeedURL(feedURL, callback);
 	}, false);
 	xhr.send(null);
 },
 
-"processFeedURL": function(feedURL, mgid, callback) {
+"processFeedURL": function(feedURL, callback) {
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", feedURL, true);
 	xhr.addEventListener("load", function() {
 		var xml = new DOMParser().parseFromString(xhr.responseText.replace(/^\s+/,""), "text/xml");
+		var channels = xml.getElementsByTagName("channel");
+		if(channels.length !== 0) xml = channels[0];
 		var items = xml.getElementsByTagName("item");
 		
 		var list = [];
 		var playlist = [];
 		
-		var content, poster, title, obj;
 		for(var i = 0; i < items.length; i++) {
-			content = items[i].getElementsByTagNameNS("http://search.yahoo.com/mrss/", "content")[0];
-			if(!content) continue;
-			obj = {"content": content.getAttribute("url")};
+			var element = items[i].getElementsByTagName("guid")[0];
+			if(!element) continue;
+			var track = {"mgid": element.textContent};
 			
-			poster = items[i].getElementsByTagNameNS("http://search.yahoo.com/mrss/", "thumbnail")[0];
-			if(poster) obj.poster = poster.getAttribute("url");
+			element = items[i].getElementsByTagNameNS("http://search.yahoo.com/mrss/", "thumbnail")[0];
+			if(element) track.poster = element.getAttribute("url");
 			
-			title = items[i].getElementsByTagName("title")[0];
-			if(title) obj.title = title.textContent;
+			element = items[i].getElementsByTagName("title")[0];
+			if(element) track.title = element.textContent;
 			
-			list.push(obj);
+			list.push(track);
 		}
 		
 		var length = list.length - 1;
@@ -80,37 +80,42 @@ addKiller("MTVNetworks", {
 			else addToPlaylist(list.shift());
 		};
 		
-		var addToPlaylist = function(obj) {
+		var addToPlaylist = function(track) {
 			var xhr = new XMLHttpRequest();
-			xhr.open("GET", obj.content, true);
-			delete obj.content;
+			xhr.open("GET", "http://media.mtvnservices.com/player/html5/mediagen/?uri=" + track.mgid + "&device=iPad", true);
+			delete track.mgid;
 			xhr.addEventListener("load", function() {
-				var renditions = xhr.responseXML.getElementsByTagName("rendition");
+				var xml = new DOMParser().parseFromString(xhr.responseText.replace(/^\s+/,""), "text/xml");
+				console.log(xhr.responseText.replace(/^\s+/,""))
 				
-				var sources = [];
-				var src, index;
-				for(var i = renditions.length -1 ; i >= 0; i--) {
-					var source = typeInfo(renditions[i].getAttribute("type"));
-					if(source === null) continue;
-					
-					src = renditions[i].getElementsByTagName("src")[0].textContent;
-					index = src.indexOf("/gsp.");
-					if(index === -1) continue;
-					source.url = "http://mtvnmobile.vo.llnwd.net/kip0/_pxn=0+_pxK=18639/44620/mtvnorigin" + src.substring(index);
-					
-					source.format = renditions[i].getAttribute("bitrate") + "k " + source.format;
-					source.height = parseInt(renditions[i].getAttribute("height"));
-					sources.push(source);
-				}
-				
-				if(sources.length === 0) {
-					if(list.length === length) return;
+				var src = xml.getElementsByTagName("src")[0];
+				if(src) {
+					var addTrack = function(sources) {
+						track.sources = sources;
+						playlist.push(track);
+						next();
+					};
+					// Individual streams from gametrailers are not directly accessible (how is this possible?)
+					if(/gametrailers/.test(feedURL)) addTrack([{
+						"url": src.textContent,
+						"format": "HLS",
+						"isNative": true
+					}]);
+					else {
+						parseM3U8Track(src.textContent, function(sources) {
+							if(sources === null) return;
+							// Add 720p source manually when I know it exists
+							if(/comedycentral|thecolbertreport|thedailyshow/.test(feedURL)) {
+								var hdURL = sources[0].url.replace(/,[^.]*/, ",1280x720_3500_h32,").replace(/index_\d_av/, "index_0_av");
+								sources.push({"url": hdURL, "format": "3500k HLS", "height": 720, "isNative": true});
+							}
+							addTrack(sources);
+						});
+					}
 				} else {
-					obj.sources = sources;
-					playlist.push(obj);
+					if(list.length === length) return;
+					next();
 				}
-				
-				next();
 			}, false);
 			xhr.send(null);
 		};

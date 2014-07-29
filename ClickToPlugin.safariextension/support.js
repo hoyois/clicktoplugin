@@ -229,3 +229,36 @@ function parseXSPlaylist(playlistURL, baseURL, altPosterURL, track, handlePlayli
 	}, false);
 	xhr.send(null);
 }
+
+function parseM3U8Track(trackURL, handleSourceList) {
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", trackURL, true);
+	xhr.addEventListener("load", function() {
+		if(xhr.status !== 200) {
+			handleSourceList(null);
+			return;
+		}
+		var regex1 = /#EXT-X-STREAM-INF:(.*)\n/g;
+		var regex2 = /(.*)\n/g;
+		var sources = [];
+		var match, url, info;
+		while(match = regex1.exec(xhr.responseText)) {
+			regex2.lastIndex = regex1.lastIndex;
+			url = regex2.exec(xhr.responseText)[1];
+			info = extInfo(getExt(url));
+			if(!info) continue;
+			info.url = url;
+			var params = parseWithRegExp(match[1], /([^,=]*)=(\"[^"]*\"|[^,]*)/g);
+			if(params.RESOLUTION) info.height = parseInt(params.RESOLUTION.split("x")[1]);
+			if(params.BANDWIDTH) info.bitrate = Math.round(parseInt(params.BANDWIDTH)/100000) * 100;
+			info.format = (info.bitrate ? info.bitrate + "k " : info.height + "p ") + info.format;
+			sources.push(info);
+		}
+		sources.sort(function(s, t) {
+			return s.bitrate > t.bitrate ? 1 : -1;
+		});
+		console.log(sources);
+		handleSourceList(sources);
+	}, false);
+	xhr.send(null);
+}
