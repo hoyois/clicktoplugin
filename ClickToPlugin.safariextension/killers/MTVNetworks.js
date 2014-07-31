@@ -25,15 +25,33 @@ addKiller("MTVNetworks", {
 },
 
 "canKill": function(data) {
-	return data.src.indexOf("media.mtvnservices.com") !== -1;
+	if(data.src.indexOf("media.mtvnservices.com") !== -1) return true;
+	if(/^http:\/\/southpark\.cc\.com/.test(data.location)) {data.hulu = true; return true;}
+	return false;
 },
 
 "process": function(data, callback) {
-	var mgid = /mgid:([^.]*[.\w]+:)[-\w]+/.exec(data.src);
-	if(!mgid) return;
-	if(this.aliases[mgid[1]]) mgid[1] = this.aliases[mgid[1]];
-	
+	if(data.hulu) {
+		var _this = this;
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", data.location, true);
+		xhr.addEventListener("load", function() {
+			var mgid = /\bdata-mgid=\"(mgid:([^.]*[.\w]+:)[-\w]+)\"/.exec(xhr.responseText);
+			if(!mgid) return;
+			mgid.shift();
+			_this.processMGID(mgid, callback);
+		}, false);
+		xhr.send(null);
+	} else {
+		var mgid = /mgid:([^.]*[.\w]+:)[-\w]+/.exec(data.src);
+		if(!mgid) return;
+		this.processMGID(mgid, callback);
+	}
+},
+
+"processMGID": function(mgid, callback) {
 	var context = "";
+	if(this.aliases[mgid[1]]) mgid[1] = this.aliases[mgid[1]];
 	if(this.contexts[mgid[1]]) context = "/context" + this.contexts[mgid[1]];
 	
 	var _this = this;
@@ -86,36 +104,12 @@ addKiller("MTVNetworks", {
 			delete track.mgid;
 			xhr.addEventListener("load", function() {
 				var xml = new DOMParser().parseFromString(xhr.responseText.replace(/^\s+/,""), "text/xml");
-				console.log(xhr.responseText.replace(/^\s+/,""))
-				
 				var src = xml.getElementsByTagName("src")[0];
 				if(src) {
-					var addTrack = function(sources) {
-						track.sources = sources;
-						playlist.push(track);
-						next();
-					};
-					// Individual streams from gametrailers are not directly accessible (how is this possible?)
-					if(/gametrailers/.test(feedURL)) addTrack([{
-						"url": src.textContent,
-						"format": "HLS",
-						"isNative": true
-					}]);
-					else {
-						parseM3U8Track(src.textContent, function(sources) {
-							if(sources === null) return;
-							// Add 720p source manually when I know it exists
-							if(/comedycentral|thecolbertreport|thedailyshow/.test(feedURL)) {
-								var hdURL = sources[0].url.replace(/,[^.]*/, ",1280x720_3500_h32,").replace(/index_\d_av/, "index_0_av");
-								sources.push({"url": hdURL, "format": "3500k HLS", "height": 720, "isNative": true});
-							}
-							addTrack(sources);
-						});
-					}
-				} else {
-					if(list.length === length) return;
-					next();
-				}
+					track.sources = [{"url": src.textContent, "format": "HLS", "isNative": true}];
+					playlist.push(track);
+				} else if(list.length === length) return;
+				next();
 			}, false);
 			xhr.send(null);
 		};

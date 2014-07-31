@@ -3,7 +3,9 @@ if(window.safari) {
 	// Prevents YouTube from removing the Flash player and disables SPF
 	var script = "\
 		var s = document.createElement('script');\
-		s.textContent = 'window.ytplayer=window.ytplayer||{};ytplayer.config=ytplayer.config||{};Object.defineProperty(ytplayer.config,\"min_version\",{\"value\":\"0.0.0\"});window.ytspf=window.ytspf||{};Object.defineProperty(ytspf,\"enabled\",{\"value\":false});';\
+		s.textContent = 'window.ytplayer=window.ytplayer||{};ytplayer.config=ytplayer.config||{};Object.defineProperty(ytplayer.config,\"min_version\",{\"value\":\"0.0.0\"});";
+	if(window.MediaSource) script += "Object.defineProperty(ytplayer.config,\"html5\",{\"value\":false});";
+	script += "window.ytspf=window.ytspf||{};Object.defineProperty(ytspf,\"enabled\",{\"value\":false});';\
 		document.head.appendChild(s);";
 	safari.extension.addContentScript(script, ["http://www.youtube.com/*", "https://www.youtube.com/*"], [], true);
 }
@@ -107,7 +109,7 @@ addKiller("YouTube", {
 			sources.push(source);
 		}
 	} else if(flashvars.hlsvp) {
-		sources.push({"url": decodeURIComponent(flashvars.hlsvp), "format": "M3U8", "isNative": true});
+		sources.push({"url": decodeURIComponent(flashvars.hlsvp), "format": "HLS", "isNative": true});
 	}
 	
 	var poster, title;
@@ -145,7 +147,7 @@ addKiller("YouTube", {
 	var videoIDList = [];
 	var _this = this;
 	
-	var loadAPIList = function(startIndex) {
+	var loadAPIList = function(startIndex) { // hides age-restricted videos
 		var xhr = new XMLHttpRequest();
 		xhr.open("GET", "https://gdata.youtube.com/feeds/api/playlists/" + playlistID + "?start-index=" + startIndex + "&max-results=50", true);
 		xhr.addEventListener("load", function() {
@@ -225,7 +227,7 @@ addKiller("YouTube", {
 		_this.processVideoID(videoIDList.shift(), true, next);
 	};
 	
-	if(/^UL$/.test(playlistID) && videoID) playlistID = "UL" + videoID;
+	if(playlistID === "UL" && videoID) playlistID = "UL" + videoID;
 	if(/^PL|^FL|^SP|^AL/.test(playlistID)) loadPlaylist();
 	else loadAPIList(1);
 },
