@@ -5,7 +5,7 @@
 	<key>Author</key>
 	<string>Marc Hoyois</string>
 	<key>Builder Version</key>
-	<string>9537.77.4</string>
+	<string>9537.85.10.1</string>
 	<key>CFBundleDisplayName</key>
 	<string>ClickToFlash</string>
 	<key>CFBundleIdentifier</key>
@@ -13,9 +13,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.9.6</string>
+	<string>2.9.7</string>
 	<key>CFBundleVersion</key>
-	<string>72</string>
+	<string>73</string>
 	<key>Chrome</key>
 	<dict>
 		<key>Global Page</key>
@@ -39,6 +39,8 @@
 	</dict>
 	<key>Description</key>
 	<string>Prevents Flash content from loading automatically</string>
+	<key>DeveloperIdentifier</key>
+	<string>GY5KR7239Q</string>
 	<key>ExtensionInfoDictionaryVersion</key>
 	<string>1.0</string>
 	<key>Permissions</key>

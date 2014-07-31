@@ -70,7 +70,7 @@ var nativeMediaTypes = {
 	"audio/x-scpls": {"exts": [], "format": "PLS"},
 	"audio/x-wav": {"exts": [], "format": "WAV"},
 	"application/mp4": {"exts": [], "format": "MP4"},
-	"application/vnd.apple.mpegurl": {"exts": ["m3u8"], "format": "M3U8"}
+	"application/vnd.apple.mpegurl": {"exts": ["m3u8"], "format": "HLS"}
 };
 
 var addedMediaTypes = {};
