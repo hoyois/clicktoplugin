@@ -9,6 +9,7 @@ addKiller("MTVNetworks", {
 	"arc:video:gametrailers.com:": "",
 	"arc:video:southparkstudios.com:": "",
 	"arc:episode:southparkstudios.com:": "3",
+	"arc:episode:southpark.nl:": "2",
 	"arc:video:comedycentral.com:": "",
 	"arc:playlist:comedycentral.com:": "6",
 	"arc:episode:comedycentral.com:": "",
@@ -80,7 +81,7 @@ addKiller("MTVNetworks", {
 		
 		for(var i = 0; i < items.length; i++) {
 			var element = items[i].getElementsByTagName("guid")[0];
-			if(!element) continue;
+			if(!element || !/^mgid:/.test(element.textContent)) continue;
 			var track = {"mgid": element.textContent};
 			
 			element = items[i].getElementsByTagNameNS("http://search.yahoo.com/mrss/", "thumbnail")[0];

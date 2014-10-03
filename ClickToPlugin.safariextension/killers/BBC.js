@@ -1,7 +1,7 @@
 addKiller("BBC", {
 
 "canKill": function(data) {
-	return /^http:\/\/emp\.bbci\.co\.uk\/.*[es]mp\.swf/.test(data.src);
+	return /^http:\/\/emp\.bbci\.co\.uk\/.*\.swf/.test(data.src);
 },
 
 "process": function(data, callback) {

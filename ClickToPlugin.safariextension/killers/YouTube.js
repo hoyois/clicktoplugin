@@ -1,11 +1,19 @@
 if(window.safari) {
-	// SITE-SPECIFIC HACK for ClickToPlugin
-	// Prevents YouTube from removing the Flash player and disables SPF
-	var script = "\
-		var s = document.createElement('script');\
-		s.textContent = 'window.ytplayer=window.ytplayer||{};ytplayer.config=ytplayer.config||{};Object.defineProperty(ytplayer.config,\"min_version\",{\"value\":\"0.0.0\"});window.ytspf=window.ytspf||{};Object.defineProperty(ytspf,\"enabled\",{\"value\":false});';\
-		document.head.appendChild(s);";
-	safari.extension.addContentScript(script, ["http://www.youtube.com/*", "https://www.youtube.com/*"], [], true);
+	// YOUTUBE HACKS for ClickToPlugin
+	var script = "var s = document.createElement('script'); s.textContent = '";
+	// Disable SPF
+	script += "ytspf={};Object.defineProperty(ytspf,\"enabled\",{\"value\":false});";
+	// Disable HTML5 on Safari 8+
+	if(window.MediaSource) script += "document.createElement(\"video\").constructor.prototype.canPlayType=function(){return\"\";};";
+	// Disable Flash version checking...
+	// ... on /watch pages
+	script += "ytplayer={};Object.defineProperty(ytplayer,\"config\",{\"get\":function(){return ytplayer.$;},\"set\":function($){$.min_version=\"0.0.0\";ytplayer.$=$;}});";
+	// ... on /embed pages
+	script += "yt={\"config_\":{}};Object.defineProperty(yt.config_,\"PLAYER_CONFIG\",{\"get\":function(){return yt.config_.$;},\"set\":function($){$.min_version=\"0.0.0\";yt.config_.$=$;}});";
+	// ... on /user pages
+	script += "document.addEventListener(\"DOMContentLoaded\",function(){var v=document.getElementById(\"upsell-video\");if(v)v.dataset.swfConfig=v.dataset.swfConfig.replace(/(min_version[^\\\\d]*)\\\\d+\\\\.\\\\d+\\\\.\\\\d+/,\"$10.0.0\");},true);";
+	script += "'; document.documentElement.appendChild(s);";
+	safari.extension.addContentScript(script, ["http://www.youtube.com/*", "https://www.youtube.com/*"], [], false);
 }
 
 addKiller("YouTube", {
