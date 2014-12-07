@@ -92,6 +92,7 @@ addKiller("YouTube", {
 	if(flashvars.ps === "live" && !flashvars.hlsvp) return;
 	
 	var sources = [];
+	var title = flashvars.title.replace(/%22/g, "%5C%22");
 	
 	// Get video URLs
 	if(flashvars.url_encoded_fmt_stream_map) { // Get 240p, 360p, and 720p
@@ -109,9 +110,11 @@ addKiller("YouTube", {
 				source = {"format": "240p FLV", "height": 240, "isNative": false};
 			} else continue;
 			
-			source.url = decodeURIComponent(fmt.url) + "&title=" + flashvars.title.replace(/%22/g, "%27") + "%20%5B" + source.height + "p%5D";
+			source.url = decodeURIComponent(fmt.url);
 			if(fmt.sig) source.url += "&signature=" + fmt.sig;
 			else if(fmt.s) source.url += "&signature=" + this.decodeSignature(fmt.s);
+			// title parameter cannot be more than 228 unescaped characters
+			if(unescape(title + source.height).length < 225) source.url += "&title=" + title + "%20%5B" + source.height + "p%5D";
 			sources.push(source);
 		}
 	} else if(flashvars.hlsvp) {

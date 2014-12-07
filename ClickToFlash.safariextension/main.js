@@ -230,23 +230,7 @@ function handleBeforeLoadEvent(event) {
 	// Replace and stack
 	event.target.parentNode.replaceChild(placeholder, event.target);
 	event.target.isInStack = true;
-	if(!response.isNative) {
-		// Create stack if necessary
-		if(stack === undefined || stack.parentNode !== document.body) {
-			stack = document.createElement("div");
-			stack.id = "CTPstack";
-			stack.style.setProperty("display", "none", "important"); // in case the extension is disabled
-			stack.innerHTML = "<div><div></div></div>";
-			document.body.appendChild(stack);
-		}
-		try {
-			stack.firstChild.firstChild.appendChild(event.target);
-		} catch(e) {
-			stack.innerHTML = "<div><div></div></div>";
-			stack.firstChild.firstChild.appendChild(event.target);
-		}
-		event.target.classList.remove("CTPnodisplay");
-	}
+	if(!response.isNative) placeInStack(event.target);
 	
 	// Fill the main array
 	_[data.elementID] = {
@@ -273,6 +257,7 @@ function loadPlugin(elementID) {
 	if(_[elementID].placeholder.parentNode) {
 		delete _[elementID].element.isInStack;
 		_[elementID].element.allowedToLoad = true;
+		_[elementID].element.classList.remove("CTPnodisplay");
 		_[elementID].placeholder.parentNode.replaceChild(_[elementID].element, _[elementID].placeholder);
 		delete _[elementID];
 	}
@@ -286,11 +271,8 @@ function hidePlugin(elementID) {
 }
 
 function restorePlugin(elementID) {
-	delete _[elementID].element.isInStack;
-	_[elementID].element.allowedToLoad = true;
-	_[elementID].player.container.parentNode.replaceChild(_[elementID].element, _[elementID].player.container);
 	_[elementID].player.destroy();
-	delete _[elementID];
+	loadPlugin(elementID);
 }
 
 function loadAll() {	
@@ -368,10 +350,10 @@ function loadMedia(elementID, focus) {
 	
 	// Load player
 	_[elementID].placeholder.parentNode.replaceChild(_[elementID].player.container, _[elementID].placeholder);
+	_[elementID].placeholder = _[elementID].player.container;
 	_[elementID].player.loadFirstTrack();
 	
-	if(focus) _[elementID].player.container.focus();
-	_[elementID].placeholder = {};
+	if(focus) _[elementID].placeholder.focus();
 }
 
 function displayBadge(elementID, label, async) {
@@ -459,11 +441,10 @@ function addListeners(elementID) {
 }
 
 function addObserver(elementID) {
-	_[elementID].observer = new MutationObserver(function(mutations) {
-		mutations.forEach(function(mutation) {
-			if(_[elementID].player && _[elementID].player.container) copyBoxCSS(mutation.target, _[elementID].player.container);
-			else copyBoxCSS(mutation.target, _[elementID].placeholder);
-		});
+	_[elementID].observer = new MutationObserver(function() {
+		_[elementID].placeholder.parentNode.insertBefore(_[elementID].element, _[elementID].placeholder);
+		copyBoxCSS(_[elementID].element, _[elementID].placeholder);
+		placeInStack(_[elementID].element);
 	});
 	_[elementID].observer.observe(_[elementID].element, {"attributes": true, "attributeFilter": ["style"]});
 }

@@ -97,9 +97,7 @@ MediaPlayer.prototype.init = function(style) {
 	}
 	
 	// Set styles
-	this.mediaElement.style.setProperty("width", "inherit", "important");
-	this.mediaElement.style.setProperty("height", "inherit", "important");
-	applyCSS(this.container, style, ["width", "height", "position", "top", "right", "bottom", "left", "z-index", "clear", "float", "vertical-align", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-before-collapse", "-webkit-margin-after-collapse"]);
+	applyCSS(this.container, style, ["width", "height", "min-width", "max-width", "min-height", "max-height", "position", "top", "right", "bottom", "left", "z-index", "clear", "float", "vertical-align", "margin-top", "margin-right", "margin-bottom", "margin-left", "-webkit-margin-before-collapse", "-webkit-margin-after-collapse"]);
 	
 	// Set volume
 	this.mediaElement.volume = settings.volume;
@@ -118,7 +116,7 @@ MediaPlayer.prototype.init = function(style) {
 };
 
 MediaPlayer.prototype.destroy = function() {
-	if(this.restoreScript) injectScript("(function(){" + this.restoreScript + "})();");
+	if(this.restoreScript) injectScript("(function(){" + this.restoreScript + "}).call(document.getElementById(\"" + this.mediaElement.id + "\"));");
 };
 
 MediaPlayer.prototype.initPlaylistControls = function() {

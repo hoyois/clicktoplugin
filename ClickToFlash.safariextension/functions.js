@@ -27,13 +27,32 @@ function copyBoxCSS(element, target, offsetWidth, offsetHeight) {
 	// Position: static -> relative
 	if(style.getPropertyValue("position") === "static") target.style.setProperty("position", "relative", "important");
 	else properties.push("position");
-	// Dimensions: absolute -> offset
+	// Dimensions: absolute -> use offset; % -> ignore padding+border
 	if(/%$|^auto$/.test(style.getPropertyValue("width"))) properties.push("width");
 	else if(offsetWidth !== undefined) target.style.setProperty("width", offsetWidth + "px", "important");
 	if(/%$|^auto$/.test(style.getPropertyValue("height"))) properties.push("height");
 	else if(offsetHeight !== undefined) target.style.setProperty("height", offsetHeight + "px", "important");
+	["min-width", "max-width", "min-height", "max-height"].forEach(function(property) {
+		if(/%$/.test(style.getPropertyValue(property))) properties.push(property);
+	});
 	// Apply CSS
 	applyCSS(target, style, properties);
+}
+
+function placeInStack(node) {
+	if(stack === undefined) {
+		stack = document.createElement("div");
+		stack.id = "CTPstack";
+		stack.style.setProperty("display", "none", "important"); // in case the extension is disabled
+		stack.innerHTML = "<div><div></div></div>";
+		document.body.appendChild(stack);
+	}
+	try {
+		stack.firstChild.firstChild.appendChild(node);
+	} catch(e) {
+		stack.innerHTML = "<div><div></div></div>";
+		stack.firstChild.firstChild.appendChild(node);
+	}
 }
 
 function injectScript(script) {
