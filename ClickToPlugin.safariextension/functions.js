@@ -36,6 +36,22 @@ function copyBoxCSS(element, target, offsetWidth, offsetHeight) {
 	applyCSS(target, style, properties);
 }
 
+function placeInStack(node) {
+	if(stack === undefined) {
+		stack = document.createElement("div");
+		stack.id = "CTPstack";
+		stack.style.setProperty("display", "none", "important"); // in case the extension is disabled
+		stack.innerHTML = "<div><div></div></div>";
+		document.body.appendChild(stack);
+	}
+	try {
+		stack.firstChild.firstChild.appendChild(node);
+	} catch(e) {
+		stack.innerHTML = "<div><div></div></div>";
+		stack.firstChild.firstChild.appendChild(node);
+	}
+}
+
 function injectScript(script) {
 	var element = document.createElement("script");
 	element.text = script;

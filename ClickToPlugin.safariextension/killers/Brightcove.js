@@ -1,16 +1,21 @@
 addKiller("Brightcove", {
 	
 "canKill": function(data) {
-	return /^https?:\/\/(?:c|secure)\.brightcove\.com\/services\/viewer\/federated_f9/.test(data.src);
+	if(/^https?:\/\/(?:c|secure)\.brightcove\.com\/services\/viewer\/federated_f9/.test(data.src)) return true;
+	if(/^http:\/\/graphics8\.nytimes\.com\/video\//.test(data.src)) {data.nyt = true; return true;}
+	return false;
 },
 
 "process": function(data, callback) {
 	var isSecure = data.src.charAt(4) === "s";
+	var flashvars = parseFlashVariables(data.params.flashvars);
+	
 	var url;
-	if(/[&?]playerID=/.test(data.src)) {
+	if(data.nyt) {
+		url = "http://c.brightcove.com/services/viewer/htmlFederated?%40videoPlayer=ref%3A" + flashvars.id + "&playerID=2640832222001";
+	} else if(/[&?]playerID=/.test(data.src)) {
 		url = data.src.replace("federated_f9", "htmlFederated");
 	} else {
-		var flashvars = parseFlashVariables(data.params.flashvars);
 		url = (isSecure ? "https://secure" : "http://c") + ".brightcove.com/services/viewer/htmlFederated?playerID=" + flashvars.playerID + "&playerKey=" + flashvars.playerKey + "&%40videoPlayer=" + flashvars.videoId;
 	}
 	
@@ -52,11 +57,28 @@ addKiller("Brightcove", {
 			}
 		}
 		
-		callback({"playlist": [{
+		var mediaData = {"playlist": [{
 			"sources": sources,
 			"poster": media.videoStillURL,
 			"title": media.displayName
-		}]});
+		}]};
+		
+		// Fix annoying behavior on nytimes.com
+		if(/www\.nytimes\.com/.test(data.location)) {
+			mediaData.initScript = "try{\
+				var container = this.parentNode.parentNode;\
+				var sheet = container.insertBefore(document.createElement(\"style\"), container.firstChild).sheet;\
+				sheet.insertRule(\".video-player-container object,.nytd-player-controls{display:none !important;}\", 0);\
+			} catch(e) {}";
+			mediaData.restoreScript = "try{\
+				var container = this.parentNode.parentNode;\
+				var duplicate = container.getElementsByTagName(\"object\")[0];\
+				if(duplicate) duplicate.parentNode.removeChild(duplicate);\
+				container.removeChild(container.getElementsByTagName(\"style\")[0]);\
+			} catch(e) {}";
+		}
+		
+		callback(mediaData);
 	}, false);
 	xhr.send(null);
 }

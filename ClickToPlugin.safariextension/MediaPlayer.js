@@ -118,7 +118,7 @@ MediaPlayer.prototype.init = function(style) {
 };
 
 MediaPlayer.prototype.destroy = function() {
-	if(this.restoreScript) injectScript("(function(){" + this.restoreScript + "})();");
+	if(this.restoreScript) injectScript("(function(){" + this.restoreScript + "}).call(document.getElementById(\"" + this.mediaElement.id + "\"));");
 };
 
 MediaPlayer.prototype.initPlaylistControls = function() {

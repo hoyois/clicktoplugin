@@ -80,9 +80,9 @@ addKiller("MTVNetworks", {
 		var playlist = [];
 		
 		for(var i = 0; i < items.length; i++) {
-			var element = items[i].getElementsByTagName("guid")[0];
-			if(!element || !/^mgid:/.test(element.textContent)) continue;
-			var track = {"mgid": element.textContent};
+			var element = items[i].getElementsByTagNameNS("http://search.yahoo.com/mrss/", "content")[0];
+			if(!element) continue;
+			var track = {"content": element.getAttribute("url")};
 			
 			element = items[i].getElementsByTagNameNS("http://search.yahoo.com/mrss/", "thumbnail")[0];
 			if(element) track.poster = element.getAttribute("url");
@@ -102,22 +102,39 @@ addKiller("MTVNetworks", {
 		
 		var addToPlaylist = function(track) {
 			var xhr = new XMLHttpRequest();
-			xhr.open("GET", "http://www." + (/gametrailers/.test(track.mgid) ? "gametrailers" : "cc") + ".com/feeds/mediagen/?uri=" + track.mgid + "&acceptMethods=hls", true);
-			delete track.mgid;
+			xhr.open("GET", track.content, true);
+			delete track.content;
 			xhr.addEventListener("load", function() {
-				var xml = new DOMParser().parseFromString(xhr.responseText.replace(/^\s+/,""), "text/xml");
-				var src = xml.getElementsByTagName("src")[0];
-				if(src && getExt(src.textContent) === "m3u8") {
-					track.sources = [{"url": src.textContent, "format": "HLS", "isNative": true}];
+				var renditions = xhr.responseXML.getElementsByTagName("rendition");
+				
+				var sources = [];
+				var src, index;
+				for(var i = renditions.length -1 ; i >= 0; i--) {
+					var source = typeInfo(renditions[i].getAttribute("type"));
+					if(source === null) continue;
+				
+					src = renditions[i].getElementsByTagName("src")[0].textContent;
+					index = src.indexOf("/gsp.");
+					if(index === -1) continue;
+					source.url = "http://viacommtvstrmfs.fplive.net" + src.substring(index);
+				
+					source.format = renditions[i].getAttribute("bitrate") + "k " + source.format;
+					source.height = parseInt(renditions[i].getAttribute("height"));
+					sources.push(source);
+				}
+				
+				if(sources.length === 0) {
+					if(list.length === length) return;
+				} else {
+					track.sources = sources;
 					playlist.push(track);
-				} else if(list.length === length) return;
+				}
+				
 				next();
 			}, false);
 			xhr.send(null);
 		};
-		
 		next();
-		
 	}, false);
 	xhr.send(null);
 }
