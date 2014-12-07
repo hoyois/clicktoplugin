@@ -120,6 +120,10 @@ Placeholder element
 	border: 1px solid rgba(180, 180, 180, 1) !important;
 	box-sizing: border-box !important;
 	height: inherit !important;
+	min-height: inherit !important;
+	min-width: inherit !important;
+	max-height: inherit !important;
+	max-width: inherit !important;
 	width: inherit !important;
 }
 
@@ -229,11 +233,17 @@ Media player
 	display: block !important;
 	-webkit-transition-property: none !important;
 	bottom: 0 !important;
+	height: inherit !important;
 	left: 0 !important;
+	min-height: inherit !important;
+	min-width: inherit !important;
 	margin: auto !important;
+	max-height: inherit !important;
+	max-width: inherit !important;
 	opacity: 1 !important;
 	right: 0 !important;
 	top: 0 !important;
+	width: inherit !important;
 }
 
 .CTPmediaPlayer .CTPmediaElement::-webkit-media-controls-status-display.hidden {
