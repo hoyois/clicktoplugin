@@ -1112,6 +1112,32 @@ var PREFERENCES_STRINGS = {
 		"pl-pl": "Zmniejsz głośność:",
 		"ca-es": "Baixa el volum:"
 	},
+	"SEEK_BACKWARD_SHORTCUT": {
+		"en-us": "Seek backward:",
+		"tr-tr": "Geri atlamak:",
+		"it-it": "Saltare indietro:",
+		"fr-fr": "Sauter en arrière:",
+		"es-es": "Saltar hacia atrás:",
+		"de-de": "Rückwärts springen:",
+		"ja-jp": "後方スキップ:",
+		"zh-tw": "快退:",
+		"zh-cn": "快退:",
+		"pl-pl": "Przejść do tyłu:",
+		"ca-es": "Saltar cap enrere:"
+	},
+	"SEEK_FORWARD_SHORTCUT": {
+		"en-us": "Seek forward:",
+		"tr-tr": "Ileri atlamak:",
+		"it-it": "Saltare in avanti:",
+		"fr-fr": "Sauter vers l'avant:",
+		"es-es": "Saltar hacia adelante:",
+		"de-de": "Vorwärtssprung:",
+		"ja-jp": "フォワードスキップ:",
+		"zh-tw": "快進:",
+		"zh-cn": "快进:",
+		"pl-pl": "Przejść do przodu:",
+		"ca-es": "Saltar cap endavant:"
+	},
 	"TOGGLE_LOOPING_SHORTCUT": {
 		"en-us": "Toggle repeat:",
 		"tr-tr": "Tekrarı değiştir:",

@@ -324,6 +324,22 @@ MediaPlayer.prototype.registerShortcuts = function() {
 				}
 			});
 		}
+		if(settings[x].seekBackward) {
+			this.addEventListener(settings[x].seekBackward.type, function(event) {
+				if(testShortcut(event, settings[x].seekBackward)) {
+					var newTime = _this.mediaElement.currentTime - 10;
+					_this.mediaElement.currentTime = Math.max(newTime, 0)
+				}
+			});
+		}
+		if(settings[x].seekForward) {
+			this.addEventListener(settings[x].seekForward.type, function(event) {
+				if(testShortcut(event, settings[x].seekForward)) {
+					var newTime = _this.mediaElement.currentTime + 10;
+					_this.mediaElement.currentTime = Math.min(newTime, _this.mediaElement.duration);
+				}
+			});
+		}
 		if(this.playlistLength > 1) {
 			if(settings[x].prevTrack) {
 				this.addEventListener(settings[x].prevTrack.type, function(event) {
