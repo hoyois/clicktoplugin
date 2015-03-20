@@ -316,7 +316,7 @@
 				<key>type</key>
 				<string>keydown</string>
 			</dict>
-			<key>prevTrack</key>
+			<key>seekBackward</key>
 			<dict>
 				<key>altKey</key>
 				<false/>
@@ -331,7 +331,7 @@
 				<key>type</key>
 				<string>keydown</string>
 			</dict>
-			<key>nextTrack</key>
+			<key>seekForward</key>
 			<dict>
 				<key>altKey</key>
 				<false/>
@@ -341,6 +341,36 @@
 				<string>Right</string>
 				<key>metaKey</key>
 				<false/>
+				<key>shiftKey</key>
+				<false/>
+				<key>type</key>
+				<string>keydown</string>
+			</dict>
+			<key>prevTrack</key>
+			<dict>
+				<key>altKey</key>
+				<false/>
+				<key>ctrlKey</key>
+				<false/>
+				<key>keyIdentifier</key>
+				<string>Left</string>
+				<key>metaKey</key>
+				<true/>
+				<key>shiftKey</key>
+				<false/>
+				<key>type</key>
+				<string>keydown</string>
+			</dict>
+			<key>nextTrack</key>
+			<dict>
+				<key>altKey</key>
+				<false/>
+				<key>ctrlKey</key>
+				<false/>
+				<key>keyIdentifier</key>
+				<string>Right</string>
+				<key>metaKey</key>
+				<true/>
 				<key>shiftKey</key>
 				<false/>
 				<key>type</key>
