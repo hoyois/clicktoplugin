@@ -12,6 +12,12 @@
 		<key>DefaultValue</key>
 		<array/>
 		<key>Key</key>
+		<string>allowedPlugins</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<array/>
+		<key>Key</key>
 		<string>locationsWhitelist</string>
 	</dict>
 	<dict>
@@ -56,8 +62,10 @@
 			<string>killers/MTVNetworks.js</string>
 			<string>killers/BBC.js</string>
 			<string>killers/Brightcove.js</string>
-			<string>killers/IGN.js</string>
+			<string>killers/NYTimes.js</string>
 			<string>killers/Flash.js</string>
+			<string>killers/Silverlight.js</string>
+			<string>killers/Generic.js</string>
 		</array>
 		<key>Key</key>
 		<string>killers</string>
@@ -308,6 +316,10 @@
 				<key>type</key>
 				<string>keydown</string>
 			</dict>
+			<key>seekForward</key>
+			<false/>
+			<key>seekBackward</key>
+			<false/>
 			<key>prevTrack</key>
 			<dict>
 				<key>altKey</key>
@@ -385,6 +397,10 @@
 			<false/>
 			<key>volumeDown</key>
 			<false/>
+			<key>seekForward</key>
+			<false/>
+			<key>seekBackward</key>
+			<false/>
 			<key>prevTrack</key>
 			<false/>
 			<key>nextTrack</key>
@@ -409,6 +425,12 @@
 		</dict>
 		<key>Key</key>
 		<string>gestures</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<real>10</real>
+		<key>Key</key>
+		<string>seekTime</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
