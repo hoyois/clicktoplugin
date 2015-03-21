@@ -62,7 +62,7 @@
 			<string>killers/MTVNetworks.js</string>
 			<string>killers/BBC.js</string>
 			<string>killers/Brightcove.js</string>
-			<string>killers/IGN.js</string>
+			<string>killers/NYTimes.js</string>
 			<string>killers/Flash.js</string>
 			<string>killers/Silverlight.js</string>
 			<string>killers/Generic.js</string>
@@ -316,36 +316,10 @@
 				<key>type</key>
 				<string>keydown</string>
 			</dict>
-			<key>seekBackward</key>
-			<dict>
-				<key>altKey</key>
-				<false/>
-				<key>ctrlKey</key>
-				<false/>
-				<key>keyIdentifier</key>
-				<string>Left</string>
-				<key>metaKey</key>
-				<false/>
-				<key>shiftKey</key>
-				<false/>
-				<key>type</key>
-				<string>keydown</string>
-			</dict>
 			<key>seekForward</key>
-			<dict>
-				<key>altKey</key>
-				<false/>
-				<key>ctrlKey</key>
-				<false/>
-				<key>keyIdentifier</key>
-				<string>Right</string>
-				<key>metaKey</key>
-				<false/>
-				<key>shiftKey</key>
-				<false/>
-				<key>type</key>
-				<string>keydown</string>
-			</dict>
+			<false/>
+			<key>seekBackward</key>
+			<false/>
 			<key>prevTrack</key>
 			<dict>
 				<key>altKey</key>
@@ -355,7 +329,7 @@
 				<key>keyIdentifier</key>
 				<string>Left</string>
 				<key>metaKey</key>
-				<true/>
+				<false/>
 				<key>shiftKey</key>
 				<false/>
 				<key>type</key>
@@ -370,7 +344,7 @@
 				<key>keyIdentifier</key>
 				<string>Right</string>
 				<key>metaKey</key>
-				<true/>
+				<false/>
 				<key>shiftKey</key>
 				<false/>
 				<key>type</key>
@@ -423,6 +397,10 @@
 			<false/>
 			<key>volumeDown</key>
 			<false/>
+			<key>seekForward</key>
+			<false/>
+			<key>seekBackward</key>
+			<false/>
 			<key>prevTrack</key>
 			<false/>
 			<key>nextTrack</key>
@@ -447,6 +425,12 @@
 		</dict>
 		<key>Key</key>
 		<string>gestures</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<real>10</real>
+		<key>Key</key>
+		<string>seekTime</string>
 	</dict>
 	<dict>
 		<key>DefaultValue</key>

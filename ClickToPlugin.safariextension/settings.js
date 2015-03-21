@@ -90,7 +90,7 @@ main.addEventListener("input", function(event) {
 var updatedKillers = false;
 
 // Killer reset
-var defaultKillers = "killers/YouTube.js\nkillers/Dailymotion.js\nkillers/Facebook.js\nkillers/Blip.js\nkillers/Metacafe.js\nkillers/TED.js\nkillers/MTVNetworks.js\nkillers/BBC.js\nkillers/Brightcove.js\nkillers/IGN.js\nkillers/Flash.js\nkillers/Silverlight.js\nkillers/Generic.js";
+var defaultKillers = "killers/YouTube.js\nkillers/Dailymotion.js\nkillers/Facebook.js\nkillers/Blip.js\nkillers/Metacafe.js\nkillers/TED.js\nkillers/MTVNetworks.js\nkillers/BBC.js\nkillers/Brightcove.js\nkillers/NYTimes.js\nkillers/Flash.js\nkillers/Silverlight.js\nkillers/Generic.js";
 document.getElementById("reset_killers").addEventListener("click", function() {
 	var textarea = document.getElementById("killers");
 	textarea.value = defaultKillers;
