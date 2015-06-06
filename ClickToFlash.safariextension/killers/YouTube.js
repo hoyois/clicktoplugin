@@ -13,7 +13,7 @@ if(window.safari) {
 	// ... on /user pages
 	script += "document.addEventListener(\"DOMContentLoaded\",function(){var v=document.getElementById(\"upsell-video\");if(v)v.dataset.swfConfig=v.dataset.swfConfig.replace(/(min_version[^\\\\d]*)\\\\d+\\\\.\\\\d+\\\\.\\\\d+/,\"$10.0.0\");},true);";
 	script += "'; document.documentElement.appendChild(s);";
-	safari.extension.addContentScript(script, ["http://www.youtube.com/*", "https://www.youtube.com/*"], [], false);
+	safari.extension.addContentScript(script, ["http://www.youtube.com/*", "https://www.youtube.com/*"], ["http://www.youtube.com/embed/", "https://www.youtube.com/embed/"], false);
 }
 
 addKiller("YouTube", {
