@@ -1,6 +1,6 @@
 if(window.safari) {
 	// YOUTUBE HACKS for ClickToPlugin
-	var script = "var s = document.createElement('script'); s.textContent = '";
+	var script = "var s = document.createElement('script'); s.textContent = 'if(!/[?&]html5=1/.test(location.search)){";
 	// Disable SPF
 	script += "ytspf={};Object.defineProperty(ytspf,\"enabled\",{\"value\":false});";
 	// Disable HTML5 on Safari 8+
@@ -12,8 +12,8 @@ if(window.safari) {
 	script += "yt={\"config_\":{}};Object.defineProperty(yt.config_,\"PLAYER_CONFIG\",{\"get\":function(){return yt.config_.$;},\"set\":function($){$.min_version=\"0.0.0\";yt.config_.$=$;}});";
 	// ... on /user pages
 	script += "document.addEventListener(\"DOMContentLoaded\",function(){var v=document.getElementById(\"upsell-video\");if(v)v.dataset.swfConfig=v.dataset.swfConfig.replace(/(min_version[^\\\\d]*)\\\\d+\\\\.\\\\d+\\\\.\\\\d+/,\"$10.0.0\");},true);";
-	script += "'; document.documentElement.appendChild(s);";
-	safari.extension.addContentScript(script, ["http://www.youtube.com/*", "https://www.youtube.com/*"], ["http://www.youtube.com/embed/", "https://www.youtube.com/embed/"], false);
+	script += "}'; document.documentElement.appendChild(s);";
+	safari.extension.addContentScript(script, ["http://www.youtube.com/*", "https://www.youtube.com/*"], [], false);
 }
 
 addKiller("YouTube", {
@@ -55,7 +55,7 @@ addKiller("YouTube", {
 			return;
 		}
 		
-		if(flashvars.list && !/^UU/.test(flashvars.list)) playlistID = flashvars.list;
+		if(flashvars.list && /^PL|^FL|^SP|^AL/.test(playlistID)) playlistID = flashvars.list;
 		if(onsite) {
 			var match = /[#&?]t=(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?/.exec(data.location);
 			if(match) {
@@ -228,25 +228,6 @@ addKiller("YouTube", {
 	var videoIDList = [];
 	var _this = this;
 	
-	var loadAPIList = function(startIndex) { // hides age-restricted videos
-		var xhr = new XMLHttpRequest();
-		xhr.open("GET", "https://gdata.youtube.com/feeds/api/playlists/" + playlistID + "?start-index=" + startIndex + "&max-results=50", true);
-		xhr.addEventListener("load", function() {
-			if(xhr.status === 200) {
-				var entries = xhr.responseXML.getElementsByTagName("entry");
-				for(var i = 0; i < entries.length; i++) {
-					try{ // being lazy
-						videoIDList.push(/\?v=([^&?']+)/.exec(entries[i].getElementsByTagNameNS("http://search.yahoo.com/mrss/", "player")[0].getAttribute("url"))[1]);
-					} catch(e) {}
-				}
-				if(xhr.responseXML.querySelector("link[rel='next']") === null) processList();
-				else loadAPIList(startIndex + 50);
-			} else if(flashvars) _this.processFlashVars(flashvars, mainCallback);
-			else if(videoID) _this.processVideoID(videoID, mainCallback);
-		}, false);
-		xhr.send(null);
-	};
-	
 	var loadPlaylist = function(url) {
 		var xhr = new XMLHttpRequest();
 		xhr.open("GET", url ? url : "https://www.youtube.com/playlist?list=" + playlistID, true);
@@ -311,9 +292,7 @@ addKiller("YouTube", {
 		_this.processVideoID(videoIDList.shift(), next);
 	};
 	
-	if(playlistID === "UL" && videoID) playlistID = "UL" + videoID;
-	if(/^PL|^FL|^SP|^AL/.test(playlistID)) loadPlaylist();
-	else loadAPIList(1);
+	loadPlaylist();
 },
 
 "initScript": "\
