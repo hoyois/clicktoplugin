@@ -8,14 +8,14 @@ addKiller("MTVNetworks", {
 	// "arc:episode:colbertnation.com:": "", // no feed
 	"arc:video:gametrailers.com:": "",
 	"arc:video:southparkstudios.com:": "",
-	"arc:episode:southparkstudios.com:": "3",
+	"arc:episode:southparkstudios.com:": "4",
 	"arc:episode:southpark.nl:": "2",
 	"arc:video:comedycentral.com:": "",
-	"arc:playlist:comedycentral.com:": "6",
-	"arc:episode:comedycentral.com:": "1",
+	"arc:playlist:comedycentral.com:": "9",
+	"arc:episode:comedycentral.com:": "2",
 	"arc:promo:tosh.comedycentral.com:": "",
 	"arc:video:tosh.comedycentral.com:": "",
-	"arc:episode:tosh.comedycentral.com:": "1"//
+	"arc:episode:tosh.comedycentral.com:": "2"//
 	// "uma:video:mtv.com:": "", // only rtmpe
 	// "uma:videolist:mtv.com:": "" // only rtmpe
 },
@@ -58,7 +58,7 @@ addKiller("MTVNetworks", {
 	
 	var _this = this;
 	var xhr = new XMLHttpRequest();
-	xhr.open("GET", "http://media.mtvnservices.com/pmt/e1/players/mgid:" + mgid[1] + context + "/config.xml", true);
+	xhr.open("GET", "http://media.mtvnservices.com/pmt-arc/e1/players/mgid:" + mgid[1] + context + "/config.xml", true);
 	xhr.addEventListener("load", function() {
 		var xml = xhr.responseXML;
 		var feedURL = xml.getElementsByTagName("feed")[0].textContent.replace(/\n/g, "").replace("{uri}", mgid[0]);

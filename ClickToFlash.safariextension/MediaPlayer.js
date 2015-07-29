@@ -420,25 +420,6 @@ MediaPlayer.prototype.initShadowDOM = function() {
 		shadowDOM.timelineContainer.style.removeProperty("display");
 	}, false);
 	
-	if(this.playlistLength > 1) {
-		// Reorder controls
-		if("WebkitOrder" in document.documentElement.style) { // Safari >= 6.1
-			shadowDOM.rewindButton.style.WebkitOrder = "-6";
-			shadowDOM.playButton.style.WebkitOrder = "-4";
-			shadowDOM.timelineContainer.style.WebkitOrder = "-1";
-			shadowDOM.fullscreenButton.style.WebkitOrder = "1";
-		} else { // Safari < 6.1
-			shadowDOM.controlsPanel.style.WebkitBoxDirection = "reverse";
-			shadowDOM.timelineContainer.style.WebkitBoxDirection = "normal";
-			shadowDOM.volumeSliderContainer.style.WebkitBoxDirection = "normal";
-			shadowDOM.rewindButton.style.WebkitBoxOrdinalGroup = "9";
-			shadowDOM.playButton.style.WebkitBoxOrdinalGroup = "7";
-			shadowDOM.statusDisplay.style.WebkitBoxOrdinalGroup = "5";
-			shadowDOM.timelineContainer.style.WebkitBoxOrdinalGroup = "4";
-			shadowDOM.fullscreenButton.style.WebkitBoxOrdinalGroup = "1";
-		}
-	}
-	
 	this.shadowDOM = shadowDOM;
 };
 
