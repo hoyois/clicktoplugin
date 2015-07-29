@@ -651,7 +651,7 @@ var PREFERENCES_STRINGS = {
 		"tr-tr": "Önyükleme",
 		"it-it": "Precarica",
 		"fr-fr": "Préchargement",
-		"es-es": "Emprezar la precarga",
+		"es-es": "Empezar la precarga",
 		"de-de": "Puffern",
 		"ja-jp": "バッファリングを始めます",
 		"zh-tw": "只開始緩衝",

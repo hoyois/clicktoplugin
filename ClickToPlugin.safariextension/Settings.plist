@@ -62,7 +62,6 @@
 			<string>killers/MTVNetworks.js</string>
 			<string>killers/BBC.js</string>
 			<string>killers/Brightcove.js</string>
-			<string>killers/NYTimes.js</string>
 			<string>killers/Flash.js</string>
 			<string>killers/Silverlight.js</string>
 			<string>killers/Generic.js</string>
