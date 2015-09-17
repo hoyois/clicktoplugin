@@ -12,7 +12,7 @@ addKiller("MTVNetworks", {
 	"arc:episode:southpark.nl:": "2",
 	"arc:video:comedycentral.com:": "",
 	"arc:playlist:comedycentral.com:": "9",
-	"arc:episode:comedycentral.com:": "2",
+	"arc:episode:comedycentral.com:": "3",
 	"arc:promo:tosh.comedycentral.com:": "",
 	"arc:video:tosh.comedycentral.com:": "",
 	"arc:episode:tosh.comedycentral.com:": "2"//
