@@ -464,3 +464,139 @@ Generic classes
 .CTPhidden, .CTPplaceholder .CTPhidden, .CTPmediaPlayer .CTPhidden {
 	visibility: hidden !important;
 }
+
+@supports (mix-blend-mode: normal) and ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+
+	.CTPplaceholder .CTPlogo {
+		border: none !important;
+		border-radius: 7px !important;
+		box-shadow: none !important;
+		color: white !important;
+		font-family: -apple-system !important;
+		font-size: 20px !important;
+		font-weight: bold !important;
+		mix-blend-mode: plus-lighter !important;
+		opacity: .45 !important;
+		padding: 20px 15px !important;
+		position: relative !important;
+		text-shadow: none !important;
+		z-index: 2 !important;
+	}
+
+	.CTPplaceholder.CTPnoimage .CTPlogo {
+		border: none !important;
+		color: white !important;
+	}
+
+	.CTPplaceholder .CTPlogo.CTPinset {
+		display: none !important;
+	}
+
+	.CTPplaceholder.CTPnoimage .CTPlogo.CTPinset {
+		display: none !important;
+	}
+
+	.CTPplaceholder .CTPlogoContainer.CTPmini .CTPlogo,
+	.CTPplaceholder .CTPlogoContainer.CTPhidden .CTPlogo.CTPtmp {
+		border-width: 0 !important;
+		font-size: 11px !important;
+	}
+
+	.CTPplaceholder.CTPnoimage .CTPlogoContainer.CTPmini .CTPlogo {
+		color: white !important;
+	}
+
+	.CTPmediaPlayer .CTPtrackSelector {
+		background-image: none !important;
+		height: 25px !important;
+		opacity: 1 !important;
+		padding: 0 10px !important;
+	}
+
+	.CTPmediaPlayer .CTPtrackList {
+		font-family: -apple-system !important;
+		font-size: 11px !important;
+		mix-blend-mode: plus-lighter !important;;
+		opacity: .45 !important;
+		position: relative !important;
+		text-shadow: none !important;
+		white-space: pre !important;
+		z-index: 2 !important;
+	}
+
+	.CTPmediaPlayer .CTPtrackList {
+		font-family: -apple-system !important;
+		font-size: 11px !important;
+		text-shadow: none !important;
+	}
+
+	.CTPsourceSelector * {
+		font-family: -apple-system !important;
+		font-size: 11px !important;
+		text-shadow: none !important;
+	}
+
+	.CTPsourceSelector {
+		background-image: none !important;
+		border: none !important;
+		border-radius: 5px !important;
+		box-shadow: none !important;
+	}
+
+	.CTPsourceSelector .CTPsourceList {
+		border-radius: none !important;
+		border-top: none !important;
+		mix-blend-mode: plus-lighter !important;
+		padding: 5px !important;
+		position: relative !important;
+		z-index: 2 !important;
+	}
+
+	.CTPsourceSelector .CTPsourceItem {
+		color: white !important;
+		opacity: .45 !important;
+	}
+
+	.CTPsourceSelector .CTPsourceItem:active,
+	.CTPsourceSelector .CTPsourceItem.CTPcurrentSource {
+		opacity: 1 !important;
+	}
+
+	.CTPsourceSelector .CTPsourceItem:active {
+		text-shadow: none !important;
+	}
+
+	.CTPmediaPlayer .CTPsourceItem.CTPcurrentSource::before {
+		display: none !important;
+	}
+
+	.CTPbackgroundContainer,
+	.CTPbackground,
+	.CTPbackgroundTint {
+		position: absolute !important;
+		left: 0 !important;
+		top: 0 !important;
+		width: 100% !important;
+		height: 100% !important;
+	}
+
+	.CTPsourceSelector .CTPbackground,
+	.CTPsourceSelector .CTPbackgroundTint,
+	.CTPplaceholder .CTPbackground,
+	.CTPplaceholder .CTPbackgroundTint {
+		border-radius: 5px !important;
+	}
+
+	.CTPbackground,
+	.CTPplaceholder .CTPbackground {
+		background-color: rgba(30, 30, 30, 0.45) !important;
+		-webkit-backdrop-filter: saturate(180%) blur(20px) !important;
+	}
+
+	.CTPbackgroundTint,
+	.CTPplaceholder .CTPbackgroundTint {
+		background-color: rgb(41, 41, 41) !important;
+		mix-blend-mode: lighten !important;
+	}
+
+}

@@ -246,7 +246,7 @@ function handleBeforeLoadEvent(event) {
 	if("MutationObserver" in window) addObserver(data.elementID);
 	
 	// Fill the placeholder
-	placeholder.innerHTML = "<div class=\"CTPplaceholderContainer\"><div class=\"CTPlogoContainer CTPnodisplay\"><div class=\"CTPlogo\"></div><div class=\"CTPlogo CTPinset\"></div></div></div>";
+	placeholder.innerHTML = "<div class=\"CTPplaceholderContainer\"><div class=\"CTPlogoContainer CTPnodisplay\"><div class=\"CTPlogo\"></div><div class=\"CTPlogo CTPinset\"></div><div class=\"CTPbackgroundContainer\"><div class=\"CTPbackground\"></div><div class=\"CTPbackgroundTint\"></div></div></div></div>";
 	placeholder.firstChild.style.setProperty("opacity", settings.opacity, "important");
 	
 	// Display the badge
