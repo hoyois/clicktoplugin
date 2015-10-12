@@ -433,6 +433,7 @@ MediaPlayer.prototype.initSourceSelector = function() {
 	container.className = "CTPsourceSelector CTPhidden";
 	var list = document.createElement("div");
 	list.className = "CTPsourceList";
+	var backgroundContainer = document.createElement("div");
 	backgroundContainer.className = "CTPbackgroundContainer";
 	var background = document.createElement("div");
 	background.className = "CTPbackground";

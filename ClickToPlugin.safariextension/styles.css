@@ -598,5 +598,11 @@ Generic classes
 		background-color: rgb(41, 41, 41) !important;
 		mix-blend-mode: lighten !important;
 	}
+	
+	.CTPhidden .CTPbackgroundContainer,
+	.CTPhidden .CTPbackground,
+	.CTPhidden .CTPbackgroundTint {
+		display: none;
+	}
 
 }
