@@ -3,8 +3,8 @@ if(window.safari) {
 	var script = "var s = document.createElement('script'); s.textContent = 'if(!/[?&]html5=1/.test(location.search)){";
 	// Disable SPF
 	script += "ytspf={};Object.defineProperty(ytspf,\"enabled\",{\"value\":false});";
-	// Disable HTML5 on Safari 8+
-	if(window.MediaSource) script += "document.createElement(\"video\").constructor.prototype.canPlayType=function(){return\"\";};";
+	// Disable HTML5
+	script += "HTMLMediaElement.prototype.canPlayType=function(){return\"\";};";
 	// Disable Flash version checking...
 	// ... on /watch pages
 	script += "ytplayer={};Object.defineProperty(ytplayer,\"config\",{\"get\":function(){return ytplayer.$;},\"set\":function($){$.min_version=\"0.0.0\";ytplayer.$=$;}});";
