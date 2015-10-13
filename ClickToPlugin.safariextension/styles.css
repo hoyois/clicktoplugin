@@ -465,7 +465,34 @@ Generic classes
 	visibility: hidden !important;
 }
 
-@supports (mix-blend-mode: lighten) {
+/***************
+Safari 9+ design
+***************/
+
+.CTPbackgroundContainer {
+	display: none !important;
+}
+
+@supports(-webkit-backdrop-filter: none) {
+	
+	.CTPbackgroundContainer, .CTPbackground, .CTPbackgroundTint {
+		position: absolute !important;
+		display: block !important;
+		left: 0 !important;
+		top: 0 !important;
+		width: 100% !important;
+		height: 100% !important;
+	}
+	
+	.CTPbackground {
+		background-color: rgba(30, 30, 30, 0.45) !important;
+		-webkit-backdrop-filter: saturate(180%) blur(20px) !important;
+	}
+	
+	.CTPbackgroundTint {
+		background-color: rgb(41, 41, 41) !important;
+		mix-blend-mode: lighten !important;
+	}
 	
 	.CTPmediaPlayer .CTPtrackSelector {
 		background-image: none !important;
@@ -478,11 +505,9 @@ Generic classes
 	}
 	
 	.CTPmediaPlayer .CTPtrackList {
-		position: absolute !important;
-		bottom: 0 !important;
-		height: 25px !important;
 		font-family: -apple-system !important;
 		font-size: 11px !important;
+		height: 25px !important;
 		mix-blend-mode: plus-lighter !important;
 		opacity: .45 !important;
 		text-shadow: none !important;
@@ -511,7 +536,7 @@ Generic classes
 		border-radius: none !important;
 		border-top: none !important;
 		mix-blend-mode: plus-lighter !important;
-		padding: 2px 4px !important;
+		padding: 3px 4px !important;
 	}
 	
 	.CTPsourceSelector .CTPsourceItem {
@@ -531,25 +556,4 @@ Generic classes
 	.CTPmediaPlayer .CTPsourceItem.CTPcurrentSource::before {
 		display: none !important;
 	}
-	
-	.CTPbackgroundContainer,
-	.CTPbackground,
-	.CTPbackgroundTint {
-		position: absolute !important;
-		left: 0 !important;
-		top: 0 !important;
-		width: 100% !important;
-		height: 100% !important;
-	}
-	
-	.CTPbackground {
-		background-color: rgba(30, 30, 30, 0.45) !important;
-		-webkit-backdrop-filter: saturate(180%) blur(20px) !important;
-	}
-	
-	.CTPbackgroundTint {
-		background-color: rgb(41, 41, 41) !important;
-		mix-blend-mode: lighten !important;
-	}
-
 }

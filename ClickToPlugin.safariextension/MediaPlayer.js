@@ -433,17 +433,7 @@ MediaPlayer.prototype.initSourceSelector = function() {
 	container.className = "CTPsourceSelector CTPnodisplay";
 	var list = document.createElement("div");
 	list.className = "CTPsourceList";
-	
-	var backgroundContainer = document.createElement("div");
-	backgroundContainer.className = "CTPbackgroundContainer";
-	var background = document.createElement("div");
-	background.className = "CTPbackground";
-	var backgroundTint = document.createElement("div");
-	backgroundTint.className = "CTPbackgroundTint";
-	backgroundContainer.appendChild(background);
-	backgroundContainer.appendChild(backgroundTint);
-	container.appendChild(backgroundContainer);
-	
+	addBackgroundBlur(container);
 	container.appendChild(list);
 	
 	var append = function(name, click, url, source) {
@@ -520,17 +510,7 @@ MediaPlayer.prototype.initTrackSelector = function() {
 	container.className = "CTPtrackSelector CTPnodisplay";
 	var selector = document.createElement("select");
 	selector.className = "CTPtrackList";
-	
-	var backgroundContainer = document.createElement("div");
-	backgroundContainer.className = "CTPbackgroundContainer";
-	var background = document.createElement("div");
-	background.className = "CTPbackground";
-	var backgroundTint = document.createElement("div");
-	backgroundTint.className = "CTPbackgroundTint";
-	backgroundContainer.appendChild(background);
-	backgroundContainer.appendChild(backgroundTint);
-	container.appendChild(backgroundContainer);
-	
+	addBackgroundBlur(container);
 	container.appendChild(selector);
 	
 	var show = function() {
