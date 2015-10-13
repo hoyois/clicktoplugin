@@ -430,22 +430,22 @@ SourceSelector interface
 MediaPlayer.prototype.initSourceSelector = function() {
 	var player = this;
 	var container = document.createElement("div");
-	container.className = "CTPsourceSelector CTPhidden";
+	container.className = "CTPsourceSelector CTPnodisplay";
 	var list = document.createElement("div");
 	list.className = "CTPsourceList";
+	
 	var backgroundContainer = document.createElement("div");
 	backgroundContainer.className = "CTPbackgroundContainer";
 	var background = document.createElement("div");
 	background.className = "CTPbackground";
 	var backgroundTint = document.createElement("div");
 	backgroundTint.className = "CTPbackgroundTint";
-
 	backgroundContainer.appendChild(background);
 	backgroundContainer.appendChild(backgroundTint);
 	container.appendChild(backgroundContainer);
-
+	
 	container.appendChild(list);
-
+	
 	var append = function(name, click, url, source) {
 		var a = document.createElement("a");
 		a.className = "CTPsourceItem";
@@ -484,7 +484,7 @@ MediaPlayer.prototype.initSourceSelector = function() {
 		},
 		
 		"update": function() {
-			container.classList.add("CTPhidden");
+			container.classList.add("CTPnodisplay");
 			list.innerHTML = "";
 			var media = player.playlist[player.currentTrack];
 			if(settings.showMediaSources) {
@@ -500,7 +500,7 @@ MediaPlayer.prototype.initSourceSelector = function() {
 			if(settings.showAirPlaySource && player.currentSource !== undefined) append("AirPlay", clickAirPlay);
 			
 			// Unhide (even if it overflows)
-			if(list.childNodes.length > 0) container.classList.remove("CTPhidden");
+			if(list.childNodes.length > 0) container.classList.remove("CTPnodisplay");
 		},
 		
 		"setSource": function(i) {
@@ -517,37 +517,37 @@ TrackSelector interface
 MediaPlayer.prototype.initTrackSelector = function() {
 	var player = this;
 	var container = document.createElement("div");
-	container.className = "CTPtrackSelector CTPhidden";
+	container.className = "CTPtrackSelector CTPnodisplay";
+	var selector = document.createElement("select");
+	selector.className = "CTPtrackList";
+	
 	var backgroundContainer = document.createElement("div");
 	backgroundContainer.className = "CTPbackgroundContainer";
 	var background = document.createElement("div");
 	background.className = "CTPbackground";
 	var backgroundTint = document.createElement("div");
 	backgroundTint.className = "CTPbackgroundTint";
-	var selector = document.createElement("select");
-	selector.className = "CTPtrackList";
-
 	backgroundContainer.appendChild(background);
 	backgroundContainer.appendChild(backgroundTint);
 	container.appendChild(backgroundContainer);
-
+	
 	container.appendChild(selector);
-
+	
 	var show = function() {
 		player.shadowDOM.controlsPanel.style.display = "none";
-		container.classList.remove("CTPhidden");
+		container.classList.remove("CTPnodisplay");
 		selector.focus();
 	};
 	
 	var hide = function() {
 		player.container.focus();
-		container.classList.add("CTPhidden");
+		container.classList.add("CTPnodisplay");
 		player.shadowDOM.controlsPanel.style.removeProperty("display");
 	};
 	
 	this.trackSelector = {
 		"toggle": function() {
-			if(container.classList.contains("CTPhidden")) show();
+			if(container.classList.contains("CTPnodisplay")) show();
 			else hide();
 		},
 		"update": function() {
