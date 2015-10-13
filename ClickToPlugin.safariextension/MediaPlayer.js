@@ -433,8 +433,19 @@ MediaPlayer.prototype.initSourceSelector = function() {
 	container.className = "CTPsourceSelector CTPhidden";
 	var list = document.createElement("div");
 	list.className = "CTPsourceList";
+	var backgroundContainer = document.createElement("div");
+	backgroundContainer.className = "CTPbackgroundContainer";
+	var background = document.createElement("div");
+	background.className = "CTPbackground";
+	var backgroundTint = document.createElement("div");
+	backgroundTint.className = "CTPbackgroundTint";
+
+	backgroundContainer.appendChild(background);
+	backgroundContainer.appendChild(backgroundTint);
+	container.appendChild(backgroundContainer);
+
 	container.appendChild(list);
-	
+
 	var append = function(name, click, url, source) {
 		var a = document.createElement("a");
 		a.className = "CTPsourceItem";
@@ -507,11 +518,21 @@ MediaPlayer.prototype.initTrackSelector = function() {
 	var player = this;
 	var container = document.createElement("div");
 	container.className = "CTPtrackSelector CTPhidden";
+	var backgroundContainer = document.createElement("div");
+	backgroundContainer.className = "CTPbackgroundContainer";
+	var background = document.createElement("div");
+	background.className = "CTPbackground";
+	var backgroundTint = document.createElement("div");
+	backgroundTint.className = "CTPbackgroundTint";
 	var selector = document.createElement("select");
 	selector.className = "CTPtrackList";
-	
+
+	backgroundContainer.appendChild(background);
+	backgroundContainer.appendChild(backgroundTint);
+	container.appendChild(backgroundContainer);
+
 	container.appendChild(selector);
-	
+
 	var show = function() {
 		player.shadowDOM.controlsPanel.style.display = "none";
 		container.classList.remove("CTPhidden");
