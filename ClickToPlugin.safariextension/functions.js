@@ -40,6 +40,7 @@ function copyBoxCSS(element, target, offsetWidth, offsetHeight) {
 }
 
 function addBackgroundBlur(element) {
+	if(!window.CSS || !window.CSS.supports("-webkit-backdrop-filter", "none")) return;
 	var backgroundContainer = document.createElement("div");
 	backgroundContainer.className = "CTPbackgroundContainer";
 	var background = document.createElement("div");

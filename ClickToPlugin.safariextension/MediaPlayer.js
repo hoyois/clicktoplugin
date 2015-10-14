@@ -216,7 +216,7 @@ MediaPlayer.prototype.load = function(track, source, updatePoster) {
 
 MediaPlayer.prototype.updatePoster = function() {
 	if(!this.playlist[this.currentTrack].poster) return;
-	if(this.playlist[this.currentTrack].sources[this.currentSource].isAudio) {
+	if(this.audioOnly) {
 		this.container.style.setProperty("background-image", "url('" + this.playlist[this.currentTrack].poster + "')", "important");
 	} else {
 		this.mediaElement.poster = this.playlist[this.currentTrack].poster;
@@ -358,17 +358,6 @@ MediaPlayer.prototype.addEventListener = function(type, handler) {
 			handler(event);
 		}, false);
 	}
-};
-
-MediaPlayer.prototype.getCoordinates = function(event) {
-	var x = event.offsetX, y = event.offsetY;
-	var e = event.target;
-	do {
-		if(e === this.container) break;
-		x += e.offsetLeft;
-		y += e.offsetTop;
-	} while(e = e.offsetParent);
-	return {"x": x, "y": y};
 };
 
 /******************

@@ -469,10 +469,6 @@ Generic classes
 Safari 9+ design
 ***************/
 
-.CTPbackgroundContainer {
-	display: none !important;
-}
-
 @supports(-webkit-backdrop-filter: none) {
 	
 	.CTPbackgroundContainer, .CTPbackground, .CTPbackgroundTint {
