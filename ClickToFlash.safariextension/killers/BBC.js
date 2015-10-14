@@ -30,30 +30,24 @@ addKiller("BBC", {
 		}
 		
 		var xhr = new XMLHttpRequest();
-		xhr.open("GET", "http://open.live.bbc.co.uk/mediaselector/4/jsfunc/stream/" + mediator.getAttribute("identifier") + "/processJSON/", true);
-		// Can also use /mtis instead of /jsfunc to get an XML response; JSON should be marginally faster
+		xhr.open("GET", "http://open.live.bbc.co.uk/mediaselector/5/select/version/2.0/mediaset/journalism-http-tablet/vpid/" + mediator.getAttribute("identifier") + "/format/json/", true);
+		// Can also use /xml instead of /json to get an XML response; JSON should be marginally faster
 		xhr.addEventListener("load", function() {
-			var processJSON = function(data) {
-				if(data.result !== "ok") return;
-				
-				var sources = [];
-				data.media.forEach(function(media) {
-					var connection = media.connection[0];
-					if(!connection || connection.protocol !== "http" || !connection.href) return;
-					sources.unshift({
-						"url": connection.href,
-						"format":  media.bitrate + "k MP4",
-						"height": parseInt(media.height),
-						"isNative": true
-					});
+			var data = JSON.parse(xhr.responseText);
+			var sources = [];
+			data.media.forEach(function(media) {
+				var connection = media.connection[0];
+				if(!connection || connection.protocol !== "http" || !connection.href) return;
+				sources.unshift({
+					"url": connection.href,
+					"format":  media.bitrate + "k MP4",
+					"height": parseInt(media.height),
+					"isNative": true
 				});
-				if(sources.length === 0) return;
-				track.sources = sources;
-				callback({"playlist": [track]});
-			};
-			
-			eval(xhr.responseText);
-			
+			});
+			if(sources.length === 0) return;
+			track.sources = sources;
+			callback({"playlist": [track]});
 		}, false);
 		xhr.send(null);
 	}, false);

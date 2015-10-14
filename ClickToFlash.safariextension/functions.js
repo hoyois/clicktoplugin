@@ -39,6 +39,19 @@ function copyBoxCSS(element, target, offsetWidth, offsetHeight) {
 	applyCSS(target, style, properties);
 }
 
+function addBackgroundBlur(element) {
+	if(!window.CSS || !window.CSS.supports("-webkit-backdrop-filter", "none")) return;
+	var backgroundContainer = document.createElement("div");
+	backgroundContainer.className = "CTPbackgroundContainer";
+	var background = document.createElement("div");
+	background.className = "CTPbackground";
+	var backgroundTint = document.createElement("div");
+	backgroundTint.className = "CTPbackgroundTint";
+	backgroundContainer.appendChild(background);
+	backgroundContainer.appendChild(backgroundTint);
+	element.appendChild(backgroundContainer);
+}
+
 function placeInStack(node) {
 	if(stack === undefined) {
 		stack = document.createElement("div");

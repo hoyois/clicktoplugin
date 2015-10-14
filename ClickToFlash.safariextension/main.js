@@ -259,6 +259,7 @@ function loadPlugin(elementID) {
 		_[elementID].element.allowedToLoad = true;
 		_[elementID].element.classList.remove("CTPnodisplay");
 		_[elementID].placeholder.parentNode.replaceChild(_[elementID].element, _[elementID].placeholder);
+		if(_[elementID].observer) _[elementID].observer.disconnect();
 		delete _[elementID];
 	}
 }
@@ -266,6 +267,7 @@ function loadPlugin(elementID) {
 function hidePlugin(elementID) {
 	if(_[elementID].placeholder.parentNode) {
 		removeHTMLNode(_[elementID].placeholder);
+		if(_[elementID].observer) _[elementID].observer.disconnect();
 		delete _[elementID];
 	}
 }
@@ -275,7 +277,7 @@ function restorePlugin(elementID) {
 	loadPlugin(elementID);
 }
 
-function loadAll() {	
+function loadAll() {
 	for(var i in _) loadPlugin(i);
 }
 
@@ -388,7 +390,7 @@ function displayBadge(elementID, label, async) {
 function clickPlaceholder(elementID) {
 	if(_[elementID].player && _[elementID].player.currentSource !== undefined) {
 		switch(settings.defaultPlayer) {
-		case "html5": 
+		case "html5":
 			loadMedia(elementID, true);
 			break;
 		case "qtp":

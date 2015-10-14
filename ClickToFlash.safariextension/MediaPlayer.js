@@ -216,7 +216,7 @@ MediaPlayer.prototype.load = function(track, source, updatePoster) {
 
 MediaPlayer.prototype.updatePoster = function() {
 	if(!this.playlist[this.currentTrack].poster) return;
-	if(this.playlist[this.currentTrack].sources[this.currentSource].isAudio) {
+	if(this.audioOnly) {
 		this.container.style.setProperty("background-image", "url('" + this.playlist[this.currentTrack].poster + "')", "important");
 	} else {
 		this.mediaElement.poster = this.playlist[this.currentTrack].poster;
@@ -360,17 +360,6 @@ MediaPlayer.prototype.addEventListener = function(type, handler) {
 	}
 };
 
-MediaPlayer.prototype.getCoordinates = function(event) {
-	var x = event.offsetX, y = event.offsetY;
-	var e = event.target;
-	do {
-		if(e === this.container) break;
-		x += e.offsetLeft;
-		y += e.offsetTop;
-	} while(e = e.offsetParent);
-	return {"x": x, "y": y};
-};
-
 /******************
 ShadowDOM interface
 ******************/
@@ -430,9 +419,10 @@ SourceSelector interface
 MediaPlayer.prototype.initSourceSelector = function() {
 	var player = this;
 	var container = document.createElement("div");
-	container.className = "CTPsourceSelector CTPhidden";
+	container.className = "CTPsourceSelector CTPnodisplay";
 	var list = document.createElement("div");
 	list.className = "CTPsourceList";
+	addBackgroundBlur(container);
 	container.appendChild(list);
 	
 	var append = function(name, click, url, source) {
@@ -473,7 +463,7 @@ MediaPlayer.prototype.initSourceSelector = function() {
 		},
 		
 		"update": function() {
-			container.classList.add("CTPhidden");
+			container.classList.add("CTPnodisplay");
 			list.innerHTML = "";
 			var media = player.playlist[player.currentTrack];
 			if(settings.showMediaSources) {
@@ -489,7 +479,7 @@ MediaPlayer.prototype.initSourceSelector = function() {
 			if(settings.showAirPlaySource && player.currentSource !== undefined) append("AirPlay", clickAirPlay);
 			
 			// Unhide (even if it overflows)
-			if(list.childNodes.length > 0) container.classList.remove("CTPhidden");
+			if(list.childNodes.length > 0) container.classList.remove("CTPnodisplay");
 		},
 		
 		"setSource": function(i) {
@@ -506,27 +496,27 @@ TrackSelector interface
 MediaPlayer.prototype.initTrackSelector = function() {
 	var player = this;
 	var container = document.createElement("div");
-	container.className = "CTPtrackSelector CTPhidden";
+	container.className = "CTPtrackSelector CTPnodisplay";
 	var selector = document.createElement("select");
 	selector.className = "CTPtrackList";
-	
+	addBackgroundBlur(container);
 	container.appendChild(selector);
 	
 	var show = function() {
 		player.shadowDOM.controlsPanel.style.display = "none";
-		container.classList.remove("CTPhidden");
+		container.classList.remove("CTPnodisplay");
 		selector.focus();
 	};
 	
 	var hide = function() {
 		player.container.focus();
-		container.classList.add("CTPhidden");
+		container.classList.add("CTPnodisplay");
 		player.shadowDOM.controlsPanel.style.removeProperty("display");
 	};
 	
 	this.trackSelector = {
 		"toggle": function() {
-			if(container.classList.contains("CTPhidden")) show();
+			if(container.classList.contains("CTPnodisplay")) show();
 			else hide();
 		},
 		"update": function() {

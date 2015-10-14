@@ -3,14 +3,14 @@
 if(settings.version === undefined) {
 	openTab(safari.extension.baseURI + "settings.html");
 }
-if(settings.version < 83) {
+if(settings.version < 84) {
 	var tmpArray = [];
 	for(var i = 0; i < settings.killers.length; i++) {
-		if(settings.killers[i] !== "killers/NYTimes.js") tmpArray.push(settings.killers[i]);
+		if(settings.killers[i] !== "killers/Blip.js" && settings.killers[i] !== "killers/Metacafe.js") tmpArray.push(settings.killers[i]);
 	}
 	settings.killers = tmpArray;
 }
-settings.version = 83;
+settings.version = 84;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);
