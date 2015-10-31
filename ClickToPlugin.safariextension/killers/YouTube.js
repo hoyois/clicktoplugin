@@ -4,7 +4,7 @@ if(window.safari) {
 	// Disable SPF
 	script += "ytspf={};Object.defineProperty(ytspf,\"enabled\",{\"value\":false});";
 	// Disable HTML5
-	script += "HTMLMediaElement.prototype.canPlayType=function(){return\"\";};";
+	script += "HTMLMediaElement.prototype.canPlayType=function(){return\"\";};HTMLMediaElement.prototype.nativePlay=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){if(this.className===\"CTPmediaElement\")this.nativePlay();else{this.removeAttribute(\"src\");this.load();}};";
 	// Disable Flash version checking...
 	// ... on /watch pages
 	script += "ytplayer={};Object.defineProperty(ytplayer,\"config\",{\"get\":function(){return ytplayer.$;},\"set\":function($){$.min_version=\"0.0.0\";ytplayer.$=$;}});";
@@ -67,12 +67,11 @@ addKiller("YouTube", {
 		} else startTime = parseInt(flashvars.start);
 	}
 	
-	var _this = this;
 	var mainCallback = function(mediaData) {
 		mediaData.startTime = startTime;
 		if(onsite) {
-			mediaData.initScript = _this.initScript;
-			mediaData.restoreScript = _this.restoreScript;
+			mediaData.initScript = "try{var _this=this;var seekTo=function(time){var seek=function(){_this.removeEventListener(\"loadeddata\",seek,false);_this.play();_this.currentTime=time;};if(_this.readyState>=_this.HAVE_CURRENT_DATA)seek();else{_this.preload=\"auto\";_this.addEventListener(\"loadeddata\",seek,false);}_this.parentNode.focus();};window.yt=window.yt||{};yt.www=yt.www||{};yt.www.watch=yt.www.watch||{};yt.www.watch.player=yt.www.watch.player||{};yt.www.watch.player.flashSeekTo=yt.www.watch.player.seekTo;Object.defineProperty(yt.www.watch.player,\"seekTo\",{\"get\":function(){return seekTo;},\"set\":function(x){yt.www.watch.player.flashSeekTo=x;},\"enumerable\":false,\"configurable\":false});}catch(e){}";
+			mediaData.restoreScript = "try{var player={\"seekTo\":yt.www.watch.player.flashSeekTo};for(var e in yt.www.watch.player){if(e!==\"flashSeekTo\")player[e]=yt.www.watch.player[e];}yt.www.watch.player=player;}catch(e){}";
 		}
 		callback(mediaData);
 	};
@@ -293,38 +292,6 @@ addKiller("YouTube", {
 	};
 	
 	loadPlaylist();
-},
-
-"initScript": "\
-	try{\
-		var _this = this;\
-		var seekTo = function(time) {\
-			var seek = function() {\
-				_this.removeEventListener(\"loadeddata\", seek, false);\
-				_this.currentTime = time;\
-				_this.play();\
-			};\
-			if(_this.readyState >= _this.HAVE_CURRENT_DATA) {\
-				_this.pause();\
-				seek();\
-			} else {\
-				_this.preload = \"auto\";\
-				_this.addEventListener(\"loadeddata\", seek, false);\
-			}\
-			_this.parentNode.focus();\
-		};\
-		window.yt = window.yt || {}; yt.www = yt.www || {}; yt.www.watch = yt.www.watch || {}; yt.www.watch.player = yt.www.watch.player || {};\
-		yt.www.watch.player.flashSeekTo = yt.www.watch.player.seekTo;\
-		Object.defineProperty(yt.www.watch.player, \"seekTo\", {\"get\": function() {return seekTo;}, \"set\": function(x) {yt.www.watch.player.flashSeekTo = x;}, \"configurable\": false, \"enumerable\": false});\
-	} catch(e) {}",
-
-"restoreScript": "\
-	try{\
-		var player = {\"seekTo\": yt.www.watch.player.flashSeekTo};\
-		for(var e in yt.www.watch.player) {\
-			if(e !== \"flashSeekTo\") player[e] = yt.www.watch.player[e];\
-		}\
-		yt.www.watch.player = player;\
-	} catch(e) {}"
+}
 
 });
