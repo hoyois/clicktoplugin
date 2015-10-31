@@ -40,6 +40,7 @@ MediaPlayer.prototype.airplay = function(source) {
 };
 
 MediaPlayer.prototype.viewOnSite = function() {
+	if(this.mediaElement) this.mediaElement.pause();
 	safari.self.tab.dispatchMessage("openTab", this.playlist[this.currentTrack].siteInfo.url);
 };
 

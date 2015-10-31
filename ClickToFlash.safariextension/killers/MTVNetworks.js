@@ -12,7 +12,7 @@ addKiller("MTVNetworks", {
 	"arc:episode:southpark.nl:": "2",
 	"arc:video:comedycentral.com:": "",
 	"arc:playlist:comedycentral.com:": "9",
-	"arc:episode:comedycentral.com:": "3",
+	"arc:episode:comedycentral.com:": "4",
 	"arc:promo:tosh.comedycentral.com:": "",
 	"arc:video:tosh.comedycentral.com:": "",
 	"arc:episode:tosh.comedycentral.com:": "2"//
@@ -44,10 +44,18 @@ addKiller("MTVNetworks", {
 			_this.processMGID(mgid, callback);
 		}, false);
 		xhr.send(null);
+	} else if(/adbridge/.test(data.src) && /^https?:\/\/www\.cc\.com/.test(data.location)) {
+		var _this = this;
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", data.location, true);
+		xhr.addEventListener("load", function() {
+			var mgid = /data-mgid=\"(mgid:([^.]*[.\w]+:)[-\w]+)/.exec(xhr.responseText);
+			if(mgid) _this.processMGID([mgid[1], mgid[2]], callback);
+		}, false);
+		xhr.send(null);
 	} else {
 		var mgid = /mgid:([^.]*[.\w]+:)[-\w]+/.exec(data.src);
-		if(!mgid) return;
-		this.processMGID(mgid, callback);
+		if(mgid) this.processMGID(mgid, callback);
 	}
 },
 
