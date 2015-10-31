@@ -10,7 +10,7 @@ if(settings.version < 84) {
 	}
 	settings.killers = tmpArray;
 }
-settings.version = 85;
+settings.version = 86;
 
 // LOCALIZATION
 localize(GLOBAL_STRINGS, settings.language);

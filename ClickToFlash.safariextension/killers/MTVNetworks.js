@@ -44,18 +44,19 @@ addKiller("MTVNetworks", {
 			_this.processMGID(mgid, callback);
 		}, false);
 		xhr.send(null);
-	} else if(/adbridge/.test(data.src) && /^https?:\/\/www\.cc\.com/.test(data.location)) {
-		var _this = this;
-		var xhr = new XMLHttpRequest();
-		xhr.open("GET", data.location, true);
-		xhr.addEventListener("load", function() {
-			var mgid = /data-mgid=\"(mgid:([^.]*[.\w]+:)[-\w]+)/.exec(xhr.responseText);
-			if(mgid) _this.processMGID([mgid[1], mgid[2]], callback);
-		}, false);
-		xhr.send(null);
 	} else {
 		var mgid = /mgid:([^.]*[.\w]+:)[-\w]+/.exec(data.src);
 		if(mgid) this.processMGID(mgid, callback);
+		else if(/^https?:\/\/www\.cc\.com/.test(data.location)) {
+			var _this = this;
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", data.location, true);
+			xhr.addEventListener("load", function() {
+				var mgid = /data-mgid=\"(mgid:([^.]*[.\w]+:)[-\w]+)/.exec(xhr.responseText);
+				if(mgid) _this.processMGID([mgid[1], mgid[2]], callback);
+			}, false);
+			xhr.send(null);
+		}
 	}
 },
 
