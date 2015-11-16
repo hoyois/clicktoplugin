@@ -195,7 +195,7 @@ addKiller("YouTube", {
 		xhr2.open("GET", "https:" + match[1].replace(/\\/g, ""), true);
 		xhr2.addEventListener("load", function() {
 			// Crude JS parsing
-			var match = /function [$_A-Za-z0-9]+\(a\)\{a=a(?:\.split|\[[$_A-Za-z0-9]+\])\(\"\"\);([^"]*)/.exec(xhr2.responseText);
+			var match = /function[ $_A-Za-z0-9]*\(a\)\{a=a(?:\.split|\[[$_A-Za-z0-9]+\])\(\"\"\);([^"]*)/.exec(xhr2.responseText);
 			var index = xhr2.responseText.indexOf(";var " + /^[$_A-Za-z0-9]+/.exec(match[1])[0] + "=\{");
 			var x = xhr2.responseText.substring(index);
 			var a, tmp, n, r, s, regex = /([$_A-Za-z0-9]+):|reverse|splice/g;
