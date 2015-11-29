@@ -73,6 +73,7 @@ width
 	visibility: inherit !important; /* not default */
 	white-space: nowrap !important; /* not default */
 	word-spacing: normal !important;
+	word-wrap: normal !important;
 	z-index: auto !important;
 }
 
